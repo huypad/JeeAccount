@@ -52,7 +52,7 @@ namespace JeeAccount
             //Configuration["KafkaConfig:username"] = KafkaUser;
             //Configuration["KafkaConfig:password"] = KafkaPassword;
             // add Kafka
-            services.addKafkaService();
+            // services.addKafkaService();
 
             services.AddCors(o => o.AddPolicy("AllowOrigin", builder =>
             {
