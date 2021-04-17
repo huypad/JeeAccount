@@ -1,0 +1,48 @@
+<div class="gridster-container">
+  <gridster [options]="options">
+    <gridster-item [item]="widget" *ngFor="let widget of dashboard">
+      <div class=" widget-header" (mouseover)="getShowSetting(widget.id, true)"
+        (mouseout)="getShowSetting(widget.id, false)">
+        <div class="drag-handler widget-header-child widget-header-title">
+          {{widget.name}}
+        </div>
+        <div *ngIf="widget.id == 1" class="widget-header-child widget-header-right">
+          <button mat-icon-button type="button" (click)="closeWidget(widget.id)">
+            <span class="material-icons" style="font-size: 1.8rem;"> close </span>
+          </button>
+        </div>
+        <div *ngIf="widget.id == 3" class="widget-header-child widget-header-right">
+          <button [hidden]="!showSetting[widget.id]" mat-icon-button type="button" (click)="closeWidget(widget.id)">
+            <span class="material-icons" style="font-size: 1.8rem;"> close </span>
+          </button>
+        </div>
+        <div *ngIf="widget.id == 4" class="widget-header-child widget-header-right">
+          <button [hidden]="!showSetting[widget.id]" mat-icon-button type="button" (click)="closeWidget(widget.id)">
+            <span class="material-icons" style="font-size: 1.8rem;"> close </span>
+          </button>
+        </div>
+        <div *ngIf="widget.id == 5" class="widget-header-child widget-header-right">
+          <button [hidden]="!showSetting[widget.id]" mat-icon-button type="button" (click)="closeWidget(widget.id)">
+            <span class="material-icons" style="font-size: 1.8rem;"> close </span>
+          </button>
+        </div>
+        <div *ngIf="widget.id == 6" class="widget-header-child widget-header-right">
+          <button [hidden]="!showSetting[widget.id]" mat-icon-button type="button" (click)="closeWidget(widget.id)">
+            <span class="material-icons" style="font-size: 1.8rem;"> close </span>
+          </button>
+        </div>
+      </div>
+      <div class="gridster-item-content" style="height: 100%">
+        <ndc-dynamic [ndcDynamicComponent]="widget.componentType" [ndcDynamicInputs]="getInput(widget)"
+          [ndcDynamicOutputs]="outputs"></ndc-dynamic>
+      </div>
+    </gridster-item>
+    <div id="button-edit-widget">
+      <div class="example-flex-container">
+        <button (click)="AddCloseWidget()" mat-mini-fab matTooltip="Thêm widget">
+          <mat-icon style="margin-top: 4px;">add</mat-icon>
+        </button>
+      </div>
+    </div>
+  </gridster>
+</div>

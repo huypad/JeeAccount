@@ -1,0 +1,412 @@
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700|Roboto:300,400,500,600,700');
+// Global vendors
+@import '~bootstrap/dist/css/bootstrap.css';
+// => Material
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+@import '~highlight.js/styles/googlecode.css';
+@import '~perfect-scrollbar/css/perfect-scrollbar.css';
+
+// Global fonts
+@import '~socicon/css/socicon.css';
+@import '~@fortawesome/fontawesome-free/css/all.min.css';
+@import './assets/plugins/flaticon/flaticon.css';
+@import './assets/plugins/flaticon2/flaticon.css';
+@import './assets/plugins/keenthemes-icons/font/ki.css';
+
+// Metronic styles (replace these path when using RTL css below)
+@import './assets/sass/style.angular.scss';
+
+// For RTL, check this documentation https://keenthemes.com/metronic/?page=docs&section=angular-rtl
+// @import "./assets/sass/style.angular.rtl.css";
+
+// Default Layout themes
+@import './assets/sass/themes/layout/header/base/light.scss';
+@import './assets/sass/themes/layout/header/menu/light.scss';
+@import './assets/sass/themes/layout/brand/dark.scss';
+@import './assets/sass/themes/layout/aside/dark.scss';
+
+// Header themes
+.header-base-light {
+  @import './assets/sass/themes/layout/header/base/light.scss';
+}
+
+.header-base-dark {
+  @import './assets/sass/themes/layout/header/base/dark.scss';
+}
+
+// Header Menu themes
+.header-menu-light {
+  @import './assets/sass/themes/layout/header/menu/light.scss';
+}
+.header-menu-dark {
+  @import './assets/sass/themes/layout/header/menu/dark.scss';
+}
+
+// Brand themes
+.brand-dark {
+  @import './assets/sass/themes/layout/brand/dark.scss';
+}
+
+.brand-light {
+  @import './assets/sass/themes/layout/brand/light.scss';
+}
+
+// Aside themes
+.aside-dark {
+  @import './assets/sass/themes/layout/aside/dark.scss';
+}
+
+.aside-light {
+  @import './assets/sass/themes/layout/aside/light.scss';
+}
+
+// hide bootstrap dropdown arrow globally
+.dropdown-toggle::after {
+  display: none !important;
+}
+
+.angular-bootstrap-table {
+  overflow-x: auto;
+}
+.angular-bootstrap-table {
+  th {
+    outline: none;
+
+    &.sortable {
+      .svg-icon-sort {
+        opacity: 0;
+      }
+
+      &:hover {
+        cursor: pointer;
+
+        .svg-icon-sort {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  .table.table-head-custom thead th.sortable-active {
+    color: $primary !important;
+  }
+}
+
+.cursor-default {
+  cursor: default !important;
+}
+
+.progress-modal {
+  height: 3px;
+  width: 100%;
+}
+
+/*font-family*/
+body,
+html {
+  font-family: Roboto, Arial, Helvetica, sans-serif !important;
+}
+/*font-family*/
+
+/*--- Dùng để show hide waiting div*/
+
+.nemo-process-waiting {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: grey;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  cursor: wait;
+  opacity: 0.3;
+}
+
+.nemo-process-waiting-loader {
+  position: fixed;
+  top: 45%;
+  left: 50%;
+  z-index: 10000;
+  cursor: wait;
+}
+
+.nemo-show-wait {
+  display: block;
+}
+
+.nemo-hide-wait {
+  display: none;
+}
+
+.pulse-loader:not(:required) {
+  width: 50px;
+  height: 50px;
+  -moz-animation: pulse-loader 0.7s linear infinite alternate;
+  -webkit-animation: pulse-loader 0.7s linear infinite alternate;
+  animation: pulse-loader 0.7s linear infinite alternate;
+  border: 0px solid #ae35e6ec;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+  overflow: hidden;
+  text-indent: 50px;
+}
+@-moz-keyframes pulse-loader {
+  0% {
+    -moz-box-shadow: #ae35e6ec 0 0 0px 20px;
+    box-shadow: #ae35e6ec 0 0 0px 20px;
+  }
+
+  40% {
+    -moz-box-shadow: none;
+    box-shadow: none;
+  }
+
+  100% {
+    -moz-box-shadow: #ae35e6ec 0 0 0px 25px inset;
+    box-shadow: #ae35e6ec 0 0 0px 25px inset;
+  }
+}
+
+@-webkit-keyframes pulse-loader {
+  0% {
+    -webkit-box-shadow: #ae35e6ec 0 0 0px 20px;
+    box-shadow: #ae35e6ec 0 0 0px 20px;
+  }
+
+  40% {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
+
+  100% {
+    -webkit-box-shadow: #ae35e6ec 0 0 0px 25px inset;
+    box-shadow: #ae35e6ec 0 0 0px 25px inset;
+  }
+}
+
+@keyframes pulse-loader {
+  0% {
+    -moz-box-shadow: #ae35e6ec 0 0 0px 20px;
+    -webkit-box-shadow: #ae35e6ec 0 0 0px 20px;
+    box-shadow: #ae35e6ec 0 0 0px 20px;
+  }
+
+  40% {
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
+
+  100% {
+    -moz-box-shadow: #ae35e6ec 0 0 0px 25px inset;
+    -webkit-box-shadow: #ae35e6ec 0 0 0px 25px inset;
+    box-shadow: #ae35e6ec 0 0 0px 25px inset;
+  }
+}
+
+/*Kết thúc waiting*/
+
+/* content  */
+.main_center {
+  background-color: #ffffff;
+  height: 100%;
+}
+
+//==============================STYLE SCROLL BAR creator: DuLam=======================
+/*
+ * Scrollbar rail styles
+ */
+.ps {
+  overflow: hidden !important;
+  overflow-anchor: none;
+  -ms-overflow-style: none;
+  touch-action: auto;
+  -ms-touch-action: auto;
+}
+.ps__rail-x {
+  display: none;
+  opacity: 0;
+  transition: background-color 0.2s linear, opacity 0.2s linear;
+  -webkit-transition: background-color 0.2s linear, opacity 0.2s linear;
+  height: 15px;
+  /* there must be 'bottom' or 'top' for ps__rail-x */
+  bottom: 0px;
+  /* please don't change 'position' */
+  position: absolute;
+}
+
+.ps__rail-y {
+  display: none;
+  opacity: 0;
+  transition: background-color 0.2s linear, opacity 0.2s linear;
+  -webkit-transition: background-color 0.2s linear, opacity 0.2s linear;
+  width: 15px;
+  /* there must be 'right' or 'left' for ps__rail-y */
+  right: 0;
+  /* please don't change 'position' */
+  position: absolute;
+}
+
+.ps--active-x > .ps__rail-x,
+.ps--active-y > .ps__rail-y {
+  display: block;
+  background-color: transparent;
+}
+
+.ps:hover > .ps__rail-x,
+.ps:hover > .ps__rail-y,
+.ps--focus > .ps__rail-x,
+.ps--focus > .ps__rail-y,
+.ps--scrolling-x > .ps__rail-x,
+.ps--scrolling-y > .ps__rail-y {
+  opacity: 0.6;
+}
+
+.ps .ps__rail-x:hover,
+.ps .ps__rail-y:hover,
+.ps .ps__rail-x:focus,
+.ps .ps__rail-y:focus,
+.ps .ps__rail-x.ps--clicking,
+.ps .ps__rail-y.ps--clicking {
+  background-color: #eee;
+  opacity: 0.9;
+}
+
+/*
+   * Scrollbar thumb styles
+   */
+.ps__thumb-x {
+  background-color: #aaa;
+  border-radius: 6px;
+  transition: background-color 0.2s linear, height 0.2s ease-in-out;
+  -webkit-transition: background-color 0.2s linear, height 0.2s ease-in-out;
+  height: 6px;
+  /* there must be 'bottom' for ps__thumb-x */
+  bottom: 2px;
+  /* please don't change 'position' */
+  position: absolute;
+}
+
+.ps__thumb-y {
+  background-color: #aaa;
+  border-radius: 6px;
+  transition: background-color 0.2s linear, width 0.2s ease-in-out;
+  -webkit-transition: background-color 0.2s linear, width 0.2s ease-in-out;
+  width: 6px;
+  /* there must be 'right' for ps__thumb-y */
+  right: 2px;
+  /* please don't change 'position' */
+  position: absolute;
+}
+
+.ps__rail-x:hover > .ps__thumb-x,
+.ps__rail-x:focus > .ps__thumb-x,
+.ps__rail-x.ps--clicking .ps__thumb-x {
+  background-color: #999;
+  height: 11px;
+}
+
+.ps__rail-y:hover > .ps__thumb-y,
+.ps__rail-y:focus > .ps__thumb-y,
+.ps__rail-y.ps--clicking .ps__thumb-y {
+  background-color: #999;
+  width: 11px;
+}
+//==============================END SCROLL BAR=======================
+//=================Kích thước thanh scroll==============
+@media only screen and (min-width: 1028px) {
+  ::-webkit-scrollbar {
+    width: 5px;
+    opacity: 0;
+    height: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
+  }
+
+  //===========Css mat-menu========================
+  .mat-menu-panel {
+    min-height: 0 !important;
+  }
+  .mat-menu-item {
+    line-height: 10px !important;
+    height: 30px !important;
+  }
+  .mat-menu-content {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  // PHONG CODE THÊM STYLE JEEHR
+  // QUY ĐỊNH CHUNG THIẾT KẾ (10/04/2021)
+  /* Textbox thông tin*/
+  .textbox-info-title {
+    font-family: 'Roboto';
+    font-size: 9px;
+    padding-bottom: 5px;
+    padding-left: 0px;
+    padding-top: 0px;
+  }
+
+  .textbox-info-value {
+    font-family: 'Roboto';
+    font-size: 12px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 0px;
+  }
+
+  .textbox-date {
+    color: #808080;
+    padding-top: 10px;
+    padding-bottom: 9px;
+    padding-right: 6px;
+  }
+}
+
+// PHONG CODE THÊM STYLE JEEHR
+// QUY ĐỊNH CHUNG THIẾT KẾ (10/04/2021)
+/* Grid danh sách titlte*/
+.jee-card-title-label {
+  font-family: 'Roboto';
+  font-size: 14px;
+  text-transform: uppercase;
+  padding-bottom: 20px;
+  padding-left: 20px;
+}
+
+/* Textbox thông tin*/
+.textbox-info-title {
+  font-family: 'Roboto';
+  font-size: 9px;
+  padding-bottom: 5px;
+  padding-left: 0px;
+  padding-top: 0px;
+}
+
+.textbox-info-value {
+  font-family: 'Roboto';
+  font-size: 12px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 0px;
+}
+
+.textbox-date {
+  color: #808080;
+  padding-top: 10px;
+  padding-bottom: 9px;
+  padding-right: 6px;
+}
+// End JEE

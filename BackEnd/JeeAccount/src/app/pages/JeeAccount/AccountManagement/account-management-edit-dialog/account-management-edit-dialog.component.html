@@ -1,0 +1,129 @@
+<div class="m-portlet">
+  <div class="m-portlet__head">
+    <div class="m-portlet__head-caption">
+      <div class="m-portlet__head-title">
+        <div class="row" style="height: 24px; display: inline" >
+          <h3 class="m-portlet__head-text">
+            Thêm mới tài khoản sử dụng
+            <button style ="float: right; margin: 0" type="button" class="btn jee-btn btn-themmoi-blue" (click)="onSubmit()">Thêm</button>
+            <button style ="float: right; margin: 0; margin-right: 12px" type="button" class="btn jee-btn btn-quaylai" (click)="goBack()">Đóng</button>
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="m-form m-form--fit m-form--label-align-right m-form--group-seperator-dashed">
+    <div class="m-portlet__body">
+      <form [formGroup]="itemForm" class="m-form m-form--group-seperator-dashed">
+        <div class="m-form__section m-form__section--first">
+          <div class="row m-form__group">
+            <div class="col-6 m--margin-bottom-10-mobile">
+              <div class="row">
+                <div class="col-md-8 m--margin-bottom-10-mobile">
+                  <mat-form-field class="mat-form-field-fluid">
+                    <input formControlName="AnhDaiDien" placeholder="Ảnh đại diện" matInput readonly>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-4 m--margin-bottom-5-mobile">
+                  <input style="display: none;" accept="image/jpg, image/jpeg, image/png" formControlName="file"
+                         id="file" type="file" class="form-control" (change)="onFileChange($event)"
+                         #hiddenfileinput>
+                  <button type="button" class="btn jee-btn btn-themmoi-blue" (click)="hiddenfileinput.click()">Browse</button>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 m--margin-bottom-10-mobile">
+                  <mat-form-field class="mat-form-field-fluid">
+                    <input class="require" formControlName="HoTen" placeholder="Họ và tên" matInput required>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 m--margin-bottom-10-mobile">
+                  <mat-form-field class="mat-form-field-fluid">
+                    <input class="require" formControlName="Email" placeholder="Email" matInput required>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 m--margin-bottom-10-mobile">
+                  <mat-form-field class="mat-form-field-fluid">
+                    <mat-select formControlName="PhongBan" placeholder="Phòng ban"  #singleSelect>
+                      <mat-option>
+                        <ngx-mat-select-search noEntriesFoundLabel="Không tìm thấy" placeholderLabel="Thêm quản phòng ban" formControlName="PhongBanFilterCtrl"></ngx-mat-select-search>
+                      </mat-option>
+                      <mat-option *ngFor="let phongban of filterPhongBans | async" [value]="phongban.RowID">
+                        {{phongban.DeparmentName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 m--margin-bottom-10-mobile">
+                  <mat-form-field class="mat-form-field-fluid">
+                    <span matPrefix style=" color: #760b0b;">{{CompanyCode}}.</span>
+                    <input class="require" formControlName="TenDangNhap" placeholder="Tên đăng nhập" matInput required>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 m--margin-bottom-10-mobile">
+                  <mat-form-field class="mat-form-field-fluid">
+                    <input type="password" class="require" formControlName="MatKhau" placeholder="Mật khẩu" matInput
+                      required>
+                  </mat-form-field>
+                </div>
+              </div>
+              <!-- ================== -->
+            </div>
+            <div class="col-6 m--margin-bottom-10-mobile">
+              <div class="row" >
+                <div class="col-md-12 m--margin-bottom-10-mobile">
+                    <img [src]="imgFile" style="width:87px; height:117px">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 m--margin-bottom-10-mobile">
+                  <mat-form-field class="mat-form-field-fluid">
+                    <input class="require" formControlName="SoDienThoai" placeholder="Số điện thoại" matInput required>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 m--margin-bottom-10-mobile">
+                  <mat-form-field class="mat-form-field-fluid">
+                    <input class="require" formControlName="ChucVu" placeholder="Chức vụ" matInput required>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row" style="margin-top: 53px">
+                <div class="col-md-12 m--margin-bottom-10-mobile">
+                  <mat-form-field class="mat-form-field-fluid">
+                    <input type="password" class="require" formControlName="NhapLaiMatKhau"
+                      placeholder="Nhập lại mật khẩu" matInput required>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row m-form__group">
+            <div class="col-12 m--margin-bottom-10-mobile">
+              <div style="padding-left: 12.5px;" class="row m--margin-bottom-10-mobile">
+                <span>Ứng dụng được sử dụng</span>
+              </div>
+              <div style="padding-left: 12.5px;" class="row m--margin-bottom-10-mobile">
+                <label formArrayName="AppsCheckbox" *ngFor="let app of AppsFromArray.controls; let i = index">
+                  <input type="checkbox" [formControlName]="i" >
+                  {{listApp[i].AppName}} &nbsp; &nbsp;
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="m-portlet__foot m-portlet__no-border m-portlet__foot--fit text-right">
+    </div>
+  </div>
+</div>
