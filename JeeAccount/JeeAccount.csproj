@@ -22,6 +22,7 @@
     <Folder Include="ConsumerServices\" />
     <Folder Include="DBscript\" />
     <Folder Include="Entities\" /> 
+    <Folder Include="DPS\" />
     <Content Include="images\nhanvien\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
