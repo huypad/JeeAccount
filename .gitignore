@@ -1,1 +1,3 @@
 /.vs
+/BackEnd/Properties/launchSettings.json
+/BackEnd/BackEnd.csproj.user
