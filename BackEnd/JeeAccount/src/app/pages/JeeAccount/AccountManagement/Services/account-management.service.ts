@@ -5,8 +5,8 @@ import { HttpUtilsService } from '../../_core/utils/http-utils.service';
 import { Injectable } from '@angular/core';
 import { QueryParamsModelNew } from '../../_core/models/query-models/query-params.model';
 import { ResultModel } from '../../_core/models/_base.model';
-import {AccountManagementDTO, AccountManagementModel, AppListDTO, PostImgModel} from '../Model/account-management.model';
-import {DepartmentModel} from '../../DepartmentManagement/Model/department-management.model';
+import { AccountManagementDTO, AccountManagementModel, AppListDTO, PostImgModel } from '../Model/account-management.model';
+import { DepartmentModel } from '../../DepartmentManagement/Model/department-management.model';
 
 const API_PRODUCTS_URL = environment.ApiRoot + '/accountmanagement';
 
@@ -46,10 +46,16 @@ export class AccountManagementService {
     const url = API_PRODUCTS_URL + '/createAccount';
     return this.http.post<any>(url, item, { headers: httpHeaders });
   }
-  
+
   UpdateAvatar(img: PostImgModel): Observable<any> {
     const httpHeaders = this.httpUtils.getHTTPHeaders();
     const url = API_PRODUCTS_URL + `/UpdateAvatar`;
-    return this.http.post<any>(url, img,{ headers: httpHeaders });
+    return this.http.post<any>(url, img, { headers: httpHeaders });
+  }
+
+  UpdateAvatarWithChangeUrlAvatar(img: PostImgModel): Observable<any> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const url = API_PRODUCTS_URL + `/UpdateAvatarWithChangeUrlAvatar`;
+    return this.http.post<any>(url, img, { headers: httpHeaders });
   }
 }

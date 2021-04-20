@@ -121,7 +121,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
             SqlConditions Conds = new SqlConditions();
             Conds.Add("Username", username);
 
-            string sql = @"select FirstName + '' + LastName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department from AccountList 
+            string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department from AccountList 
 where Username = @username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
@@ -146,7 +146,7 @@ where Username = @username and (Disable != 1 or Disable is null)";
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", customerID);
 
-            string sql = @"select FirstName + '' + LastName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department from AccountList 
+            string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department from AccountList 
 where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
@@ -202,7 +202,7 @@ where CustomerID = @CustomerID";
             Conds.Add("CustomerID", customerID);
             Conds.Add("isAdmin", 1);
 
-            string sql = @"select FirstName + '' + LastName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department, Username from AccountList 
+            string sql = @"select  LastName + ' ' + FirstName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department, Username from AccountList 
 where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
@@ -282,14 +282,17 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
             try
             {
                 #region val data
-                val.Add("Username", account.Username);
-                string FirstName = GeneralService.getFirstname(account.Fullname);
-                string Lastname = GeneralService.getlastname(account.Fullname);
-                val.Add("FirstName", FirstName);
-                val.Add("LastName", Lastname);
-                val.Add("Jobtitle", account.Jobtitle);
-                val.Add("Department", account.Departmemt);
-                val.Add("PhoneNumber", account.Phonemumber);
+                if (account.Fullname is not null)
+                {
+                    string FirstName = GeneralService.getFirstname(account.Fullname);
+                    string Lastname = GeneralService.getlastname(account.Fullname);
+                    val.Add("FirstName", FirstName);
+                    val.Add("LastName", Lastname);
+                }
+                if (account.Username is not null) val.Add("Username", account.Username);
+                if (account.Jobtitle is not null) val.Add("Jobtitle", account.Jobtitle);
+                if (account.Departmemt is not null) val.Add("Department", account.Departmemt);
+                if (account.Phonemumber is not null) val.Add("PhoneNumber", account.Phonemumber);
                 val.Add("IsActive", 1);
                 val.Add("Disable", 0);
                 val.Add("ActiveDate", DateTime.Now);
@@ -312,7 +315,7 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
             return new ReturnSqlModel();
         }
 
-        public ReturnSqlModel UpdateAvatar(string AvatarUrl, long userID, long CustomerID)
+        public ReturnSqlModel UpdateAvatar(DpsConnection cnn, string AvatarUrl, long userID, long CustomerID)
         {
             Hashtable val = new Hashtable();
             val.Add("AvartarImgURL", AvatarUrl);
@@ -321,15 +324,11 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
             cond.Add("CustomerID", CustomerID);
             try
             {
-                using (DpsConnection cnn = new DpsConnection(_connectionString))
+                int x = cnn.Update(val, cond, "AccountList");
+                if (x <= 0)
                 {
-                    int x = cnn.Update(val, cond, "AccountList");
-                    if (x <= 0)
-                    {
-                        return new ReturnSqlModel(cnn.LastError.ToString(), Constant.ERRORCODE_EXCEPTION);
-                    }
+                    return new ReturnSqlModel(cnn.LastError.ToString(), Constant.ERRORCODE_EXCEPTION);
                 }
-
             }
             catch (Exception ex)
             {
@@ -406,5 +405,34 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
                 return long.Parse(UserId.ToString());
             }
         }
+
+        public PersonalInfoCustomData GetPersonalInfoCustomData(long UserID, long CustomerID)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                Conds.Add("CustomerID", CustomerID);
+                Conds.Add("UserID", UserID);
+
+                string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department, PhoneNumber, Birthday from AccountList 
+where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
+
+                dt = cnn.CreateDataTable(sql, Conds);
+                if (dt.Rows.Count == 0)
+                    return new PersonalInfoCustomData();
+                return new PersonalInfoCustomData
+                {
+                    Avatar = dt.Rows[0]["Avatar"].ToString(),
+                    Birthday = dt.Rows[0]["Birthday"].ToString(),
+                    Departmemt = dt.Rows[0]["Department"].ToString(),
+                    Fullname = dt.Rows[0]["Fullname"].ToString(),
+                    Jobtitle = dt.Rows[0]["Jobtitle"].ToString(),
+                    Name = dt.Rows[0]["Name"].ToString(),
+                    Phonenumber = dt.Rows[0]["PhoneNumber"].ToString(),
+                };
+            }
+        }
+
     }
 }

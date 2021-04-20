@@ -275,6 +275,7 @@ namespace JeeAccount.Controllers
             }
         }
 
+        #region api public bên ngoài 
         [HttpPost("UppdatePersonalInfo")]
         public async Task<BaseModel<object>> UppdatePersonalInfo(PersonalInfoCustomData personalInfoCustom, long UserID)
         {
@@ -322,7 +323,7 @@ namespace JeeAccount.Controllers
                 return JsonResultCommon.Exception(ex);
             }
         }
-
+        #endregion
         [HttpPost("UpdateAvatar")]
         public BaseModel<object> UpdateAvatar(PostImgModel img)
         {
@@ -342,11 +343,34 @@ namespace JeeAccount.Controllers
                 return JsonResultCommon.Exception(ex);
             }
         }
+        #region testing api
+        [HttpPost("UpdateAvatarWithChangeUrlAvatar")]
+        public async Task<BaseModel<object>> UpdateAvatarWithChangeUrlAvatar(PostImgModel img)
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                }
+                string apiUrl = _config.GetValue<string>("JeeAccount:API");
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                var UserID = accountManagementService.GetUserIdByUsername(img.Username, customData.JeeAccount.CustomerID);
+                var updateAvatar = await accountManagementService.UpdateAvatarWithChangeUrlAvatar(token, UserID, img.Username, customData.JeeAccount.CustomerID, apiUrl);
+                if (updateAvatar.data is null)
+                {
+                    return JsonResultCommon.ThatBai(updateAvatar.message);
+                }
+                GeneralService.saveImgNhanVien(img.imgFile, UserID.ToString(), customData.JeeAccount.CustomerID);
+                return JsonResultCommon.ThanhCong(updateAvatar.data);
+            }
+            catch (Exception ex)
+            {
+                return JsonResultCommon.Exception(ex);
+            }
+        }
+        #endregion
     }
 
-    public class PostImgModel
-    {
-        public string imgFile { get; set; }
-        public string Username { get; set; }
-    }
 }

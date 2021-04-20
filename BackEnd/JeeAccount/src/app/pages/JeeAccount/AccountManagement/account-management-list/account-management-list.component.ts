@@ -10,12 +10,13 @@ import { tap } from 'rxjs/operators';
 import { TokenStorage } from 'src/app/modules/auth/_services/token-storage.service';
 import { SubheaderService } from 'src/app/_metronic/partials/layout';
 import { QueryParamsModelNew } from '../../_core/models/query-models/query-params.model';
-import {LayoutUtilsService, MessageType} from '../../_core/utils/layout-utils.service';
+import { LayoutUtilsService, MessageType } from '../../_core/utils/layout-utils.service';
 import { AccountManagementEditDialogComponent } from '../account-management-edit-dialog/account-management-edit-dialog.component';
-import {AccountManagementDTO, PostImgModel} from '../Model/account-management.model';
+import { AccountManagementDTO, PostImgModel } from '../Model/account-management.model';
 import { AccountManagementDataSource } from '../Model/data-sources/account-management.datasource';
 import { AccountManagementService } from '../Services/account-management.service';
-import {DanhMucChungService} from '../../_core/services/danhmuc.service';
+import { DanhMucChungService } from '../../_core/services/danhmuc.service';
+import { QuanLytrucTiepEditDialogComponent } from '../quan-ly-truc-tiep-edit-dialog/quan-ly-truc-tiep-edit-dialog.component';
 
 @Component({
   selector: 'app-account-management-list',
@@ -77,7 +78,7 @@ export class AccountManagementLístComponent implements OnInit {
     private layoutUtilsService: LayoutUtilsService,
     private tokenStorage: TokenStorage,
     public dialog: MatDialog,
-    public  danhmuc: DanhMucChungService
+    public danhmuc: DanhMucChungService
   ) {}
 
   //=================PageSize Table=====================
@@ -154,7 +155,7 @@ export class AccountManagementLístComponent implements OnInit {
     const saveMessage = this.translate.instant(saveMessageTranslateParam);
     const messageType = MessageType.Create;
     const dialogRef = this.dialog.open(AccountManagementEditDialogComponent, {
-      data: { },
+      data: {},
     });
     dialogRef.afterClosed().subscribe((res) => {
       if (!res) {
@@ -177,9 +178,27 @@ export class AccountManagementLístComponent implements OnInit {
       this.loadDataList();
     });
   }
-  
+
+  openQuanLyTrucTiepEdit(username, DirectManager) {
+    let saveMessageTranslateParam = '';
+    DirectManager === '' ? (saveMessageTranslateParam += 'Thêm thành công') : (saveMessageTranslateParam += 'Cập nhật thành công');
+    const saveMessage = this.translate.instant(saveMessageTranslateParam);
+    let messageType;
+    DirectManager === '' ? (messageType = MessageType.Create) : (messageType = MessageType.Update);
+    const dialogRef = this.dialog.open(QuanLytrucTiepEditDialogComponent, {
+      data: { username, DirectManager },
+    });
+    dialogRef.afterClosed().subscribe((res) => {
+      if (!res) {
+        this.loadDataList();
+      } else {
+        this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+        this.loadDataList();
+      }
+    });
+  }
+
   onFileChange(event, username: string) {
-    console.log({username: username});
     let saveMessageTranslateParam = '';
     saveMessageTranslateParam += 'Thêm thành công';
     const saveMessage = this.translate.instant(saveMessageTranslateParam);
@@ -187,18 +206,20 @@ export class AccountManagementLístComponent implements OnInit {
     if (event.target.files && event.target.files[0]) {
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        this.imgFile =  e.target.result.split(',')[1];
+        this.imgFile = e.target.result.split(',')[1];
         const postimg = new PostImgModel();
         postimg.imgFile = this.imgFile;
         postimg.Username = username;
-        this.accountManagementService.UpdateAvatar(postimg).subscribe((res => {
+        this.accountManagementService.UpdateAvatarWithChangeUrlAvatar(postimg).subscribe((res) => {
           if (res && res.status === 1) {
             this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+            this.imgFile = '';
+            this.loadDataList();
           } else {
             this.layoutUtilsService.showActionNotification(res.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
+            this.imgFile = '';
           }
-        }));
-        console.log({imgFile: this.imgFile});
+        });
       };
       reader.readAsDataURL(event.target.files[0]);
     }

@@ -1,14 +1,14 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import {AccountManagementModel, AppListDTO} from '../Model/account-management.model';
+import { AccountManagementModel, AppListDTO } from '../Model/account-management.model';
 import { AccountManagementService } from '../Services/account-management.service';
-import { ResultModel} from '../../_core/models/_base.model';
-import {DepartmentModel} from '../../DepartmentManagement/Model/department-management.model';
-import {LayoutUtilsService, MessageType} from '../../_core/utils/layout-utils.service';
-import {ReplaySubject} from 'rxjs';
-import {DepartmentSelection} from '../../_core/models/danhmuc.model';
-import {DanhMucChungService} from '../../_core/services/danhmuc.service';
+import { ResultModel } from '../../_core/models/_base.model';
+import { DepartmentModel } from '../../DepartmentManagement/Model/department-management.model';
+import { LayoutUtilsService, MessageType } from '../../_core/utils/layout-utils.service';
+import { ReplaySubject } from 'rxjs';
+import { DepartmentSelection } from '../../_core/models/danhmuc.model';
+import { DanhMucChungService } from '../../_core/services/danhmuc.service';
 
 @Component({
   selector: 'app-account-management-edit-dialog',
@@ -45,7 +45,7 @@ export class AccountManagementEditDialogComponent implements OnInit {
     private accountManagementService: AccountManagementService,
     private changeDetect: ChangeDetectorRef,
     private layoutUtilsService: LayoutUtilsService,
-    public danhmuc: DanhMucChungService,
+    public danhmuc: DanhMucChungService
   ) {}
 
   ngOnInit(): void {
@@ -57,10 +57,10 @@ export class AccountManagementEditDialogComponent implements OnInit {
         this.changeDetect.detectChanges();
       }
     });
-    
+
     this.danhmuc.GetSelectionDepartment().subscribe((res: ResultModel<DepartmentSelection>) => {
       if (res && res.status === 1) {
-        console.log({phongban: res.data});
+        console.log({ phongban: res.data });
         this.phongBans = res.data;
         this.filterPhongBans.next([...res.data]);
       }
@@ -75,13 +75,13 @@ export class AccountManagementEditDialogComponent implements OnInit {
   onSubmit() {
     if (this.itemForm.valid) {
       const acc = this.initDataFromFB();
-      console.log({acc: acc});
+      console.log({ acc: acc });
       this.create(acc);
     } else {
       this.validateAllFormFields(this.itemForm);
     }
   }
-  
+
   initDataFromFB(): AccountManagementModel {
     const acc = new AccountManagementModel();
     const AppCode: string[] = [];
@@ -102,7 +102,7 @@ export class AccountManagementEditDialogComponent implements OnInit {
     return acc;
   }
   validateAllFormFields(formGroup: FormGroup) {
-    Object.keys(formGroup.controls).forEach(field => {
+    Object.keys(formGroup.controls).forEach((field) => {
       const control = formGroup.get(field);
       if (control instanceof FormControl) {
         control.markAsTouched({ onlySelf: true });
@@ -114,21 +114,21 @@ export class AccountManagementEditDialogComponent implements OnInit {
 
   onFileChange(event) {
     if (event.target.files && event.target.files[0]) {
-        const reader = new FileReader();
-        reader.onload = (e: any) => {
-          this.imgFile =  e.target.result;
-          const filename = event.target.files[0].name;
-          this.itemForm.controls.AnhDaiDien.setValue(filename);
-          this.changeDetect.detectChanges();
-        };
-        reader.readAsDataURL(event.target.files[0]);
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.imgFile = e.target.result;
+        const filename = event.target.files[0].name;
+        this.itemForm.controls.AnhDaiDien.setValue(filename);
+        this.changeDetect.detectChanges();
+      };
+      reader.readAsDataURL(event.target.files[0]);
     }
   }
   create(acc: AccountManagementModel) {
     this.accountManagementService.createAccount(acc).subscribe((res) => {
       if (res && res.status === 1) {
-        this.dialogRef.close(res.data);
-      } else  {
+        this.dialogRef.close(res);
+      } else {
         this.layoutUtilsService.showActionNotification(res.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
       }
     });

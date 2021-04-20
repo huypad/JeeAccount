@@ -24,13 +24,13 @@ namespace JeeAccount.Reponsitories
         Task<IEnumerable<AccountManagementDTO>> GetListAccountManagement(long customerID);
         Task<ReturnSqlModel> ChangeTinhTrang(long customerID, string Username);
         ReturnSqlModel CreateAccount(DpsConnection cnn, AccountManagementModel account, long AdminUserID, long CustomerID);
-        ReturnSqlModel UpdateAvatar(string AvatarUrl, long userID, long CustomerID);
+        ReturnSqlModel UpdateAvatar(DpsConnection cnn, string AvatarUrl, long userID, long CustomerID);
         ReturnSqlModel UpdateAvatarFirstTime(DpsConnection cnn, string AvatarUrl, long userID, long CustomerID);
         ReturnSqlModel UpdatePersonalInfoCustomData(DpsConnection cnn, PersonalInfoCustomData personalInfoCustom, long userId, long customerId);
         long GetCurrentIdentity(DpsConnection cnn);
         string GetUsername(DpsConnection cnn, long userId, long customerId);
-
         long GetUserIdByUsername(string Username, long customerId);
+        PersonalInfoCustomData GetPersonalInfoCustomData(long UserID, long CustomerID);
     }
 }
 

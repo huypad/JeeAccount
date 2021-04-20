@@ -2,7 +2,6 @@
 using JeeAccount.Models.Common;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,78 +27,25 @@ namespace JeeAccount.Services
             return result;
         }
 
-        public static System.Drawing.Image RezizeImage(System.Drawing.Image img, int maxHeight)
+        public static Aspose.Imaging.Image RezizeImage(Aspose.Imaging.Image img, int maxHeight)
         {
             if (img.Height < maxHeight) return img;
-            using (img)
-            {
-                Double yRatio = (double)img.Height / maxHeight;
-                Double ratio = yRatio;
-                int nnx = (int)Math.Floor(img.Width / ratio);
-                int nny = (int)Math.Floor(img.Height / ratio);
-                Bitmap cpy = new Bitmap(nnx, nny, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                using (Graphics gr = Graphics.FromImage(cpy))
-                {
-                    gr.Clear(System.Drawing.Color.Transparent);
-
-                    // This is said to give best quality when resizing images
-                    gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-
-                    gr.DrawImage(img,
-                        new Rectangle(0, 0, nnx, nny),
-                        new Rectangle(0, 0, img.Width, img.Height),
-                        GraphicsUnit.Pixel);
-                }
-                return cpy;
-            }
-        }
-
-        public static MemoryStream BytearrayToStream(byte[] arr)
-        {
-            return new MemoryStream(arr, 0, arr.Length);
-        }
-
-        public static byte[] CopyImageToByteArray(System.Drawing.Image theImage)
-        {
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                theImage.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
-                return memoryStream.ToArray();
-            }
+            Double yRatio = (double)img.Height / maxHeight;
+            Double ratio = yRatio;
+            int nnx = (int)Math.Floor(img.Width / ratio);
+            int nny = (int)Math.Floor(img.Height / ratio);
+            img.Resize(nnx, nny);
+            return img;
         }
 
         public static void saveImgNhanVien(string image, string userID, long customerID)
         {
 
             byte[] ImageArray = Convert.FromBase64String(image);
-            System.Drawing.Image myImg = RezizeImage(System.Drawing.Image.FromStream(GeneralService.BytearrayToStream(ImageArray)), 130);
-
-            byte[] AvatarImageArray = CopyImageToByteArray(myImg);
 
             string ID_NV = userID;
 
-            String path = Environment.CurrentDirectory + "\\images\\nhanvien\\" + customerID + "\\";
-
-            //Check if directory exist
-            if (!System.IO.Directory.Exists(path))
-            {
-                System.IO.Directory.CreateDirectory(path); //Create directory if it doesn't exist
-            }
-
-            string imageName = ID_NV + ".jpg";
-
-            //set the image path
-            string imgPath = Path.Combine(path, imageName);
-
-            //Delete if file exist
-            if (System.IO.File.Exists(imgPath))
-            {
-                System.IO.File.Delete(imgPath);
-            };
-
-            System.IO.File.WriteAllBytes(imgPath, AvatarImageArray);
-
-            String pathOriginal = Environment.CurrentDirectory + "\\images\\nhanvien\\" + customerID + "\\Original\\";
+            String pathOriginal = Environment.CurrentDirectory + "/images/nhanvien/" + customerID + "/Original/";
 
 
             //Check if directory exist
@@ -119,6 +65,31 @@ namespace JeeAccount.Services
             };
 
             System.IO.File.WriteAllBytes(imgPathOriginal, ImageArray);
+
+            using (Aspose.Imaging.Image myImg = Aspose.Imaging.Image.Load(imgPathOriginal))
+            {
+                RezizeImage(myImg, 130);
+                String path = Environment.CurrentDirectory + "/images/nhanvien/" + customerID + "/";
+
+                //Check if directory exist
+                if (!System.IO.Directory.Exists(path))
+                {
+                    System.IO.Directory.CreateDirectory(path); //Create directory if it doesn't exist
+                }
+
+                string imageName = ID_NV + ".jpg";
+
+                //set the image path
+                string imgPath = Path.Combine(path, imageName);
+
+                //Delete if file exist
+                if (System.IO.File.Exists(imgPath))
+                {
+                    System.IO.File.Delete(imgPath);
+                };
+
+                myImg.Save(imgPath);
+            }
 
         }
 
@@ -147,7 +118,7 @@ namespace JeeAccount.Services
             return fullname;
         }
 
-        public static IdentityServerReturn TranformIdentityServerReturnToRe(ReturnSqlModel returnSql)
+        public static IdentityServerReturn TranformIdentityServerReturnSqlModel(ReturnSqlModel returnSql)
         {
             IdentityServerReturn identity = new IdentityServerReturn();
             identity.statusCode = Int32.Parse(returnSql.ErrorCode);

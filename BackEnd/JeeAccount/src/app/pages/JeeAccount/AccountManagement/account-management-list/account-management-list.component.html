@@ -18,15 +18,16 @@
           </th>
           <td mat-cell *matCellDef="let r">
             <div class="row jee-avatar">
-                <ngx-avatar (click)="hiddenfileinput.click()" size="40" src="{{r.Avatar}}" *ngIf="r.Avatar"></ngx-avatar>
-                <ngx-avatar (click)="hiddenfileinput.click()" size="40" [name]="r.Name" bgColor="#FF0000" *ngIf="!r.Avatar"></ngx-avatar>
+              <span (click)="hiddenfileinput.click()" style="cursor: pointer;">
+                <ngx-avatar size="40" src="{{r.Avatar}}" *ngIf="r.Avatar"></ngx-avatar>
+                <ngx-avatar size="40" [name]="r.Name" bgColor="#FF0000" *ngIf="!r.Avatar"></ngx-avatar>
+              </span>
               <span class="jee-name">
                 {{r.Fullname}}
               </span>
             </div>
-            <input style="display: none;" accept="image/jpg, image/jpeg, image/png" name="Image"
-                   id="file" type="file" class="form-control" (change)="onFileChange($event, r.Username)"
-                   #hiddenfileinput>
+            <input style="display: none;" accept="image/jpg, image/jpeg, image/png" name="Image" id="file" type="file"
+              class="form-control" (change)="onFileChange($event, r.Username)" #hiddenfileinput>
           </td>
         </ng-container>
 
@@ -51,14 +52,16 @@
         </ng-container>
 
         <ng-container matColumnDef="QuanLyTrucTiep">
-          <th mat-header-cell *matHeaderCellDef>
+          <th mat-header-cell *matHeaderCellDef style="text-align: center">
             <span>Quản lý trực tiếp</span>
           </th>
-          <td class="jee-content" mat-cell *matCellDef="let r">
-            <span *ngIf="r.DirectManager != ''">{{ r.DirectManager }}</span>
-            <span *ngIf="r.DirectManager == ''">
-              <mat-icon>person_add</mat-icon>
-            </span>
+          <td class="jee-content" mat-cell *matCellDef="let r" style="text-align: center; padding-right: 12px;">
+            <div style="cursor: pointer;" (click)="openQuanLyTrucTiepEdit(r.Username, r.DirectManager)">
+              <span *ngIf="r.DirectManager != ''">{{ r.DirectManager }}</span>
+              <span *ngIf="r.DirectManager == ''">
+                <mat-icon>person_add</mat-icon>
+              </span>
+            </div>
           </td>
         </ng-container>
 
@@ -88,14 +91,14 @@
           </th>
           <td mat-cell *matCellDef="let r">
             <a title="Edit customer" class="btn btn-icon btn-light btn-hover-primary btn-sm mx-3">
-                <span [inlineSVG]="'./assets/media/svg/icons/Communication/Write.svg'"
-                      class="svg-icon svg-icon-md svg-icon-primary">
-                </span>
+              <span [inlineSVG]="'./assets/media/svg/icons/Communication/Write.svg'"
+                class="svg-icon svg-icon-md svg-icon-primary">
+              </span>
             </a>
             <a title="Delete customer" class="btn btn-icon btn-light btn-hover-danger btn-sm">
-                <span [inlineSVG]="'./assets/media/svg/icons/General/Trash.svg'"
-                      class="svg-icon svg-icon-md svg-icon-danger">
-                </span>
+              <span [inlineSVG]="'./assets/media/svg/icons/General/Trash.svg'"
+                class="svg-icon svg-icon-md svg-icon-danger">
+              </span>
             </a>
           </td>
         </ng-container>

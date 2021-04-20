@@ -7,8 +7,9 @@ import { AccountManagementService } from './Services/account-management.service'
 import { AccountManagementComponent } from './account-management.component';
 import { AccountManagementEditDialogComponent } from './account-management-edit-dialog/account-management-edit-dialog.component';
 import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
-import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
-import {InlineSVGModule} from 'ng-inline-svg';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { InlineSVGModule } from 'ng-inline-svg';
+import { QuanLytrucTiepEditDialogComponent } from './quan-ly-truc-tiep-edit-dialog/quan-ly-truc-tiep-edit-dialog.component';
 
 const routes: Routes = [
   {
@@ -24,13 +25,17 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [AccountManagementLístComponent, AccountManagementComponent, AccountManagementEditDialogComponent],
+  declarations: [
+    AccountManagementLístComponent,
+    AccountManagementComponent,
+    AccountManagementEditDialogComponent,
+    QuanLytrucTiepEditDialogComponent,
+  ],
   imports: [CommonModule, RouterModule.forChild(routes), JeeAccountModule, NgxMatSelectSearchModule, InlineSVGModule],
-  exports: [AccountManagementEditDialogComponent],
   providers: [
     AccountManagementService,
     { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true, height: 'auto', width: '900px' } },
   ],
-  entryComponents: [AccountManagementEditDialogComponent],
+  entryComponents: [AccountManagementEditDialogComponent, QuanLytrucTiepEditDialogComponent],
 })
 export class AccountManagementModule {}

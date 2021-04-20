@@ -84,8 +84,11 @@ namespace JeeAccount.Services
         }
         public ReturnSqlModel UpdateAvatar(string AvatarUrl, long userID, long CustomerID)
         {
-            var update = accountManagementReponsitory.UpdateAvatar(AvatarUrl, userID, CustomerID);
-            return update;
+            using (DpsConnection cnn = new DpsConnection(ConnectionString))
+            {
+                var update = accountManagementReponsitory.UpdateAvatar(cnn, AvatarUrl, userID, CustomerID);
+                return update;
+            }
         }
         public async Task<ReturnSqlModel> CreateAccount(string Admin_accessToken, long customerID, long AdminUserID, AccountManagementModel account, string apiUrl)
         {
@@ -183,7 +186,7 @@ namespace JeeAccount.Services
                     {
                         cnn.RollbackTransaction();
                         cnn.EndTransaction();
-                        identity = GeneralService.TranformIdentityServerReturnToRe(update);
+                        identity = GeneralService.TranformIdentityServerReturnSqlModel(update);
                         return identity;
                     }
 
@@ -239,6 +242,55 @@ namespace JeeAccount.Services
         public long GetUserIdByUsername(string Username, long CustomerId)
         {
             return accountManagementReponsitory.GetUserIdByUsername(Username, CustomerId);
+        }
+
+        public PersonalInfoCustomData GetPersonalInfoCustomData(long UserID, long CustomerID)
+        {
+            return accountManagementReponsitory.GetPersonalInfoCustomData(UserID, CustomerID);
+        }
+
+        public async Task<IdentityServerReturn> UpdateAvatarWithChangeUrlAvatar(string Admin_access_token, long UserId, string Username, long CustomerID, string apiUrl)
+        {
+
+            IdentityServerReturn identity = new IdentityServerReturn();
+            try
+            {
+
+                var person = accountManagementReponsitory.GetPersonalInfoCustomData(UserId, CustomerID);
+                if (person.Fullname is null)
+                {
+                    identity.message = "UserId không tồn tại";
+                    identity.statusCode = Int32.Parse(Constant.ERRORCODE_NOTEXIST);
+                    return identity;
+                }
+                string urlAvatar = apiUrl + $"images/nhanvien/{CustomerID}/{UserId}.jpg";
+                using (DpsConnection cnn = new DpsConnection(ConnectionString))
+                {
+                    cnn.BeginTransaction();
+                    var updateAvatarToDB = accountManagementReponsitory.UpdateAvatar(cnn, urlAvatar, UserId, CustomerID);
+                    if (!updateAvatarToDB.Susscess)
+                    {
+                        cnn.RollbackTransaction();
+                        cnn.EndTransaction();
+                        return GeneralService.TranformIdentityServerReturnSqlModel(updateAvatarToDB);
+                    }
+                    person.Avatar = urlAvatar;
+                    var updateCustom = await this.identityServerController.updateCustomDataPersonalInfo(Admin_access_token, person, Username);
+                    if (updateCustom.data is null)
+                    {
+                        cnn.RollbackTransaction();
+                        cnn.EndTransaction();
+                        return updateCustom;
+                    }
+                    cnn.EndTransaction();
+                    return updateCustom;
+                }
+            } catch (Exception ex)
+            {
+                identity.message = ex.Message;
+                identity.statusCode = Int32.Parse(Constant.ERRORCODE_EXCEPTION);
+                return identity;
+            } 
         }
     }
 }
