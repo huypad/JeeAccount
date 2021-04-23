@@ -92,7 +92,11 @@ export class AuthService implements OnDestroy {
 
   isAuthenticated(): boolean {
     const auth = this.getAuthFromLocalStorage();
-    if (auth && this.isTokenExpired()) return true;
+    if (auth && this.isTokenExpired()) {
+      if (!this.accessToken$.getValue()) this.accessToken$.next(auth.access_token);
+      if (!this.refreshToken$.getValue()) this.refreshToken$.next(auth.refresh_token);
+      return true;
+    }
     return false;
   }
 
