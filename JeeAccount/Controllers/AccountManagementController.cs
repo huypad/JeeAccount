@@ -42,7 +42,7 @@ namespace JeeAccount.Controllers
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
                 var usernames = await accountManagementService.GetListUsernameByCustormerID(customData.JeeAccount.CustomerID);
                 if (usernames is null)
@@ -63,7 +63,7 @@ namespace JeeAccount.Controllers
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
                 var customerid = await accountManagementService.GetCustormerIDByUsername(username);
                 if (customerid == 0)
@@ -84,7 +84,7 @@ namespace JeeAccount.Controllers
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
                 var infoAdminDTOs = await accountManagementService.GetInfoAdminAccountByCustomerID(customData.JeeAccount.CustomerID);
                 return JsonResultCommon.ThanhCong(infoAdminDTOs);
@@ -103,7 +103,7 @@ namespace JeeAccount.Controllers
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
                 var infoUser = await accountManagementService.GetInfoByCustomerID(customData.JeeAccount.CustomerID);
                 return infoUser.Name is null ? JsonResultCommon.KhongTonTai("CustomerID") : JsonResultCommon.ThanhCong(infoUser);
@@ -122,7 +122,7 @@ namespace JeeAccount.Controllers
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
                 var infoUser = await accountManagementService.GetInfoByUsername(username);
                 return infoUser.Name is null ? JsonResultCommon.KhongTonTai("CustomerID") : JsonResultCommon.ThanhCong(infoUser);
@@ -141,7 +141,7 @@ namespace JeeAccount.Controllers
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
                 var admins = await accountManagementService.GetListAdminsByCustomerID(customData.JeeAccount.CustomerID);
                 return JsonResultCommon.ThanhCong(admins);
@@ -161,7 +161,7 @@ namespace JeeAccount.Controllers
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
                 var appList = await accountManagementService.GetListAppByCustomerID(customData.JeeAccount.CustomerID);
                 return JsonResultCommon.ThanhCong(appList);
@@ -180,7 +180,7 @@ namespace JeeAccount.Controllers
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
                 var accUser = await accountManagementService.GetListUsernameByAppcode(customData.JeeAccount.CustomerID, appcode);
                 return JsonResultCommon.ThanhCong(accUser);
@@ -200,7 +200,7 @@ namespace JeeAccount.Controllers
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
                 var accManagement = await accountManagementService.GetListAccountManagement(customData.JeeAccount.CustomerID);
                 return JsonResultCommon.ThanhCong(accManagement);
@@ -219,7 +219,7 @@ namespace JeeAccount.Controllers
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
                 ReturnSqlModel update = await accountManagementService.ChangeTinhTrang(customData.JeeAccount.CustomerID, Username);
                 if (!update.Susscess)
@@ -252,7 +252,7 @@ namespace JeeAccount.Controllers
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
                 var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
                 string apiUrl = _config.GetValue<string>("JeeAccount:API");
@@ -284,7 +284,7 @@ namespace JeeAccount.Controllers
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
                 var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
                 var update = await accountManagementService.UpdatePersonalInfoCustomData(token, personalInfoCustom, UserID, customData.JeeAccount.CustomerID);
@@ -308,7 +308,7 @@ namespace JeeAccount.Controllers
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
                 var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
                 var update = await accountManagementService.UppdateCustomData(token, objCustomData, customData.JeeAccount.CustomerID);
@@ -332,7 +332,7 @@ namespace JeeAccount.Controllers
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
                 var UserID =  accountManagementService.GetUserIdByUsername(img.Username, customData.JeeAccount.CustomerID);
                 GeneralService.saveImgNhanVien(img.imgFile, UserID.ToString(), customData.JeeAccount.CustomerID);
@@ -352,7 +352,7 @@ namespace JeeAccount.Controllers
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
                 string apiUrl = _config.GetValue<string>("JeeAccount:API");
                 var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);

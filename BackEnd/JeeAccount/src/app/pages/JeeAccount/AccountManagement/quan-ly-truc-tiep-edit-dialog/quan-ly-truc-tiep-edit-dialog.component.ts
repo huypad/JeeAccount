@@ -66,7 +66,6 @@ export class QuanLytrucTiepEditDialogComponent implements OnInit {
   onSubmit() {
     if (this.itemForm.valid) {
       if (this.item) {
-        console.log('update');
       }
       const depart = this.initDataFromFB();
     } else {

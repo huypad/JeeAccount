@@ -9,6 +9,9 @@ export const environment = {
   ApiRootsLanding: 'https://localhost:44327/api',
 
   ApiIdentity: 'https://identityserver.jee.vn',
+  ApiIdentity_Logout: 'https://identityserver.jee.vn/user/logout',
+  ApiIdentity_GetUser: 'https://identityserver.jee.vn/user/me',
+  ApiIdentity_Refresh: 'https://identityserver.jee.vn/user/refresh',
   redirectUrl: 'https://portal.jee.vn/?redirectUrl=',
   sso: 'sso_token',
   //API JeeWork

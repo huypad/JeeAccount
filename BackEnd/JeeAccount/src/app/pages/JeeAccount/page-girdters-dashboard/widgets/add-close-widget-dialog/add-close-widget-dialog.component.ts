@@ -114,7 +114,6 @@ export class AddCloseWidgetDialogComponent implements OnInit {
   }
   refreshDataSource() {
     this.dataSource = new MatTableDataSource(this.showWidgets);
-    console.log('this.showWidgets', this.showWidgets);
     this.selection.clear();
     for (var i = 0; i < this.dataSource.data.length; i++) {
       this.selection.select(this.dataSource.data[i]);

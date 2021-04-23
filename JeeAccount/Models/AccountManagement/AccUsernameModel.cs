@@ -17,6 +17,7 @@ namespace JeeAccount.Models.AccountManagement
         public string AvartarImgURL { get; set; }
         public string PhoneNumber { get; set; }
         public long CustomerID { get; set; }
+        public string Email { get; set; }
 
     }
 }

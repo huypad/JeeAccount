@@ -13,9 +13,10 @@ namespace JeeAccount.Models.AccountManagement
         public override string Jobtitle { get ; set ; }
         public override string Departmemt { get ; set ; }
         public string Username { get; set; }
-
         public string DirectManager { get; set; }
         public bool IsActive { get; set; }
         public string Note { get; set; }
+        public string Email { get; set; }
+
     }
 }

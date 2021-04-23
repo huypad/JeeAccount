@@ -60,7 +60,6 @@ export class AccountManagementEditDialogComponent implements OnInit {
 
     this.danhmuc.GetSelectionDepartment().subscribe((res: ResultModel<DepartmentSelection>) => {
       if (res && res.status === 1) {
-        console.log({ phongban: res.data });
         this.phongBans = res.data;
         this.filterPhongBans.next([...res.data]);
       }
@@ -75,7 +74,6 @@ export class AccountManagementEditDialogComponent implements OnInit {
   onSubmit() {
     if (this.itemForm.valid) {
       const acc = this.initDataFromFB();
-      console.log({ acc: acc });
       this.create(acc);
     } else {
       this.validateAllFormFields(this.itemForm);

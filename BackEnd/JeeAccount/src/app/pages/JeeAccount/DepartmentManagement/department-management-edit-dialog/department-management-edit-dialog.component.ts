@@ -7,23 +7,23 @@ import {
   Inject,
   OnDestroy,
   OnInit,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ResultModel} from '../../_core/models/_base.model';
-import {DepartmentManagementService} from '../Sevices/department-management.service';
-import {AppListDTO} from '../../AccountManagement/Model/account-management.model';
-import {DanhMucChungService} from '../../_core/services/danhmuc.service';
-import {BehaviorSubject, Observable, ReplaySubject} from 'rxjs';
-import {COMMA, ENTER} from '@angular/cdk/keycodes';
-import {MatAutocomplete, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
-import {map, startWith} from 'rxjs/operators';
-import {MatChipInputEvent} from '@angular/material/chips';
-import {MatSelect} from '@angular/material/select';
-import {DepartmentModel} from '../Model/department-management.model';
-import {LayoutUtilsService, MessageType} from '../../_core/utils/layout-utils.service';
-import {NhanVienMatchip} from '../../_core/models/danhmuc.model';
+import { ResultModel } from '../../_core/models/_base.model';
+import { DepartmentManagementService } from '../Sevices/department-management.service';
+import { AppListDTO } from '../../AccountManagement/Model/account-management.model';
+import { DanhMucChungService } from '../../_core/services/danhmuc.service';
+import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { map, startWith } from 'rxjs/operators';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { MatSelect } from '@angular/material/select';
+import { DepartmentModel } from '../Model/department-management.model';
+import { LayoutUtilsService, MessageType } from '../../_core/utils/layout-utils.service';
+import { NhanVienMatchip } from '../../_core/models/danhmuc.model';
 
 @Component({
   selector: 'app-department-management-edit-dialog',
@@ -51,7 +51,7 @@ export class DepartmentManagementEditDialogComponent implements OnInit {
   // ngx-mat-search area
   quanLys: NhanVienMatchip[] = [];
   filterQuanLys: ReplaySubject<NhanVienMatchip[]> = new ReplaySubject<NhanVienMatchip[]>();
-   // End
+  // End
   @ViewChild('thanhVienInput') thanhVienInput: ElementRef<HTMLInputElement>;
   @ViewChild('autoThanhVien') matAutocomplete: MatAutocomplete;
   @ViewChild('singleSelect') singleSelect: MatSelect;
@@ -64,7 +64,7 @@ export class DepartmentManagementEditDialogComponent implements OnInit {
     private danhmucService: DanhMucChungService,
     private layoutUtilsService: LayoutUtilsService
   ) {}
-  
+
   ngOnInit(): void {
     this.item = this.data.item;
     this.danhmucService.GetMatchipNhanVien().subscribe((res: ResultModel<NhanVienMatchip>) => {
@@ -73,15 +73,15 @@ export class DepartmentManagementEditDialogComponent implements OnInit {
         this.allThanhviens = res.data;
         this.filteredThanhViens = this.itemForm.controls.ThanhVien.valueChanges.pipe(
           startWith(null),
-          map((fruit: string | null) => fruit ? this._filter(fruit) : this.allThanhviens.slice()));
+          map((fruit: string | null) => (fruit ? this._filter(fruit) : this.allThanhviens.slice()))
+        );
         // ngx
         this.quanLys = [...res.data];
         this.filterQuanLys.next([...res.data]);
         // listen for search field value changes
-        this.itemForm.controls.FilterQuanLyNhom.valueChanges
-          .subscribe(() => {
-            this.filterBanks();
-          });
+        this.itemForm.controls.FilterQuanLyNhom.valueChanges.subscribe(() => {
+          this.filterBanks();
+        });
         this.singleSelect.compareWith = (a: NhanVienMatchip, b: NhanVienMatchip) => a && b && a.Username === b.Username;
       }
     });
@@ -97,14 +97,12 @@ export class DepartmentManagementEditDialogComponent implements OnInit {
       this.validateAllFormFields(this.itemForm);
     }
   }
-  update() {
-
-  }
+  update() {}
   create(depart: DepartmentModel) {
     this.departmentManagementService.createDepart(depart).subscribe((res) => {
       if (res && res.status === 1) {
         this.dialogRef.close(res.data);
-      } else  {
+      } else {
         this.layoutUtilsService.showActionNotification(res.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
       }
     });
@@ -119,11 +117,10 @@ export class DepartmentManagementEditDialogComponent implements OnInit {
       depart.RowID = this.item.RowID;
     }
     depart.ThanhVien = this.thanhViens;
-    console.log({department: depart});
     return depart;
   }
   validateAllFormFields(formGroup: FormGroup) {
-    Object.keys(formGroup.controls).forEach(field => {
+    Object.keys(formGroup.controls).forEach((field) => {
       const control = formGroup.get(field);
       if (control instanceof FormControl) {
         control.markAsTouched({ onlySelf: true });
@@ -159,7 +156,7 @@ export class DepartmentManagementEditDialogComponent implements OnInit {
   }
   private _filter(value: string): NhanVienMatchip[] {
     const filterValue = value.toLowerCase();
-    return this.allThanhviens.filter(fruit => fruit.Display.toLowerCase().indexOf(filterValue) === 0);
+    return this.allThanhviens.filter((fruit) => fruit.Display.toLowerCase().indexOf(filterValue) === 0);
   }
   protected filterBanks() {
     if (!this.itemForm.controls.QuanLyNhom) {
@@ -174,8 +171,6 @@ export class DepartmentManagementEditDialogComponent implements OnInit {
       search = search.toLowerCase();
     }
     // filter the banks
-    this.filterQuanLys.next(
-      this.quanLys.filter(item => item.Display.toLowerCase().indexOf(search) > -1)
-    );
+    this.filterQuanLys.next(this.quanLys.filter((item) => item.Display.toLowerCase().indexOf(search) > -1));
   }
 }

@@ -29,9 +29,10 @@ namespace JeeAccount.Reponsitories
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", custormerID);
 
-            string sql = @"select UserID, Username, FirstName +' '+LastName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle,
-Department, PhoneNumber, CustomerID
-from AccountList where CustomerID=@CustomerID";
+            string sql = @"select UserID, Username, email, LastName +' '+FirstName as FullName
+                           , FirstName as Name, AvartarImgURL as Avatar, Jobtitle,
+                           Department, PhoneNumber, CustomerID
+                           from AccountList where CustomerID=@CustomerID";
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 dt = cnn.CreateDataTable(sql, Conds);
@@ -45,6 +46,7 @@ from AccountList where CustomerID=@CustomerID";
                     Department = row["Department"].ToString(),
                     PhoneNumber = row["PhoneNumber"].ToString(),
                     Jobtitle = row["Jobtitle"].ToString(),
+                    Email = row["email"].ToString(),
                 });
             }
 
@@ -82,7 +84,7 @@ where AppList.AppCode = @AppCode and CustomerID = @custormerID and (Disable != 1
             Conds.Add("CustomerID", customerID);
             Conds.Add("IsAdmin", 1);
 
-            string sql = @"select UserID, Username from AccountList 
+            string sql = @"select UserID, Username, email from AccountList 
 where CustomerID = @CustomerID and (Disable != 1 or Disable is null) and IsAdmin = @IsAdmin";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
@@ -91,7 +93,8 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null) and IsAdmin
                 return dt.AsEnumerable().Select(row => new AccUsernameModel
                 {
                     UserId = Int32.Parse(row["UserID"].ToString()),
-                    Username = row["Username"].ToString()
+                    Username = row["Username"].ToString(),
+                    Email = row["email"].ToString(),
                 });
             }
         }
@@ -121,7 +124,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
             SqlConditions Conds = new SqlConditions();
             Conds.Add("Username", username);
 
-            string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department from AccountList 
+            string sql = @"select LastName + '' + FirstName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department from AccountList 
 where Username = @username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
@@ -202,8 +205,10 @@ where CustomerID = @CustomerID";
             Conds.Add("CustomerID", customerID);
             Conds.Add("isAdmin", 1);
 
-            string sql = @"select  LastName + ' ' + FirstName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department, Username from AccountList 
-where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
+            string sql = @"select LastName + '' + FirstName as FullName, FirstName as Name
+                        , AvartarImgURL as Avatar, Jobtitle, Department, Username, Email 
+                        from AccountList 
+                        where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
@@ -217,6 +222,7 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
                     Name = row["Name"].ToString(),
                     Username = row["Username"].ToString(),
                     Departmemt = row["Department"].ToString(),
+                    Email = row["Email"].ToString(),
                 });
             }
         }
@@ -227,9 +233,10 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", customerID);
 
-            string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name, 
-AvartarImgURL as Avatar, Jobtitle, Department, Username, DirectManager, IsActive, Note from AccountList 
-where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
+            string sql = @"select LastName + '' + FirstName as FullName, FirstName as Name, 
+                        AvartarImgURL as Avatar, Jobtitle, Department, Username, DirectManager
+                        , IsActive, Note, email from AccountList 
+                        where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
@@ -246,6 +253,7 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
                     Note = row["Note"].ToString(),
                     Departmemt = row["Department"].ToString(),
                     Username = row["Username"].ToString(),
+                    Email = row["Email"].ToString(),
                 });
             }
         }
@@ -387,7 +395,7 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
             if (personalInfoCustom.Jobtitle is not null) val.Add("Jobtitle", personalInfoCustom.Jobtitle);
             if (personalInfoCustom.Phonenumber is not null) val.Add("Phonenumber", personalInfoCustom.Phonenumber);
             if (personalInfoCustom.Fullname is not null) val.Add("FirstName", firstname);
-            if (personalInfoCustom.Fullname is not null)  val.Add("LastName", lastname);
+            if (personalInfoCustom.Fullname is not null) val.Add("LastName", lastname);
             int x = cnn.Update(val, Conds, "AccountList");
             if (x <= 0)
             {

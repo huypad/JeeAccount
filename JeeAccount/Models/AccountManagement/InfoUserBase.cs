@@ -7,5 +7,6 @@
         public abstract string Avatar { get; set; }
         public abstract string Jobtitle { get; set; }
         public abstract string Departmemt { get; set; }
+        public abstract string Email { get; set; }
     }
 }

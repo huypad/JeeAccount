@@ -4,7 +4,9 @@ import { HttpParams, HttpHeaders } from '@angular/common/http';
 import { TokenStorage } from '../../../../modules/auth/_services/token-storage.service';
 import { AuthService } from '../../../../modules/auth';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class HttpUtilsService {
   constructor(private tokenStorage: TokenStorage, private auth: AuthService) {}
   getFindHTTPParams(queryParams): HttpParams {

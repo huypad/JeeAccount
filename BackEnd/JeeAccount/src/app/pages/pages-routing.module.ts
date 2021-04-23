@@ -22,8 +22,8 @@ const routes: Routes = [
       },
       {
         path: 'DepartmentManagement',
-        loadChildren: () => import('./JeeAccount/DepartmentManagement/department-management.module').
-          then((m) => m.DepartmentManagementModule),
+        loadChildren: () =>
+          import('./JeeAccount/DepartmentManagement/department-management.module').then((m) => m.DepartmentManagementModule),
       },
       {
         path: '',
