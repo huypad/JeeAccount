@@ -39,13 +39,15 @@ export class AuthService implements OnDestroy {
   subscriptions: Subscription[] = [];
   ssoToken$: BehaviorSubject<string> = new BehaviorSubject<string>(undefined);
   authLocalStorageToken = `${environment.appVersion}-${environment.USERDATA_KEY}`;
+  accessToken$ = new BehaviorSubject<string>(undefined);
+  refreshToken$ = new BehaviorSubject<string>(undefined);
 
   constructor(private http: HttpClient, private authHttpService: AuthHTTPService) {
     this.isLoading$ = new BehaviorSubject<boolean>(false);
     this.currentUser$ = this.currentUserSubject.asObservable();
     this.authSSOModel$ = this.authSSOModelSubject$.asObservable();
     this.ssoToken$.next(this.getParamsSSO());
-    setInterval(() => this.autoGetUserFromSSO(), 10000);
+    setInterval(() => this.autoGetUserFromSSO(), 60000);
   }
 
   get currentUserValue(): UserModel {
@@ -59,40 +61,33 @@ export class AuthService implements OnDestroy {
   autoGetUserFromSSO() {
     const auth = this.getAuthFromLocalStorage();
     if (auth) {
-      this.ssoToken$.next(this.authSSOModelSubject$.getValue().access_token);
-      this.getUserDataFromSSO().subscribe(
-        (data) => {
-          if (data && data.access_token) {
-            this.saveLocalStorageToken(this.authLocalStorageToken, data);
-          }
-        },
-        (error) => {
-          console.log('come here: ', error);
-          this.refreshToken().subscribe(
-            (data: AuthSSO) => {
-              if (data && data.access_token) {
-                this.saveLocalStorageToken(this.authLocalStorageToken, data);
-              }
-            },
-            (error) => {
-              console.log('error refresh:', error);
-              localStorage.removeItem(this.authLocalStorageToken);
-              this.logout();
-            }
-          );
-        }
-      );
+      this.saveNewUserMe();
     }
   }
 
-  refreshToken(): Observable<any> {
-    console.log('refresh_token: ', this.authSSOModelSubject$.getValue().refresh_token);
-    const url = API_IDENTITY_REFESHTOKEN;
-    const httpHeader = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.authSSOModelSubject$.getValue().refresh_token}`,
-    });
-    return this.http.post<any>(url, { headers: httpHeader });
+  saveNewUserMe(access_token?: string, refresh_token?: string) {
+    if (access_token) this.accessToken$.next(access_token);
+    if (refresh_token) this.refreshToken$.next(refresh_token);
+    this.getUserMeFromSSO().subscribe(
+      (data) => {
+        if (data && data.access_token) {
+          this.saveLocalStorageToken(this.authLocalStorageToken, data);
+        }
+      },
+      (error) => {
+        this.refreshToken().subscribe(
+          (data: AuthSSO) => {
+            if (data && data.access_token) {
+              this.saveLocalStorageToken(this.authLocalStorageToken, data);
+            }
+          },
+          (error) => {
+            localStorage.removeItem(this.authLocalStorageToken);
+            this.logout();
+          }
+        );
+      }
+    );
   }
 
   isAuthenticated(): boolean {
@@ -117,22 +112,76 @@ export class AuthService implements OnDestroy {
     return date;
   }
 
-  getUserDataFromSSO(): Observable<any> {
-    console.log('ssoToken: ', this.ssoToken$.getValue());
-    const ssoToken = this.ssoToken$.getValue();
-    const url = API_IDENTITY_USER;
-    const httpHeader = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${ssoToken}`,
-    });
-    return this.http.get<any>(url, { headers: httpHeader });
-  }
-
   logout() {
     let url = redirectUrl + document.location.protocol + '//' + document.location.hostname + ':' + document.location.port;
     window.location.href = url;
   }
 
+  getParamsSSO() {
+    const url = window.location.href;
+    let paramValue = undefined;
+    if (url.includes('?')) {
+      const httpParams = new HttpParams({ fromString: url.split('?')[1] });
+      paramValue = httpParams.get('sso_token').split('Bearer ')[1];
+    }
+    return paramValue;
+  }
+
+  getAuthFromLocalStorage() {
+    try {
+      const authData = JSON.parse(localStorage.getItem(this.authLocalStorageToken));
+      if (authData === null) return undefined;
+      return authData;
+    } catch (error) {
+      return undefined;
+    }
+  }
+
+  saveLocalStorageToken(key: string, value: any) {
+    localStorage.setItem(key, JSON.stringify(value));
+    this.authSSOModelSubject$.next(value);
+    this.authSSOModel$ = this.authSSOModelSubject$.asObservable();
+    this.accessToken$.next(value.access_token);
+    this.refreshToken$.next(value.refresh_token);
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe.forEach((sb) => sb.unsubscribe());
+  }
+
+  // call api identity server
+  getUserMeFromSSO(): Observable<any> {
+    const accessToken = this.accessToken$.getValue();
+    const url = API_IDENTITY_USER;
+    const httpHeader = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    });
+    return this.http.get<any>(url, { headers: httpHeader });
+  }
+
+  refreshToken(): Observable<any> {
+    const url = API_IDENTITY_REFESHTOKEN;
+    const httpHeader = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.refreshToken$.getValue()}`,
+    });
+    return this.http.post<any>(url, { headers: httpHeader });
+  }
+
+  logoutToSSO(): Observable<any> {
+    const url = API_IDENTITY_LOGOUT;
+    const accessToken = this.accessToken$.getValue();
+    const httpHeader = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    });
+    return this.http.post<any>(url, { headers: httpHeader });
+  }
+
+  // end call api identity server
+
+  // method metronic call
   getUserByToken(): Observable<UserModel> {
     const auth = this.getAuthFromLocalStorage();
     if (!auth || !auth.accessToken) {
@@ -152,60 +201,11 @@ export class AuthService implements OnDestroy {
     );
   }
 
-  logoutToSSO(): Observable<any> {
-    const url = API_IDENTITY_LOGOUT;
-    const httpHeader = this.getHTTPHeaders();
-    return this.http.post<any>(url, null, { headers: httpHeader });
-  }
-
-  saveLocalStorageToken(key: string, value: any) {
-    localStorage.setItem(key, JSON.stringify(value));
-    this.authSSOModelSubject$.next(value);
-    this.authSSOModel$ = this.authSSOModelSubject$.asObservable();
-    this.ssoToken$.next(value.access_token);
-    console.log('access_token value', value.access_token);
-    console.log('value', value);
-  }
-
-  getParamsSSO() {
-    const url = window.location.href;
-    let paramValue = undefined;
-    if (url.includes('?')) {
-      const httpParams = new HttpParams({ fromString: url.split('?')[1] });
-      paramValue = httpParams.get('sso_token').split('Bearer ')[1];
-    }
-    return paramValue;
-  }
-
-  ngOnDestroy() {
-    this.unsubscribe.forEach((sb) => sb.unsubscribe());
-  }
-
-  getAuthFromLocalStorage() {
-    try {
-      const authData = JSON.parse(localStorage.getItem(this.authLocalStorageToken));
-      if (authData === null) return undefined;
-      return authData;
-    } catch (error) {
-      return undefined;
-    }
-  }
-
-  getHTTPHeaders(): HttpHeaders {
-    const auth = this.getAuthFromLocalStorage();
-    let result = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${auth.access_token}`,
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    });
-    return result;
-  }
-
   forgotPassword(value: any): Observable<any> {
     throw new Error('Method not implemented.');
   }
   registration(newUser: UserModel): Observable<any> {
     throw new Error('Method not implemented.');
   }
+  // end method metronic call
 }

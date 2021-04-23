@@ -9,6 +9,7 @@ import { LayoutUtilsService, MessageType } from '../../_core/utils/layout-utils.
 import { ReplaySubject } from 'rxjs';
 import { DepartmentSelection } from '../../_core/models/danhmuc.model';
 import { DanhMucChungService } from '../../_core/services/danhmuc.service';
+import { AuthService } from 'src/app/modules/auth/_services/auth.service';
 
 @Component({
   selector: 'app-account-management-edit-dialog',
@@ -45,7 +46,8 @@ export class AccountManagementEditDialogComponent implements OnInit {
     private accountManagementService: AccountManagementService,
     private changeDetect: ChangeDetectorRef,
     private layoutUtilsService: LayoutUtilsService,
-    public danhmuc: DanhMucChungService
+    public danhmuc: DanhMucChungService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -125,6 +127,7 @@ export class AccountManagementEditDialogComponent implements OnInit {
   create(acc: AccountManagementModel) {
     this.accountManagementService.createAccount(acc).subscribe((res) => {
       if (res && res.status === 1) {
+        this.authService.saveNewUserMe(res.access_token, res.refresh_token);
         this.dialogRef.close(res);
       } else {
         this.layoutUtilsService.showActionNotification(res.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
