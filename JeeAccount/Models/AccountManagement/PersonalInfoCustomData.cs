@@ -14,6 +14,6 @@ namespace JeeAccount.Models.AccountManagement
         public override string Avatar { get ; set ; }
         public override string Jobtitle { get ; set ; }
         public override string Departmemt { get ; set ; }
-
+        public override string Email { get ; set ; }
     }
 }
