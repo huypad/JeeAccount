@@ -1,4 +1,5 @@
-﻿using JeeAccount.Models;
+﻿using JeeAccount.Classes;
+using JeeAccount.Models;
 using JeeAccount.Models.Common;
 using System;
 using System.Collections.Generic;
@@ -126,7 +127,12 @@ namespace JeeAccount.Services
             return identity;
         }
 
-
+        public static IdentityServerReturn TranformIdentityServerException(Exception ex)
+        {
+            IdentityServerReturn identity = new IdentityServerReturn();
+            identity.statusCode = Int32.Parse(Constant.ERRORCODE_EXCEPTION);
+            return identity;
+        }
     }
 
 }

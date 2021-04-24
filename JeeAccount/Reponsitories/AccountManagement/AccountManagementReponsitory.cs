@@ -124,7 +124,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
             SqlConditions Conds = new SqlConditions();
             Conds.Add("Username", username);
 
-            string sql = @"select LastName + '' + FirstName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department from AccountList 
+            string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department from AccountList 
 where Username = @username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
@@ -205,7 +205,7 @@ where CustomerID = @CustomerID";
             Conds.Add("CustomerID", customerID);
             Conds.Add("isAdmin", 1);
 
-            string sql = @"select LastName + '' + FirstName as FullName, FirstName as Name
+            string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name
                         , AvartarImgURL as Avatar, Jobtitle, Department, Username, Email 
                         from AccountList 
                         where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
@@ -233,7 +233,7 @@ where CustomerID = @CustomerID";
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", customerID);
 
-            string sql = @"select LastName + '' + FirstName as FullName, FirstName as Name, 
+            string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name, 
                         AvartarImgURL as Avatar, Jobtitle, Department, Username, DirectManager
                         , IsActive, Note, email from AccountList 
                         where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";

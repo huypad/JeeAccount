@@ -90,13 +90,13 @@ namespace JeeAccount.Services
                 return update;
             }
         }
-        public async Task<ReturnSqlModel> CreateAccount(string Admin_accessToken, long customerID, long AdminUserID, AccountManagementModel account, string apiUrl)
+        public async Task<IdentityServerReturn> CreateAccount(string Admin_accessToken, long customerID, long AdminUserID, AccountManagementModel account, string apiUrl)
         {
             using (DpsConnection cnn = new DpsConnection(ConnectionString))
             {
+                IdentityServerReturn identityServerReturn = new IdentityServerReturn();
                 try
                 {
-
                     cnn.BeginTransaction();
                     var create = accountManagementReponsitory.CreateAccount(cnn, account, AdminUserID, customerID);
                     if (create.Susscess)
@@ -112,23 +112,24 @@ namespace JeeAccount.Services
                         {
                             cnn.RollbackTransaction();
                             cnn.EndTransaction();
-                            return new ReturnSqlModel(createUser.message + " Error code: " + createUser.statusCode, Constant.ERRORCODE_EXCEPTION);
+                            return createUser;
                         }
                         cnn.EndTransaction();
-                        return create;
+                        return createUser;
                     }
                     else
                     {
                         cnn.RollbackTransaction();
                         cnn.EndTransaction();
-                        return create;
+                        identityServerReturn = GeneralService.TranformIdentityServerReturnSqlModel(create);
+                        return identityServerReturn;
                     }
-    
                 } catch (Exception ex)
                 {
                     cnn.RollbackTransaction();
                     cnn.EndTransaction();
-                    return new ReturnSqlModel(ex.Message, Constant.ERRORCODE_EXCEPTION);
+                    identityServerReturn = GeneralService.TranformIdentityServerException(ex);
+                    return identityServerReturn;
                 }
             }
         }

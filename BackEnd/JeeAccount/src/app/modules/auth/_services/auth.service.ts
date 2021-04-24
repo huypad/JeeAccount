@@ -170,7 +170,7 @@ export class AuthService implements OnDestroy {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.refreshToken$.getValue()}`,
     });
-    return this.http.post<any>(url, { headers: httpHeader });
+    return this.http.post<any>(url, null, { headers: httpHeader });
   }
 
   logoutToSSO(): Observable<any> {
@@ -180,7 +180,7 @@ export class AuthService implements OnDestroy {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${accessToken}`,
     });
-    return this.http.post<any>(url, { headers: httpHeader });
+    return this.http.post<any>(url, null, { headers: httpHeader });
   }
 
   // end call api identity server

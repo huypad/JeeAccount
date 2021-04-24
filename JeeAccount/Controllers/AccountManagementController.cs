@@ -257,17 +257,12 @@ namespace JeeAccount.Controllers
                 var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
                 string apiUrl = _config.GetValue<string>("JeeAccount:API");
                 var create = await accountManagementService.CreateAccount(token, customData.JeeAccount.CustomerID, customData.JeeAccount.UserID, account, apiUrl);
-                if (!create.Susscess)
+                if (create.data is null)
                 {
-                    if (create.ErrorCode.Equals(Constant.ERRORCODE_EXCEPTION))
-                    {
-                        // TODO: bổ sung ghi log sau
-                        string logMessage = create.ErrorMessgage;
-
-                        return JsonResultCommon.ThatBai(create.ErrorMessgage);
-                    }
+                
+                    return JsonResultCommon.ThatBai(create.message); 
                 }
-                return JsonResultCommon.ThanhCong();
+                return JsonResultCommon.ThanhCong(create.data);
             }
             catch (Exception ex)
             {
