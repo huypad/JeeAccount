@@ -77,9 +77,9 @@ namespace JeeAccount.Services
             return accManagement;
         }
 
-        public Task<ReturnSqlModel> ChangeTinhTrang(long customerID, string Username)
+        public ReturnSqlModel ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin)
         {
-            var update = accountManagementReponsitory.ChangeTinhTrang(customerID, Username);
+            var update = accountManagementReponsitory.ChangeTinhTrang(customerID, Username, Note, UserIdLogin);
             return update;
         }
         public ReturnSqlModel UpdateAvatar(string AvatarUrl, long userID, long CustomerID)
@@ -292,6 +292,11 @@ namespace JeeAccount.Services
                 identity.statusCode = Int32.Parse(Constant.ERRORCODE_EXCEPTION);
                 return identity;
             } 
+        }
+        public ReturnSqlModel UpdateDirectManager(string Username, string DirectManager, long customerID)
+        {
+            var update = accountManagementReponsitory.UpdateDirectManager(Username, DirectManager, customerID);
+            return update;
         }
     }
 }

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { AccountManagementModel, AppListDTO } from '../Model/account-management.model';
+import { AccountManagementDTO, AccountManagementModel, AppListDTO, InfoUserDTO } from '../Model/account-management.model';
 import { AccountManagementService } from '../Services/account-management.service';
 import { ResultModel } from '../../_core/models/_base.model';
 import { DepartmentModel } from '../../DepartmentManagement/Model/department-management.model';
@@ -12,22 +12,18 @@ import { DanhMucChungService } from '../../_core/services/danhmuc.service';
 import { AuthService } from 'src/app/modules/auth/_services/auth.service';
 
 @Component({
-  selector: 'app-account-management-edit-dialog',
-  templateUrl: './account-management-edit-dialog.component.html',
+  selector: 'app-account-management-edit-no-jeehr-dialog',
+  templateUrl: './account-management-edit-no-jeehr-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AccountManagementEditDialogComponent implements OnInit {
-  item: any = [];
+export class AccountManagementEditNoJeeHRDialogComponent implements OnInit {
   itemForm = this.fb.group({
-    AnhDaiDien: [''],
-    HoTen: ['', [Validators.required]],
-    Email: ['', [Validators.required]],
+    HoLot: ['', [Validators.required]],
+    Ten: ['', [Validators.required]],
+    Email: [''],
     PhongBan: ['', [Validators.required]],
-    TenDangNhap: ['', [Validators.required]],
-    MatKhau: ['', [Validators.required]],
     SoDienThoai: [''],
     ChucVu: ['', [Validators.required]],
-    NhapLaiMatKhau: ['', [Validators.required]],
     AppsCheckbox: new FormArray([]),
     file: [],
     PhongBanFilterCtrl: [],
@@ -39,9 +35,12 @@ export class AccountManagementEditDialogComponent implements OnInit {
   phongBans: DepartmentSelection[] = [];
   filterPhongBans: ReplaySubject<DepartmentSelection[]> = new ReplaySubject<DepartmentSelection[]>();
   // End
+  item: InfoUserDTO;
+  username: string;
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
-    public dialogRef: MatDialogRef<AccountManagementEditDialogComponent>,
+    public dialogRef: MatDialogRef<AccountManagementEditNoJeeHRDialogComponent>,
     private fb: FormBuilder,
     private accountManagementService: AccountManagementService,
     private changeDetect: ChangeDetectorRef,
@@ -51,7 +50,12 @@ export class AccountManagementEditDialogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.item = this.data.item;
+    this.accountManagementService.GetInfoByUsername(this.data.item.Username).subscribe((res) => {
+      if (res && res.data) {
+        this.item = res.data;
+        this.initData();
+      }
+    });
     this.accountManagementService.GetListAppByCustomerID().subscribe((res: ResultModel<AppListDTO>) => {
       if (res && res.status === 1) {
         this.listApp = res.data;
@@ -67,6 +71,15 @@ export class AccountManagementEditDialogComponent implements OnInit {
       }
     });
   }
+  initData() {
+    this.itemForm.controls.HoLot.setValue(this.item.LastName);
+    this.itemForm.controls.Ten.setValue(this.item.Name);
+    this.itemForm.controls.Email.setValue(this.item.Email);
+    this.itemForm.controls.SoDienThoai.setValue(this.item.PhoneNumber);
+    this.itemForm.controls.ChucVu.setValue(this.item.Jobtitle);
+    const index = this.phongBans.findIndex((x) => x.RowID === this.item.Departmemt);
+    this.itemForm.controls.PhongBan.setValue(this.phongBans[index].RowID);
+  }
   get AppsFromArray() {
     return this.itemForm.controls.AppsCheckbox as FormArray;
   }
@@ -76,7 +89,7 @@ export class AccountManagementEditDialogComponent implements OnInit {
   onSubmit() {
     if (this.itemForm.valid) {
       //  check password
-      if (this.itemForm.controls.MatKhau.value !== this.item.controls.NhapLaiMatKhau.value) {
+      if (this.itemForm.controls.MatKhau.value !== this.itemForm.controls.NhapLaiMatKhau.value) {
         this.layoutUtilsService.showActionNotification(
           'Mật khẩu không trùng khớp',
           MessageType.Read,
@@ -111,9 +124,6 @@ export class AccountManagementEditDialogComponent implements OnInit {
     acc.Phonemumber = this.itemForm.controls.SoDienThoai.value;
     acc.Departmemt = this.itemForm.controls.PhongBan.value;
     acc.Jobtitle = this.itemForm.controls.ChucVu.value;
-    acc.Username = `${this.CompanyCode}.${this.itemForm.controls.TenDangNhap.value}`;
-    acc.Password = this.itemForm.controls.MatKhau.value;
-    acc.ImageAvatar = this.imgFile.split(',')[1];
     return acc;
   }
   validateAllFormFields(formGroup: FormGroup) {
@@ -140,14 +150,14 @@ export class AccountManagementEditDialogComponent implements OnInit {
     }
   }
   create(acc: AccountManagementModel) {
-    this.accountManagementService.createAccount(acc).subscribe((res) => {
-      if (res && res.status === 1) {
-        this.authService.saveNewUserMe(res.access_token, res.refresh_token);
-        this.dialogRef.close(res);
-      } else {
-        this.layoutUtilsService.showActionNotification(res.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
-      }
-    });
+    // this.accountManagementService.createAccount(acc).subscribe((res) => {
+    //   if (res && res.status === 1) {
+    //     this.authService.saveNewUserMe(res.access_token, res.refresh_token);
+    //     this.dialogRef.close(res);
+    //   } else {
+    //     this.layoutUtilsService.showActionNotification(res.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
+    //   }
+    // });
   }
   goBack() {
     this.dialogRef.close();

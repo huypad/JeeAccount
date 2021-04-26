@@ -11,5 +11,6 @@ namespace JeeAccount.Reponsitories
     {
         Task<IEnumerable<DepartmentDTO>> GetListDepartment(long custormerID);
         ReturnSqlModel CreateDepartment(DepartmentModel departmentModel, long CustomerID, long UserID);
+        ReturnSqlModel ChangeTinhTrang(long customerID, long RowID, string Note, long UserIdLogin);
     }
 }

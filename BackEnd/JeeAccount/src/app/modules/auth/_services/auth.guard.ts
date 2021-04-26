@@ -10,13 +10,21 @@ export class AuthGuard implements CanActivate {
       if (!this.authService.isAuthenticated()) {
         if (this.authService.ssoToken$.getValue()) {
           this.authService.accessToken$.next(this.authService.ssoToken$.getValue());
-          this.authService.getUserMeFromSSO().subscribe((data: AuthSSO) => {
-            if (data && data.access_token) {
-              this.authService.saveLocalStorageToken(this.authService.authLocalStorageToken, data);
-              return resolve(true);
+          this.authService.getUserMeFromSSO().subscribe(
+            (data: AuthSSO) => {
+              if (data && data.access_token) {
+                this.authService.saveLocalStorageToken(this.authService.authLocalStorageToken, data);
+                return resolve(true);
+              }
+            },
+            (error) => {
+              localStorage.clear();
+              this.authService.logout();
+              return resolve(false);
             }
-          });
+          );
         } else {
+          localStorage.clear();
           this.authService.logout();
           return resolve(false);
         }

@@ -6,9 +6,6 @@
 .btn {
   outline: none !important;
   vertical-align: middle;
-  font-family: $jee-font-family;
-  font-size: $jee-btn-font-size;
-  height: $jee-btn-height;
 
   // Transition
   @include button-custom-transition($transition-link);
@@ -37,46 +34,6 @@
   &.btn-borderless {
     border-color: transparent;
   }
-
-  &.jee-btn {
-    padding-top: $jee-btn-padding-top;
-    padding-left: $jee-btn-padding-left-right;
-    padding-right: $jee-btn-padding-left-right;
-    padding-bottom: $jee-btn-padding-bottom;
-    margin: $jee-btn-margin;
-    color: $jee-btn-color;
-
-    &.btn-themmoi-blue {
-      background-color: #3699ff;
-    }
-
-    &.btn-themmoi-blue:hover {
-      color: $jee-btn-color;
-      background-color: #0e72d8;
-    }
-
-    &.btn-themmoi-green {
-      color: $jee-btn-color;
-      background-color: #1bc5bd;
-    }
-
-    &.btn-themmoi-green:hover {
-      color: $jee-btn-color;
-      background-color: #0bb7af;
-    }
-
-    &.btn-quaylai {
-      color: black;
-      background-color: #ffffff;
-      border-color: black;
-    }
-
-    &.btn-quaylai:hover {
-      color: black;
-      background-color: #e4e6ef;
-      border-color: black;
-    }
-  }
 }
 
 // Icons
@@ -88,6 +45,11 @@
     vertical-align: middle;
     line-height: 1;
     display: inline-flex;
+
+    &:after,
+    &:before {
+      //line-height: 0;
+    }
   }
 
   // Svg icons

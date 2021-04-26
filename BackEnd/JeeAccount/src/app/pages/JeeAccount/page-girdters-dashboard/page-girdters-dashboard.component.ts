@@ -74,12 +74,6 @@ export class PageGidtersDashboardComponent implements OnInit {
           if (widget.componentName === this.listWidget[2].componentName) {
             widget.componentType = this.listWidget[2].componentType;
           }
-          if (widget.componentName === this.listWidget[3].componentName) {
-            widget.componentType = this.listWidget[3].componentType;
-          }
-          if (widget.componentName === this.listWidget[4].componentName) {
-            widget.componentType = this.listWidget[4].componentType;
-          }
         });
       } else {
         this.dashboard = [];

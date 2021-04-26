@@ -4,7 +4,7 @@ export class DepartmentModel {
   public DepartmentManager: string;
   public ThanhVien: string[];
   public Note: string;
-  public  Fullname: string;
+  public Fullname: string;
   clear() {
     this.RowID = 0;
     this.DepartmentManager = '';
@@ -12,5 +12,15 @@ export class DepartmentModel {
     this.ThanhVien = [];
     this.Note = '';
     this.Fullname = '';
+  }
+}
+
+export class DepChangeTinhTrangModel {
+  RowID: number;
+  Note: string;
+
+  clear() {
+    this.RowID = 0;
+    this.Note = '';
   }
 }

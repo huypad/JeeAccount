@@ -10,6 +10,7 @@ import { DepartmentManagementEditDialogComponent } from './department-management
 import { MatChipsModule } from '@angular/material/chips';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { InlineSVGModule } from 'ng-inline-svg';
+import { DepartmentChangeTinhTrangEditDialogComponent } from './department-change-tinh-trang-edit-dialog/department-change-tinh-trang-edit-dialog.component';
 
 const routes: Routes = [
   {
@@ -25,12 +26,18 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [DepartmentManagementComponent, DepartmentManagementLístComponent, DepartmentManagementEditDialogComponent],
+  declarations: [
+    DepartmentManagementComponent,
+    DepartmentManagementLístComponent,
+    DepartmentManagementEditDialogComponent,
+    DepartmentChangeTinhTrangEditDialogComponent,
+  ],
   imports: [CommonModule, RouterModule.forChild(routes), JeeAccountModule, MatChipsModule, NgxMatSelectSearchModule, InlineSVGModule],
   providers: [
     DepartmentManagementService,
     { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true, height: 'auto', width: '900px' } },
   ],
-  entryComponents: [DepartmentManagementEditDialogComponent],
+  entryComponents: [DepartmentManagementEditDialogComponent, DepartmentChangeTinhTrangEditDialogComponent],
+  exports: [DepartmentManagementLístComponent],
 })
 export class DepartmentManagementModule {}

@@ -27,7 +27,7 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/AccountManagement',
+        redirectTo: '/dashboard',
         pathMatch: 'full',
       },
       {

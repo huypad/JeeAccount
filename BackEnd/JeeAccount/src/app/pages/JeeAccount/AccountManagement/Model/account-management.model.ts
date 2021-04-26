@@ -39,3 +39,47 @@ export class PostImgModel {
   imgFile: string;
   Username: string;
 }
+
+export class AccDirectManagerModel {
+  Username: string;
+  DirectManager: string;
+
+  clear() {
+    this.Username = '';
+    this.DirectManager = '';
+  }
+}
+
+export class AccChangeTinhTrangModel {
+  Username: string;
+  Note: string;
+
+  clear() {
+    this.Username = '';
+    this.Note = '';
+  }
+}
+
+export class InfoUserDTO {
+  Fullname: string;
+  Name: string;
+  Avatar: string;
+  Jobtitle: string;
+  Departmemt: string;
+  Email: string;
+  PhoneNumber: string;
+  LastName: string;
+  Username: string;
+
+  clear() {
+    this.Fullname = '';
+    this.Name = '';
+    this.Avatar = '';
+    this.Jobtitle = '';
+    this.Departmemt = '';
+    this.Email = '';
+    this.PhoneNumber = '';
+    this.LastName = '';
+    this.Username = '';
+  }
+}

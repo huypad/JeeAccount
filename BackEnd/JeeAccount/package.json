@@ -9,7 +9,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "rtl": "webpack --config webpack-rtl.config.js",
-    "start_wls2": "ng serve --poll=2000 --host 0.0.0.0"
+    "start_wsl": "ng serve --poll=2000 --host 0.0.0.0"
   },
   "private": true,
   "dependencies": {

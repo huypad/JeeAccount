@@ -1,7 +1,7 @@
 gridster {
   margin: 0;
   padding: 0;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 115px);
   background-color: inherit;
 }
 
@@ -13,6 +13,8 @@ gridster {
 
 gridster-item {
   border-radius: 7px;
+  padding: 24px;
+  padding-top: 0px;
 }
 
 .gridster-container {
@@ -37,18 +39,16 @@ gridster-item {
   right: 0;
   align-items: center;
   white-space: nowrap;
-  height: 40px;
+  height: 76px;
   padding: 5px 5px;
   border-bottom: 1px solid #e9ebf0;
 
-  .widget-header-child {
-    flex: 0 0 auto;
-  }
-
   .widget-header-title {
+    font-family: 'Roboto';
     overflow: hidden;
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 18px;
+    color: #000000;
+    font-weight: 600;
     background-color: white;
     text-overflow: ellipsis;
     flex-grow: 1;
@@ -56,7 +56,13 @@ gridster-item {
   }
 
   .widget-header-right {
-    flex: 0 0 10px;
+    flex: 0 0 2;
+
+    .btn {
+      border-radius: 0.4rem;
+      height: 35px;
+      width: 35px;
+    }
   }
 }
 
@@ -96,5 +102,41 @@ app-nomination-widget {
   .mat-expansion-panel:not([class*='mat-elevation-z']) {
     box-shadow: none;
     border-bottom: 1px solid #e9ebf0;
+  }
+}
+
+::ng-deep .gridster-container .card.card-custom.gutter-b {
+  .card-header {
+    display: none;
+  }
+
+  .angular-bootstrap-table {
+    overflow-y: hidden;
+  }
+
+  .card-body {
+    .table.table-head-custom {
+      thead,
+      th {
+        height: 50px;
+        font-weight: bold !important;
+        color: #000000 !important;
+        background-color: #f3f6f9 !important;
+      }
+      tr {
+        height: 70px;
+      }
+    }
+    .table.table-head-custom td.mat-cell {
+      font-size: 15px !important;
+
+      .jee-name {
+        font-size: 15px !important;
+      }
+
+      .mat-icon {
+        font-size: 27px !important;
+      }
+    }
   }
 }

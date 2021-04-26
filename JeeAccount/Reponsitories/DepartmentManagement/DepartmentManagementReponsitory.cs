@@ -102,6 +102,50 @@ namespace JeeAccount.Reponsitories
             }
             return true;
         }
+        public ReturnSqlModel ChangeTinhTrang(long customerID, long RowID, string Note, long UserIdLogin)
+        {
+            Hashtable val = new Hashtable();
+            if (!string.IsNullOrEmpty(Note))
+            {
+                val.Add("Note", Note);
+            }
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("CustomerID", customerID);
+            Conds.Add("RowID", RowID);
+            string sql = $"select IsActive from DepartmentList where CustomerID=@CustomerID and RowID=@RowID";
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                DataTable dt = cnn.CreateDataTable(sql, Conds);
+                if (dt.Rows.Count == 0)
+                {
+                    return new ReturnSqlModel("RowID không tồn tại", Constant.ERRORCODE_NOTEXIST);
+                }
+                string sqlGetUsernameLogin = $"select Username from AccountList where CustomerID=@CustomerID and UserID=@UserID";
+                SqlConditions CondsLogin = new SqlConditions();
+                CondsLogin.Add("UserID", UserIdLogin);
+                CondsLogin.Add("CustomerID", customerID);
+                DataTable dtGetUsernameLogin = new DataTable();
+                dtGetUsernameLogin = cnn.CreateDataTable(sqlGetUsernameLogin, CondsLogin);
+                var isTinhTrang = Convert.ToBoolean((bool)dt.Rows[0][0]);
+                if (isTinhTrang)
+                {
+                    val.Add("DeActiveDate", DateTime.Now);
+                    val.Add("DeActiveBy", dtGetUsernameLogin.Rows[0][0]);
+                }
+                else
+                {
+                    val.Add("ActiveDate", DateTime.Now);
+                    val.Add("ActiveBy", dtGetUsernameLogin.Rows[0][0]);
+                }
+                val.Add("IsActive", !isTinhTrang);
 
+                int x = cnn.Update(val, Conds, "DepartmentList");
+                if (x <= 0)
+                {
+                    return new ReturnSqlModel(cnn.LastError.ToString(), Constant.ERRORCODE_EXCEPTION);
+                }
+            }
+            return new ReturnSqlModel();
+        }
     }
 }

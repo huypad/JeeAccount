@@ -3,9 +3,9 @@
     <div class="m-portlet__head-title">
       <div class="row" style="display: inline">
         <h5 class="m-portlet__head-text">
-          <span class="dialog-title">Thêm mới tài khoản sử dụng</span>
+          <span class="dialog-title">Sửa tài khoản {{this.data.item.Username}}</span>
           <button mat-button style="float: right; margin: 0" class="ja_button mat-button ja_btn-addnew"
-            (click)="onSubmit()">Thêm</button>
+            (click)="onSubmit()">Lưu</button>
           <button mat-button style="float: right; margin: 0; margin-right: 12px;"
             class="ja_button mat-button ja_btn-goback" (click)="goBack()">Đóng</button>
         </h5>
@@ -18,23 +18,11 @@
         <div class="m-form__section m-form__section--first">
           <div class="row m-form__group">
             <div class="col-6 m--margin-bottom-10-mobile">
-              <div class="row">
-                <div class="col-md-8 m--margin-bottom-10-mobile">
-                  <mat-form-field class="mat-form-field-fluid">
-                    <input formControlName="AnhDaiDien" placeholder="Ảnh đại diện" matInput readonly>
-                  </mat-form-field>
-                </div>
-                <div class="col-md-4 m--margin-bottom-5-mobile">
-                  <input style="display: none;" accept="image/jpg, image/jpeg, image/png" formControlName="file"
-                    id="file" type="file" class="form-control" (change)="onFileChange($event)" #hiddenfileinput>
-                  <button mat-button class="ja_button mat-button ja_btn-addnew"
-                    (click)="hiddenfileinput.click()">Browse</button>
-                </div>
-              </div>
+
               <div class="row">
                 <div class="col-md-12 m--margin-bottom-10-mobile">
                   <mat-form-field class="mat-form-field-fluid">
-                    <input class="require" formControlName="HoTen" placeholder="Họ và tên" matInput required>
+                    <input class="require" formControlName="HoLot" placeholder="Họ và tên lót" matInput required>
                   </mat-form-field>
                 </div>
               </div>
@@ -61,28 +49,14 @@
                   </mat-form-field>
                 </div>
               </div>
-              <div class="row">
-                <div class="col-md-12 m--margin-bottom-10-mobile">
-                  <mat-form-field class="mat-form-field-fluid">
-                    <span matPrefix style=" color: #760b0b;">{{CompanyCode}}.</span>
-                    <input class="require" formControlName="TenDangNhap" placeholder="Tên đăng nhập" matInput required>
-                  </mat-form-field>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-12 m--margin-bottom-10-mobile">
-                  <mat-form-field class="mat-form-field-fluid">
-                    <input type="password" class="require" formControlName="MatKhau" placeholder="Mật khẩu" matInput
-                      required>
-                  </mat-form-field>
-                </div>
-              </div>
               <!-- ================== -->
             </div>
             <div class="col-6 m--margin-bottom-10-mobile">
               <div class="row">
                 <div class="col-md-12 m--margin-bottom-10-mobile">
-                  <img [src]="imgFile" style="width:auto; height:104px">
+                  <mat-form-field class="mat-form-field-fluid">
+                    <input class="require" formControlName="Ten" placeholder="Tên" matInput required>
+                  </mat-form-field>
                 </div>
               </div>
               <div class="row">
@@ -96,14 +70,6 @@
                 <div class="col-md-12 m--margin-bottom-10-mobile">
                   <mat-form-field class="mat-form-field-fluid">
                     <input class="require" formControlName="ChucVu" placeholder="Chức vụ" matInput required>
-                  </mat-form-field>
-                </div>
-              </div>
-              <div class="row" style="margin-top: 53px">
-                <div class="col-md-12 m--margin-bottom-10-mobile">
-                  <mat-form-field class="mat-form-field-fluid">
-                    <input type="password" class="require" formControlName="NhapLaiMatKhau"
-                      placeholder="Nhập lại mật khẩu" matInput required>
                   </mat-form-field>
                 </div>
               </div>

@@ -28,5 +28,10 @@ namespace JeeAccount.Services
             var create = departmentManagementReponsitory.CreateDepartment(departmentModel, CustomerID, UserID);
             return create;
         }
+        public ReturnSqlModel ChangeTinhTrang(long customerID, long RowID, string Note, long UserIdLogin)
+        {
+            var update = departmentManagementReponsitory.ChangeTinhTrang(customerID, RowID, Note, UserIdLogin);
+            return update;
+        }
     }
 }
