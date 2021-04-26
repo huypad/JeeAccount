@@ -9,8 +9,8 @@
       font-weight: $table-head-font-weight;
       font-size: $table-head-font-size;
       border-bottom-width: 1px;
-      padding-top: 1rem;
-      padding-bottom: 1rem;
+      padding-left: 16px;
+      padding-bottom: 12px;
     }
   }
 
@@ -49,43 +49,35 @@
     thead {
       tr,
       th {
-        font-weight: $jee-table-header-font-weight;
-        color: $jee-table-header-color !important;
-        font-size: $jee-table-header-font-size;
-        background-color: $jee-table-header-background-color;
-        height: $jee-table-header-height;
-        font-family: $jee-font-family;
-        padding-bottom: 12px;
-        padding-top: 12px;
-        padding-left: 16px;
+        height: 48px;
+        font-weight: $table-compact-head-font-weight;
+        color: #808080 !important;
+        font-size: 13px;
+        text-transform: $table-compact-head-text-transform;
+        letter-spacing: $table-compact-head-letter-spacing;
+        background-color: #e4e6ef !important;
       }
     }
 
-    tr.mat-row {
-      font-family: $jee-font-family;
-      height: $jee-table-header-height;
-      font-size: $jee-table-mat-cell-font-size;
-      color: #000000;
-    }
     td.mat-cell {
-      font-size: $jee-table-mat-cell-font-size;
+      font-size: 12px;
+      color: #000000;
+      //padding-bottom: 12px;
+      //padding-top: 12px;
+      padding-left: 16px;
 
-      span.jee-name {
-        padding-top: 12px;
-        padding-bottom: 12px;
-        padding-left: 60px;
-      }
-
-      &.jee-content {
-        padding-top: 12px;
-        padding-bottom: 12px;
-        padding-left: 16px;
-      }
-
-      div.jee-avatar {
+      .jee-avatar {
         padding-left: 12px;
         padding-top: 4px;
         padding-bottom: 4px;
+      }
+
+      .jee-name {
+        color: #000;
+        padding-left: 30px;
+        //padding-bottom: 12px;
+        padding-top: 12px;
+        font-size: 12px;
       }
     }
   }
@@ -97,6 +89,8 @@
         font-weight: $table-compact-head-font-weight;
         color: $table-compact-head-color !important;
         font-size: $table-compact-head-font-size;
+        text-transform: $table-compact-head-text-transform;
+        letter-spacing: $table-compact-head-letter-spacing;
       }
     }
   }

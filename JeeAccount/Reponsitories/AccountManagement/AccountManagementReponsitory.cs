@@ -124,7 +124,8 @@ where Username = @Username and (Disable != 1 or Disable is null)";
             SqlConditions Conds = new SqlConditions();
             Conds.Add("Username", username);
 
-            string sql = @"select LastName + '' + FirstName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department from AccountList 
+            string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department, LastName, Username, Email, PhoneNumber
+from AccountList 
 where Username = @username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
@@ -138,7 +139,11 @@ where Username = @username and (Disable != 1 or Disable is null)";
                     Avatar = dt.Rows[0]["Avatar"].ToString(),
                     Jobtitle = dt.Rows[0]["Jobtitle"].ToString(),
                     Name = dt.Rows[0]["Name"].ToString(),
-                    Departmemt = dt.Rows[0]["Department"].ToString()
+                    Departmemt = dt.Rows[0]["Department"].ToString(),
+                    Email = dt.Rows[0]["Email"].ToString(),
+                    LastName = dt.Rows[0]["LastName"].ToString(),
+                    PhoneNumber = dt.Rows[0]["PhoneNumber"].ToString(),
+                    Username = dt.Rows[0]["Username"].ToString(),
                 };              
             }
         }
@@ -205,7 +210,7 @@ where CustomerID = @CustomerID";
             Conds.Add("CustomerID", customerID);
             Conds.Add("isAdmin", 1);
 
-            string sql = @"select LastName + '' + FirstName as FullName, FirstName as Name
+            string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name
                         , AvartarImgURL as Avatar, Jobtitle, Department, Username, Email 
                         from AccountList 
                         where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
@@ -233,7 +238,7 @@ where CustomerID = @CustomerID";
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", customerID);
 
-            string sql = @"select LastName + '' + FirstName as FullName, FirstName as Name, 
+            string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name, 
                         AvartarImgURL as Avatar, Jobtitle, Department, Username, DirectManager
                         , IsActive, Note, email from AccountList 
                         where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
@@ -258,9 +263,13 @@ where CustomerID = @CustomerID";
             }
         }
 
-        public async Task<ReturnSqlModel> ChangeTinhTrang(long customerID, string Username)
+        public ReturnSqlModel ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin)
         {
             Hashtable val = new Hashtable();
+            if (!string.IsNullOrEmpty(Note))
+            {
+                val.Add("Note", Note);
+            }
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", customerID);
             Conds.Add("Username", Username);
@@ -272,7 +281,22 @@ where CustomerID = @CustomerID";
                 {
                     return new ReturnSqlModel("userId không tồn tại", Constant.ERRORCODE_NOTEXIST);
                 }
+                string sqlGetUsernameLogin = $"select Username from AccountList where CustomerID=@CustomerID and UserID=@UserID";
+                SqlConditions CondsLogin = new SqlConditions();
+                CondsLogin.Add("UserID", UserIdLogin);
+                CondsLogin.Add("CustomerID", customerID);
+                DataTable dtGetUsernameLogin = new DataTable();
+                dtGetUsernameLogin = cnn.CreateDataTable(sqlGetUsernameLogin, CondsLogin);
                 var isTinhTrang = Convert.ToBoolean((bool)dt.Rows[0][0]);
+                if (isTinhTrang)
+                {
+                    val.Add("DeActiveDate", DateTime.Now);
+                    val.Add("DeActiveBy", dtGetUsernameLogin.Rows[0][0]);
+                } else
+                {
+                    val.Add("ActiveDate", DateTime.Now);
+                    val.Add("ActiveBy", dtGetUsernameLogin.Rows[0][0]);
+                }
                 val.Add("IsActive", !isTinhTrang);
  
                 int x = cnn.Update(val, Conds, "AccountList");
@@ -442,5 +466,29 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
             }
         }
 
+        public ReturnSqlModel UpdateDirectManager(string Username, string DirectManager, long customerID)
+        {
+            Hashtable val = new Hashtable();
+            val.Add("DirectManager", DirectManager);
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("CustomerID", customerID);
+            Conds.Add("Username", Username);
+            string sql = $"select Username from AccountList where CustomerID=@CustomerID and Username=@Username";
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                DataTable dt = cnn.CreateDataTable(sql, Conds);
+                if (dt.Rows.Count == 0)
+                {
+                    return new ReturnSqlModel("Username không tồn tại", Constant.ERRORCODE_NOTEXIST);
+                }
+
+                int x = cnn.Update(val, Conds, "AccountList");
+                if (x <= 0)
+                {
+                    return new ReturnSqlModel(cnn.LastError.ToString(), Constant.ERRORCODE_EXCEPTION);
+                }
+            }
+            return new ReturnSqlModel();
+        }
     }
 }

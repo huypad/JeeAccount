@@ -211,8 +211,8 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpGet("ChangeTinhTrang/Username={Username}")]
-        public async Task<BaseModel<object>> changeTinhTrang(string Username)
+        [HttpPost("ChangeTinhTrang")]
+        public async Task<BaseModel<object>> changeTinhTrang(AccChangeTinhTrangModel acc)
         {
             try
             {
@@ -221,7 +221,8 @@ namespace JeeAccount.Controllers
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
-                ReturnSqlModel update = await accountManagementService.ChangeTinhTrang(customData.JeeAccount.CustomerID, Username);
+                
+                ReturnSqlModel update = accountManagementService.ChangeTinhTrang(customData.JeeAccount.CustomerID, acc.Username, acc.Note, customData.JeeAccount.UserID);
                 if (!update.Susscess)
                 {
                     if (update.ErrorCode.Equals(Constant.ERRORCODE_NOTEXIST))
@@ -257,17 +258,12 @@ namespace JeeAccount.Controllers
                 var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
                 string apiUrl = _config.GetValue<string>("JeeAccount:API");
                 var create = await accountManagementService.CreateAccount(token, customData.JeeAccount.CustomerID, customData.JeeAccount.UserID, account, apiUrl);
-                if (!create.Susscess)
+                if (create.data is null)
                 {
-                    if (create.ErrorCode.Equals(Constant.ERRORCODE_EXCEPTION))
-                    {
-                        // TODO: bổ sung ghi log sau
-                        string logMessage = create.ErrorMessgage;
-
-                        return JsonResultCommon.ThatBai(create.ErrorMessgage);
-                    }
+                
+                    return JsonResultCommon.ThatBai(create.message); 
                 }
-                return JsonResultCommon.ThanhCong();
+                return JsonResultCommon.ThanhCong(create.data);
             }
             catch (Exception ex)
             {
@@ -343,7 +339,6 @@ namespace JeeAccount.Controllers
                 return JsonResultCommon.Exception(ex);
             }
         }
-        #region testing api
         [HttpPost("UpdateAvatarWithChangeUrlAvatar")]
         public async Task<BaseModel<object>> UpdateAvatarWithChangeUrlAvatar(PostImgModel img)
         {
@@ -370,7 +365,34 @@ namespace JeeAccount.Controllers
                 return JsonResultCommon.Exception(ex);
             }
         }
-        #endregion
+        [HttpPost("UpdateDirectManager")]
+        public async Task<object> UpdateDirectManager(AccDirectManagerModel acc)
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
+                }
+                var update = accountManagementService.UpdateDirectManager(acc.Username, acc.DirectManager, customData.JeeAccount.CustomerID);
+                if (!update.Susscess)
+                {
+                    if (update.ErrorCode.Equals(Constant.ERRORCODE_EXCEPTION))
+                    {
+                        // TODO: bổ sung ghi log sau
+                        string logMessage = update.ErrorMessgage;
+
+                        return JsonResultCommon.ThatBai(update.ErrorMessgage);
+                    }
+                }
+                return JsonResultCommon.ThanhCong(update);
+
+            } catch (Exception ex)
+            {
+                return JsonResultCommon.Exception(ex);
+            }
+        }
     }
 
 }

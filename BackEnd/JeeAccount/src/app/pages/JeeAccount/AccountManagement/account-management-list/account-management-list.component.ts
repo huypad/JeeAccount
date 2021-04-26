@@ -17,6 +17,9 @@ import { AccountManagementDataSource } from '../Model/data-sources/account-manag
 import { AccountManagementService } from '../Services/account-management.service';
 import { DanhMucChungService } from '../../_core/services/danhmuc.service';
 import { QuanLytrucTiepEditDialogComponent } from '../quan-ly-truc-tiep-edit-dialog/quan-ly-truc-tiep-edit-dialog.component';
+import { ChangeTinhTrangEditDialogComponent } from '../change-tinh-trang-edit-dialog/change-tinh-trang-edit-dialog.component';
+import { AccountManagementEditNoJeeHRDialogComponent } from '../account-management-edit-no-jeehr-dialog/account-management-edit-no-jeehr-dialog.component';
+import { DeleteEntityDialogComponent } from '../../_shared/delete-entity-dialog/delete-entity-dialog.component';
 
 @Component({
   selector: 'app-account-management-list',
@@ -174,19 +177,31 @@ export class AccountManagementLístComponent implements OnInit {
   }
 
   changeTinhTrang(Username: string) {
-    this.accountManagementService.changeTinhTrang(Username).subscribe((res) => {
-      this.loadDataList();
+    let saveMessageTranslateParam = '';
+    saveMessageTranslateParam += 'Thay đổi tình trạng thành công';
+    const saveMessage = this.translate.instant(saveMessageTranslateParam);
+    const messageType = MessageType.Create;
+    const dialogRef = this.dialog.open(ChangeTinhTrangEditDialogComponent, {
+      data: { Username: Username },
+    });
+    dialogRef.afterClosed().subscribe((res) => {
+      if (!res) {
+        this.loadDataList();
+      } else {
+        this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+        this.loadDataList();
+      }
     });
   }
 
-  openQuanLyTrucTiepEdit(username, DirectManager) {
+  openQuanLyTrucTiepEdit(Username: string, DirectManager: string) {
     let saveMessageTranslateParam = '';
     DirectManager === '' ? (saveMessageTranslateParam += 'Thêm thành công') : (saveMessageTranslateParam += 'Cập nhật thành công');
     const saveMessage = this.translate.instant(saveMessageTranslateParam);
     let messageType;
     DirectManager === '' ? (messageType = MessageType.Create) : (messageType = MessageType.Update);
     const dialogRef = this.dialog.open(QuanLytrucTiepEditDialogComponent, {
-      data: { username, DirectManager },
+      data: { Username, DirectManager },
     });
     dialogRef.afterClosed().subscribe((res) => {
       if (!res) {
@@ -223,5 +238,41 @@ export class AccountManagementLístComponent implements OnInit {
       };
       reader.readAsDataURL(event.target.files[0]);
     }
+  }
+
+  update(item) {
+    let saveMessageTranslateParam = '';
+    saveMessageTranslateParam += 'Cập nhật thành công';
+    const saveMessage = this.translate.instant(saveMessageTranslateParam);
+    const messageType = MessageType.Create;
+    const dialogRef = this.dialog.open(AccountManagementEditNoJeeHRDialogComponent, {
+      data: { item: item },
+    });
+    dialogRef.afterClosed().subscribe((res) => {
+      if (!res) {
+        this.loadDataList();
+      } else {
+        this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+        this.loadDataList();
+      }
+    });
+  }
+
+  delete(item) {
+    let saveMessageTranslateParam = '';
+    saveMessageTranslateParam += 'Xoá thành công';
+    const saveMessage = this.translate.instant(saveMessageTranslateParam);
+    const messageType = MessageType.Create;
+    const dialogRef = this.dialog.open(DeleteEntityDialogComponent, {
+      data: {},
+    });
+    dialogRef.afterClosed().subscribe((res) => {
+      if (!res) {
+        this.loadDataList();
+      } else {
+        this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+        this.loadDataList();
+      }
+    });
   }
 }

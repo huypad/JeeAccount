@@ -77,9 +77,9 @@ namespace JeeAccount.Services
             return accManagement;
         }
 
-        public Task<ReturnSqlModel> ChangeTinhTrang(long customerID, string Username)
+        public ReturnSqlModel ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin)
         {
-            var update = accountManagementReponsitory.ChangeTinhTrang(customerID, Username);
+            var update = accountManagementReponsitory.ChangeTinhTrang(customerID, Username, Note, UserIdLogin);
             return update;
         }
         public ReturnSqlModel UpdateAvatar(string AvatarUrl, long userID, long CustomerID)
@@ -90,13 +90,13 @@ namespace JeeAccount.Services
                 return update;
             }
         }
-        public async Task<ReturnSqlModel> CreateAccount(string Admin_accessToken, long customerID, long AdminUserID, AccountManagementModel account, string apiUrl)
+        public async Task<IdentityServerReturn> CreateAccount(string Admin_accessToken, long customerID, long AdminUserID, AccountManagementModel account, string apiUrl)
         {
             using (DpsConnection cnn = new DpsConnection(ConnectionString))
             {
+                IdentityServerReturn identityServerReturn = new IdentityServerReturn();
                 try
                 {
-
                     cnn.BeginTransaction();
                     var create = accountManagementReponsitory.CreateAccount(cnn, account, AdminUserID, customerID);
                     if (create.Susscess)
@@ -112,23 +112,24 @@ namespace JeeAccount.Services
                         {
                             cnn.RollbackTransaction();
                             cnn.EndTransaction();
-                            return new ReturnSqlModel(createUser.message + " Error code: " + createUser.statusCode, Constant.ERRORCODE_EXCEPTION);
+                            return createUser;
                         }
                         cnn.EndTransaction();
-                        return create;
+                        return createUser;
                     }
                     else
                     {
                         cnn.RollbackTransaction();
                         cnn.EndTransaction();
-                        return create;
+                        identityServerReturn = GeneralService.TranformIdentityServerReturnSqlModel(create);
+                        return identityServerReturn;
                     }
-    
                 } catch (Exception ex)
                 {
                     cnn.RollbackTransaction();
                     cnn.EndTransaction();
-                    return new ReturnSqlModel(ex.Message, Constant.ERRORCODE_EXCEPTION);
+                    identityServerReturn = GeneralService.TranformIdentityServerException(ex);
+                    return identityServerReturn;
                 }
             }
         }
@@ -291,6 +292,11 @@ namespace JeeAccount.Services
                 identity.statusCode = Int32.Parse(Constant.ERRORCODE_EXCEPTION);
                 return identity;
             } 
+        }
+        public ReturnSqlModel UpdateDirectManager(string Username, string DirectManager, long customerID)
+        {
+            var update = accountManagementReponsitory.UpdateDirectManager(Username, DirectManager, customerID);
+            return update;
         }
     }
 }

@@ -1,21 +1,20 @@
 <style>
-
-	.swal-poppup{
+	.swal-poppup {
 		display: none;
-    position: relative;
-    flex-direction: column;
-    justify-content: center;
-    width: 32em;
-    max-width: 100%;
-    padding: 1.25em;
-    border-radius: .3125em;
-    background: #fff;
-    font-family: inherit;
-    font-size: 1rem;
-    box-sizing: border-box;
+		position: relative;
+		flex-direction: column;
+		justify-content: center;
+		width: 32em;
+		max-width: 100%;
+		padding: 1.25em;
+		border-radius: .3125em;
+		background: #fff;
+		font-family: inherit;
+		font-size: 1rem;
+		box-sizing: border-box;
 	}
 
-	.swal-pad{
+	.swal-pad {
 		display: block;
 		position: relative;
 		max-width: 100%;
@@ -29,14 +28,14 @@
 		word-wrap: break-word;
 	}
 
-	::ng-deep  .cdk-overlay-container  .cdk-global-overlay-wrapper .cdk-overlay-pane  .mat-snack-bar-container {
+	::ng-deep .cdk-overlay-container .cdk-global-overlay-wrapper .cdk-overlay-pane .mat-snack-bar-container {
 		background-color: white;
 		display: block;
 		box-shadow: 0 0 70px grey;
-    	border-radius: 15px;
+		border-radius: 15px;
 	}
 
-	button{
+	button {
 		border-left-color: rgb(48, 133, 214);
 		border-right-color: rgb(48, 133, 214);
 		border: 0;
@@ -49,38 +48,37 @@
 		white-space: nowrap;
 	}
 
-	.m-mat-snackbar__close{
+	.m-mat-snackbar__close {
 		justify-content: center;
 	}
 
-	.m-mat-snackbar__message{
+	.m-mat-snackbar__message {
 		font-family: Arial, Helvetica, sans-serif;
 		margin: 8px auto;
 	}
 
-	.b-success{
+	.b-success {
 		color: #c0e48e;
 	}
 
-	.b-fail{
+	.b-fail {
 		color: red;
 	}
 
-	i{
+	i {
 		font-size: 4.0rem;
 	}
 
-	.msg-center{
-		justify-content:center;
+	.msg-center {
+		justify-content: center;
 	}
-
 </style>
 
 <div class="m-mat-snackbar swal-pad">
 
-	 <i class="far fa-check-circle b-success" *ngIf="data.meanMes==1"></i> 
-	 <i class="fa fa-times b-fail" *ngIf="data.meanMes==0"></i>
-	
+	<i class="far fa-check-circle b-success" *ngIf="data.meanMes==1"></i>
+	<i class="fa fa-times b-fail" *ngIf="data.meanMes==0"></i>
+
 	<div class="m-mat-snackbar__message msg-center" [innerHTML]="data.message"></div>
 	<div class="m-mat-snackbar__btn">
 		<button *ngIf="data.showUndoButton" type="button" mat-button color="primary" (click)="onDismissWithAction()">
@@ -88,16 +86,14 @@
 		</button>
 	</div>
 	<div class="m-mat-snackbar__close">
-		<!-- <button *ngIf="data.showCloseButton" 
-			mat-icon-button 
+		<!-- <button *ngIf="data.showCloseButton"
+			mat-icon-button
 			(click)="onDismiss()"
 			color="warn">
 			<mat-icon>clear</mat-icon>
 		</button> -->
 
-		<button *ngIf="data.showCloseButton" style="cursor: pointer;"			
-			(click)="onDismiss()"
-			color="warn">
+		<button *ngIf="data.showCloseButton" style="cursor: pointer;" (click)="onDismiss()" color="warn">
 			OK
 		</button>
 	</div>

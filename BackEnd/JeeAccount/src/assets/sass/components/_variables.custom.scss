@@ -421,7 +421,7 @@ $offcanvas-config: (
   // Offcanvas panel's box shadow
   bg-color: #ffffff,
   // Offcanvas panel's Background color
-  overlay-bg-color: rgba(#000000, 0.1) // Offcanvas panel's overlay background color,,,,,,,,,,,,,,,,,,,,,,,,,,,
+  overlay-bg-color: rgba(#000000, 0.1) // Offcanvas panel's overlay background color,,
 ) !default;
 
 // Datatable
@@ -479,25 +479,3 @@ $datatable-config: (
   page-info-color: $dark-50,
   page-info-color-hover: theme-inverse-color('primary')
 ) !default;
-
-$jee-font-family: 'Roboto';
-$jee-card-header-height: 65px;
-// table
-$jee-table-header-height: 48px;
-$jee-table-header-font-size: 13px;
-$jee-table-header-padding-top-bottom: 12px;
-$jee-table-header-padding-left: 16px;
-$jee-table-header-color: #808080;
-$jee-table-header-font-weight: 700;
-$jee-table-row-height: 48px;
-$jee-table-header-background-color: #f0f0f0;
-$jee-table-mat-cell-font-size: 12px;
-
-// button
-$jee-btn-height: 24px;
-$jee-btn-font-size: 12px;
-$jee-btn-padding-top: 0px;
-$jee-btn-padding-left-right: 20px;
-$jee-btn-padding-bottom: 5px;
-$jee-btn-margin: 20px;
-$jee-btn-color: #d1d1d1;

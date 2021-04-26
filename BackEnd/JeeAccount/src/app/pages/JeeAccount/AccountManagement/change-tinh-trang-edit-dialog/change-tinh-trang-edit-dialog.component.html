@@ -3,9 +3,9 @@
     <div class="m-portlet__head-title">
       <div class="row" style="display: inline">
         <h5 class="m-portlet__head-text">
-          <span class="dialog-title">Quản lý trực tiếp</span>
+          <span class="dialog-title">Thay đổi tình trạng tài khoản</span>
           <button mat-button style="float: right; margin: 0" class="ja_button mat-button ja_btn-addnew"
-            (click)="onSubmit()">Thêm</button>
+            (click)="onSubmit()">Lưu</button>
           <button mat-button style="float: right; margin: 0; margin-right: 12px;"
             class="ja_button mat-button ja_btn-goback" (click)="goBack()">Đóng</button>
         </h5>
@@ -19,15 +19,8 @@
           <div class="row m-form__group">
             <div class="col-md-12 m--margin-bottom-10-mobile">
               <mat-form-field class="mat-form-field-fluid">
-                <mat-select formControlName="QuanLyNhom" placeholder="Quản lý nhóm" #singleSelect>
-                  <mat-option>
-                    <ngx-mat-select-search noEntriesFoundLabel="Không tìm thấy" placeholderLabel="Thêm quản lý nhóm"
-                      formControlName="FilterQuanLyNhom"></ngx-mat-select-search>
-                  </mat-option>
-                  <mat-option *ngFor="let thanhvien of filterQuanLys | async" [value]="thanhvien.Username">
-                    {{thanhvien.Display}}
-                  </mat-option>
-                </mat-select>
+                <textarea cols="12" rows="4" formControlName="GhiChu" placeholder="Ghi chú" matInput
+                  required> </textarea>
               </mat-form-field>
             </div>
           </div>

@@ -8,6 +8,8 @@ import { GridType, CompactType, DisplayGrid } from 'angular-gridster2';
 import { QueryParamsModel } from '../../_core/models/query-models/query-params.model';
 import { QueryResultsModel } from '../../_core/models/query-models/query-results.model';
 import { DanhSachTruyCapNhanhWidgetComponent } from '../widgets/danh-sach-truy-cap-nhanh/danh-sach-truy-cap-nhanh.component';
+import { DepartmentManagementLístComponent } from '../../DepartmentManagement/department-management-list/department-management-list.component';
+import { AccountManagementLístComponent } from '../../AccountManagement/account-management-list/account-management-list.component';
 
 interface IDashboardService {
   saveUserDashBoard(): void;
@@ -25,11 +27,31 @@ export class PageGirdtersDashboardService implements IDashboardService {
     const listWidget: Widget[] = [
       {
         id: '1',
-        name: 'm-danh-sach-truy-cap-nhanh-widget',
+        name: 'Danh sách truy cập nhanh',
         componentName: 'm-danh-sach-truy-cap-nhanh-widget',
         componentType: DanhSachTruyCapNhanhWidgetComponent,
         cols: 12,
         rows: 5,
+        y: 0,
+        x: 0,
+      },
+      {
+        id: '2',
+        name: 'Danh sách phòng ban, nhóm',
+        componentName: 'app-department-management-list',
+        componentType: DepartmentManagementLístComponent,
+        cols: 12,
+        rows: 6,
+        y: 0,
+        x: 0,
+      },
+      {
+        id: '3',
+        name: 'Danh sách người dùng',
+        componentName: 'app-account-management-list',
+        componentType: AccountManagementLístComponent,
+        cols: 12,
+        rows: 6,
         y: 0,
         x: 0,
       },
@@ -41,7 +63,7 @@ export class PageGirdtersDashboardService implements IDashboardService {
     return {
       gridType: GridType.ScrollVertical,
       compactType: CompactType.None,
-      margin: 10,
+      margin: 20,
       outerMargin: true,
       outerMarginTop: null,
       outerMarginRight: null,

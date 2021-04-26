@@ -1,7 +1,7 @@
 // Angular
 import { Injectable } from '@angular/core';
 // RxJS
-import { Subject } from 'rxjs'; 
+import { Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from 'src/environments/environment';
 import { MenuServices } from './menu.service';
@@ -28,11 +28,10 @@ export class MenuConfigService {
 	 */
 	async getMenus() {
 		//lấy menu phân quyền
-		let res = await this.layMenu().then(); 
+		let res = await this.layMenu().then();
 		let menu;
 		menu = this.fs_Assign(res.data);
 
-		console.log(menu)
 		return menu;
 	}
 
@@ -106,7 +105,6 @@ export class MenuConfigService {
 	 */
 	loadConfigs(config: any) {
 		this.menuConfig = config;
-        console.log(this.menuConfig)
 		this.onConfigUpdated$.next(this.menuConfig);
 	}
 }

@@ -4,8 +4,16 @@ import { environment } from '../../../../../environments/environment';
 import { HttpUtilsService } from '../../_core/utils/http-utils.service';
 import { Injectable } from '@angular/core';
 import { QueryParamsModelNew } from '../../_core/models/query-models/query-params.model';
-import { ResultModel } from '../../_core/models/_base.model';
-import { AccountManagementDTO, AccountManagementModel, AppListDTO, PostImgModel } from '../Model/account-management.model';
+import { ResultModel, ResultObjModel } from '../../_core/models/_base.model';
+import {
+  AccChangeTinhTrangModel,
+  AccDirectManagerModel,
+  AccountManagementDTO,
+  AccountManagementModel,
+  AppListDTO,
+  InfoUserDTO,
+  PostImgModel,
+} from '../Model/account-management.model';
 import { DepartmentModel } from '../../DepartmentManagement/Model/department-management.model';
 
 const API_PRODUCTS_URL = environment.ApiRoot + '/accountmanagement';
@@ -23,14 +31,6 @@ export class AccountManagementService {
     return this.http.get<any>(url, {
       headers: httpHeaders,
       params: httpParams,
-    });
-  }
-
-  changeTinhTrang(Username: string): Observable<any> {
-    const httpHeaders = this.httpUtils.getHTTPHeaders();
-    const url = API_PRODUCTS_URL + `/ChangeTinhTrang/Username=${Username}`;
-    return this.http.get<any>(url, {
-      headers: httpHeaders,
     });
   }
 
@@ -57,5 +57,29 @@ export class AccountManagementService {
     const httpHeaders = this.httpUtils.getHTTPHeaders();
     const url = API_PRODUCTS_URL + `/UpdateAvatarWithChangeUrlAvatar`;
     return this.http.post<any>(url, img, { headers: httpHeaders });
+  }
+
+  UpdateDirectManager(acc: AccDirectManagerModel): Observable<any> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const url = API_PRODUCTS_URL + `/UpdateDirectManager`;
+    return this.http.post<any>(url, acc, {
+      headers: httpHeaders,
+    });
+  }
+
+  changeTinhTrang(acc: AccChangeTinhTrangModel): Observable<any> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const url = API_PRODUCTS_URL + `/ChangeTinhTrang`;
+    return this.http.post<any>(url, acc, {
+      headers: httpHeaders,
+    });
+  }
+
+  GetInfoByUsername(username: string): Observable<ResultObjModel<InfoUserDTO>> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const url = API_PRODUCTS_URL + `/GetInfoByUsername/username=${username}`;
+    return this.http.get<any>(url, {
+      headers: httpHeaders,
+    });
   }
 }
