@@ -33,7 +33,6 @@ namespace JeeAccount.Controllers
         /// </summary>
         /// <returns></returns>
 
-        [Authorize]
         [Route("LayMenuChucNang")]
         [HttpGet]
         public object LayMenuChucNang()

@@ -24,11 +24,11 @@ export class AuthGuard implements CanActivate {
             }
           );
         } else {
-          localStorage.clear();
-          this.authService.logout();
+          this.authService.saveNewUserMe();
           return resolve(false);
         }
       } else {
+        this.authService.saveNewUserMe();
         return resolve(true);
       }
     });

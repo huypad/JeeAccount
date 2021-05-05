@@ -29,6 +29,9 @@ namespace JeeAccount.Classes
         public static string RootUpload { get { return "/Avatar/"; } }
         public static string RootUploadFile { get { return "/File/"; } }
         public static int MaxSize { get { return 30000000; } }//maximum file size 30MB
+
+        public static string PASSWORD_ED = "JeeAccount_Security431s";
+
         //public const string TEMPLATE_IMPORT_FOLDER = "dulieu/Template";
         //public const string ATTACHFILE_YKIEN_FOLDER = "dulieu/dinhkem/YKienXuLy";
 

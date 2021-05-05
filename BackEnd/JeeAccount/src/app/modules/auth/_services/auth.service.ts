@@ -25,7 +25,6 @@ const API_IDENTITY_REFESHTOKEN = `${environment.ApiIdentity_Refresh}`;
 export class AuthService implements OnDestroy {
   // private fields
   private unsubscribe: Subscription[] = [];
-  // private authLocalStorageToken = `${environment.appVersion}-${environment.USERDATA_KEY}`;
 
   // public fields
   currentUser$: Observable<UserModel>;
@@ -92,20 +91,34 @@ export class AuthService implements OnDestroy {
 
   isAuthenticated(): boolean {
     const auth = this.getAuthFromLocalStorage();
-    if (auth && this.isTokenExpired()) {
-      if (!this.accessToken$.getValue()) this.accessToken$.next(auth.access_token);
-      if (!this.refreshToken$.getValue()) this.refreshToken$.next(auth.refresh_token);
-      return true;
+    if (auth) {
+      if (this.isTokenExpired(auth.access_token)) {
+        this.saveAuthSSOModelAccessTokenRefreshToken(auth);
+        return true;
+      }
+      if (this.isTokenExpired(auth.refresh_token)) {
+        this.saveAuthSSOModelAccessTokenRefreshToken(auth);
+        return true;
+      }
     }
     return false;
   }
 
-  isTokenExpired(): boolean {
-    const auth = this.getAuthFromLocalStorage();
-    if (!auth || !auth.access_token) return false;
-    const date = this.getTokenExpirationDate(auth.access_token);
+  isTokenExpired(token: string): boolean {
+    const date = this.getTokenExpirationDate(token);
     if (!date) return false;
     return date.valueOf() > new Date().valueOf();
+  }
+
+  saveAuthSSOModelAccessTokenRefreshToken(auth) {
+    if (!this.authSSOModelSubject$.getValue()) {
+      const authSSOModel = new AuthSSO();
+      authSSOModel.setAuthSSO(auth);
+      this.authSSOModelSubject$.next(authSSOModel);
+      this.authSSOModel$ = this.authSSOModelSubject$.asObservable();
+    }
+    if (!this.accessToken$.getValue()) this.accessToken$.next(auth.access_token);
+    if (!this.refreshToken$.getValue()) this.refreshToken$.next(auth.refresh_token);
   }
 
   getTokenExpirationDate(auth: string): Date {
@@ -126,7 +139,7 @@ export class AuthService implements OnDestroy {
     let paramValue = undefined;
     if (url.includes('?')) {
       const httpParams = new HttpParams({ fromString: url.split('?')[1] });
-      paramValue = httpParams.get('sso_token').split('Bearer ')[1];
+      paramValue = httpParams.get('sso_token');
     }
     return paramValue;
   }

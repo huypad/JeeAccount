@@ -19,8 +19,8 @@ import { AddCloseWidgetDialogComponent } from './widgets/add-close-widget-dialog
 import { DanhSachTruyCapNhanhWidgetComponent } from './widgets/danh-sach-truy-cap-nhanh/danh-sach-truy-cap-nhanh.component';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { MatTableModule } from '@angular/material/table';
-import { DepartmentManagementService } from '../DepartmentManagement/Sevices/department-management.service';
-import { AccountManagementService } from '../AccountManagement/Services/account-management.service';
+import { DepartmentManagementService } from '../Management/DepartmentManagement/Sevices/department-management.service';
+import { AccountManagementService } from '../Management/AccountManagement/Services/account-management.service';
 
 @NgModule({
   declarations: [PageGidtersDashboardComponent, AddCloseWidgetDialogComponent, DanhSachTruyCapNhanhWidgetComponent],

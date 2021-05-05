@@ -8,8 +8,8 @@ import { GridType, CompactType, DisplayGrid } from 'angular-gridster2';
 import { QueryParamsModel } from '../../_core/models/query-models/query-params.model';
 import { QueryResultsModel } from '../../_core/models/query-models/query-results.model';
 import { DanhSachTruyCapNhanhWidgetComponent } from '../widgets/danh-sach-truy-cap-nhanh/danh-sach-truy-cap-nhanh.component';
-import { DepartmentManagementLístComponent } from '../../DepartmentManagement/department-management-list/department-management-list.component';
-import { AccountManagementLístComponent } from '../../AccountManagement/account-management-list/account-management-list.component';
+import { DepartmentManagementLístComponent } from '../../Management/DepartmentManagement/department-management-list/department-management-list.component';
+import { AccountManagementLístComponent } from '../../Management/AccountManagement/account-management-list/account-management-list.component';
 
 interface IDashboardService {
   saveUserDashBoard(): void;

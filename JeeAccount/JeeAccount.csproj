@@ -20,13 +20,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ConsumerServices\" />
-    <Folder Include="DBscript\" />
-    <Folder Include="Entities\" /> 
+    <Folder Include="DBscript\" /> 
     <Folder Include="DPS\" />
     <Content Include="images\nhanvien\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="ConsumerServices\**" />
+    <Compile Remove="Entities\**" />
+    <Content Remove="ConsumerServices\**" />
+    <Content Remove="Entities\**" />
+    <EmbeddedResource Remove="ConsumerServices\**" />
+    <EmbeddedResource Remove="Entities\**" />
+    <None Remove="ConsumerServices\**" />
+    <None Remove="Entities\**" />
   </ItemGroup>
 
   <ItemGroup>

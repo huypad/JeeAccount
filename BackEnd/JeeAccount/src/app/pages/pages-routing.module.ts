@@ -17,13 +17,14 @@ const routes: Routes = [
           import('./JeeAccount/page-girdters-dashboard/page-girdters-dashboard.module').then((m) => m.PageGirdtersDashboardModule),
       },
       {
-        path: 'AccountManagement',
-        loadChildren: () => import('./JeeAccount/AccountManagement/account-management.module').then((m) => m.AccountManagementModule),
+        path: 'Management/AccountManagement',
+        loadChildren: () =>
+          import('./JeeAccount/Management/AccountManagement/account-management.module').then((m) => m.AccountManagementModule),
       },
       {
-        path: 'DepartmentManagement',
+        path: 'Management/DepartmentManagement',
         loadChildren: () =>
-          import('./JeeAccount/DepartmentManagement/department-management.module').then((m) => m.DepartmentManagementModule),
+          import('./JeeAccount/Management/DepartmentManagement/department-management.module').then((m) => m.DepartmentManagementModule),
       },
       {
         path: '',
