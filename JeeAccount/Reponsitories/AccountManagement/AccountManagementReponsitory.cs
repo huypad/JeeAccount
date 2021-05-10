@@ -327,6 +327,7 @@ where CustomerID = @CustomerID";
                 if (account.Phonemumber is not null) val.Add("PhoneNumber", account.Phonemumber);
                 val.Add("IsActive", 1);
                 val.Add("Disable", 0);
+                val.Add("Email", account.Email);
                 val.Add("ActiveDate", DateTime.Now);
                 val.Add("ActiveBy", userID);
                 val.Add("CreatedDate", DateTime.Now);
@@ -489,6 +490,14 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
                 }
             }
             return new ReturnSqlModel();
+        }
+
+        public long GetLastUserID(DpsConnection cnn)
+        {
+            long userid = -1;
+            var rowid = cnn.ExecuteScalar("SELECT IDENT_CURRENT ('AccountList') AS Current_Identity;");
+            userid = long.Parse(rowid.ToString());
+            return userid;
         }
     }
 }

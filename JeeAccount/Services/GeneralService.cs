@@ -133,6 +133,14 @@ namespace JeeAccount.Services
             identity.statusCode = Int32.Parse(Constant.ERRORCODE_EXCEPTION);
             return identity;
         }
+
+        private static Random random = new Random();
+        public static string RandomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghjklmnoprstuwxyz@!@!@!";
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
     }
 
 }

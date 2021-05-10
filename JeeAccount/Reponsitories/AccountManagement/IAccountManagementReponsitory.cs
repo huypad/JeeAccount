@@ -30,6 +30,7 @@ namespace JeeAccount.Reponsitories
         long GetUserIdByUsername(string Username, long customerId);
         PersonalInfoCustomData GetPersonalInfoCustomData(long UserID, long CustomerID);
         ReturnSqlModel UpdateDirectManager(string Username, string DirectManager, long customerID);
+        long GetLastUserID(DpsConnection cnn);
     }
 }
 

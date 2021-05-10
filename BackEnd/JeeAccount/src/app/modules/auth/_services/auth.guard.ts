@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 import { AuthSSO } from '../_models/authSSO.model';
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) { }
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       if (!this.authService.isAuthenticated()) {
@@ -24,12 +24,56 @@ export class AuthGuard implements CanActivate {
             }
           );
         } else {
-          this.authService.saveNewUserMe();
-          return resolve(false);
+          this.authService.getUserMeFromSSO()
+            .subscribe(
+              (data) => {
+                if (data && data.access_token) {
+                  this.authService.saveLocalStorageToken(this.authService.authLocalStorageToken, data);
+                  return resolve(true);
+                }
+              },
+              (error) => {
+                this.authService.refreshToken().subscribe(
+                  (data: AuthSSO) => {
+                    if (data && data.access_token) {
+                      this.authService.saveLocalStorageToken(this.authService.authLocalStorageToken, data);
+                      return resolve(true);
+                    }
+                  },
+                  (error) => {
+                    localStorage.removeItem(this.authService.authLocalStorageToken);
+                    this.authService.logout();
+                    return resolve(false);
+                  }
+                );
+              }
+            );
         }
       } else {
-        this.authService.saveNewUserMe();
-        return resolve(true);
+        this.authService.getUserMeFromSSO()
+          .subscribe(
+            (data) => {
+              if (data && data.access_token) {
+                this.authService.saveLocalStorageToken(this.authService.authLocalStorageToken, data);
+                return resolve(true);
+              }
+            },
+            (error) => {
+              this.authService.refreshToken().subscribe(
+                (data: AuthSSO) => {
+                  if (data && data.access_token) {
+                    this.authService.saveLocalStorageToken(this.authService.authLocalStorageToken, data);
+                    return resolve(true);
+                  }
+                },
+                (error) => {
+                  localStorage.removeItem(this.authService.authLocalStorageToken);
+                  this.authService.logout();
+                  return resolve(false);
+                }
+              );
+            }
+          );
       }
     });
   }

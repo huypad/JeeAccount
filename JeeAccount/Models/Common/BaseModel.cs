@@ -80,32 +80,9 @@ namespace JeeAccount.Models.Common
         {
             filter = new FilterModel();
         }
-        //[JsonPropertyName("filter")]//for derelize of NEWTON.JSON
-        //[JsonProperty("filter")]//for serilize of NEWTON.JSON
-        //public Dictionary<string, string> Filter { get; set; }
 
-        //[JsonPropertyName("paginator")]
-        //[JsonProperty("paginator")]
-        //public Panigator Panigator { get; set; }
-
-        //[JsonPropertyName("searchTerm")]
-        //[JsonProperty("searchTerm")]
-        //public string SearchValue { get; set; }
-
-        //[JsonPropertyName("sorting")]
-        //[JsonProperty("sorting")]
-        //public SortParams Sort { get; set; }
     }
-    public class SortParams
-    {
-        [JsonPropertyName("column")]
-        [JsonProperty("column")]
-        public string ColumnName { get; set; }
 
-        [JsonPropertyName("direction")]
-        [JsonProperty("direction")]
-        public string Direction { get; set; }
-    }
     public class FilterModel
     {
         public string keys { get; set; }
@@ -145,23 +122,23 @@ namespace JeeAccount.Models.Common
     {
         [JsonPropertyName("total")]
         [JsonProperty("total")]
-        public int total { get; set; }
+        public int TotalItems { get; set; }
 
         [JsonPropertyName("totalpage")]
         [JsonProperty("totalpage")]
-        public int totalpage { get; set; }
+        public int TotalPage { get; set; }
 
         [JsonPropertyName("page")]
         [JsonProperty("page")]
-        public int page { get; set; }
+        public int PageIndex { get; set; }
 
         [JsonPropertyName("pageSize")]
         [JsonProperty("pageSize")]
-        public int pageSize { get; set; }
+        public int PageSize { get; set; }
 
         [JsonPropertyName("pageSizes")]
         [JsonProperty("pageSizes")]
-        public List<int> pageSizes { get; set; }
+        public List<int> PageSizes { get; set; }
 
         public Panigator()
         {
@@ -170,39 +147,44 @@ namespace JeeAccount.Models.Common
 
         public Panigator(int p_PageIndex, int p_PageSize, int p_TotalRows)
         {
-            page = p_PageIndex;
-            pageSize = p_PageSize;
-            total = p_TotalRows;
-            totalpage = int.Parse(Math.Ceiling((double)total / pageSize).ToString());
-            pageSizes = Enumerable.Range(1, totalpage).Select(x => x).ToList();
+            PageIndex = p_PageIndex;
+            PageSize = p_PageSize;
+            TotalItems = p_TotalRows;
+            TotalPage = int.Parse(Math.Ceiling((double)TotalItems / PageSize).ToString());
+            PageSizes = Enumerable.Range(1, TotalPage).Select(x => x).ToList();
         }
-        public class QueryRequestParams
-        {
-            [JsonPropertyName("filter")]//for derelize of NEWTON.JSON
-            [JsonProperty("filter")]//for serilize of NEWTON.JSON
-            public Dictionary<string, string> Filter { get; set; }
-            [JsonPropertyName("paginator")]
-            [JsonProperty("paginator")]
-            public Panigator Panigator { get; set; }
 
-            [JsonPropertyName("searchTerm")]
-            [JsonProperty("searchTerm")]
-            public string SearchValue { get; set; }
+    }
 
-            [JsonPropertyName("sorting")]
-            [JsonProperty("sorting")]
-            public SortParams Sort { get; set; }
-        }
-        public class SortParams
-        {
-            [JsonPropertyName("column")]
-            [JsonProperty("column")]
-            public string ColumnName { get; set; }
 
-            [JsonPropertyName("direction")]
-            [JsonProperty("direction")]
-            public string Direction { get; set; }
-        }
+    public class QueryRequestParams
+    {
+        [JsonPropertyName("filter")]//for derelize of NEWTON.JSON
+        [JsonProperty("filter")]//for serilize of NEWTON.JSON
+        public Dictionary<string, string> Filter { get; set; }
+
+        [JsonPropertyName("paginator")]
+        [JsonProperty("paginator")]
+        public Panigator Panigator { get; set; }
+
+        [JsonPropertyName("searchTerm")]
+        [JsonProperty("searchTerm")]
+        public string SearchValue { get; set; }
+
+        [JsonPropertyName("sorting")]
+        [JsonProperty("sorting")]
+        public SortParams Sort { get; set; }
+    }
+
+    public class SortParams
+    {
+        [JsonPropertyName("column")]
+        [JsonProperty("column")]
+        public string ColumnName { get; set; }
+
+        [JsonPropertyName("direction")]
+        [JsonProperty("direction")]
+        public string Direction { get; set; }
     }
 
     public class ReturnSqlModel

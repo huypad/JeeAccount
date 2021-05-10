@@ -46,7 +46,7 @@ export class AccountManagementEditNoJeeHRDialogComponent implements OnInit {
     private layoutUtilsService: LayoutUtilsService,
     public danhmuc: DanhMucChungService,
     private authService: AuthService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.accountManagementService.GetInfoByUsername(this.data.item.Username).subscribe((res) => {
@@ -87,21 +87,6 @@ export class AccountManagementEditNoJeeHRDialogComponent implements OnInit {
   }
   onSubmit() {
     if (this.itemForm.valid) {
-      //  check password
-      if (this.itemForm.controls.MatKhau.value !== this.itemForm.controls.NhapLaiMatKhau.value) {
-        this.layoutUtilsService.showActionNotification(
-          'Mật khẩu không trùng khớp',
-          MessageType.Read,
-          999999999,
-          true,
-          false,
-          3000,
-          'top',
-          0
-        );
-        return;
-      }
-
       const acc = this.initDataFromFB();
       this.create(acc);
     } else {
