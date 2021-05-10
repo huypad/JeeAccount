@@ -45,6 +45,18 @@ namespace JeeAccount.Models
         public CustomData customData { get; set; }
     }
 
+    public class IdentityServeAddAdminNewUser
+    {
+        [JsonProperty("username")]
+
+        public string username { get; set; }
+        [JsonProperty("password")]
+        public string password { get; set; }
+        [JsonProperty("customData")]
+        public CustomAdminData customData { get; set; }
+    }
+
+
     public class IdentityServerLogin
     {
         [JsonProperty("username")]

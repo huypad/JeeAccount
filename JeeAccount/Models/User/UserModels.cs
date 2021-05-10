@@ -53,6 +53,23 @@ namespace JeeAccount.Models
 
     }
 
+    public class CustomAdminData
+    {
+        [JsonProperty("personalInfo")]
+        public PersonalInfoCustomData PersonalInfo { get; set; }
+        [JsonProperty("jee-account")]
+        public JeeAccountModel JeeAccount { get; set; }
+        [JsonProperty("identityServer")]
+        public IdentityServer identityServer { get; set; }
+
+    }
+
+    public class IdentityServer
+    {
+        [JsonProperty("actions")]
+        public List<string> actions { get; set; } 
+    }
+
     public class JeeAccountModel
     {
         [JsonProperty("customerID")]

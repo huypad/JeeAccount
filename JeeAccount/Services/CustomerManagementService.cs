@@ -1,10 +1,12 @@
-﻿using DpsLibs.Data;
+﻿using DPSinfra.Kafka;
+using DpsLibs.Data;
 using JeeAccount.Controllers;
 using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.CustomerManagement;
 using JeeAccount.Reponsitories;
 using JeeAccount.Reponsitories.CustomerManagement;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -47,7 +49,7 @@ namespace JeeAccount.Services
             return customerManagementReponsitory.checkTrungCode(Code);
         }
 
-        public async Task<IdentityServerReturn> CreateCustomer(string Admin_accessToken, CustomerModel customerModel)
+        public async Task<IdentityServerReturn> CreateCustomer(string Admin_accessToken, CustomerModel customerModel, IProducer producer, string TopicAddNewCustomer)
         {
             using (DpsConnection cnn = new DpsConnection(ConnectionString))
             {
@@ -55,8 +57,6 @@ namespace JeeAccount.Services
                 try
                 {
                     cnn.BeginTransaction();
-                    string username = customerModel.Code + ".admin";
-                    string password = GeneralService.RandomString(8);
                     var create = customerManagementReponsitory.CreateCustomer(cnn, customerModel);
                     if (!create.Susscess)
                     {
@@ -84,8 +84,8 @@ namespace JeeAccount.Services
                         Email = customerModel.Email,
                         Fullname = customerModel.RegisterName,
                         Phonemumber = customerModel.Phone,
-                        Username = username,
-                        Password = password,
+                        Username = customerModel.Username,
+                        Password = customerModel.Password,
                     };
 
                     var createAccount = _accountManagementReponsitory.CreateAccount(cnn, accountManagementModel, 0, customerId);
@@ -98,11 +98,11 @@ namespace JeeAccount.Services
                     }
 
                     long userId = _accountManagementReponsitory.GetLastUserID(cnn);
-                    IdentityServerAddNewUser identity = new IdentityServerAddNewUser
+                    IdentityServeAddAdminNewUser identity = new IdentityServeAddAdminNewUser
                     {
-                        username = username,
-                        password = password,
-                        customData = new CustomData
+                        username = customerModel.Username,
+                        password = customerModel.Password,
+                        customData = new CustomAdminData
                         {
                             JeeAccount = new JeeAccountModel
                             {
@@ -120,16 +120,22 @@ namespace JeeAccount.Services
                                 Departmemt = "",
                                 Jobtitle = "",
                                 Phonenumber = customerModel.Phone
-                            }
+                            },
+                            identityServer = new IdentityServer
+                            {
+                                actions = new List<string>() { "create_new_user", "update_custom_data", "change_user_state" }
+                            } 
                         }
                     };
-                    var addNewUser = await identityServerController.addNewUser(identity, Admin_accessToken);
+                    var addNewUser = await identityServerController.addNewAdminUser(identity, Admin_accessToken);
                     if (addNewUser.statusCode != 0)
                     {
                         cnn.RollbackTransaction();
                         cnn.EndTransaction();
                         return addNewUser;
                     }
+                    // kafak
+                    producer.PublishAsync("helloitme", JsonConvert.SerializeObject(identity.customData.JeeAccount));
                     cnn.EndTransaction();
                     return addNewUser;
                 }

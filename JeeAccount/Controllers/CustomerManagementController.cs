@@ -28,11 +28,13 @@ namespace JeeAccount.Controllers
         private readonly IConfiguration _config;
         private readonly IProducer _producer;
         private readonly CustomerManagementService _service;
+        public readonly string TopicAddNewCustomer;
         public CustomerManagementController(IConfiguration configuration, IProducer producer)
         {
             _config = configuration;
             _service = new CustomerManagementService(_config.GetConnectionString("DefaultConnection"));
             _producer = producer;
+            TopicAddNewCustomer = _config.GetValue<string>("KafkaTopic:TopicAddNewCustomer");
         }
 
         [HttpPost("Get_DSCustomer")]
@@ -114,7 +116,7 @@ namespace JeeAccount.Controllers
 
                 var checkTrungCode = _service.checkTrungCode(customerModel.Code);
                 if (checkTrungCode) return JsonResultCommon.Trung("Code");
-                var create = await _service.CreateCustomer(access_token, customerModel);
+                var create = await _service.CreateCustomer(access_token, customerModel, _producer, TopicAddNewCustomer);
                 if (create.statusCode != 0)
                 {
                     return JsonResultCommon.ThatBai(create.message);

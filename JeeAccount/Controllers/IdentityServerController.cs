@@ -92,6 +92,38 @@ namespace JeeAccount.Controllers
 
         }
 
+        public async Task<IdentityServerReturn> addNewAdminUser(IdentityServeAddAdminNewUser identityServerUserModel, string Admin_access_token)
+        {
+            string url = LINK_ADD_NEWUSER;
+            var content = new IdentityServeAddAdminNewUser
+            {
+                username = identityServerUserModel.username,
+                password = identityServerUserModel.password,
+                customData = identityServerUserModel.customData,
+            };
+
+            var stringContent = await Task.Run(() => JsonConvert.SerializeObject(content));
+            var httpContent = new StringContent(stringContent, Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(Admin_access_token);
+
+                var reponse = await client.PostAsync(url, httpContent);
+                if (reponse.StatusCode == System.Net.HttpStatusCode.Created)
+                {
+                    return new IdentityServerReturn();
+                }
+                else
+                {
+                    string returnValue = reponse.Content.ReadAsStringAsync().Result;
+                    var res = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
+                    return res;
+                }
+            }
+
+        }
+
         public async Task<IdentityServerReturn> changePassword(IdentityServerChangePasswordModel identityServerChangePasswordModel)
         {
             string url = LINK_CHANGE_PASSWORD;
