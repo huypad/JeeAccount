@@ -134,9 +134,9 @@ namespace JeeAccount.Services
                         cnn.EndTransaction();
                         return addNewUser;
                     }
-                    // kafak
-                    producer.PublishAsync("helloitme", JsonConvert.SerializeObject(identity.customData.JeeAccount));
                     cnn.EndTransaction();
+                    // kafak
+                    producer.PublishAsync(TopicAddNewCustomer, JsonConvert.SerializeObject(identity.customData.JeeAccount));
                     return addNewUser;
                 }
                 catch (Exception ex)

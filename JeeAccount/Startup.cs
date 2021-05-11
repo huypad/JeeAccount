@@ -39,17 +39,13 @@ namespace JeeAccount
     {
 
       // add Vault and get Vault for secret in another services
-      var vaultClient = ConfigVault(services);
+     var vaultClient = ConfigVault(services);
       Secret<SecretData> kafkaSecret = vaultClient.V1.Secrets.KeyValue.V2.ReadSecretAsync(path: "kafka", mountPoint: "kv").Result;
       IDictionary<string, object> kafkaData = kafkaSecret.Data.Data;
       string KafkaUser = kafkaData["username"].ToString();
       string KafkaPassword = kafkaData["password"].ToString();
       Configuration["KafkaConfig:username"] = KafkaUser;
       Configuration["KafkaConfig:password"] = KafkaPassword;
-      Console.WriteLine("===================================");
-      Console.WriteLine(Configuration["KafkaConfig:username"]);
-      Console.WriteLine(Configuration["KafkaConfig:password"]);
-      Console.WriteLine("===================================");
       // add Kafka
       services.addKafkaService();
 
