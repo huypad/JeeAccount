@@ -298,5 +298,17 @@ namespace JeeAccount.Services
             var update = accountManagementReponsitory.UpdateDirectManager(Username, DirectManager, customerID);
             return update;
         }
+
+        public bool checkUserIDInCustomerID(long UserID, long CustomerID)
+        {
+            long customerID = accountManagementReponsitory.GetCustomerIDByUserID(UserID);
+            return (CustomerID == customerID);
+        }
+
+        public Task<IEnumerable<AppListDTO>> GetListAppByUserID(long UserID)
+        {
+            var listapp = accountManagementReponsitory.GetListAppByUserID(UserID);
+            return listapp;
+        }
     }
 }

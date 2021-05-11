@@ -171,6 +171,26 @@ namespace JeeAccount.Controllers
       }
     }
 
+    [HttpGet("GetListAppByUserID")]
+    public async Task<BaseModel<object>> GetListAppByUserID(long UserID)
+    {
+        try
+        {
+            var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+            if (customData is null)
+            {
+                return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
+            }
+            //if (!accountManagementService.checkUserIDInCustomerID(UserID, customData.JeeAccount.CustomerID)) return JsonResultCommon.ThatBai("Bạn không có quyền truy xuất UserID này");
+            var appList = await accountManagementService.GetListAppByCustomerID(customData.JeeAccount.CustomerID);
+            return JsonResultCommon.ThanhCong(appList);
+        }
+        catch (Exception ex)
+        {
+            return JsonResultCommon.Exception(ex);
+        }
+    }
+
     [HttpGet("GetListUsernameByAppcode/appcode={appcode}")]
     public async Task<BaseModel<object>> GetListUsernameByAppcode(string appcode)
     {

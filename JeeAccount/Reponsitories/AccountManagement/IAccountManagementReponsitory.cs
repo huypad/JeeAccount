@@ -18,10 +18,11 @@ namespace JeeAccount.Reponsitories
         Task<InfoUserDTO> GetInfoByUsername(string username);
         Task<InfoUserDTO> GetInfoByCustomerID(long customerID);
         Task<IEnumerable<AppListDTO>> GetListAppByCustomerID(long customerID);
+        Task<IEnumerable<AppListDTO>> GetListAppByUserID(long UserID);
         Task<IEnumerable<InfoAdminDTO>> GetInfoAdminAccountByCustomerID(long customerID);
         Task<IEnumerable<AccountManagementDTO>> GetListAccountManagement(long customerID);
         ReturnSqlModel ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin);
-        ReturnSqlModel CreateAccount(DpsConnection cnn, AccountManagementModel account, long AdminUserID, long CustomerID);
+        ReturnSqlModel CreateAccount(DpsConnection cnn, AccountManagementModel account, long AdminUserID, long CustomerID, bool isAdmin = false);
         ReturnSqlModel UpdateAvatar(DpsConnection cnn, string AvatarUrl, long userID, long CustomerID);
         ReturnSqlModel UpdateAvatarFirstTime(DpsConnection cnn, string AvatarUrl, long userID, long CustomerID);
         ReturnSqlModel UpdatePersonalInfoCustomData(DpsConnection cnn, PersonalInfoCustomData personalInfoCustom, long userId, long customerId);
@@ -31,6 +32,7 @@ namespace JeeAccount.Reponsitories
         PersonalInfoCustomData GetPersonalInfoCustomData(long UserID, long CustomerID);
         ReturnSqlModel UpdateDirectManager(string Username, string DirectManager, long customerID);
         long GetLastUserID(DpsConnection cnn);
+        long GetCustomerIDByUserID(long UserID);
     }
 }
 

@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace JeeAccount.Reponsitories
 {
-    public class AccountManagementReponsitory: IAccountManagementReponsitory
+    public class AccountManagementReponsitory : IAccountManagementReponsitory
     {
 
         private readonly string _connectionString;
@@ -113,7 +113,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
             {
                 dt = cnn.CreateDataTable(sql, Conds);
                 if (dt.Rows.Count == 0)
-                    return 0;    
+                    return 0;
                 return dt.AsEnumerable().Select(row => long.Parse(row["CustomerID"].ToString())).SingleOrDefault();
             }
         }
@@ -144,7 +144,7 @@ where Username = @username and (Disable != 1 or Disable is null)";
                     LastName = dt.Rows[0]["LastName"].ToString(),
                     PhoneNumber = dt.Rows[0]["PhoneNumber"].ToString(),
                     Username = dt.Rows[0]["Username"].ToString(),
-                };              
+                };
             }
         }
 
@@ -198,7 +198,9 @@ where CustomerID = @CustomerID";
                     LastUpdate = row["LastUpdate"].ToString(),
                     Note = row["Note"].ToString(),
                     ReleaseDate = row["ReleaseDate"].ToString(),
-                    IsDefaultApp = Convert.ToBoolean((bool)row["IsDefaultApply"])
+                    IsDefaultApp = Convert.ToBoolean((bool)row["IsDefaultApply"]),
+                    Icon = row["Icon"].ToString(),
+                    Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString())
                 });
             }
         }
@@ -292,13 +294,14 @@ where CustomerID = @CustomerID";
                 {
                     val.Add("DeActiveDate", DateTime.Now);
                     val.Add("DeActiveBy", dtGetUsernameLogin.Rows[0][0]);
-                } else
+                }
+                else
                 {
                     val.Add("ActiveDate", DateTime.Now);
                     val.Add("ActiveBy", dtGetUsernameLogin.Rows[0][0]);
                 }
                 val.Add("IsActive", !isTinhTrang);
- 
+
                 int x = cnn.Update(val, Conds, "AccountList");
                 if (x <= 0)
                 {
@@ -308,7 +311,7 @@ where CustomerID = @CustomerID";
             return new ReturnSqlModel();
         }
 
-        public ReturnSqlModel CreateAccount(DpsConnection cnn, AccountManagementModel account, long userID, long CustomerID)
+        public ReturnSqlModel CreateAccount(DpsConnection cnn, AccountManagementModel account, long userID, long CustomerID, bool isAdmin = false)
         {
             Hashtable val = new Hashtable();
             try
@@ -334,6 +337,7 @@ where CustomerID = @CustomerID";
                 val.Add("CreatedBy", userID);
                 val.Add("CustomerID", CustomerID);
                 val.Add("Password", account.Password);
+                if (isAdmin) val.Add("IsAdmin", 1);
                 #endregion
                 int x = cnn.Insert(val, "AccountList");
                 if (x <= 0)
@@ -498,6 +502,49 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
             var rowid = cnn.ExecuteScalar("SELECT IDENT_CURRENT ('AccountList') AS Current_Identity;");
             userid = long.Parse(rowid.ToString());
             return userid;
+        }
+
+        public long GetCustomerIDByUserID(long UserID)
+        {
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                long CustomerID = -1;
+                var item = cnn.ExecuteScalar($"select CustomerID from AccountList where UserID = {UserID} ");
+                CustomerID = long.Parse(item.ToString());
+                return CustomerID;
+            }
+        }
+
+        public async Task<IEnumerable<AppListDTO>> GetListAppByUserID(long customerID)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("CustomerID", customerID);
+
+            string sql = @"select AppList.*,  Customer_App.IsDefaultApply from AppList 
+join Customer_App on Customer_App.AppID = AppList.AppID
+where CustomerID = @CustomerID";
+
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                dt = cnn.CreateDataTable(sql, Conds);
+                return dt.AsEnumerable().Select(row => new AppListDTO
+                {
+                    AppID = Int32.Parse(row["AppID"].ToString()),
+                    APIUrl = row["APIUrl"].ToString(),
+                    AppCode = row["AppCode"].ToString(),
+                    AppName = row["AppName"].ToString(),
+                    BackendURL = row["BackendURL"].ToString(),
+                    CurrentVersion = row["CurrentVersion"].ToString(),
+                    Description = row["Description"].ToString(),
+                    LastUpdate = row["LastUpdate"].ToString(),
+                    Note = row["Note"].ToString(),
+                    ReleaseDate = row["ReleaseDate"].ToString(),
+                    IsDefaultApp = Convert.ToBoolean((bool)row["IsDefaultApply"]),
+                    Icon = row["Icon"].ToString(),
+                    Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString())
+                });
+            }
         }
     }
 }

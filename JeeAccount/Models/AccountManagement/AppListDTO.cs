@@ -18,5 +18,7 @@ namespace JeeAccount.Models.AccountManagement
         public string CurrentVersion { get; set; }
         public string LastUpdate { get; set; }
         public bool IsDefaultApp { get; set; }
+        public int Position { get; set; }
+        public string Icon { get; set; }
     }
 }

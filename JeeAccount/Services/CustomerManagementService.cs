@@ -88,7 +88,7 @@ namespace JeeAccount.Services
                         Password = customerModel.Password,
                     };
 
-                    var createAccount = _accountManagementReponsitory.CreateAccount(cnn, accountManagementModel, 0, customerId);
+                    var createAccount = _accountManagementReponsitory.CreateAccount(cnn, accountManagementModel, 0, customerId, true);
                     if (!createAccount.Susscess)
                     {
                         cnn.RollbackTransaction();
@@ -136,7 +136,14 @@ namespace JeeAccount.Services
                     }
                     cnn.EndTransaction();
                     // kafak
-                    producer.PublishAsync(TopicAddNewCustomer, JsonConvert.SerializeObject(identity.customData.JeeAccount));
+                    var obj = new
+                    {
+                        CustomerID = identity.customData.JeeAccount.CustomerID,
+                        AppCode = identity.customData.JeeAccount.AppCode,
+                        UserID = identity.customData.JeeAccount.UserID,
+                        Username = customerModel.Username,
+                    };
+                    producer.PublishAsync(TopicAddNewCustomer, JsonConvert.SerializeObject(obj));
                     return addNewUser;
                 }
                 catch (Exception ex)
