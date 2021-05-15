@@ -1,5 +1,6 @@
 ﻿using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
+using JeeAccount.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace JeeAccount.Controllers
         private readonly static string LINK_UPDATE_CUSTOMDATASELF = LINK_IDENTITY_SERVER + "/user/updateCustomData/self";
         private readonly static string LINK_CHANGE_USERSTATE = LINK_IDENTITY_SERVER + "/user/changeUserState";
 
-        public async Task<IdentityServerReturn> loginUser(string username, string password)
+        public async Task<AppAccount> loginUser(string username, string password)
         {
             string url = LINK_LOGIN;
             var content = new IdentityServerLogin
@@ -44,19 +45,26 @@ namespace JeeAccount.Controllers
 
                     var logindata = JsonConvert.DeserializeObject<LoginObject>(returnValue);
 
+                    var appcodes = logindata.User.CustomData.JeeAccount.AppCode;
+                    var userid = logindata.User.CustomData.JeeAccount.UserID;
                     AccessRefreshToken accessRefreshToken = new AccessRefreshToken();
                     accessRefreshToken.access_token = logindata.Access_token;
                     accessRefreshToken.refresh_token = logindata.Refresh_token;
 
                     IdentityServerReturn identity = new IdentityServerReturn();
                     identity.data = accessRefreshToken;
-                    return identity;
+                    var obj = new AppAccount
+                    {
+                        AppCode = appcodes,
+                        UserId = userid
+                    };
+                    return obj;
                 }
                 else
                 {
                     string returnValue = reponse.Content.ReadAsStringAsync().Result;
                     var res = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
-                    return res;
+                    return new AppAccount();
                 }
             }
         }
@@ -82,7 +90,8 @@ namespace JeeAccount.Controllers
                 if (reponse.StatusCode == System.Net.HttpStatusCode.Created)
                 {
                     return new IdentityServerReturn();
-                } else
+                }
+                else
                 {
                     string returnValue = reponse.Content.ReadAsStringAsync().Result;
                     var res = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
@@ -155,7 +164,7 @@ namespace JeeAccount.Controllers
 
         }
 
-        public async Task<IdentityServerReturn> changeUserState(IdentityServerChangeUserStateModel identityServerChangeUserStateModel )
+        public async Task<IdentityServerReturn> changeUserState(IdentityServerChangeUserStateModel identityServerChangeUserStateModel)
         {
             string url = LINK_CHANGE_USERSTATE;
             var content = new IdentityServerChangeUserState

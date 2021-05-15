@@ -50,6 +50,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { GeneralModule } from '../_metronic/partials/content/general/general.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {DanhMucChungService} from './JeeAccount/_core/services/danhmuc.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 const MY_FORMATS_EDIT: any = {
   parse: {
@@ -114,7 +115,8 @@ const MY_FORMATS_EDIT: any = {
     CRUDTableModule,
     NgbModalModule,
     NgbDatepickerModule,
-    NgxMatSelectSearchModule
+    NgxMatSelectSearchModule,
+    TranslateModule
   ],
   entryComponents: [],
   providers: [
@@ -148,6 +150,7 @@ const MY_FORMATS_EDIT: any = {
     MatSortModule,
     MatProgressSpinnerModule,
     FormsModule,
+    TranslateModule,
     ReactiveFormsModule,
   ],
 })

@@ -2,6 +2,7 @@
 using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.Common;
+using JeeAccount.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +34,9 @@ namespace JeeAccount.Reponsitories
         ReturnSqlModel UpdateDirectManager(string Username, string DirectManager, long customerID);
         long GetLastUserID(DpsConnection cnn);
         long GetCustomerIDByUserID(long UserID);
+        ReturnSqlModel InsertAppCodeAccount(DpsConnection cnn, long UserID, List<int> AppID);
+        List<int> GetAppIdByAppCode(DpsConnection cnn, List<string> AppCode);
+        List<LoginAccountModel> GetListLogin(DpsConnection cnn);
     }
 }
 

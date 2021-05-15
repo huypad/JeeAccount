@@ -187,6 +187,7 @@ namespace JeeAccount.Classes
             }
         }
 
+
         public static string GetAccessTokenByHeader(IHeaderDictionary pHeader)
         {
             try

@@ -42,7 +42,7 @@ export class AccountManagementEditDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<AccountManagementEditDialogComponent>,
     private fb: FormBuilder,
-    private accountManagementService: AccountManagementService,
+    public accountManagementService: AccountManagementService,
     private changeDetect: ChangeDetectorRef,
     private layoutUtilsService: LayoutUtilsService,
     public danhmuc: DanhMucChungService,

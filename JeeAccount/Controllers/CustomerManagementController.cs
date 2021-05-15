@@ -23,17 +23,17 @@ namespace JeeAccount.Controllers
     [Route("api/customermanagement")]
     [ApiController]
 
-    public class CustomerManagementController: ControllerBase
+    public class CustomerManagementController : ControllerBase
     {
         private readonly IConfiguration _config;
         private readonly IProducer _producer;
         private readonly CustomerManagementService _service;
         public readonly string TopicAddNewCustomer;
-        public CustomerManagementController(IConfiguration configuration, IProducer producer)
+        public CustomerManagementController(IConfiguration configuration)
         {
             _config = configuration;
             _service = new CustomerManagementService(_config.GetConnectionString("DefaultConnection"));
-            _producer = producer;
+            //_producer = producer;
             TopicAddNewCustomer = _config.GetValue<string>("KafkaTopic:TopicAddNewCustomer");
         }
 
@@ -42,11 +42,6 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var access_token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
-                if (string.IsNullOrEmpty(access_token))
-                {
-                    return JsonResultCommon.DangNhap();
-                }
                 query = query == null ? new QueryRequestParams() : query;
                 BaseModel<object> model = new BaseModel<object>();
                 PageModel pageModel = new PageModel();
@@ -88,12 +83,6 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var access_token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
-                if (string.IsNullOrEmpty(access_token))
-                {
-                    return JsonResultCommon.DangNhap();
-                }
-
                 var list = _service.GetListApp();
                 if (list is null) return JsonResultCommon.KhongTonTai();
                 return JsonResultCommon.ThanhCong(list);
@@ -103,29 +92,7 @@ namespace JeeAccount.Controllers
                 return JsonResultCommon.Exception(ex);
             }
         }
-        [HttpPost("CreateCustomer")]
-        public async Task<BaseModel<object>> CreateCustomer([FromBody] CustomerModel customerModel)
-        {
-            try
-            {
-                var access_token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
-                if (string.IsNullOrEmpty(access_token))
-                {
-                    return JsonResultCommon.DangNhap();
-                }
 
-                var checkTrungCode = _service.checkTrungCode(customerModel.Code);
-                if (checkTrungCode) return JsonResultCommon.Trung("Code");
-                var create = await _service.CreateCustomer(access_token, customerModel, _producer, TopicAddNewCustomer);
-                if (create.statusCode != 0)
-                {
-                    return JsonResultCommon.ThatBai(create.message);
-                }
-                return JsonResultCommon.ThanhCong();
-            } catch (Exception ex)
-            {
-                return JsonResultCommon.Exception(ex);
-            }
-        }
     }
+
 }

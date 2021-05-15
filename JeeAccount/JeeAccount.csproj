@@ -25,6 +25,7 @@
     <Content Include="images\nhanvien\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Folder Include="ConsumerKafka\" />
   </ItemGroup>
 
   <ItemGroup>

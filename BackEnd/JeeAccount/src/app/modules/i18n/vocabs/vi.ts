@@ -101,6 +101,24 @@ export const locale = {
         },
       },
     },
+    COMMOM: {
+      THAOTAC: 'Thao tác',
+      THEMMOI: 'Thêm mới',
+      THEMTHANHCONG: 'Thêm thành công',
+      THEMKHACHHANG: 'Thêm khách hàng',
+      LUU: 'Lưu',
+      TROLAI: 'Trở lại',
+      DONG: 'Đóng',
+      AVATAR: 'Ảnh đại diện',
+      HOTEN: 'Họ và tên',
+      TEN: 'Tên',
+      PHONE: 'Số điện thoại',
+      PHONGBAN: 'Phòng ban',
+      CHUCVU: 'Chức vụ',
+      USERNAME: 'Tên đăng nhập',
+      PASSWORD: 'Mật khẩu',
+      REPASSWORD: 'Nhập lại mật khẩu',
+    },
     dropdowntimkiem: {
       timkiem1: 'Tìm kiếm theo mã và họ tên',
       timkiemnhanvien: 'Tìm kiếm nhân viên',
@@ -109,8 +127,10 @@ export const locale = {
       timkiemsearch3: 'Tìm theo mã, họ tên, phòng ban và chức vụ',
       timkiemsearch4: 'Tìm theo mã, tiêu đề và tình trạng',
     },
-    account_management: {
-      title: 'Danh sách phòng ban, nhóm',
-    },
+    ACCOUNTMANAGEMENT: {
+      TITLE: 'Danh sách phòng ban, nhóm',
+      THEMMOITAIKHOAN: 'Thêm mới tài khoản sử dụng',
+      UNGDUNGDUOCSUDUNG: 'Ứng dụng được sử dụng',
+    }
   },
 };

@@ -546,5 +546,73 @@ where CustomerID = @CustomerID";
                 });
             }
         }
+
+        public ReturnSqlModel InsertAppCodeAccount(DpsConnection cnn, long UserID, List<int> AppID)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("UserID", UserID);
+
+            string sql = @"select * from Account_App where UserID = @UserID";
+            dt = cnn.CreateDataTable(sql, Conds);
+            if (dt.Rows.Count > 0)
+            {
+                return new ReturnSqlModel();
+            }
+
+            foreach (var id in AppID)
+            {
+                Hashtable val = new Hashtable();
+                val.Add("UserID", UserID);
+                val.Add("AppID", id);
+                val.Add("CreatedDate", DateTime.Now);
+                val.Add("CreatedBy", 0);
+                val.Add("Disable", 0);
+
+                int x = cnn.Insert(val, "Account_App");
+                if (x <= 0)
+                {
+                    return new ReturnSqlModel(cnn.LastError.ToString(), Constant.ERRORCODE_EXCEPTION);
+                }
+            }
+
+            return new ReturnSqlModel();
+        }
+
+        public List<int> GetAppIdByAppCode(DpsConnection cnn, List<string> AppCode)
+        {
+            List<int> appid = new List<int>();
+            foreach (string code in AppCode)
+            {
+                if (code.Equals("jee-doc"))
+                {
+                    appid.Add(6);
+                }
+                else
+                {
+                    var id = cnn.ExecuteScalar($"select AppId from AppList where AppCode = '{code}'");
+                    appid.Add(Int32.Parse(id.ToString()));
+                }
+
+            }
+
+            return appid;
+        }
+
+
+        public List<LoginAccountModel> GetListLogin(DpsConnection cnn)
+        {
+            DataTable dt = new DataTable();
+
+            string sql = @"select Username, Password from AccountList";
+
+            dt = cnn.CreateDataTable(sql);
+            return dt.AsEnumerable().Select(row => new LoginAccountModel
+            {
+                Username = row["Username"].ToString(),
+                Password = row["Password"].ToString()
+            }).ToList<LoginAccountModel>();
+
+        }
     }
 }

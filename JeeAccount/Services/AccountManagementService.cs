@@ -5,6 +5,7 @@ using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.Common;
 using JeeAccount.Reponsitories;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -114,6 +115,7 @@ namespace JeeAccount.Services
                             cnn.EndTransaction();
                             return createUser;
                         }
+
                         cnn.EndTransaction();
                         return createUser;
                     }
@@ -124,7 +126,8 @@ namespace JeeAccount.Services
                         identityServerReturn = GeneralService.TranformIdentityServerReturnSqlModel(create);
                         return identityServerReturn;
                     }
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     cnn.RollbackTransaction();
                     cnn.EndTransaction();
@@ -134,7 +137,7 @@ namespace JeeAccount.Services
             }
         }
 
-        private IdentityServerAddNewUser InitIdentityServerUserModel(DpsConnection cnn, long customerID, AccountManagementModel account) 
+        private IdentityServerAddNewUser InitIdentityServerUserModel(DpsConnection cnn, long customerID, AccountManagementModel account)
         {
             IdentityServerAddNewUser identity = new IdentityServerAddNewUser();
             identity.username = account.Username;
@@ -223,19 +226,19 @@ namespace JeeAccount.Services
                     return updateCustom;
                 }
                 return updateCustom;
-                
-   
+
+
             }
             catch (Exception ex)
             {
- 
+
                 identity.message = ex.Message;
                 identity.statusCode = Int32.Parse(Constant.ERRORCODE_EXCEPTION);
                 return identity;
             }
         }
 
-        public async Task<IdentityServerReturn> login(string username, string password)
+        public async Task<object> login(string username, string password)
         {
             return await this.identityServerController.loginUser(username, password);
         }
@@ -286,12 +289,13 @@ namespace JeeAccount.Services
                     cnn.EndTransaction();
                     return updateCustom;
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 identity.message = ex.Message;
                 identity.statusCode = Int32.Parse(Constant.ERRORCODE_EXCEPTION);
                 return identity;
-            } 
+            }
         }
         public ReturnSqlModel UpdateDirectManager(string Username, string DirectManager, long customerID)
         {
@@ -310,5 +314,89 @@ namespace JeeAccount.Services
             var listapp = accountManagementReponsitory.GetListAppByUserID(UserID);
             return listapp;
         }
+
+        public List<int> GetAppIdByAppCode(DpsConnection cnn, List<string> AppCode)
+        {
+
+            return accountManagementReponsitory.GetAppIdByAppCode(cnn, AppCode);
+        }
+
+        public List<LoginAccountModel> GetListLogin()
+        {
+
+            using (DpsConnection cnn = new DpsConnection(ConnectionString))
+            {
+                return accountManagementReponsitory.GetListLogin(cnn);
+            }
+
+        }
+
+        public async Task<ReturnSqlModel> UpdateTool()
+        {
+
+            using (DpsConnection cnn = new DpsConnection(ConnectionString))
+            {
+                cnn.BeginTransaction();
+                var listlogin = accountManagementReponsitory.GetListLogin(cnn);
+                string listAccountempy = "";
+                foreach (var login in listlogin)
+                {
+                    var appAccount = await identityServerController.loginUser(login.Username, login.Password);
+                    if (appAccount.AppCode is null)
+                    {
+                        if (string.IsNullOrEmpty(listAccountempy))
+                        {
+                            listAccountempy = login.Username + "/" + login.Password;
+                        }
+                        else
+                        {
+                            listAccountempy += ", " + login.Username + "/" + login.Password;
+                        }
+                        continue;
+                    }
+                    var listId = GetAppIdByAppCode(cnn, appAccount.AppCode);
+                    var insert = accountManagementReponsitory.InsertAppCodeAccount(cnn, appAccount.UserId, listId);
+                    if (!insert.Susscess)
+                    {
+                        cnn.RollbackTransaction();
+                        cnn.EndTransaction();
+                        return insert;
+                    }
+                }
+
+                cnn.EndTransaction();
+                if (string.IsNullOrEmpty(listAccountempy))
+                {
+                    return new ReturnSqlModel();
+
+                }
+                else
+                {
+                    return new ReturnSqlModel(listAccountempy, "0");
+                }
+            }
+
+
+        }
+    }
+
+    public class InsertAppListAccountModel
+    {
+        public List<string> AppCode { get; set; }
+        public List<int> AppId { get; set; }
+        public long CustomerId { get; set; }
+        public long UserId { get; set; }
+    }
+
+    public class AppAccount
+    {
+        public List<string> AppCode { get; set; }
+        public long UserId { get; set; }
+    }
+
+    public class LoginAccountModel
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
     }
 }

@@ -53,7 +53,7 @@
         font-weight: $table-compact-head-font-weight;
         color: #808080 !important;
         font-size: 13px;
-        text-transform: $table-compact-head-text-transform;
+        text-transform: capitalize;
         letter-spacing: $table-compact-head-letter-spacing;
         background-color: #e4e6ef !important;
       }
@@ -78,6 +78,10 @@
         //padding-bottom: 12px;
         padding-top: 12px;
         font-size: 12px;
+      }
+
+      .row {
+        padding-left: 16px !important;
       }
     }
   }
