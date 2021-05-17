@@ -19,7 +19,7 @@ namespace JeeAccount.Reponsitories.DatabaseManagement
         public DatabaseListDTO GetDBByCustomerIDAppCode(long customerID, string appCode)
         {
             DataTable dt = new DataTable();
-            string sql = $@"select DatabaseList.InstantName, DatabaseList.DatabaseName from DatabaseList
+            string sql = $@"select DatabaseList.InstantName, DatabaseList.DatabaseName, DatabaseList.Username ,DatabaseList.Password from DatabaseList
 join Customer_App on Customer_App.DatabaseID = DatabaseList.RowID
 join AppList on AppList.AppID = Customer_App.AppID
 where DatabaseList.AppCode = '{appCode}' and Customer_App.CustomerID = @CustomerID";
@@ -33,7 +33,9 @@ where DatabaseList.AppCode = '{appCode}' and Customer_App.CustomerID = @Customer
                 return dt.AsEnumerable().Select(row => new DatabaseListDTO
                 {
                     DatabaseName = row["DatabaseName"].ToString(),
-                    InstantName = row["InstantName"].ToString()
+                    InstantName = row["InstantName"].ToString(),
+                    Username = row["Username"].ToString(),
+                    Password = row["Password"].ToString()
                 }).SingleOrDefault();
             }
         }
