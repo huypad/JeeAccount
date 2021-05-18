@@ -17,12 +17,12 @@ namespace JeeAccount.Controllers
     [EnableCors("AllowOrigin")]
     [Route("api/departmentmanagement")]
     [ApiController]
-    public class StructureManagementController : ControllerBase
+    public class DepartmentManagementController: ControllerBase
     {
         private readonly IConfiguration _config;
         private readonly DepartmentManagementService departmentManagementService;
 
-        public StructureManagementController(IConfiguration configuration)
+        public DepartmentManagementController(IConfiguration configuration)
         {
             _config = configuration;
             departmentManagementService = new DepartmentManagementService(_config.GetConnectionString("DefaultConnection"));
@@ -50,7 +50,7 @@ namespace JeeAccount.Controllers
 
 
         [HttpPost("CreateDepartment")]
-        public BaseModel<object> CreateDepartment(StructureModel depart)
+        public BaseModel<object> CreateDepartment(DepartmentModel depart)
         {
             try
             {

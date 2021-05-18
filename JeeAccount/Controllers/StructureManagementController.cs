@@ -17,12 +17,12 @@ namespace JeeAccount.Controllers
     [EnableCors("AllowOrigin")]
     [Route("api/departmentmanagement")]
     [ApiController]
-    public class DepartmentManagementController: ControllerBase
+    public class StructureManagementController : ControllerBase
     {
         private readonly IConfiguration _config;
         private readonly StructureManagementService structureManagementService;
 
-        public DepartmentManagementController(IConfiguration configuration)
+        public StructureManagementController(IConfiguration configuration)
         {
             _config = configuration;
             structureManagementService = new StructureManagementService(_config.GetConnectionString("DefaultConnection"));

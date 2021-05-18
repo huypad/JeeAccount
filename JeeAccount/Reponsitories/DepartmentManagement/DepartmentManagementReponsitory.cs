@@ -18,7 +18,7 @@ namespace JeeAccount.Reponsitories
         {
             _connectionString = connectionString;
         }
-        public async Task<IEnumerable<StructureDTO>> GetListDepartment(long custormerID)
+        public async Task<IEnumerable<DepartmentDTO>> GetListDepartment(long custormerID)
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
@@ -29,7 +29,7 @@ namespace JeeAccount.Reponsitories
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 dt = cnn.CreateDataTable(sql, Conds);
-                return dt.AsEnumerable().Select(row => new StructureDTO
+                return dt.AsEnumerable().Select(row => new DepartmentDTO
                 {
                     RowID = long.Parse(row["RowID"].ToString()),
                     IsActive = Convert.ToBoolean((bool)row["IsActive"]),
@@ -40,7 +40,7 @@ namespace JeeAccount.Reponsitories
             }
         }
 
-        public ReturnSqlModel CreateDepartment(StructureModel departmentModel, long CustomerID, long UserID)
+        public ReturnSqlModel CreateDepartment(DepartmentModel departmentModel, long CustomerID, long UserID)
         {
             Hashtable val = new Hashtable();
             ReturnSqlModel returnSql = new ReturnSqlModel();

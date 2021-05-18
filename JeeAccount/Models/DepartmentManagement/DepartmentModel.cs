@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace JeeAccount.Models.DepartmentManagement
 {
-    public class StructureModel
+    public class DepartmentModel
     {
         public long RowID { get; set; }
         public string DepartmentName { get; set; }
