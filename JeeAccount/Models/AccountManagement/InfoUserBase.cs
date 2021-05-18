@@ -8,5 +8,6 @@
         public abstract string Jobtitle { get; set; }
         public abstract string Departmemt { get; set; }
         public abstract string Email { get; set; }
+        public abstract string StructureID { get; set; }
     }
 }

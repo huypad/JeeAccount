@@ -9,8 +9,8 @@ namespace JeeAccount.Reponsitories
 {
     public interface IDepartmentManagementReponsitory
     {
-        Task<IEnumerable<DepartmentDTO>> GetListDepartment(long custormerID);
-        ReturnSqlModel CreateDepartment(DepartmentModel departmentModel, long CustomerID, long UserID);
+        Task<IEnumerable<StructureDTO>> GetListDepartment(long custormerID);
+        ReturnSqlModel CreateDepartment(StructureModel departmentModel, long CustomerID, long UserID);
         ReturnSqlModel ChangeTinhTrang(long customerID, long RowID, string Note, long UserIdLogin);
     }
 }

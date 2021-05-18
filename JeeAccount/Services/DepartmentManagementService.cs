@@ -10,20 +10,20 @@ namespace JeeAccount.Services
 {
     public class DepartmentManagementService
     {
-        private IDepartmentManagementReponsitory departmentManagementReponsitory;
+        private IStructureManagementReponsitory departmentManagementReponsitory;
 
         public DepartmentManagementService(string connectionString)
         {
             this.departmentManagementReponsitory = new DepartmentManagementReponsitory(connectionString);
         }
 
-        public Task<IEnumerable<DepartmentDTO>> GetListDepartment(long CustomerID)
+        public Task<IEnumerable<StructureDTO>> GetListDepartment(long CustomerID)
         {
             var departs = departmentManagementReponsitory.GetListDepartment(CustomerID);
             return departs;
         }
 
-        public ReturnSqlModel CreateDepartment(DepartmentModel departmentModel, long CustomerID, long UserID)
+        public ReturnSqlModel CreateDepartment(StructureModel departmentModel, long CustomerID, long UserID)
         {
             var create = departmentManagementReponsitory.CreateDepartment(departmentModel, CustomerID, UserID);
             return create;

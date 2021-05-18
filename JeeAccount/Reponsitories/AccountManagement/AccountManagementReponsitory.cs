@@ -31,7 +31,7 @@ namespace JeeAccount.Reponsitories
 
             string sql = @"select UserID, Username, email, LastName +' '+FirstName as FullName
                            , FirstName as Name, AvartarImgURL as Avatar, Jobtitle,
-                           Department, PhoneNumber, CustomerID
+                           Department, PhoneNumber, CustomerID, cocauid
                            from AccountList where CustomerID=@CustomerID";
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
@@ -47,6 +47,7 @@ namespace JeeAccount.Reponsitories
                     PhoneNumber = row["PhoneNumber"].ToString(),
                     Jobtitle = row["Jobtitle"].ToString(),
                     Email = row["email"].ToString(),
+                    StructureID = row["cocauid"].ToString(),
                 });
             }
 
@@ -124,7 +125,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
             SqlConditions Conds = new SqlConditions();
             Conds.Add("Username", username);
 
-            string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department, LastName, Username, Email, PhoneNumber
+            string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department, LastName, Username, Email, PhoneNumber, cocauid
 from AccountList 
 where Username = @username and (Disable != 1 or Disable is null)";
 
@@ -144,6 +145,7 @@ where Username = @username and (Disable != 1 or Disable is null)";
                     LastName = dt.Rows[0]["LastName"].ToString(),
                     PhoneNumber = dt.Rows[0]["PhoneNumber"].ToString(),
                     Username = dt.Rows[0]["Username"].ToString(),
+                    StructureID = dt.Rows[0]["cocauid"].ToString(),
                 };
             }
         }
@@ -154,8 +156,10 @@ where Username = @username and (Disable != 1 or Disable is null)";
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", customerID);
 
-            string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department from AccountList 
-where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
+            string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name
+                        , AvartarImgURL as Avatar, Jobtitle, Department, cocauid 
+                        from AccountList 
+                        where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
@@ -168,7 +172,8 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
                     Avatar = dt.Rows[0]["Avatar"].ToString(),
                     Jobtitle = dt.Rows[0]["Jobtitle"].ToString(),
                     Name = dt.Rows[0]["Name"].ToString(),
-                    Departmemt = dt.Rows[0]["Department"].ToString()
+                    Departmemt = dt.Rows[0]["Department"].ToString(),
+                    StructureID = dt.Rows[0]["cocauid"].ToString(),
                 };
             }
         }
@@ -180,8 +185,8 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
             Conds.Add("CustomerID", customerID);
 
             string sql = @"select AppList.*,  Customer_App.IsDefaultApply from AppList 
-join Customer_App on Customer_App.AppID = AppList.AppID
-where CustomerID = @CustomerID";
+                            join Customer_App on Customer_App.AppID = AppList.AppID
+                            where CustomerID = @CustomerID";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
@@ -213,7 +218,7 @@ where CustomerID = @CustomerID";
             Conds.Add("isAdmin", 1);
 
             string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name
-                        , AvartarImgURL as Avatar, Jobtitle, Department, Username, Email 
+                        , AvartarImgURL as Avatar, Jobtitle, Department, Username, Email, cocauid
                         from AccountList 
                         where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
 
@@ -230,6 +235,7 @@ where CustomerID = @CustomerID";
                     Username = row["Username"].ToString(),
                     Departmemt = row["Department"].ToString(),
                     Email = row["Email"].ToString(),
+                    StructureID = row["cocauid"].ToString(),
                 });
             }
         }
@@ -242,7 +248,7 @@ where CustomerID = @CustomerID";
 
             string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name, 
                         AvartarImgURL as Avatar, Jobtitle, Department, Username, DirectManager
-                        , IsActive, Note, email from AccountList 
+                        , IsActive, Note, email, cocauid from AccountList 
                         where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
@@ -261,6 +267,7 @@ where CustomerID = @CustomerID";
                     Departmemt = row["Department"].ToString(),
                     Username = row["Username"].ToString(),
                     Email = row["Email"].ToString(),
+                    StructureID = row["cocauid"].ToString(),
                 });
             }
         }
@@ -452,8 +459,11 @@ where CustomerID = @CustomerID";
                 Conds.Add("CustomerID", CustomerID);
                 Conds.Add("UserID", UserID);
 
-                string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department, PhoneNumber, Birthday from AccountList 
-where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
+                string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name
+                                , AvartarImgURL as Avatar, Jobtitle, Department, PhoneNumber, Birthday, cocauid 
+                                from AccountList 
+                                where CustomerID = @CustomerID 
+                                and (Disable != 1 or Disable is null)";
 
                 dt = cnn.CreateDataTable(sql, Conds);
                 if (dt.Rows.Count == 0)
@@ -467,6 +477,7 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
                     Jobtitle = dt.Rows[0]["Jobtitle"].ToString(),
                     Name = dt.Rows[0]["Name"].ToString(),
                     Phonenumber = dt.Rows[0]["PhoneNumber"].ToString(),
+                    StructureID = dt.Rows[0]["cocauid"].ToString(),
                 };
             }
         }
@@ -522,8 +533,8 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
             Conds.Add("CustomerID", customerID);
 
             string sql = @"select AppList.*,  Customer_App.IsDefaultApply from AppList 
-join Customer_App on Customer_App.AppID = AppList.AppID
-where CustomerID = @CustomerID";
+                        join Customer_App on Customer_App.AppID = AppList.AppID
+                        where CustomerID = @CustomerID";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {

@@ -14,5 +14,7 @@ namespace JeeAccount.Models.AccountManagement
         public override string Jobtitle { get ; set ; }
         public override string Departmemt { get ; set ; }
         public override string Email { get; set; }
+        public override string StructureID { get; set; }
+
     }
 }
