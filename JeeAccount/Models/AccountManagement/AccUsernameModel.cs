@@ -18,6 +18,8 @@ namespace JeeAccount.Models.AccountManagement
         public string PhoneNumber { get; set; }
         public long CustomerID { get; set; }
         public string Email { get; set; }
+        public long StructureID { get; set; } // sử dụng cho JeeOffice
+
 
     }
 }

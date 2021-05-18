@@ -1,0 +1,77 @@
+<div class="m-portlet">
+    <div class="m-portlet__head">
+        <div class="m-portlet__head-caption">
+            <div class="m-portlet__head-title">
+                <div class="row" style="height: 24px; display: inline" >
+                    <h3 class="m-portlet__head-text">
+                        Tạo phòng ban/nhóm
+                        <button style ="float: right; margin: 0" type="button" class="btn jee-btn btn-themmoi-blue" (click)="onSubmit()">Thêm</button>
+                        <button style ="float: right; margin: 0 12px 0 0;" type="button" class="btn jee-btn btn-quaylai" (click)="goBack()">Đóng</button>
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="m-form m-form--fit m-form--label-align-right m-form--group-seperator-dashed">
+        <div class="m-portlet__body">
+            <form [formGroup]="itemForm" class="m-form m-form--group-seperator-dashed">
+                <div class="m-form__section m-form__section--first">
+                    <div class="row m-form__group">
+                        <div class="col-md-12 m--margin-bottom-10-mobile">
+                            <mat-form-field class="mat-form-field-fluid">
+                                <input  formControlName="TenPhongBan" placeholder="Tên phòng ban" matInput required>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-12 m--margin-bottom-10-mobile">
+                            <mat-form-field class="mat-form-field-fluid">
+                                <mat-select formControlName="QuanLyNhom" placeholder="Quản lý nhóm"  #singleSelect>
+                                    <mat-option>
+                                        <ngx-mat-select-search noEntriesFoundLabel="Không tìm thấy" placeholderLabel="Thêm quản lý nhóm" formControlName="FilterQuanLyNhom"></ngx-mat-select-search>
+                                    </mat-option>
+                                    <mat-option *ngFor="let thanhvien of filterQuanLys | async" [value]="thanhvien.Username">
+                                        {{thanhvien.Display}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-12 m--margin-bottom-10-mobile">
+                            <mat-form-field class="mat-form-field-fluid">
+                                <mat-label>Thành viên</mat-label>
+                                <mat-chip-list #chipListThanhVien aria-label="Chọn thành viên">
+                                    <mat-chip
+                                            *ngFor="let thanhVien of thanhViens"
+                                            [selectable]="selectable"
+                                            [removable]="removable"
+                                            (removed)="remove(thanhVien)">
+                                        {{thanhVien}}
+                                        <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                                    </mat-chip>
+                                    <input
+                                            placeholder="Thêm thành viên..."
+                                            #thanhVienInput
+                                            formControlName="ThanhVien"
+                                            [matAutocomplete]="autoThanhVien"
+                                            [matChipInputFor]="chipListThanhVien"
+                                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                                            (matChipInputTokenEnd)="add($event)">
+                                </mat-chip-list>
+                                <mat-autocomplete #autoThanhVien="matAutocomplete" (optionSelected)="selected($event)">
+                                    <mat-option *ngFor="let thanhvien of filteredThanhViens | async" [value]="thanhvien.Username">
+                                        {{thanhvien.Display}}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-12 m--margin-bottom-10-mobile">
+                            <mat-form-field class="mat-form-field-fluid">
+                                <textarea cols="12" rows="4" formControlName="MoTa" placeholder="Mô tả" matInput > </textarea>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="m-portlet__foot m-portlet__no-border m-portlet__foot--fit text-right">
+        </div>
+    </div>
+</div>
