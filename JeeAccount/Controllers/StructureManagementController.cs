@@ -47,6 +47,24 @@ namespace JeeAccount.Controllers
                 return JsonResultCommon.Exception(ex);
             }
         }
+        [HttpGet("Sysn_Structure")]
+        public async Task<BaseModel<object>> Sysn_Structure(long CustomerID)
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                }
 
+                var depart = await structureManagementService.Sysn_Structure(CustomerID);
+                return JsonResultCommon.ThanhCong(depart);
+            }
+            catch (Exception ex)
+            {
+                return JsonResultCommon.Exception(ex);
+            }
+        }
     }
 }

@@ -23,5 +23,10 @@ namespace JeeAccount.Services
             var departs = StructureManagementReponsitory.GetOrgStructure(query);
             return departs;
         }
+        public Task<IEnumerable<StructureDTO>> Sysn_Structure(long CustomerID)
+        {
+            var departs = StructureManagementReponsitory.Sysn_Structure(CustomerID);
+            return departs;
+        }
     }
 }

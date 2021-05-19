@@ -118,6 +118,59 @@ namespace JeeAccount.Reponsitories
                 });
             }
         }
-
+        public async Task<IEnumerable<StructureDTO>> Sysn_Structure(long CustomerID)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            //Conds.Add("CustomerID", custormerID);
+            string sqlq = @"select dv1.[Id]
+                                          , dv1.[LoaiDonVi]
+                                          ,dv1.[DonVi]
+                                          ,dv1.[MaDonvi]
+                                          ,dv1.[MaDinhDanh]
+                                          ,dv1.[Parent]
+                                          ,dv1.[SDT]
+                                          ,dv1.[Email]
+                                          ,dv1.[DiaChi]
+                                          ,dv1.[Logo]
+                                          ,dv1.[Locked]
+                                          ,dv1.[Priority]
+                                          ,dv1.[DangKyLichLanhDao]
+                                          ,dv1.[KhongCoVanThu]
+                                          ,dv1.[CreatedBy]
+                                          ,dv1.[CreatedDate]
+                                          ,dv1.[UpdatedBy]
+                                          ,dv1.[UpdatedDate]
+                                          ,dv1.[Disabled]
+                                            ,dv2.DonVi as ParentName
+                                           from Cocautochuc dv1
+                                            left
+                                           join Cocautochuc dv2 on dv1.Parent = dv2.Id
+                                          where dv1.[Disabled] = 0 and(dv1.Parent = @IdDV or dv1.Id = @IdDV)";
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                dt = cnn.CreateDataTable(sqlq, Conds);
+                var temp = dt.AsEnumerable();
+                return dt.AsEnumerable().Select(row => new StructureDTO
+                {
+                    Id = long.Parse(row["ID"].ToString()),
+                    DonVi = row["DonVi"].ToString(),
+                    MaDonvi = row["MaDonvi"].ToString(),
+                    MaDinhDanh = row["MaDinhDanh"].ToString(),
+                    Parent = long.Parse(row["Parent"].ToString()),
+                    SDT = row["SDT"].ToString(),
+                    Email = row["Email"].ToString(),
+                    DiaChi = row["DiaChi"].ToString(),
+                    Logo = row["Logo"].ToString(),
+                    DangKyLichLanhDao = Convert.ToBoolean((bool)row["DangKyLichLanhDao"]),
+                    KhongCoVanThu = Convert.ToBoolean((bool)row["KhongCoVanThu"]),
+                    LoaiDonVi = long.Parse(row["LoaiDonVi"].ToString()),
+                    Priority = long.Parse(row["Priority"].ToString()),
+                    Locked = Convert.ToBoolean((bool)row["Locked"]),
+                    CreatedDate = String.Format("{0:dd\\/MM\\/yyyy HH:mm}", row["CreatedDate"]),
+                    ParentName = row["ParentName"].ToString()
+                });
+            }
+        }
     }
 }

@@ -11,5 +11,6 @@ namespace JeeAccount.Reponsitories
     public interface IStructureManagementReponsitory
     {
         Task<IEnumerable<StructureDTO>> GetOrgStructure([FromQuery] QueryParams query);
+        Task<IEnumerable<StructureDTO>> Sysn_Structure(long CustomerID);
     }
 }
