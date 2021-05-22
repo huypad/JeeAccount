@@ -98,7 +98,7 @@
               <input type="checkbox" [formControlName]="i">
               {{listApp[i].AppName}} &nbsp; &nbsp;
             </label> -->
-            <section class="example-section">
+            <section >
               <mat-checkbox class="example-margin" formArrayName="AppsCheckbox"
                 *ngFor="let app of AppsFromArray.controls; let i = index" [formControlName]="i">
                 {{listApp[i].AppName}}

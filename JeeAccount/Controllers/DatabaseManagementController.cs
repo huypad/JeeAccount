@@ -70,22 +70,13 @@ namespace JeeAccount.Controllers
                 HttpClientHandler clientHandler = new HttpClientHandler();
                 clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
 
-                var secret = _config.GetValue<string>("Jwt:access_secret");
-                var projectName = _config.GetValue<string>("KafkaConfig:ProjectName");
-                var token = JsonWebToken.issueToken(new TokenClaims { projectName = projectName }, secret);
-                var obj = new DBTokenModel
-                {
-                    customerID = 1,
-                    appCode = "HR"
-                };
+                var token = "1231232132131313";
 
-                var stringContent = await Task.Run(() => Newtonsoft.Json.JsonConvert.SerializeObject(obj));
-                var httpContent = new StringContent(stringContent, Encoding.UTF8, "application/json");
 
                 using (var client = new HttpClient(clientHandler))
                 {
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(token);
-                    var reponse = await client.PostAsync("https://localhost:5001/api/databasemanagement/GetDSDB", httpContent);
+                    var reponse = await client.GetAsync("https://localhost:5001/api/customermanagement/CreateCustomer");
                     string returnValue = reponse.Content.ReadAsStringAsync().Result;
                     var res = returnValue;
                     return res;

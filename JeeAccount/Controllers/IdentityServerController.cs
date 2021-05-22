@@ -21,6 +21,7 @@ namespace JeeAccount.Controllers
         private readonly static string LINK_LOGOUT = LINK_IDENTITY_SERVER + "/user/logout";
         private readonly static string LINK_CHANGE_PASSWORD = LINK_IDENTITY_SERVER + "/user/changePassword";
         private readonly static string LINK_ADD_NEWUSER = LINK_IDENTITY_SERVER + "/user/addnew";
+        private readonly static string LINK_ADD_NEWUSER_INTERNAL = LINK_IDENTITY_SERVER + "/user/addnew/internal";
         private readonly static string LINK_UPDATE_CUSTOMDATA = LINK_IDENTITY_SERVER + "/user/updateCustomData";
         private readonly static string LINK_UPDATE_CUSTOMDATASELF = LINK_IDENTITY_SERVER + "/user/updateCustomData/self";
         private readonly static string LINK_CHANGE_USERSTATE = LINK_IDENTITY_SERVER + "/user/changeUserState";
@@ -120,6 +121,38 @@ namespace JeeAccount.Controllers
 
                 var reponse = await client.PostAsync(url, httpContent);
                 if (reponse.StatusCode == System.Net.HttpStatusCode.Created)
+                {
+                    return new IdentityServerReturn();
+                }
+                else
+                {
+                    string returnValue = reponse.Content.ReadAsStringAsync().Result;
+                    var res = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
+                    return res;
+                }
+            }
+
+        }
+
+        public async Task<IdentityServerReturn> addNewAdminUserInternal(IdentityServeAddAdminNewUser identityServerUserModel, string internal_token)
+        {
+            string url = LINK_ADD_NEWUSER_INTERNAL;
+            var content = new IdentityServeAddAdminNewUser
+            {
+                username = identityServerUserModel.username,
+                password = identityServerUserModel.password,
+                customData = identityServerUserModel.customData,
+            };
+
+            var stringContent = await Task.Run(() => JsonConvert.SerializeObject(content));
+            var httpContent = new StringContent(stringContent, Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(internal_token);
+
+                var reponse = await client.PostAsync(url, httpContent);
+                if (reponse.IsSuccessStatusCode)
                 {
                     return new IdentityServerReturn();
                 }
@@ -263,6 +296,48 @@ namespace JeeAccount.Controllers
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(Admin_access_token);
+
+                var reponse = await client.PostAsync(url, httpContent);
+                if (reponse.IsSuccessStatusCode)
+                {
+                    string returnValue = reponse.Content.ReadAsStringAsync().Result;
+
+                    var logindata = JsonConvert.DeserializeObject<LoginObject>(returnValue);
+
+                    AccessRefreshToken accessRefreshToken = new AccessRefreshToken();
+                    accessRefreshToken.access_token = logindata.Access_token;
+                    accessRefreshToken.refresh_token = logindata.Refresh_token;
+
+                    IdentityServerReturn identity = new IdentityServerReturn();
+                    identity.data = accessRefreshToken;
+                    return identity;
+                }
+                else
+                {
+                    string returnValue = reponse.Content.ReadAsStringAsync().Result;
+                    var res = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
+                    return res;
+                }
+            }
+
+        }
+
+        public async Task<IdentityServerReturn> UppdateCustomDataInternal(string internal_token, string Username, ObjCustomData objCustomData)
+        {
+            string url = LINK_UPDATE_CUSTOMDATA + "/internal";
+            var content = new UpdateCustomDataModel
+            {
+                username = Username,
+                updateField = objCustomData.updateField,
+                fieldValue = objCustomData.fieldValue,
+            };
+
+            var stringContent = await Task.Run(() => JsonConvert.SerializeObject(content));
+            var httpContent = new StringContent(stringContent, Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(internal_token);
 
                 var reponse = await client.PostAsync(url, httpContent);
                 if (reponse.IsSuccessStatusCode)

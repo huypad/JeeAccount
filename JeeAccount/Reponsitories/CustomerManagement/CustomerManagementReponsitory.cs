@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace JeeAccount.Reponsitories.CustomerManagement
 {
-    public class CustomerManagementReponsitory: ICustomerManagementReponsitory
+    public class CustomerManagementReponsitory : ICustomerManagementReponsitory
     {
         private readonly string _connectionString;
         public CustomerManagementReponsitory(string connectionString)
@@ -39,7 +39,7 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
             {
                 appcodes.Add(dt.Rows[index][0].ToString());
             }
-            return appcodes;    
+            return appcodes;
         }
 
         public bool checkTrungCode(string Code)
@@ -97,6 +97,7 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
             try
             {
                 #region val data
+                if (customerModel.RowID != 0) val.Add("RowID", customerModel.RowID);
                 val.Add("Code", customerModel.Code);
                 val.Add("CompanyName", customerModel.CompanyName);
                 val.Add("RegisterName", customerModel.RegisterName);
@@ -189,7 +190,8 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
             if (string.IsNullOrEmpty(whereSrt))
             {
                 sql = $@"select * from CustomerList order by {orderByStr}";
-            } else
+            }
+            else
             {
                 sql = $@"select * from CustomerList where {whereSrt} order by {orderByStr}";
             }
@@ -209,7 +211,7 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
                     RowID = Int32.Parse(row["RowID"].ToString()),
                     Status = Int32.Parse(row["Status"].ToString()),
                 });
-            }        
+            }
         }
     }
 }

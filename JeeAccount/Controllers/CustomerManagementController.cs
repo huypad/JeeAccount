@@ -29,11 +29,11 @@ namespace JeeAccount.Controllers
         private readonly IProducer _producer;
         private readonly CustomerManagementService _service;
         public readonly string TopicAddNewCustomer;
-        public CustomerManagementController(IConfiguration configuration)
+        public CustomerManagementController(IConfiguration configuration, IProducer producer)
         {
             _config = configuration;
-            _service = new CustomerManagementService(_config.GetConnectionString("DefaultConnection"));
-            //_producer = producer;
+            _service = new CustomerManagementService(_config.GetConnectionString("DefaultConnection"), producer, configuration);
+            _producer = producer;
             TopicAddNewCustomer = _config.GetValue<string>("KafkaTopic:TopicAddNewCustomer");
         }
 
@@ -93,6 +93,29 @@ namespace JeeAccount.Controllers
             }
         }
 
+        [HttpPost("CreateCustomer")]
+        public async Task<IActionResult> CreateCustomer([FromBody] CustomerModel model)
+        {
+            try
+            {
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null) return NotFound("Secrectkey");
+
+                var create = await _service.CreateCustomer(model);
+                if (create.statusCode == 0)
+                {
+                    return Ok(token);
+                }
+                else
+                {
+                    return BadRequest(create.message);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 
 }

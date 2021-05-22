@@ -1,6 +1,7 @@
 using DPSinfra.Kafka;
 using DPSinfra.Vault;
 using JeeAccount.Models.Common;
+using JeeCustomer.ConsumerKafka;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -44,8 +45,9 @@ namespace JeeAccount
             Secret<SecretData> kafkaSecret = vaultClient.V1.Secrets.KeyValue.V2.ReadSecretAsync(path: "jwt", mountPoint: "kv").Result;
             IDictionary<string, object> kafkaDataSecret = kafkaSecret.Data.Data;
             string access_secret = kafkaDataSecret["access_secret"].ToString();
+            string internal_secret = kafkaDataSecret["internal_secret"].ToString();
             Configuration["Jwt:access_secret"] = access_secret;
-
+            Configuration["Jwt:internal_secret"] = internal_secret;
             Secret<SecretData> kafka = vaultClient.V1.Secrets.KeyValue.V2.ReadSecretAsync(path: "kafka", mountPoint: "kv").Result;
             IDictionary<string, object> kafkaData = kafka.Data.Data;
             string KafkaUser = kafkaData["username"].ToString();
@@ -115,7 +117,7 @@ namespace JeeAccount
             });
             services.AddOptions();
 
-
+            services.AddSingleton<IHostedService, AccountConsumerController>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
