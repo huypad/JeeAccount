@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace JeeAccount.Reponsitories
 {
-
     public class WidgetDashBoardRepository : IWidgetDashBoardRepository
     {
         private readonly string _connectionString;
+
         public WidgetDashBoardRepository(string connectionString)
         {
             _connectionString = connectionString;
@@ -24,19 +24,21 @@ namespace JeeAccount.Reponsitories
         {
             DataTable dt = new DataTable();
             string sql = "select * from Widget_Dashboard";
-            using (DpsConnection cnn = new DpsConnection(_connectionString)) {
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
                 dt = await cnn.CreateDataTableAsync(sql);
 
-            return dt.AsEnumerable().Select(row => new Widget
-            {
-                cols = Convert.ToInt32(row["Cols"]),
-                componentName = row["ComponentName"].ToString(),
-                id = Convert.ToInt32(row["Id"]),
-                name = row["Name"].ToString(),
-                rows = Convert.ToInt32(row["Rows"]),
-                x = Convert.ToInt32(row["x"]),
-                y = Convert.ToInt32(row["y"])
-            });
+                var result = dt.AsEnumerable().Select(row => new Widget
+                {
+                    cols = Convert.ToInt32(row["Cols"]),
+                    componentName = row["ComponentName"].ToString(),
+                    id = Convert.ToInt32(row["Id"]),
+                    name = row["Name"].ToString(),
+                    rows = Convert.ToInt32(row["Rows"]),
+                    x = Convert.ToInt32(row["x"]),
+                    y = Convert.ToInt32(row["y"])
+                });
+                return await Task.FromResult(result).ConfigureAwait(false);
             }
         }
 
@@ -44,9 +46,10 @@ namespace JeeAccount.Reponsitories
         {
             DataTable dt = new DataTable();
             string sql = $"select * from Widget_Dashboard where Id_nv = {ID_NV} and id = {WidgetId}";
-            using (DpsConnection cnn = new DpsConnection(_connectionString)) {
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
                 dt = await cnn.CreateDataTableAsync(sql);
-                return dt.AsEnumerable().Select(row => new WidgetDashBoardModel
+                var result = dt.AsEnumerable().Select(row => new WidgetDashBoardModel
                 {
                     Id_row = Convert.ToInt32(row["Id_row"]),
                     Cols = Convert.ToInt32(row["Cols"]),
@@ -58,6 +61,7 @@ namespace JeeAccount.Reponsitories
                     x = Convert.ToInt32(row["x"]),
                     y = Convert.ToInt32(row["y"])
                 }).SingleOrDefault();
+                return await Task.FromResult(result).ConfigureAwait(false);
             }
         }
 
@@ -67,9 +71,11 @@ namespace JeeAccount.Reponsitories
             DataTable dt = new DataTable();
             ReturnSqlModel returnSql = new ReturnSqlModel();
             string sql = $"select Id_nv from Widget_Dashboard where Id_nv = {widget.Id_nv} and id = {widget.Id}";
-            using (DpsConnection cnn = new DpsConnection(_connectionString)) {
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
                 dt = await cnn.CreateDataTableAsync(sql);
-                if (dt.Rows.Count == 0) {
+                if (dt.Rows.Count == 0)
+                {
                     val.Add("Id_nv", 0);
                     val.Add("Id", widget.Id);
                     val.Add("Name", widget.Name);
@@ -79,10 +85,13 @@ namespace JeeAccount.Reponsitories
                     val.Add("Rows", widget.Rows);
                     val.Add("ComponentName", widget.ComponentName);
                     int x = cnn.Insert(val, "Widget_Dashboard");
-                    if (x <= 0) {
+                    if (x <= 0)
+                    {
                         return new ReturnSqlModel(cnn.LastError.ToString(), Constant.ERRORCODE_EXCEPTION);
                     }
-                } else {
+                }
+                else
+                {
                     return new ReturnSqlModel("Widget đã tồn tại", Constant.ERRORCODE_EXIST);
                 }
             }
@@ -94,9 +103,11 @@ namespace JeeAccount.Reponsitories
             Hashtable val = new Hashtable();
             SqlConditions Conds = new SqlConditions();
             string sql = $"select Id_nv from Widget_Dashboard where Id_nv = {widget.Id_nv} and id = {widget.Id}";
-            using (DpsConnection cnn = new DpsConnection(_connectionString)) {
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
                 DataTable dt = await cnn.CreateDataTableAsync(sql);
-                if (dt.Rows.Count == 0) {
+                if (dt.Rows.Count == 0)
+                {
                     return new ReturnSqlModel("Widget không tồn tại", Constant.ERRORCODE_NOTEXIST);
                 }
                 Conds.Add("Id_nv", 0);
@@ -107,7 +118,8 @@ namespace JeeAccount.Reponsitories
                 val.Add("Cols", widget.Cols);
                 val.Add("Rows", widget.Rows);
                 int x = cnn.Update(val, Conds, "Widget_Dashboard");
-                if (x <= 0) {
+                if (x <= 0)
+                {
                     return new ReturnSqlModel(cnn.LastError.ToString(), Constant.ERRORCODE_EXCEPTION);
                 }
             }
@@ -118,15 +130,18 @@ namespace JeeAccount.Reponsitories
         {
             SqlConditions Conds = new SqlConditions();
             string sql = $"select Id_nv from Widget_Dashboard where Id_nv = {ID_NV} and id = {WidgetId}";
-            using (DpsConnection cnn = new DpsConnection(_connectionString)) {
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
                 DataTable dt = await cnn.CreateDataTableAsync(sql);
-                if (dt.Rows.Count == 0) {
+                if (dt.Rows.Count == 0)
+                {
                     return new ReturnSqlModel("Widget không tồn tại", Constant.ERRORCODE_NOTEXIST);
                 }
                 Conds.Add("Id_nv", 0);
-                Conds.Add("Id", WidgetId);      
+                Conds.Add("Id", WidgetId);
                 int x = cnn.Delete(Conds, "Widget_Dashboard");
-                if (x <= 0) {
+                if (x <= 0)
+                {
                     return new ReturnSqlModel(cnn.LastError.ToString(), Constant.ERRORCODE_EXCEPTION);
                 }
             }

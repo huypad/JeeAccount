@@ -16,8 +16,8 @@ namespace JeeAccount.Reponsitories
 {
     public class AccountManagementReponsitory : IAccountManagementReponsitory
     {
-
         private readonly string _connectionString;
+
         public AccountManagementReponsitory(string connectionString)
         {
             _connectionString = connectionString;
@@ -36,7 +36,7 @@ namespace JeeAccount.Reponsitories
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 dt = cnn.CreateDataTable(sql, Conds);
-                return dt.AsEnumerable().Select(row => new AccUsernameModel
+                var result = dt.AsEnumerable().Select(row => new AccUsernameModel
                 {
                     UserId = Int32.Parse(row["UserID"].ToString()),
                     Username = row["Username"].ToString(),
@@ -49,8 +49,9 @@ namespace JeeAccount.Reponsitories
                     Email = row["email"].ToString(),
                     StructureID = row["cocauid"].ToString(),
                 });
-            }
 
+                return await Task.FromResult(result).ConfigureAwait(false);
+            }
         }
 
         public async Task<IEnumerable<AccUsernameModel>> GetListUsernameByAppcode(long custormerID, string appcode)
@@ -69,11 +70,12 @@ where AppList.AppCode = @AppCode and CustomerID = @custormerID and (Disable != 1
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 dt = cnn.CreateDataTable(sql, Conds);
-                return dt.AsEnumerable().Select(row => new AccUsernameModel
+                var result = dt.AsEnumerable().Select(row => new AccUsernameModel
                 {
                     UserId = Int32.Parse(row["UserID"].ToString()),
                     Username = row["Username"].ToString()
                 });
+                return await Task.FromResult(result).ConfigureAwait(false);
             }
         }
 
@@ -85,21 +87,21 @@ where AppList.AppCode = @AppCode and CustomerID = @custormerID and (Disable != 1
             Conds.Add("CustomerID", customerID);
             Conds.Add("IsAdmin", 1);
 
-            string sql = @"select UserID, Username, email from AccountList 
+            string sql = @"select UserID, Username, email from AccountList
 where CustomerID = @CustomerID and (Disable != 1 or Disable is null) and IsAdmin = @IsAdmin";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 dt = cnn.CreateDataTable(sql, Conds);
-                return dt.AsEnumerable().Select(row => new AccUsernameModel
+                var result = dt.AsEnumerable().Select(row => new AccUsernameModel
                 {
                     UserId = Int32.Parse(row["UserID"].ToString()),
                     Username = row["Username"].ToString(),
                     Email = row["email"].ToString(),
                 });
+                return await Task.FromResult(result).ConfigureAwait(false);
             }
         }
-
 
         public async Task<long> GetCustormerIDByUsername(string username)
         {
@@ -107,7 +109,7 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null) and IsAdmin
 
             SqlConditions Conds = new SqlConditions();
             Conds.Add("Username", username);
-            string sql = @"select CustomerID from AccountList 
+            string sql = @"select CustomerID from AccountList
 where Username = @Username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
@@ -115,7 +117,9 @@ where Username = @Username and (Disable != 1 or Disable is null)";
                 dt = cnn.CreateDataTable(sql, Conds);
                 if (dt.Rows.Count == 0)
                     return 0;
-                return dt.AsEnumerable().Select(row => long.Parse(row["CustomerID"].ToString())).SingleOrDefault();
+                var result = dt.AsEnumerable().Select(row => long.Parse(row["CustomerID"].ToString())).SingleOrDefault();
+
+                return await Task.FromResult(result).ConfigureAwait(false);
             }
         }
 
@@ -126,7 +130,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
             Conds.Add("Username", username);
 
             string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department, LastName, Username, Email, PhoneNumber, cocauid
-from AccountList 
+from AccountList
 where Username = @username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
@@ -134,7 +138,7 @@ where Username = @username and (Disable != 1 or Disable is null)";
                 dt = cnn.CreateDataTable(sql, Conds);
                 if (dt.Rows.Count == 0)
                     return new InfoUserDTO();
-                return new InfoUserDTO
+                var result = new InfoUserDTO
                 {
                     Fullname = dt.Rows[0]["Fullname"].ToString(),
                     Avatar = dt.Rows[0]["Avatar"].ToString(),
@@ -147,6 +151,8 @@ where Username = @username and (Disable != 1 or Disable is null)";
                     Username = dt.Rows[0]["Username"].ToString(),
                     StructureID = dt.Rows[0]["cocauid"].ToString(),
                 };
+
+                return await Task.FromResult(result).ConfigureAwait(false);
             }
         }
 
@@ -157,8 +163,8 @@ where Username = @username and (Disable != 1 or Disable is null)";
             Conds.Add("CustomerID", customerID);
 
             string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name
-                        , AvartarImgURL as Avatar, Jobtitle, Department, cocauid 
-                        from AccountList 
+                        , AvartarImgURL as Avatar, Jobtitle, Department, cocauid
+                        from AccountList
                         where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
@@ -166,7 +172,7 @@ where Username = @username and (Disable != 1 or Disable is null)";
                 dt = cnn.CreateDataTable(sql, Conds);
                 if (dt.Rows.Count == 0)
                     return new InfoUserDTO();
-                return new InfoUserDTO
+                var result = new InfoUserDTO
                 {
                     Fullname = dt.Rows[0]["Fullname"].ToString(),
                     Avatar = dt.Rows[0]["Avatar"].ToString(),
@@ -175,6 +181,8 @@ where Username = @username and (Disable != 1 or Disable is null)";
                     Departmemt = dt.Rows[0]["Department"].ToString(),
                     StructureID = dt.Rows[0]["cocauid"].ToString(),
                 };
+
+                return await Task.FromResult(result).ConfigureAwait(false);
             }
         }
 
@@ -184,14 +192,14 @@ where Username = @username and (Disable != 1 or Disable is null)";
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", customerID);
 
-            string sql = @"select AppList.*,  Customer_App.IsDefaultApply from AppList 
+            string sql = @"select AppList.*,  Customer_App.IsDefaultApply from AppList
                             join Customer_App on Customer_App.AppID = AppList.AppID
                             where CustomerID = @CustomerID";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 dt = cnn.CreateDataTable(sql, Conds);
-                return dt.AsEnumerable().Select(row => new AppListDTO
+                var result = dt.AsEnumerable().Select(row => new AppListDTO
                 {
                     AppID = Int32.Parse(row["AppID"].ToString()),
                     APIUrl = row["APIUrl"].ToString(),
@@ -207,6 +215,8 @@ where Username = @username and (Disable != 1 or Disable is null)";
                     Icon = row["Icon"].ToString(),
                     Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString())
                 });
+
+                return await Task.FromResult(result).ConfigureAwait(false);
             }
         }
 
@@ -219,14 +229,14 @@ where Username = @username and (Disable != 1 or Disable is null)";
 
             string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name
                         , AvartarImgURL as Avatar, Jobtitle, Department, Username, Email, cocauid
-                        from AccountList 
+                        from AccountList
                         where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 dt = cnn.CreateDataTable(sql, Conds);
 
-                return dt.AsEnumerable().Select(row => new InfoAdminDTO
+                var result = dt.AsEnumerable().Select(row => new InfoAdminDTO
                 {
                     Avatar = row["Avatar"].ToString(),
                     Fullname = row["Fullname"].ToString(),
@@ -237,6 +247,7 @@ where Username = @username and (Disable != 1 or Disable is null)";
                     Email = row["Email"].ToString(),
                     StructureID = row["cocauid"].ToString(),
                 });
+                return await Task.FromResult(result).ConfigureAwait(false);
             }
         }
 
@@ -246,16 +257,16 @@ where Username = @username and (Disable != 1 or Disable is null)";
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", customerID);
 
-            string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name, 
+            string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name,
                         AvartarImgURL as Avatar, Jobtitle, Department, Username, DirectManager
-                        , IsActive, Note, email, cocauid from AccountList 
+                        , IsActive, Note, email, cocauid from AccountList
                         where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 dt = cnn.CreateDataTable(sql, Conds);
 
-                return dt.AsEnumerable().Select(row => new AccountManagementDTO
+                var result = dt.AsEnumerable().Select(row => new AccountManagementDTO
                 {
                     Avatar = row["Avatar"].ToString(),
                     Fullname = row["Fullname"].ToString(),
@@ -269,6 +280,8 @@ where Username = @username and (Disable != 1 or Disable is null)";
                     Email = row["Email"].ToString(),
                     StructureID = row["cocauid"].ToString(),
                 });
+
+                return await Task.FromResult(result).ConfigureAwait(false);
             }
         }
 
@@ -324,6 +337,7 @@ where Username = @username and (Disable != 1 or Disable is null)";
             try
             {
                 #region val data
+
                 if (account.Fullname is not null)
                 {
                     string FirstName = GeneralService.getFirstname(account.Fullname);
@@ -345,7 +359,9 @@ where Username = @username and (Disable != 1 or Disable is null)";
                 val.Add("CustomerID", CustomerID);
                 val.Add("Password", account.Password);
                 if (isAdmin) val.Add("IsAdmin", 1);
-                #endregion
+
+                #endregion val data
+
                 int x = cnn.Insert(val, "AccountList");
                 if (x <= 0)
                 {
@@ -397,11 +413,13 @@ where Username = @username and (Disable != 1 or Disable is null)";
 
             return new ReturnSqlModel();
         }
+
         public long GetCurrentIdentity(DpsConnection cnn)
         {
             var id = cnn.ExecuteScalar("SELECT IDENT_CURRENT ('AccountList') AS Current_Identity;");
             return long.Parse(id.ToString());
         }
+
         public string GetUsername(DpsConnection cnn, long userId, long customerId)
         {
             var username = cnn.ExecuteScalar($"select Username from AccountList where UserID = {userId} and CustomerID = {customerId}");
@@ -460,9 +478,9 @@ where Username = @username and (Disable != 1 or Disable is null)";
                 Conds.Add("UserID", UserID);
 
                 string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name
-                                , AvartarImgURL as Avatar, Jobtitle, Department, PhoneNumber, Birthday, cocauid 
-                                from AccountList 
-                                where CustomerID = @CustomerID 
+                                , AvartarImgURL as Avatar, Jobtitle, Department, PhoneNumber, Birthday, cocauid
+                                from AccountList
+                                where CustomerID = @CustomerID
                                 and (Disable != 1 or Disable is null)";
 
                 dt = cnn.CreateDataTable(sql, Conds);
@@ -532,14 +550,14 @@ where Username = @username and (Disable != 1 or Disable is null)";
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", customerID);
 
-            string sql = @"select AppList.*,  Customer_App.IsDefaultApply from AppList 
+            string sql = @"select AppList.*,  Customer_App.IsDefaultApply from AppList
                         join Customer_App on Customer_App.AppID = AppList.AppID
                         where CustomerID = @CustomerID";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 dt = cnn.CreateDataTable(sql, Conds);
-                return dt.AsEnumerable().Select(row => new AppListDTO
+                var result = dt.AsEnumerable().Select(row => new AppListDTO
                 {
                     AppID = Int32.Parse(row["AppID"].ToString()),
                     APIUrl = row["APIUrl"].ToString(),
@@ -555,6 +573,8 @@ where Username = @username and (Disable != 1 or Disable is null)";
                     Icon = row["Icon"].ToString(),
                     Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString())
                 });
+
+                return await Task.FromResult(result).ConfigureAwait(false);
             }
         }
 
@@ -604,12 +624,10 @@ where Username = @username and (Disable != 1 or Disable is null)";
                     var id = cnn.ExecuteScalar($"select AppId from AppList where AppCode = '{code}'");
                     appid.Add(Int32.Parse(id.ToString()));
                 }
-
             }
 
             return appid;
         }
-
 
         public List<LoginAccountModel> GetListLogin(DpsConnection cnn)
         {
@@ -623,7 +641,6 @@ where Username = @username and (Disable != 1 or Disable is null)";
                 Username = row["Username"].ToString(),
                 Password = row["Password"].ToString()
             }).ToList<LoginAccountModel>();
-
         }
     }
 }

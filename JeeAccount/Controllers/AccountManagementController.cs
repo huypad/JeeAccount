@@ -14,6 +14,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Common = JeeAccount.Classes.Common;
 using DPSinfra.Kafka;
+
 namespace JeeAccount.Controllers
 {
     [EnableCors("AllowOrigin")]
@@ -24,6 +25,7 @@ namespace JeeAccount.Controllers
         private readonly IConfiguration _config;
         private readonly IProducer _producer;
         private readonly AccountManagementService accountManagementService;
+
         public AccountManagementController(IConfiguration configuration, IProducer producer)
         {
             _config = configuration;
@@ -148,7 +150,6 @@ namespace JeeAccount.Controllers
                 return JsonResultCommon.Exception(ex);
             }
         }
-
 
         [HttpGet("GetListAppByCustomerID")]
         public async Task<BaseModel<object>> GetListAppByCustomerID()
@@ -288,6 +289,7 @@ namespace JeeAccount.Controllers
         }
 
         #region api public bên ngoài
+
         [HttpPost("UppdatePersonalInfo")]
         public async Task<BaseModel<object>> UppdatePersonalInfo(PersonalInfoCustomData personalInfoCustom, long UserID)
         {
@@ -335,7 +337,9 @@ namespace JeeAccount.Controllers
                 return JsonResultCommon.Exception(ex);
             }
         }
-        #endregion
+
+        #endregion api public bên ngoài
+
         [HttpPost("UpdateAvatar")]
         public BaseModel<object> UpdateAvatar(PostImgModel img)
         {
@@ -355,6 +359,7 @@ namespace JeeAccount.Controllers
                 return JsonResultCommon.Exception(ex);
             }
         }
+
         [HttpPost("UpdateAvatarWithChangeUrlAvatar")]
         public async Task<BaseModel<object>> UpdateAvatarWithChangeUrlAvatar(PostImgModel img)
         {
@@ -381,6 +386,7 @@ namespace JeeAccount.Controllers
                 return JsonResultCommon.Exception(ex);
             }
         }
+
         [HttpPost("UpdateDirectManager")]
         public async Task<object> UpdateDirectManager(AccDirectManagerModel acc)
         {
@@ -403,7 +409,6 @@ namespace JeeAccount.Controllers
                     }
                 }
                 return JsonResultCommon.ThanhCong(update);
-
             }
             catch (Exception ex)
             {
@@ -424,9 +429,5 @@ namespace JeeAccount.Controllers
                 return JsonResultCommon.Exception(ex);
             }
         }
-
-
-
     }
-
 }

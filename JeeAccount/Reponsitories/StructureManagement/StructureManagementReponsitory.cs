@@ -16,10 +16,12 @@ namespace JeeAccount.Reponsitories
     public class StructureManagementReponsitory : IStructureManagementReponsitory
     {
         private readonly string _connectionString;
+
         public StructureManagementReponsitory(string connectionString)
         {
             _connectionString = connectionString;
         }
+
         public async Task<IEnumerable<StructureDTO>> GetOrgStructure([FromQuery] QueryParams query)
         {
             DataTable dt = new DataTable();
@@ -97,7 +99,7 @@ namespace JeeAccount.Reponsitories
                     string keyword = query.filter["DiaChi"].ToLower();
                     temp = temp.Where(x => x["DiaChi"].ToString().ToLower().Contains(keyword));
                 }
-                return dt.AsEnumerable().Select(row => new StructureDTO
+                var result = dt.AsEnumerable().Select(row => new StructureDTO
                 {
                     Id = long.Parse(row["ID"].ToString()),
                     DonVi = row["DonVi"].ToString(),
@@ -116,8 +118,10 @@ namespace JeeAccount.Reponsitories
                     CreatedDate = String.Format("{0:dd\\/MM\\/yyyy HH:mm}", row["CreatedDate"]),
                     ParentName = row["ParentName"].ToString()
                 });
+                return await Task.FromResult(result).ConfigureAwait(false);
             }
         }
+
         public async Task<IEnumerable<StructureDTO>> Sysn_Structure(long CustomerID)
         {
             DataTable dt = new DataTable();
@@ -151,7 +155,7 @@ namespace JeeAccount.Reponsitories
             {
                 dt = cnn.CreateDataTable(sqlq, Conds);
                 var temp = dt.AsEnumerable();
-                return dt.AsEnumerable().Select(row => new StructureDTO
+                var result = dt.AsEnumerable().Select(row => new StructureDTO
                 {
                     Id = long.Parse(row["ID"].ToString()),
                     DonVi = row["DonVi"].ToString(),
@@ -170,6 +174,7 @@ namespace JeeAccount.Reponsitories
                     CreatedDate = String.Format("{0:dd\\/MM\\/yyyy HH:mm}", row["CreatedDate"]),
                     ParentName = row["ParentName"].ToString()
                 });
+                return await Task.FromResult(result).ConfigureAwait(false);
             }
         }
     }
