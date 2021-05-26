@@ -14,10 +14,12 @@ namespace JeeAccount.Reponsitories
     public class DepartmentManagementReponsitory : IDepartmentManagementReponsitory
     {
         private readonly string _connectionString;
+
         public DepartmentManagementReponsitory(string connectionString)
         {
             _connectionString = connectionString;
         }
+
         public async Task<IEnumerable<DepartmentDTO>> GetListDepartment(long custormerID)
         {
             DataTable dt = new DataTable();
@@ -29,7 +31,7 @@ namespace JeeAccount.Reponsitories
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 dt = cnn.CreateDataTable(sql, Conds);
-                return dt.AsEnumerable().Select(row => new DepartmentDTO
+                var result = dt.AsEnumerable().Select(row => new DepartmentDTO
                 {
                     RowID = long.Parse(row["RowID"].ToString()),
                     IsActive = Convert.ToBoolean((bool)row["IsActive"]),
@@ -37,6 +39,7 @@ namespace JeeAccount.Reponsitories
                     DepartmentName = row["DepartmentName"].ToString(),
                     Note = row["Note"].ToString(),
                 });
+                return await Task.FromResult(result).ConfigureAwait(false);
             }
         }
 
@@ -49,6 +52,7 @@ namespace JeeAccount.Reponsitories
                 try
                 {
                     #region val data
+
                     val.Add("DepartmentName", departmentModel.DepartmentName);
                     val.Add("DepartmentManager", departmentModel.DepartmentManager);
                     val.Add("Note", departmentModel.Note);
@@ -59,7 +63,9 @@ namespace JeeAccount.Reponsitories
                     val.Add("CreatedDate", DateTime.Now);
                     val.Add("CreatedBy", UserID);
                     val.Add("CustomerID", CustomerID);
-                    #endregion
+
+                    #endregion val data
+
                     cnn.BeginTransaction();
                     int x = cnn.Insert(val, "DepartmentList");
                     if (x <= 0)
@@ -85,6 +91,7 @@ namespace JeeAccount.Reponsitories
             }
             return new ReturnSqlModel();
         }
+
         private bool updateDepartmentForAccountList(DpsConnection cnn, long CustomerID, string RowIdDepartment, string AccountUsername)
         {
             Hashtable val = new Hashtable();
@@ -102,6 +109,7 @@ namespace JeeAccount.Reponsitories
             }
             return true;
         }
+
         public ReturnSqlModel ChangeTinhTrang(long customerID, long RowID, string Note, long UserIdLogin)
         {
             Hashtable val = new Hashtable();

@@ -26,6 +26,7 @@ namespace JeeCustomer.ConsumerKafka
             accountConsumer = new Consumer(_config, group);
             _producer = producer;
         }
+
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _ = Task.Run(() =>
