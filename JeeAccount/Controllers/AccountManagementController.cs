@@ -415,19 +415,5 @@ namespace JeeAccount.Controllers
                 return JsonResultCommon.Exception(ex);
             }
         }
-
-        [HttpGet("login")]
-        public async Task<object> Login()
-        {
-            try
-            {
-                //var updateTool = await accountManagementService.UpdateTool();
-                return 0;
-            }
-            catch (Exception ex)
-            {
-                return JsonResultCommon.Exception(ex);
-            }
-        }
     }
 }

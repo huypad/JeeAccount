@@ -38,7 +38,6 @@ namespace JeeAccount
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             // add Vault and get Vault for secret in another services
 
             var vaultClient = ConfigVault(services);
@@ -68,7 +67,6 @@ namespace JeeAccount
             services.AddControllersWithViews().AddNewtonsoftJson();
             services.AddRazorPages().AddNewtonsoftJson();
             services.AddControllers().AddNewtonsoftJson(options => { options.SerializerSettings.ContractResolver = new DefaultContractResolver(); });
-
 
             services.AddAuthentication(x =>
             {

@@ -129,7 +129,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
             SqlConditions Conds = new SqlConditions();
             Conds.Add("Username", username);
 
-            string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department, LastName, Username, Email, PhoneNumber, cocauid
+            string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name, AvartarImgURL as Avatar, Jobtitle, Department, LastName, Username, Email, PhoneNumber, cocauid, ChucVuID
 from AccountList
 where Username = @username and (Disable != 1 or Disable is null)";
 
@@ -150,6 +150,7 @@ where Username = @username and (Disable != 1 or Disable is null)";
                     PhoneNumber = dt.Rows[0]["PhoneNumber"].ToString(),
                     Username = dt.Rows[0]["Username"].ToString(),
                     StructureID = dt.Rows[0]["cocauid"].ToString(),
+                    ChucVuID = dt.Rows[0]["ChucVuID"].ToString(),
                 };
 
                 return await Task.FromResult(result).ConfigureAwait(false);
@@ -163,7 +164,7 @@ where Username = @username and (Disable != 1 or Disable is null)";
             Conds.Add("CustomerID", customerID);
 
             string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name
-                        , AvartarImgURL as Avatar, Jobtitle, Department, cocauid
+                        , AvartarImgURL as Avatar, Jobtitle, Department, cocauid, ChucVuID
                         from AccountList
                         where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
 
@@ -180,6 +181,7 @@ where Username = @username and (Disable != 1 or Disable is null)";
                     Name = dt.Rows[0]["Name"].ToString(),
                     Departmemt = dt.Rows[0]["Department"].ToString(),
                     StructureID = dt.Rows[0]["cocauid"].ToString(),
+                    ChucVuID = dt.Rows[0]["ChucVuID"].ToString(),
                 };
 
                 return await Task.FromResult(result).ConfigureAwait(false);

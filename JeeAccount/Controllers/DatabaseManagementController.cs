@@ -62,31 +62,6 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpGet("testtoken")]
-        public async Task<object> createTesttokenAsync()
-        {
-            try
-            {
-                HttpClientHandler clientHandler = new HttpClientHandler();
-                clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
 
-                var token = "1231232132131313";
-
-
-                using (var client = new HttpClient(clientHandler))
-                {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(token);
-                    var reponse = await client.GetAsync("https://localhost:5001/api/customermanagement/CreateCustomer");
-                    string returnValue = reponse.Content.ReadAsStringAsync().Result;
-                    var res = returnValue;
-                    return res;
-                }
-            }
-
-            catch (Exception ex)
-            {
-                return ex;
-            }
-        }
     }
 }

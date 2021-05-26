@@ -15,7 +15,7 @@ using Common = JeeAccount.Classes.Common;
 namespace JeeAccount.Controllers
 {
     [EnableCors("AllowOrigin")]
-    [Route("api/departmentmanagement")]
+    [Route("api/accountdepartmentmanagement")]
     [ApiController]
     public class DepartmentManagementController : ControllerBase
     {
