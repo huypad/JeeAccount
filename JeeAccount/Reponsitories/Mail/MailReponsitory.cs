@@ -1,20 +1,18 @@
 ﻿using DpsLibs.Data;
 using JeeAccount.Classes;
 using JeeAccount.Models.Mail;
-using System;
-using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace JeeAccount.Reponsitories.Mail
 {
-    public class MailReponsitory: IMailReponsitory
+    public class MailReponsitory : IMailReponsitory
     {
         private readonly string _connectionString;
-        public MailReponsitory(string connectionString)
+
+        public MailReponsitory(IConfiguration configuration)
         {
-            _connectionString = connectionString;
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
         public MailModel InitialData(string CustemerID)

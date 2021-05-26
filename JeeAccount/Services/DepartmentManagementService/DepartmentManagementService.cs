@@ -6,15 +6,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace JeeAccount.Services
+namespace JeeAccount.Services.DepartmentManagementService
 {
-    public class DepartmentManagementService
+    public class DepartmentManagementService : IDepartmentManagementService
     {
         private IDepartmentManagementReponsitory departmentManagementReponsitory;
 
-        public DepartmentManagementService(string connectionString)
+        public DepartmentManagementService(IDepartmentManagementReponsitory departmentManagementReponsitory)
         {
-            this.departmentManagementReponsitory = new DepartmentManagementReponsitory(connectionString);
+            this.departmentManagementReponsitory = departmentManagementReponsitory;
         }
 
         public Task<IEnumerable<DepartmentDTO>> GetListDepartment(long CustomerID)
@@ -28,6 +28,7 @@ namespace JeeAccount.Services
             var create = departmentManagementReponsitory.CreateDepartment(departmentModel, CustomerID, UserID);
             return create;
         }
+
         public ReturnSqlModel ChangeTinhTrang(long customerID, long RowID, string Note, long UserIdLogin)
         {
             var update = departmentManagementReponsitory.ChangeTinhTrang(customerID, RowID, Note, UserIdLogin);

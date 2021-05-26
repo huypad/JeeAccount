@@ -5,16 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace JeeAccount.Services
+namespace JeeAccount.Services.DatabaseManagementService
 {
-    public class DatabaseManagementService
+    public class DatabaseManagementService : IDatabaseManagementService
     {
         private IDatabaseManagementRepositoty databaseManagementRepositoty;
-        private readonly string ConnectionString;
 
-        public DatabaseManagementService(string connectionString)
+        public DatabaseManagementService(IDatabaseManagementRepositoty databaseManagementRepositoty)
         {
-            this.databaseManagementRepositoty = new DatabaseManagementRepositoty(connectionString);
+            this.databaseManagementRepositoty = databaseManagementRepositoty;
         }
 
         public DatabaseListDTO GetDBByCustomerIDAppCode(long CustomerID, string appCode)

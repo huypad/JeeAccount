@@ -1,9 +1,9 @@
-﻿
-using DPSinfra.Utils;
+﻿using DPSinfra.Utils;
 using JeeAccount.Classes;
 using JeeAccount.Models.Common;
 using JeeAccount.Models.DatabaseManagement;
 using JeeAccount.Services;
+using JeeAccount.Services.DatabaseManagementService;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -19,18 +19,18 @@ using System.Threading.Tasks;
 
 namespace JeeAccount.Controllers
 {
-
     [EnableCors("AllowOrigin")]
     [Route("api/databasemanagement")]
     [ApiController]
     public class DatabaseManagementController : ControllerBase
     {
-        private readonly IConfiguration _config;
-        private readonly DatabaseManagementService _service;
-        public DatabaseManagementController(IConfiguration configuration)
+        private IConfiguration _config;
+        private IDatabaseManagementService _service;
+
+        public DatabaseManagementController(IConfiguration configuration, IDatabaseManagementService databaseManagementService)
         {
             _config = configuration;
-            _service = new DatabaseManagementService(_config.GetConnectionString("DefaultConnection"));
+            _service = databaseManagementService;
         }
 
         [HttpPost("GetDSDB")]
@@ -61,7 +61,5 @@ namespace JeeAccount.Controllers
                 return JsonResultCommon.Exception(ex);
             }
         }
-
-
     }
 }

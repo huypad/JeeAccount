@@ -1,36 +1,31 @@
-﻿using JeeAccount.Models.CustomerManagement;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using DpsLibs.Data;
+﻿using DpsLibs.Data;
 using JeeAccount.Classes;
-using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.Common;
-using JeeAccount.Services;
+using JeeAccount.Models.CustomerManagement;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace JeeAccount.Reponsitories.CustomerManagement
 {
     public class CustomerManagementReponsitory : ICustomerManagementReponsitory
     {
         private readonly string _connectionString;
-        public CustomerManagementReponsitory(string connectionString)
+
+        public CustomerManagementReponsitory(IConfiguration configuration)
         {
-            _connectionString = connectionString;
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
         public List<string> AppCodes(DpsConnection cnn, long CustomerID)
         {
             List<string> appcodes = new List<string>();
             DataTable dt = new DataTable();
-            string sql = @"select AppCode from Customer_App 
+            string sql = @"select AppCode from Customer_App
 join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerID";
             SqlConditions conds = new SqlConditions();
             conds.Add("CustomerID", CustomerID);
@@ -97,6 +92,7 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
             try
             {
                 #region val data
+
                 if (customerModel.RowID != 0) val.Add("RowID", customerModel.RowID);
                 val.Add("Code", customerModel.Code);
                 val.Add("CompanyName", customerModel.CompanyName);
@@ -112,7 +108,8 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
                 val.Add("Gender", customerModel.Gender);
                 val.Add("RegisterDate", DateTime.Now);
 
-                #endregion
+                #endregion val data
+
                 int x = cnn.Insert(val, "CustomerList");
                 if (x <= 0)
                 {

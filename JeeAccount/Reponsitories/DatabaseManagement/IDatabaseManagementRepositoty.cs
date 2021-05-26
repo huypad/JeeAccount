@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JeeAccount.Reponsitories.DatabaseManagement
 {
-    interface IDatabaseManagementRepositoty
+    public interface IDatabaseManagementRepositoty
     {
         DatabaseListDTO GetDBByCustomerIDAppCode(long customerID, string appCode);
     }

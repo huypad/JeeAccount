@@ -17,42 +17,46 @@ namespace JeeAccount.Controllers
     [EnableCors("AllowOrigin")]
     [Route("api/widgetdashboard")]
     [ApiController]
-    public class WidgetDashBoardController: ControllerBase
+    public class WidgetDashBoardController : ControllerBase
     {
         private readonly IConfiguration _config;
 
         private readonly IWidgetDashBoardRepository repository;
 
-        public WidgetDashBoardController(IConfiguration configuration)
+        public WidgetDashBoardController(IConfiguration configuration, IWidgetDashBoardRepository widgetDashBoard)
         {
             _config = configuration;
-            this.repository = new WidgetDashBoardRepository(_config.GetConnectionString("DefaultConnection"));
+            this.repository = widgetDashBoard;
         }
 
         [HttpGet("Get_DSWidget")]
         public async Task<BaseModel<object>> GetAll()
         {
-            try {
+            try
+            {
                 var widgets = await repository.GetAll();
                 return JsonResultCommon.ThanhCong(widgets);
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return JsonResultCommon.Exception(ex);
             }
-            
         }
 
         [HttpGet("Get/WidgetId={WidgetId}")]
         public async Task<BaseModel<object>> GetById(long WidgetId)
-        { 
-            try {
+        {
+            try
+            {
                 var widget = await repository.GetByID(0, WidgetId);
-                if (widget is null) {
+                if (widget is null)
+                {
                     return JsonResultCommon.KhongTonTai("widget");
                 }
                 return JsonResultCommon.ThanhCong(widget);
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return JsonResultCommon.Exception(ex);
             }
         }
@@ -60,16 +64,21 @@ namespace JeeAccount.Controllers
         [HttpPost("Post_UpdateWidget")]
         public async Task<BaseModel<object>> Update([FromBody] WidgetDashBoardModel widget)
         {
-            try {
-                if (widget is null) {
+            try
+            {
+                if (widget is null)
+                {
                     return JsonResultCommon.BatBuoc("widget");
                 }
                 ReturnSqlModel update = await repository.Update(widget);
-                if (!update.Susscess) {
-                    if (update.ErrorCode.Equals(Constant.ERRORCODE_NOTEXIST)) {
+                if (!update.Susscess)
+                {
+                    if (update.ErrorCode.Equals(Constant.ERRORCODE_NOTEXIST))
+                    {
                         return JsonResultCommon.KhongTonTai("widget");
                     }
-                    if (update.ErrorCode.Equals(Constant.ERRORCODE_EXCEPTION)) {
+                    if (update.ErrorCode.Equals(Constant.ERRORCODE_EXCEPTION))
+                    {
                         // TODO: bổ sung ghi log sau
                         string logMessage = update.ErrorMessgage;
 
@@ -77,7 +86,9 @@ namespace JeeAccount.Controllers
                     }
                 }
                 return JsonResultCommon.ThanhCong(widget);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 return JsonResultCommon.Exception(ex);
             }
         }
@@ -85,16 +96,21 @@ namespace JeeAccount.Controllers
         [HttpPost("Create_Widget")]
         public async Task<BaseModel<object>> Create([FromBody] WidgetDashBoardModel widget)
         {
-            try {
-                if (widget is null) {
+            try
+            {
+                if (widget is null)
+                {
                     return JsonResultCommon.BatBuoc("widget");
                 }
                 ReturnSqlModel update = await repository.Create(widget);
-                if (!update.Susscess) {
-                    if (update.ErrorCode.Equals(Constant.ERRORCODE_NOTEXIST)) {
+                if (!update.Susscess)
+                {
+                    if (update.ErrorCode.Equals(Constant.ERRORCODE_NOTEXIST))
+                    {
                         return JsonResultCommon.Trung("widget");
                     }
-                    if (update.ErrorCode.Equals(Constant.ERRORCODE_EXCEPTION)) {
+                    if (update.ErrorCode.Equals(Constant.ERRORCODE_EXCEPTION))
+                    {
                         // TODO: bổ sung ghi log sau
                         string logMessage = update.ErrorMessgage;
 
@@ -103,7 +119,8 @@ namespace JeeAccount.Controllers
                 }
                 return JsonResultCommon.ThanhCong(widget);
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return JsonResultCommon.Exception(ex);
             }
         }
@@ -111,13 +128,17 @@ namespace JeeAccount.Controllers
         [HttpGet("Delete/WidgetId={WidgetId}")]
         public async Task<BaseModel<object>> Delete(long WidgetId)
         {
-            try {
+            try
+            {
                 ReturnSqlModel delete = await repository.Delete(0, WidgetId);
-                if (!delete.Susscess) {
-                    if (delete.ErrorCode.Equals(Constant.ERRORCODE_NOTEXIST)) {
+                if (!delete.Susscess)
+                {
+                    if (delete.ErrorCode.Equals(Constant.ERRORCODE_NOTEXIST))
+                    {
                         return JsonResultCommon.KhongTonTai("widget");
                     }
-                    if (delete.ErrorCode.Equals(Constant.ERRORCODE_EXCEPTION)) {
+                    if (delete.ErrorCode.Equals(Constant.ERRORCODE_EXCEPTION))
+                    {
                         // TODO: bổ sung ghi log sau
                         string logMessage = delete.ErrorMessgage;
                         return JsonResultCommon.ThatBai(delete.ErrorMessgage);
@@ -125,7 +146,8 @@ namespace JeeAccount.Controllers
                 }
                 return JsonResultCommon.ThanhCong();
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return JsonResultCommon.Exception(ex);
             }
         }

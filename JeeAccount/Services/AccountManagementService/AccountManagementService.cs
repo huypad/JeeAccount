@@ -5,24 +5,24 @@ using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.Common;
 using JeeAccount.Reponsitories;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace JeeAccount.Services
+namespace JeeAccount.Services.AccountManagementService
 {
-    public class AccountManagementService
+    public class AccountManagementService : IAccountManagementService
     {
         private IAccountManagementReponsitory accountManagementReponsitory;
         private IdentityServerController identityServerController;
-        private readonly string ConnectionString;
-        public AccountManagementService(string connectionString)
+        private string ConnectionString;
+
+        public AccountManagementService(IAccountManagementReponsitory accountManagementReponsitory, IConfiguration configuration)
         {
-            this.accountManagementReponsitory = new AccountManagementReponsitory(connectionString);
+            this.accountManagementReponsitory = accountManagementReponsitory;
             this.identityServerController = new IdentityServerController();
-            this.ConnectionString = connectionString;
+            ConnectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
         public Task<IEnumerable<AccUsernameModel>> GetListUsernameByCustormerID(long customerID)
@@ -72,6 +72,7 @@ namespace JeeAccount.Services
             var accUser = accountManagementReponsitory.GetListUsernameByAppcode(customerID, appcode);
             return accUser;
         }
+
         public Task<IEnumerable<AccountManagementDTO>> GetListAccountManagement(long customerID)
         {
             var accManagement = accountManagementReponsitory.GetListAccountManagement(customerID);
@@ -83,6 +84,7 @@ namespace JeeAccount.Services
             var update = accountManagementReponsitory.ChangeTinhTrang(customerID, Username, Note, UserIdLogin);
             return update;
         }
+
         public ReturnSqlModel UpdateAvatar(string AvatarUrl, long userID, long CustomerID)
         {
             using (DpsConnection cnn = new DpsConnection(ConnectionString))
@@ -91,6 +93,7 @@ namespace JeeAccount.Services
                 return update;
             }
         }
+
         public async Task<IdentityServerReturn> CreateAccount(string Admin_accessToken, long customerID, long AdminUserID, AccountManagementModel account, string apiUrl)
         {
             using (DpsConnection cnn = new DpsConnection(ConnectionString))
@@ -193,7 +196,6 @@ namespace JeeAccount.Services
                         identity = GeneralService.TranformIdentityServerReturnSqlModel(update);
                         return identity;
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -208,7 +210,6 @@ namespace JeeAccount.Services
 
         public async Task<IdentityServerReturn> UppdateCustomData(string Admin_access_token, ObjCustomData objCustomData, long customerId)
         {
-
             IdentityServerReturn identity = new IdentityServerReturn();
             try
             {
@@ -222,16 +223,12 @@ namespace JeeAccount.Services
                 var updateCustom = await this.identityServerController.UppdateCustomData(Admin_access_token, username, objCustomData);
                 if (updateCustom.data is null)
                 {
-
                     return updateCustom;
                 }
                 return updateCustom;
-
-
             }
             catch (Exception ex)
             {
-
                 identity.message = ex.Message;
                 identity.statusCode = Int32.Parse(Constant.ERRORCODE_EXCEPTION);
                 return identity;
@@ -255,11 +252,9 @@ namespace JeeAccount.Services
 
         public async Task<IdentityServerReturn> UpdateAvatarWithChangeUrlAvatar(string Admin_access_token, long UserId, string Username, long CustomerID, string apiUrl)
         {
-
             IdentityServerReturn identity = new IdentityServerReturn();
             try
             {
-
                 var person = accountManagementReponsitory.GetPersonalInfoCustomData(UserId, CustomerID);
                 if (person.Fullname is null)
                 {
@@ -297,6 +292,7 @@ namespace JeeAccount.Services
                 return identity;
             }
         }
+
         public ReturnSqlModel UpdateDirectManager(string Username, string DirectManager, long customerID)
         {
             var update = accountManagementReponsitory.UpdateDirectManager(Username, DirectManager, customerID);
@@ -317,23 +313,19 @@ namespace JeeAccount.Services
 
         public List<int> GetAppIdByAppCode(DpsConnection cnn, List<string> AppCode)
         {
-
             return accountManagementReponsitory.GetAppIdByAppCode(cnn, AppCode);
         }
 
         public List<LoginAccountModel> GetListLogin()
         {
-
             using (DpsConnection cnn = new DpsConnection(ConnectionString))
             {
                 return accountManagementReponsitory.GetListLogin(cnn);
             }
-
         }
 
         public async Task<ReturnSqlModel> UpdateTool()
         {
-
             using (DpsConnection cnn = new DpsConnection(ConnectionString))
             {
                 cnn.BeginTransaction();
@@ -368,15 +360,12 @@ namespace JeeAccount.Services
                 if (string.IsNullOrEmpty(listAccountempy))
                 {
                     return new ReturnSqlModel();
-
                 }
                 else
                 {
                     return new ReturnSqlModel(listAccountempy, "0");
                 }
             }
-
-
         }
     }
 

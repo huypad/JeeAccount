@@ -7,15 +7,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace JeeAccount.Services
+namespace JeeAccount.Services.StructureManagementService
 {
-    public class StructureManagementService
+    public class StructureManagementService : IStructureManagementService
     {
         private IStructureManagementReponsitory StructureManagementReponsitory;
 
-        public StructureManagementService(string connectionString)
+        public StructureManagementService(IStructureManagementReponsitory structureManagementReponsitory)
         {
-            this.StructureManagementReponsitory = new StructureManagementReponsitory(connectionString);
+            this.StructureManagementReponsitory = structureManagementReponsitory;
         }
 
         public Task<IEnumerable<StructureDTO>> GetOrgStructure([FromQuery] QueryParams query)
@@ -23,6 +23,7 @@ namespace JeeAccount.Services
             var departs = StructureManagementReponsitory.GetOrgStructure(query);
             return departs;
         }
+
         public Task<IEnumerable<StructureDTO>> Sysn_Structure(long CustomerID)
         {
             var departs = StructureManagementReponsitory.Sysn_Structure(CustomerID);

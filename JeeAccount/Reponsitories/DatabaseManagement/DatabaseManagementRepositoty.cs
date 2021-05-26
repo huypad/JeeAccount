@@ -1,5 +1,6 @@
 ﻿using DpsLibs.Data;
 using JeeAccount.Models.DatabaseManagement;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,9 +12,10 @@ namespace JeeAccount.Reponsitories.DatabaseManagement
     public class DatabaseManagementRepositoty : IDatabaseManagementRepositoty
     {
         private readonly string _connectionString;
-        public DatabaseManagementRepositoty(string connectionString)
+
+        public DatabaseManagementRepositoty(IConfiguration configuration)
         {
-            _connectionString = connectionString;
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
         public DatabaseListDTO GetDBByCustomerIDAppCode(long customerID, string appCode)

@@ -1,28 +1,27 @@
 ﻿using JeeAccount.Classes;
 using JeeAccount.Models.Common;
 using JeeAccount.Services;
+using JeeAccount.Services.MailService;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
 
-
 namespace JeeAccount.Controllers
 {
-
     [EnableCors("AllowOrigin")]
     [Route("api/mail")]
     [ApiController]
-    public class MailController: ControllerBase
+    public class MailController : ControllerBase
     {
         private readonly IConfiguration _config;
-        private readonly MailService mailService;
-        public MailController(IConfiguration configuration)
+        private readonly IMailService mailService;
+
+        public MailController(IConfiguration configuration, IMailService mailService)
         {
             _config = configuration;
-            mailService = new MailService(_config.GetConnectionString("DefaultConnection"));
+            this.mailService = mailService;
         }
-
 
         [HttpGet("GetMailByCustomerID")]
         public BaseModel<object> GetMailByCustomerID()
@@ -45,5 +44,4 @@ namespace JeeAccount.Controllers
             }
         }
     }
-
 }

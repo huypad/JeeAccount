@@ -5,21 +5,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace JeeAccount.Services
+namespace JeeAccount.Services.MailService
 {
-    public class MailService
+    public class MailService : IMailService
     {
         private IMailReponsitory mailReponsitory;
 
-        public MailService(string connectionString)
+        public MailService(IMailReponsitory mailReponsitory)
         {
-            this.mailReponsitory = new MailReponsitory(connectionString);
+            this.mailReponsitory = mailReponsitory;
         }
 
-        public MailModel InitialData (string CustemerID)
+        public MailModel InitialData(string CustemerID)
         {
             return mailReponsitory.InitialData(CustemerID);
         }
-
     }
 }

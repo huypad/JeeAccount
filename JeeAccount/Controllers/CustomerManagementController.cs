@@ -16,23 +16,24 @@ using Common = JeeAccount.Classes.Common;
 using DPSinfra.Kafka;
 using static JeeAccount.Models.Common.Panigator;
 using JeeAccount.Models.CustomerManagement;
+using JeeAccount.Services.CustomerManagementService;
 
 namespace JeeAccount.Controllers
 {
     [EnableCors("AllowOrigin")]
     [Route("api/customermanagement")]
     [ApiController]
-
     public class CustomerManagementController : ControllerBase
     {
-        private readonly IConfiguration _config;
-        private readonly IProducer _producer;
-        private readonly CustomerManagementService _service;
-        public readonly string TopicAddNewCustomer;
-        public CustomerManagementController(IConfiguration configuration, IProducer producer)
+        private IConfiguration _config;
+        private IProducer _producer;
+        private ICustomerManagementService _service;
+        public string TopicAddNewCustomer;
+
+        public CustomerManagementController(IConfiguration configuration, IProducer producer, ICustomerManagementService customerManagementService)
         {
             _config = configuration;
-            _service = new CustomerManagementService(_config.GetConnectionString("DefaultConnection"), producer, configuration);
+            _service = customerManagementService;
             _producer = producer;
             TopicAddNewCustomer = _config.GetValue<string>("KafkaTopic:TopicAddNewCustomer");
         }
@@ -117,5 +118,4 @@ namespace JeeAccount.Controllers
             }
         }
     }
-
 }

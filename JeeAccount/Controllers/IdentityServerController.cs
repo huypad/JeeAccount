@@ -1,6 +1,7 @@
 ﻿using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
 using JeeAccount.Services;
+using JeeAccount.Services.AccountManagementService;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -99,7 +100,6 @@ namespace JeeAccount.Controllers
                     return res;
                 }
             }
-
         }
 
         public async Task<IdentityServerReturn> addNewAdminUser(IdentityServeAddAdminNewUser identityServerUserModel, string Admin_access_token)
@@ -131,7 +131,6 @@ namespace JeeAccount.Controllers
                     return res;
                 }
             }
-
         }
 
         public async Task<IdentityServerReturn> addNewAdminUserInternal(IdentityServeAddAdminNewUser identityServerUserModel, string internal_token)
@@ -163,7 +162,6 @@ namespace JeeAccount.Controllers
                     return res;
                 }
             }
-
         }
 
         public async Task<IdentityServerReturn> changePassword(IdentityServerChangePasswordModel identityServerChangePasswordModel)
@@ -194,7 +192,6 @@ namespace JeeAccount.Controllers
                     return res;
                 }
             }
-
         }
 
         public async Task<IdentityServerReturn> changeUserState(IdentityServerChangeUserStateModel identityServerChangeUserStateModel)
@@ -235,7 +232,6 @@ namespace JeeAccount.Controllers
                     return res;
                 }
             }
-
         }
 
         public async Task<IdentityServerReturn> updateCustomDataPersonalInfo(string Admin_access_token, PersonalInfoCustomData personalInfoCustom, string Username)
@@ -277,7 +273,6 @@ namespace JeeAccount.Controllers
                     return res;
                 }
             }
-
         }
 
         public async Task<IdentityServerReturn> UppdateCustomData(string Admin_access_token, string Username, ObjCustomData objCustomData)
@@ -319,7 +314,6 @@ namespace JeeAccount.Controllers
                     return res;
                 }
             }
-
         }
 
         public async Task<IdentityServerReturn> UppdateCustomDataInternal(string internal_token, string Username, ObjCustomData objCustomData)
@@ -361,7 +355,6 @@ namespace JeeAccount.Controllers
                     return res;
                 }
             }
-
         }
     }
 }

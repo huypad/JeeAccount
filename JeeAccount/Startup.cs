@@ -1,26 +1,29 @@
 using DPSinfra.Kafka;
 using DPSinfra.Vault;
-using JeeAccount.Models.Common;
+using JeeAccount.Reponsitories;
+using JeeAccount.Reponsitories.CustomerManagement;
+using JeeAccount.Reponsitories.DatabaseManagement;
+using JeeAccount.Reponsitories.Mail;
+using JeeAccount.Services.AccountManagementService;
+using JeeAccount.Services.CustomerManagementService;
+using JeeAccount.Services.DatabaseManagementService;
+using JeeAccount.Services.DepartmentManagementService;
+using JeeAccount.Services.MailService;
+using JeeAccount.Services.StructureManagementService;
 using JeeCustomer.ConsumerKafka;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using VaultSharp;
 using VaultSharp.V1.Commons;
 
@@ -115,7 +118,34 @@ namespace JeeAccount
             });
             services.AddOptions();
 
+            #region add Repository
+
+            services.AddSingleton<IAccountManagementReponsitory, AccountManagementReponsitory>();
+            services.AddSingleton<ICustomerManagementReponsitory, CustomerManagementReponsitory>();
+            services.AddSingleton<IDatabaseManagementRepositoty, DatabaseManagementRepositoty>();
+            services.AddSingleton<IDepartmentManagementReponsitory, DepartmentManagementReponsitory>();
+            services.AddSingleton<IMailReponsitory, MailReponsitory>();
+            services.AddSingleton<IStructureManagementReponsitory, StructureManagementReponsitory>();
+            services.AddSingleton<IWidgetDashBoardRepository, WidgetDashBoardRepository>();
+
+            #endregion add Repository
+
+            #region add Services
+
+            services.AddSingleton<IAccountManagementService, AccountManagementService>();
+            services.AddSingleton<ICustomerManagementService, CustomerManagementService>();
+            services.AddSingleton<IDatabaseManagementService, DatabaseManagementService>();
+            services.AddSingleton<IDepartmentManagementService, DepartmentManagementService>();
+            services.AddSingleton<IMailService, MailService>();
+            services.AddSingleton<IStructureManagementService, StructureManagementService>();
+
+            #endregion add Services
+
+            #region add kafka consumer
+
             services.AddSingleton<IHostedService, AccountConsumerController>();
+
+            #endregion add kafka consumer
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

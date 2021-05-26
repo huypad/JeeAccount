@@ -6,13 +6,13 @@ import { DepartmentModel, DepChangeTinhTrangModel } from '../Model/department-ma
 import { environment } from 'src/environments/environment';
 import { HttpUtilsService } from '../../../_core/utils/http-utils.service';
 
-const API_PRODUCTS_URL = environment.ApiRoot + '/departmentmanagement';
+const API_PRODUCTS_URL = environment.ApiRoot + '/accountdepartmentmanagement';
 
 @Injectable()
 export class DepartmentManagementService {
   lastFilter$: BehaviorSubject<QueryParamsModelNew> = new BehaviorSubject(new QueryParamsModelNew({}, 'asc', '', 0, 50));
 
-  constructor(private http: HttpClient, private httpUtils: HttpUtilsService) {}
+  constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
   findData(queryParams: QueryParamsModelNew): Observable<any> {
     const httpHeaders = this.httpUtils.getHTTPHeaders();

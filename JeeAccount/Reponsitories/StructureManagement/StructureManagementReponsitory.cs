@@ -1,11 +1,9 @@
 ﻿using DpsLibs.Data;
-using JeeAccount.Classes;
 using JeeAccount.Models.Common;
-using JeeAccount.Models.DepartmentManagement;
 using JeeAccount.Models.StructureManagement;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -17,9 +15,9 @@ namespace JeeAccount.Reponsitories
     {
         private readonly string _connectionString;
 
-        public StructureManagementReponsitory(string connectionString)
+        public StructureManagementReponsitory(IConfiguration configuration)
         {
-            _connectionString = connectionString;
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
         public async Task<IEnumerable<StructureDTO>> GetOrgStructure([FromQuery] QueryParams query)

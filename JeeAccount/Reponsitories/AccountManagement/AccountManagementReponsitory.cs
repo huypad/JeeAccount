@@ -1,14 +1,14 @@
 ﻿using DpsLibs.Data;
 using JeeAccount.Classes;
-using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.Common;
 using JeeAccount.Services;
+using JeeAccount.Services.AccountManagementService;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,9 +18,9 @@ namespace JeeAccount.Reponsitories
     {
         private readonly string _connectionString;
 
-        public AccountManagementReponsitory(string connectionString)
+        public AccountManagementReponsitory(IConfiguration configuration)
         {
-            _connectionString = connectionString;
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
         public async Task<IEnumerable<AccUsernameModel>> GetListUsernameByCustormerID(long custormerID)

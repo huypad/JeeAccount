@@ -2,6 +2,7 @@
 using JeeAccount.Classes;
 using JeeAccount.Models;
 using JeeAccount.Models.Common;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,9 +16,9 @@ namespace JeeAccount.Reponsitories
     {
         private readonly string _connectionString;
 
-        public WidgetDashBoardRepository(string connectionString)
+        public WidgetDashBoardRepository(IConfiguration configuration)
         {
-            _connectionString = connectionString;
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
         public async Task<IEnumerable<Widget>> GetAll()

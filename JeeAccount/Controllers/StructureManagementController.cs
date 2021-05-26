@@ -3,6 +3,7 @@ using JeeAccount.Models.Common;
 using JeeAccount.Models.DepartmentManagement;
 using JeeAccount.Reponsitories;
 using JeeAccount.Services;
+using JeeAccount.Services.StructureManagementService;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -20,12 +21,12 @@ namespace JeeAccount.Controllers
     public class StructureManagementController : ControllerBase
     {
         private readonly IConfiguration _config;
-        private readonly StructureManagementService structureManagementService;
+        private readonly IStructureManagementService structureManagementService;
 
-        public StructureManagementController(IConfiguration configuration)
+        public StructureManagementController(IConfiguration configuration, IStructureManagementService structureManagementService)
         {
             _config = configuration;
-            structureManagementService = new StructureManagementService(_config.GetConnectionString("DefaultConnection"));
+            structureManagementService = this.structureManagementService;
         }
 
         [HttpGet("GetOrgStructure")]
@@ -47,6 +48,7 @@ namespace JeeAccount.Controllers
                 return JsonResultCommon.Exception(ex);
             }
         }
+
         [HttpGet("Sysn_Structure")]
         public async Task<BaseModel<object>> Sysn_Structure(long CustomerID)
         {

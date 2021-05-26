@@ -14,6 +14,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Common = JeeAccount.Classes.Common;
 using DPSinfra.Kafka;
+using JeeAccount.Services.AccountManagementService;
 
 namespace JeeAccount.Controllers
 {
@@ -22,15 +23,14 @@ namespace JeeAccount.Controllers
     [ApiController]
     public class AccountManagementController : ControllerBase
     {
-        private readonly IConfiguration _config;
-        private readonly IProducer _producer;
-        private readonly AccountManagementService accountManagementService;
+        private IConfiguration _config;
+        private IProducer _producer;
+        private IAccountManagementService accountManagementService;
 
-        public AccountManagementController(IConfiguration configuration, IProducer producer)
+        public AccountManagementController(IConfiguration configuration, IAccountManagementService accountManagementService)
         {
             _config = configuration;
-            accountManagementService = new AccountManagementService(_config.GetConnectionString("DefaultConnection"));
-            _producer = producer;
+            this.accountManagementService = accountManagementService;
         }
 
         [HttpGet("usernamesByCustermerID")]

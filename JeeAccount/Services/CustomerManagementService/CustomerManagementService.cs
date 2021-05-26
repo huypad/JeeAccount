@@ -13,46 +13,48 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace JeeAccount.Services
+namespace JeeAccount.Services.CustomerManagementService
 {
-    public class CustomerManagementService
+    public class CustomerManagementService : ICustomerManagementService
     {
-        private ICustomerManagementReponsitory customerManagementReponsitory;
+        private ICustomerManagementReponsitory _customerManagementReponsitory;
         private IdentityServerController identityServerController;
-        private readonly string ConnectionString;
-        private readonly IProducer producer;
+        private string ConnectionString;
+        private IProducer producer;
         private IAccountManagementReponsitory _accountManagementReponsitory;
-        private readonly IConfiguration configuration;
-        public CustomerManagementService(string connectionString, IProducer producer, IConfiguration configuration)
+        private IConfiguration configuration;
+
+        public CustomerManagementService(IProducer producer, IConfiguration configuration, ICustomerManagementReponsitory customerManagementReponsitory, IAccountManagementReponsitory accountManagementReponsitory)
         {
-            this.customerManagementReponsitory = new CustomerManagementReponsitory(connectionString);
+            this._customerManagementReponsitory = customerManagementReponsitory;
             this.identityServerController = new IdentityServerController();
-            this.ConnectionString = connectionString;
-            this._accountManagementReponsitory = new AccountManagementReponsitory(connectionString);
+            ConnectionString = configuration.GetConnectionString("DefaultConnection");
+            this._accountManagementReponsitory = accountManagementReponsitory;
             this.producer = producer;
             this.configuration = configuration;
         }
+
         public IEnumerable<CustomerModelDTO> GetListCustomer()
         {
-            var list = customerManagementReponsitory.GetListCustomer();
+            var list = _customerManagementReponsitory.GetListCustomer();
             return list;
         }
 
         public IEnumerable<CustomerModelDTO> GetListCustomer(string whereSrt, string orderByStr)
         {
-            var list = customerManagementReponsitory.GetListCustomer(whereSrt, orderByStr);
+            var list = _customerManagementReponsitory.GetListCustomer(whereSrt, orderByStr);
             return list;
         }
 
         public IEnumerable<AppListDTO> GetListApp()
         {
-            var list = customerManagementReponsitory.GetListApp();
+            var list = _customerManagementReponsitory.GetListApp();
             return list;
         }
 
         public bool checkTrungCode(string Code)
         {
-            return customerManagementReponsitory.checkTrungCode(Code);
+            return _customerManagementReponsitory.checkTrungCode(Code);
         }
 
         public string getSecretToken()
@@ -77,7 +79,7 @@ namespace JeeAccount.Services
                         identityServerReturn.message = "RowID không tồn tại";
                     }
                     cnn.BeginTransaction();
-                    var create = customerManagementReponsitory.CreateCustomer(cnn, customerModel);
+                    var create = _customerManagementReponsitory.CreateCustomer(cnn, customerModel);
                     if (!create.Susscess)
                     {
                         cnn.RollbackTransaction();
@@ -86,8 +88,7 @@ namespace JeeAccount.Services
                         return identityServerReturn;
                     }
 
-
-                    var createAppcodes = customerManagementReponsitory.CreateAppCode(cnn, customerModel, customerModel.RowID);
+                    var createAppcodes = _customerManagementReponsitory.CreateAppCode(cnn, customerModel, customerModel.RowID);
                     if (!createAppcodes.Susscess)
                     {
                         cnn.RollbackTransaction();
@@ -96,7 +97,7 @@ namespace JeeAccount.Services
                         return identityServerReturn;
                     }
 
-                    var appcodes = customerManagementReponsitory.AppCodes(cnn, customerModel.RowID);
+                    var appcodes = _customerManagementReponsitory.AppCodes(cnn, customerModel.RowID);
                     AccountManagementModel accountManagementModel = new AccountManagementModel
                     {
                         AppCode = appcodes,
@@ -177,6 +178,5 @@ namespace JeeAccount.Services
                 }
             }
         }
-
     }
 }

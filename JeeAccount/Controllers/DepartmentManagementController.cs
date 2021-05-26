@@ -3,6 +3,7 @@ using JeeAccount.Models.Common;
 using JeeAccount.Models.DepartmentManagement;
 using JeeAccount.Reponsitories;
 using JeeAccount.Services;
+using JeeAccount.Services.DepartmentManagementService;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -19,13 +20,13 @@ namespace JeeAccount.Controllers
     [ApiController]
     public class DepartmentManagementController : ControllerBase
     {
-        private readonly IConfiguration _config;
-        private readonly DepartmentManagementService departmentManagementService;
+        private IConfiguration _config;
+        private IDepartmentManagementService departmentManagementService;
 
-        public DepartmentManagementController(IConfiguration configuration)
+        public DepartmentManagementController(IConfiguration configuration, IDepartmentManagementService departmentManagementService)
         {
             _config = configuration;
-            departmentManagementService = new DepartmentManagementService(_config.GetConnectionString("DefaultConnection"));
+            this.departmentManagementService = departmentManagementService;
         }
 
         [HttpGet("GetListDepartment")]
