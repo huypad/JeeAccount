@@ -26,7 +26,7 @@ namespace JeeAccount.Controllers
         public StructureManagementController(IConfiguration configuration, IStructureManagementService structureManagementService)
         {
             _config = configuration;
-            structureManagementService = this.structureManagementService;
+            this.structureManagementService = structureManagementService;
         }
 
         [HttpGet("GetOrgStructure")]

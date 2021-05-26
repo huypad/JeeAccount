@@ -110,7 +110,7 @@ namespace JeeAccount.Classes
 
         /// <summary>
         /// Remove all unicode of string
-        /// Sample: 
+        /// Sample:
         /// Input = "Thế giới hòa binh"
         /// Output = "The gioi hoa binh"
         /// </summary>
@@ -155,7 +155,6 @@ namespace JeeAccount.Classes
             }
         }
 
-
         /// <summary>
         /// Get user by header
         /// </summary>
@@ -187,6 +186,35 @@ namespace JeeAccount.Classes
             }
         }
 
+        /// <summary>
+        /// Get user by header
+        /// </summary>
+        /// <param name="pHeader"></param>
+        /// <returns></returns>
+        public static string GetProjectnameByHeader(IHeaderDictionary pHeader)
+        {
+            try
+            {
+                if (pHeader == null) return null;
+                if (!pHeader.ContainsKey(HeaderNames.Authorization)) return null;
+
+                IHeaderDictionary _d = pHeader;
+                string _bearer_token, _projectname;
+                _bearer_token = _d[HeaderNames.Authorization].ToString().Replace("Bearer ", "");
+                var handler = new JwtSecurityTokenHandler();
+                var tokenS = handler.ReadToken(_bearer_token) as JwtSecurityToken;
+
+                _projectname = tokenS.Claims.Where(x => x.Type == "projectName").FirstOrDefault().Value;
+                if (string.IsNullOrEmpty(_projectname))
+                    return null;
+
+                return _projectname;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
 
         public static string GetAccessTokenByHeader(IHeaderDictionary pHeader)
         {
@@ -207,5 +235,4 @@ namespace JeeAccount.Classes
             }
         }
     }
-
 }

@@ -1,4 +1,5 @@
-﻿using JeeAccount.Classes;
+﻿using DPSinfra.Utils;
+using JeeAccount.Classes;
 using JeeAccount.Models.Common;
 using JeeAccount.Services;
 using JeeAccount.Services.MailService;
@@ -14,8 +15,8 @@ namespace JeeAccount.Controllers
     [ApiController]
     public class MailController : ControllerBase
     {
-        private readonly IConfiguration _config;
-        private readonly IMailService mailService;
+        private IConfiguration _config;
+        private IMailService mailService;
 
         public MailController(IConfiguration configuration, IMailService mailService)
         {
@@ -42,6 +43,36 @@ namespace JeeAccount.Controllers
             {
                 return JsonResultCommon.Exception(ex);
             }
+        }
+
+        [HttpPost("GetMailByCustomerID/Internal")]
+        public BaseModel<object> GetMailByCustomerIDInternal(long customerID)
+        {
+            try
+            {
+                var prjectname = Ulities.GetProjectnameByHeader(HttpContext.Request.Headers);
+                if (prjectname is null)
+                {
+                    return JsonResultCommon.BatBuoc("Thông tin Internal Token");
+                }
+                var mailModel = mailService.InitialData(customerID.ToString());
+                if (mailModel is null)
+                    return JsonResultCommon.KhongTonTai("CustomerID");
+                return JsonResultCommon.ThanhCong(mailModel);
+            }
+            catch (Exception ex)
+            {
+                return JsonResultCommon.Exception(ex);
+            }
+        }
+
+        [HttpGet("gettoken")]
+        public string GetSecretToken()
+        {
+            var secret = _config.GetValue<string>("Jwt:internal_secret");
+            var projectName = _config.GetValue<string>("KafkaConfig:ProjectName");
+            var token = JsonWebToken.issueToken(new TokenClaims { projectName = projectName }, secret);
+            return token;
         }
     }
 }

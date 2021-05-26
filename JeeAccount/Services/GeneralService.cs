@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace JeeAccount.Services
 {
-    public class GeneralService
+    public static class GeneralService
     {
         public static string CreateListStringWhereIn(List<string> ListStringData)
         {
             string result = "";
-            foreach(string data in ListStringData)
+            foreach (string data in ListStringData)
             {
                 if (string.IsNullOrEmpty(result))
                 {
@@ -41,13 +41,11 @@ namespace JeeAccount.Services
 
         public static void saveImgNhanVien(string image, string userID, long customerID)
         {
-
             byte[] ImageArray = Convert.FromBase64String(image);
 
             string ID_NV = userID;
 
             String pathOriginal = Environment.CurrentDirectory + "/images/nhanvien/" + customerID + "/Original/";
-
 
             //Check if directory exist
             if (!System.IO.Directory.Exists(pathOriginal))
@@ -91,7 +89,6 @@ namespace JeeAccount.Services
 
                 myImg.Save(imgPath);
             }
-
         }
 
         public static string getlastname(string fullname)
@@ -108,12 +105,13 @@ namespace JeeAccount.Services
             }
             return fullname;
         }
+
         public static string getFirstname(string fullname)
         {
             if (fullname.Contains(' '))
             {
                 string[] word = fullname.Split(' ');
-                string firstName = word[word.Length-1];
+                string firstName = word[word.Length - 1];
                 return firstName;
             }
             return fullname;
@@ -135,6 +133,7 @@ namespace JeeAccount.Services
         }
 
         private static Random random = new Random();
+
         public static string RandomString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghjklmnoprstuwxyz@!@!@!";
@@ -142,5 +141,4 @@ namespace JeeAccount.Services
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
     }
-
 }
