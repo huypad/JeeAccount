@@ -31,7 +31,7 @@ namespace JeeAccount.Reponsitories
 
             string sql = @"select UserID, Username, email, LastName +' '+FirstName as FullName
                            , FirstName as Name, AvartarImgURL as Avatar, Jobtitle,
-                           Department, PhoneNumber, CustomerID, cocauid
+                           Department, PhoneNumber, CustomerID, cocauid, ChucVuID
                            from AccountList where CustomerID=@CustomerID";
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
@@ -48,6 +48,7 @@ namespace JeeAccount.Reponsitories
                     Jobtitle = row["Jobtitle"].ToString(),
                     Email = row["email"].ToString(),
                     StructureID = row["cocauid"].ToString(),
+                    ChucVuID = row["ChucVuID"].ToString(),
                 });
 
                 return await Task.FromResult(result).ConfigureAwait(false);
