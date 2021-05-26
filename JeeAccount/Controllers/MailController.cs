@@ -50,11 +50,12 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var prjectname = Ulities.GetProjectnameByHeader(HttpContext.Request.Headers);
+                var prjectname = Ulities.GetProjectnameByHeader(HttpContext.Request.Headers, _config["Jwt:internal_secret"]);
                 if (prjectname is null)
                 {
                     return JsonResultCommon.BatBuoc("Thông tin Internal Token");
                 }
+
                 var mailModel = mailService.InitialData(customerID.ToString());
                 if (mailModel is null)
                     return JsonResultCommon.KhongTonTai("CustomerID");

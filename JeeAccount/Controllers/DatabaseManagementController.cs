@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -38,17 +39,12 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var pHeader = HttpContext.Request.Headers;
+                var prjectname = Ulities.GetProjectnameByHeader(HttpContext.Request.Headers, _config["Jwt:internal_secret"]);
+                if (prjectname is null)
+                {
+                    return JsonResultCommon.BatBuoc("Thông tin Internal Token");
+                }
 
-                if (pHeader == null) return null;
-                if (!pHeader.ContainsKey(HeaderNames.Authorization)) return null;
-
-                IHeaderDictionary _d = pHeader;
-                string _bearer_token, _user;
-                _bearer_token = _d[HeaderNames.Authorization].ToString().Replace("Bearer ", "");
-                var handler = new JwtSecurityTokenHandler();
-                var tokenS = handler.ReadToken(_bearer_token) as JwtSecurityToken;
-                string projectName = tokenS.Claims.Where(x => x.Type == "projectName").FirstOrDefault().Value;
                 if (dBTokenModel is null)
                 {
                     JsonResultCommon.BatBuoc("customerID hoặc appCode");

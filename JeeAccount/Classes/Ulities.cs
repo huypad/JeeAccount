@@ -1,5 +1,6 @@
 ﻿using JeeAccount.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using System;
@@ -191,7 +192,7 @@ namespace JeeAccount.Classes
         /// </summary>
         /// <param name="pHeader"></param>
         /// <returns></returns>
-        public static string GetProjectnameByHeader(IHeaderDictionary pHeader)
+        public static object GetProjectnameByHeader(IHeaderDictionary pHeader, string signingKey)
         {
             try
             {
@@ -201,9 +202,19 @@ namespace JeeAccount.Classes
                 IHeaderDictionary _d = pHeader;
                 string _bearer_token, _projectname;
                 _bearer_token = _d[HeaderNames.Authorization].ToString().Replace("Bearer ", "");
-                var handler = new JwtSecurityTokenHandler();
-                var tokenS = handler.ReadToken(_bearer_token) as JwtSecurityToken;
 
+                SecurityToken validatedToken;
+                JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+                TokenValidationParameters validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = false,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey)),
+                };
+
+                var tokenS = handler.ValidateToken(_bearer_token, validationParameters, out validatedToken);
                 _projectname = tokenS.Claims.Where(x => x.Type == "projectName").FirstOrDefault().Value;
                 if (string.IsNullOrEmpty(_projectname))
                     return null;
@@ -214,6 +225,22 @@ namespace JeeAccount.Classes
             {
                 return null;
             }
+        }
+
+        public static SecurityToken validationToken(string token, string signingKey)
+        {
+            SecurityToken validatedToken;
+            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+            TokenValidationParameters validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey)),
+            };
+            var user = handler.ValidateToken(token, validationParameters, out validatedToken);
+            return validatedToken;
         }
 
         public static string GetAccessTokenByHeader(IHeaderDictionary pHeader)

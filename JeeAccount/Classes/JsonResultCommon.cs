@@ -8,7 +8,6 @@ namespace JeeAccount.Classes
 {
     public class JsonResultCommon
     {
-
         public static BaseModel<object> KhongTonTai(string name = "")
         {
             return new BaseModel<object>
@@ -21,6 +20,7 @@ namespace JeeAccount.Classes
                 }
             };
         }
+
         public static BaseModel<object> Trung(string name)
         {
             return new BaseModel<object>
@@ -33,6 +33,7 @@ namespace JeeAccount.Classes
                 }
             };
         }
+
         public static BaseModel<object> BatBuoc(string str_required)
         {
             if (!string.IsNullOrEmpty(str_required))
@@ -47,6 +48,7 @@ namespace JeeAccount.Classes
                 }
             };
         }
+
         public static BaseModel<object> Custom(string str_custom)
         {
             return new BaseModel<object>()
@@ -59,6 +61,7 @@ namespace JeeAccount.Classes
                 }
             };
         }
+
         public static BaseModel<object> PhanQuyen(string quyen = "")
         {
             return new BaseModel<object>()
@@ -71,6 +74,7 @@ namespace JeeAccount.Classes
                 }
             };
         }
+
         public static BaseModel<object> DangNhap()
         {
             return new BaseModel<object>
@@ -83,6 +87,7 @@ namespace JeeAccount.Classes
                 },
             };
         }
+
         public static BaseModel<object> Exception(Exception last_error)
         {
             return new BaseModel<object>()
@@ -96,6 +101,7 @@ namespace JeeAccount.Classes
                 }
             };
         }
+
         public static BaseModel<object> PhanTrang()
         {
             return new BaseModel<object>()
@@ -108,6 +114,7 @@ namespace JeeAccount.Classes
                 },
             };
         }
+
         public static BaseModel<object> ThanhCong()
         {
             return new BaseModel<object>
@@ -115,6 +122,7 @@ namespace JeeAccount.Classes
                 status = 1,
             };
         }
+
         public static BaseModel<object> ThanhCong(object data)
         {
             return new BaseModel<object>
@@ -123,6 +131,7 @@ namespace JeeAccount.Classes
                 data = data
             };
         }
+
         public static BaseModel<object> ThanhCong(object data, PageModel pageModel)
         {
             return new BaseModel<object>
@@ -143,6 +152,7 @@ namespace JeeAccount.Classes
                 panigator = pageModel
             };
         }
+
         public static BaseModel<object> ThatBai(string message, Exception last_error)
         {
             return new BaseModel<object>()
@@ -156,6 +166,7 @@ namespace JeeAccount.Classes
                 }
             };
         }
+
         public static BaseModel<object> ThatBai(string message)
         {
             return new BaseModel<object>()
@@ -168,6 +179,7 @@ namespace JeeAccount.Classes
                 }
             };
         }
+
         public static BaseModel<object> ThatBai(string message, bool Visible)
         {
             return new BaseModel<object>()
@@ -181,6 +193,7 @@ namespace JeeAccount.Classes
                 Visible = Visible,
             };
         }
+
         public static BaseModel<object> KhongHopLe(string name = "")
         {
             return new BaseModel<object>
@@ -193,6 +206,7 @@ namespace JeeAccount.Classes
                 }
             };
         }
+
         public static BaseModel<object> SQL(string last_error)
         {
             return new BaseModel<object>()
@@ -206,6 +220,5 @@ namespace JeeAccount.Classes
                 }
             };
         }
-
     }
 }
