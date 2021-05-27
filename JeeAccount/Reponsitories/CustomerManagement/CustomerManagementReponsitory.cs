@@ -61,6 +61,7 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
                     Hashtable val = new Hashtable();
                     val.Add("CustomerID", CustomerID);
                     val.Add("AppID", customerModel.AppID[index]);
+                    if (customerModel.CurrentDBID[index] != -1) val.Add("DatabaseID", customerModel.CurrentDBID[index]);
                     val.Add("StartDate", start);
                     val.Add("CreatedDate", DateTime.Now);
                     val.Add("CreatedBy", 0);

@@ -42,7 +42,7 @@
         "ASPNETCORE_URLS": "https://localhost:5001",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "distributionName": ""
+      "distributionName": "Ubuntu-20.04"
     }
   }
 }

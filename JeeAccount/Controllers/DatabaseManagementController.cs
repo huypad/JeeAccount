@@ -1,22 +1,12 @@
-﻿using DPSinfra.Utils;
-using JeeAccount.Classes;
+﻿using JeeAccount.Classes;
 using JeeAccount.Models.Common;
 using JeeAccount.Models.DatabaseManagement;
-using JeeAccount.Services;
 using JeeAccount.Services.DatabaseManagementService;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.Net.Http.Headers;
 using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JeeAccount.Controllers
 {

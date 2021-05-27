@@ -1,17 +1,12 @@
 ﻿using JeeAccount.Classes;
 using JeeAccount.Models.Common;
 using JeeAccount.Models.DepartmentManagement;
-using JeeAccount.Reponsitories;
-using JeeAccount.Services;
 using JeeAccount.Services.DepartmentManagementService;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Common = JeeAccount.Classes.Common;
 
 namespace JeeAccount.Controllers
 {

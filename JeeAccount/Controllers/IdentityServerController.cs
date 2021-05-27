@@ -1,11 +1,7 @@
 ﻿using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
-using JeeAccount.Services;
 using JeeAccount.Services.AccountManagementService;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;

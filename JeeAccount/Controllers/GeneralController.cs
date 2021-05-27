@@ -2,20 +2,15 @@
 using JeeAccount.Classes;
 using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.Common;
-using JeeAccount.Models.DepartmentManagement;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using static JeeAccount.Models.Common.Common;
 
 namespace JeeAccount.Controllers
@@ -26,7 +21,6 @@ namespace JeeAccount.Controllers
     public class GeneralController : ControllerBase
     {
         private readonly IConfiguration _config;
-        
 
         public GeneralController(IConfiguration configuration)
         {
@@ -52,6 +46,7 @@ namespace JeeAccount.Controllers
                 return "";
             }
         }
+
         public static string genLinkImage(string domain, long idKH, string id_nv, string contentRootPath)
         {
             //string Image = domain + "dulieu/Images/Noimage.jpg";
@@ -176,7 +171,8 @@ namespace JeeAccount.Controllers
                 if (dt.Rows.Count == 0)
                     return new PersonalInfoCustomData();
 
-                return new PersonalInfoCustomData {
+                return new PersonalInfoCustomData
+                {
                     Avatar = dt.Rows[0]["Avatar"].ToString(),
                     Birthday = dt.Rows[0]["Birthday"].ToString(),
                     Departmemt = dt.Rows[0]["Department"].ToString(),
@@ -185,13 +181,11 @@ namespace JeeAccount.Controllers
                     Name = dt.Rows[0]["Name"].ToString(),
                     Phonenumber = dt.Rows[0]["PhoneNumber"].ToString()
                 };
-                
             }
             catch (Exception ex)
             {
                 return new PersonalInfoCustomData();
             }
         }
-
     }
 }

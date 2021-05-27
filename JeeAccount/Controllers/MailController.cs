@@ -1,7 +1,6 @@
 ﻿using DPSinfra.Utils;
 using JeeAccount.Classes;
 using JeeAccount.Models.Common;
-using JeeAccount.Services;
 using JeeAccount.Services.MailService;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;

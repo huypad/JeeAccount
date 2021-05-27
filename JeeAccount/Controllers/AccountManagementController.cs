@@ -1,20 +1,15 @@
-﻿using JeeAccount.Classes;
+﻿using DPSinfra.Kafka;
+using JeeAccount.Classes;
 using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.Common;
-using JeeAccount.Reponsitories;
 using JeeAccount.Services;
+using JeeAccount.Services.AccountManagementService;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using Common = JeeAccount.Classes.Common;
-using DPSinfra.Kafka;
-using JeeAccount.Services.AccountManagementService;
 
 namespace JeeAccount.Controllers
 {
