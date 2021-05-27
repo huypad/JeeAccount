@@ -120,24 +120,24 @@ namespace JeeAccount
 
             #region add Repository
 
-            services.AddSingleton<IAccountManagementReponsitory, AccountManagementReponsitory>();
-            services.AddSingleton<ICustomerManagementReponsitory, CustomerManagementReponsitory>();
-            services.AddSingleton<IDatabaseManagementRepositoty, DatabaseManagementRepositoty>();
-            services.AddSingleton<IDepartmentManagementReponsitory, DepartmentManagementReponsitory>();
-            services.AddSingleton<IMailReponsitory, MailReponsitory>();
-            services.AddSingleton<IStructureManagementReponsitory, StructureManagementReponsitory>();
-            services.AddSingleton<IWidgetDashBoardRepository, WidgetDashBoardRepository>();
+            services.AddTransient<IAccountManagementReponsitory, AccountManagementReponsitory>();
+            services.AddTransient<ICustomerManagementReponsitory, CustomerManagementReponsitory>();
+            services.AddTransient<IDatabaseManagementRepositoty, DatabaseManagementRepositoty>();
+            services.AddTransient<IDepartmentManagementReponsitory, DepartmentManagementReponsitory>();
+            services.AddTransient<IMailReponsitory, MailReponsitory>();
+            services.AddTransient<IStructureManagementReponsitory, StructureManagementReponsitory>();
+            services.AddTransient<IWidgetDashBoardRepository, WidgetDashBoardRepository>();
 
             #endregion add Repository
 
             #region add Services
 
-            services.AddSingleton<IAccountManagementService, AccountManagementService>();
-            services.AddSingleton<ICustomerManagementService, CustomerManagementService>();
-            services.AddSingleton<IDatabaseManagementService, DatabaseManagementService>();
-            services.AddSingleton<IDepartmentManagementService, DepartmentManagementService>();
-            services.AddSingleton<IMailService, MailService>();
-            services.AddSingleton<IStructureManagementService, StructureManagementService>();
+            services.AddTransient<IAccountManagementService, AccountManagementService>();
+            services.AddTransient<ICustomerManagementService, CustomerManagementService>();
+            services.AddTransient<IDatabaseManagementService, DatabaseManagementService>();
+            services.AddTransient<IDepartmentManagementService, DepartmentManagementService>();
+            services.AddTransient<IMailService, MailService>();
+            services.AddTransient<IStructureManagementService, StructureManagementService>();
 
             #endregion add Services
 
