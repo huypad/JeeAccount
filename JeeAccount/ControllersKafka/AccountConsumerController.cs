@@ -1,10 +1,13 @@
 ﻿using DPSinfra.Kafka;
+using DPSinfra.Logger;
 using DPSinfra.Utils;
 using DpsLibs.Data;
 using JeeAccount.Controllers;
 using JeeAccount.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,13 +21,15 @@ namespace JeeCustomer.ConsumerKafka
         private IConfiguration _config;
         private Consumer accountConsumer;
         private IProducer _producer;
+        private readonly ILogger<AccountConsumerController> _logger;
 
-        public AccountConsumerController(IConfiguration config, IProducer producer)
+        public AccountConsumerController(IConfiguration config, IProducer producer, ILogger<AccountConsumerController> logger)
         {
             _config = config;
             string group = _config.GetValue<string>("KafkaConfig:ProjectName") + _config.GetValue<string>("KafkaConsumer:ConsumerAddNewCustomer");
             accountConsumer = new Consumer(_config, group);
             _producer = producer;
+            _logger = logger;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -44,6 +49,19 @@ namespace JeeCustomer.ConsumerKafka
         public void GetValue(string value)
         {
             var obj = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomData>(value);
+            var d1 = new GeneralLog()
+            {
+                name = "jee-account",
+                data = value,
+                message = "jeeplatform.initialization.appupdate"
+            };
+            _logger.LogTrace(JsonConvert.SerializeObject(d1));
+            _logger.LogDebug(JsonConvert.SerializeObject(d1));
+            _logger.LogInformation(JsonConvert.SerializeObject(d1));
+            _logger.LogWarning(JsonConvert.SerializeObject(d1));
+            _logger.LogError(JsonConvert.SerializeObject(d1));
+            _logger.LogCritical(JsonConvert.SerializeObject(d1));
+
             var identity = new IdentityServerController();
             string username = GetObjectDB($"select Username from AccountList where UserID ={obj.userId}", _config.GetConnectionString("DefaultConnection")).ToString();
             var x = identity.UppdateCustomDataInternal(getSecretToken(), username, obj);

@@ -1,4 +1,5 @@
 using DPSinfra.Kafka;
+using DPSinfra.Logger;
 using DPSinfra.Vault;
 using JeeAccount.Reponsitories;
 using JeeAccount.Reponsitories.CustomerManagement;
@@ -116,7 +117,13 @@ namespace JeeAccount
             {
                 options.SuppressModelStateInvalidFilter = true;
             });
+
             services.AddOptions();
+
+            services.AddLogging(builder =>
+            {
+                builder.addAsyncLogger<AsyncLoggerProvider>(p => new AsyncLoggerProvider(p.GetService<IProducer>()));
+            });
 
             #region add Repository
 
@@ -143,7 +150,7 @@ namespace JeeAccount
 
             #region add kafka consumer
 
-            services.AddSingleton<IHostedService, AccountConsumerController>();
+            services.AddHostedService<AccountConsumerController>();
 
             #endregion add kafka consumer
         }
