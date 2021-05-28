@@ -56,11 +56,6 @@ namespace JeeCustomer.ConsumerKafka
                 message = "jeeplatform.initialization.appupdate"
             };
             _logger.LogTrace(JsonConvert.SerializeObject(d1));
-            _logger.LogDebug(JsonConvert.SerializeObject(d1));
-            _logger.LogInformation(JsonConvert.SerializeObject(d1));
-            _logger.LogWarning(JsonConvert.SerializeObject(d1));
-            _logger.LogError(JsonConvert.SerializeObject(d1));
-            _logger.LogCritical(JsonConvert.SerializeObject(d1));
 
             var identity = new IdentityServerController();
             string username = GetObjectDB($"select Username from AccountList where UserID ={obj.userId}", _config.GetConnectionString("DefaultConnection")).ToString();
