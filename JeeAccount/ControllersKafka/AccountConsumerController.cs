@@ -51,6 +51,16 @@ namespace JeeCustomer.ConsumerKafka
             try
             {
                 var obj = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomData>(value);
+                if (obj == null)
+                {
+                    var d2 = new GeneralLog()
+                    {
+                        name = "jee-account",
+                        data = value,
+                        message = "jeeplatform.initialization.appupdate"
+                    };
+                    _logger.LogError(JsonConvert.SerializeObject(d2));
+                }
                 var d1 = new GeneralLog()
                 {
                     name = "jee-account",
@@ -68,6 +78,13 @@ namespace JeeCustomer.ConsumerKafka
             }
             catch (Exception ex)
             {
+                var d2 = new GeneralLog()
+                {
+                    name = "jee-account",
+                    data = value,
+                    message = "jeeplatform.initialization.appupdate"
+                };
+                _logger.LogError(JsonConvert.SerializeObject(d2));
             }
         }
 
