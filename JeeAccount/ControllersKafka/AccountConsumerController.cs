@@ -48,18 +48,27 @@ namespace JeeCustomer.ConsumerKafka
 
         public void GetValue(string value)
         {
-            var obj = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomData>(value);
-            var d1 = new GeneralLog()
+            try
             {
-                name = "jee-account",
-                data = value,
-                message = "jeeplatform.initialization.appupdate"
-            };
-            _logger.LogTrace(JsonConvert.SerializeObject(d1));
+                var obj = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomData>(value);
+                var d1 = new GeneralLog()
+                {
+                    name = "jee-account",
+                    data = value,
+                    message = "jeeplatform.initialization.appupdate"
+                };
+                _logger.LogTrace(JsonConvert.SerializeObject(d1));
 
-            var identity = new IdentityServerController();
-            string username = GetObjectDB($"select Username from AccountList where UserID ={obj.userId}", _config.GetConnectionString("DefaultConnection")).ToString();
-            var x = identity.UppdateCustomDataInternal(getSecretToken(), username, obj);
+                var identity = new IdentityServerController();
+                string username = GetObjectDB($"select Username from AccountList where UserID = {obj.userId}", _config.GetConnectionString("DefaultConnection"));
+                if (!string.IsNullOrEmpty(username))
+                {
+                    var x = identity.UppdateCustomDataInternal(getSecretToken(), username, obj);
+                }
+            }
+            catch (Exception ex)
+            {
+            }
         }
 
         public string getSecretToken()
@@ -70,11 +79,14 @@ namespace JeeCustomer.ConsumerKafka
             return token;
         }
 
-        public object GetObjectDB(string sql, string connectionString)
+        public string GetObjectDB(string sql, string connectionString)
         {
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
-                return cnn.ExecuteScalar(sql);
+                var x = cnn.ExecuteScalar(sql);
+                if (x != null)
+                    return x.ToString();
+                return "";
             }
         }
     }
