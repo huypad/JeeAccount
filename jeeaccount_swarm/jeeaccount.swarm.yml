@@ -17,12 +17,15 @@ services:
       - kafka-network
     environment:
       ASPNETCORE_ENVIRONMENT: Production
-      KafkaConfig__Brokers: ${KAFKA_BROKER}
-      KafkaConfig__ProjectName: jee-account
       VaultConfig__Endpoint: ${VAULT_ENDPOINT}
       VaultConfig__Token: ${VAULT_TOKEN}
-      JeeAccount__API: ${PUBLIC_LINK_API}
-      ConnectionStrings__DefaultConnection: ${CONNECTION_STRING}
+      AppConfig__Connection: ${CONNECTION_STRING}
+      AppConfig__Secrectkey__JeeCustomer: sJoPSvHUHmbFvbzGC8Yp4LKUZtQ6M6pRalM3IST9cMJNGk2v2ZQETFJp87XNWAoQ4tUWGIRPwQRBpI1vtWSDgYfzbjXJZwNNT2PujJmP1YNznfURNRjLD10N0fx7qshYsDsk2dE49ifjJ4xnl0yOIUoOLwHf3dm9
+      KafkaConfig__Brokers: ${KAFKA_BROKER}
+      KafkaConfig__ProjectName: jee-account
+      KafkaConfig__TopicProduce__jeeplatformInitialization: jeeplatform.initialization
+      KafkaConfig__TopicConsume__JeeplatformInitializationAppupdate: jeeplatform.initialization.appupdate
+      KafkaConfig__Consumer__JeeAccountGroup: jeeaccount-consumer-group
     deploy:
       mode: replicated
       replicas: 1
