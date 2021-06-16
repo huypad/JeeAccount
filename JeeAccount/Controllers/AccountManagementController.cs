@@ -73,7 +73,7 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpGet("GetCustormerID")]
+        [HttpPost("GetCustormerID")]
         public async Task<ActionResult<long>> GetCustormerID(InputApiModel model)
         {
             try
@@ -163,7 +163,7 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpGet("GetInfo")]
+        [HttpPost("GetInfo")]
         public async Task<ActionResult<InfoUserDTO>> GetInfo(InputApiModel model)
         {
             try
@@ -352,7 +352,7 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpGet("GetInfoDirectManager")]
+        [HttpPost("GetInfoDirectManager")]
         public async Task<IActionResult> GetInfoDirectManager(InputApiModel model)
         {
             try
@@ -595,7 +595,7 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpGet("UsernameOrUserID")]
+        [HttpPost("UsernameOrUserID")]
         public async Task<IActionResult> UsernameOrUserID(InputApiModel model)
         {
             try

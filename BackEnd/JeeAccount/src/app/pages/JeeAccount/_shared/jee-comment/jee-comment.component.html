@@ -28,17 +28,16 @@
           src="https://scontent.fhph1-2.fna.fbcdn.net/v/t1.30497-1/143086968_2856368904622192_1959732218791162458_n.png?_nc_cat=1&ccb=1-3&_nc_sid=7206a8&_nc_ohc=qV3loY0JnC0AX-qMbjn&_nc_oc=AQkuTY2hl5gClakxdwuSeg8oKtlYtYL3BQovbftuPGDpsS0nASl84X99PgdvP_zFy24&_nc_ht=scontent.fhph1-2.fna&oh=e7e8b5438248aa379e7f27abb99539f3&oe=60CC4378">
       </div>
       <div class="post-comment-input">
-        <textarea placeholder="Viết bình luận" class="textarea-input" cdkTextareaAutosize></textarea>
+        <textarea [(value)]="input" placeholder="Viết bình luận" class="textarea-input" cdkTextareaAutosize></textarea>
         <ul class="comment-icon">
           <li class="icon"><span>
-              <div role="button" tabindex="0"><i data-visualcompletion="css-img"
-                  style="background-image: url(&quot;https://static.xx.fbcdn.net/rsrc.php/v3/yD/r/mszNyGGthUg.png&quot;); background-position: 0px -346px; background-size: auto; width: 16px; height: 16px; background-repeat: no-repeat; display: inline-block;"></i>
+              <div class="hover-icon" role="button" tabindex="0"><i id="emotion-icon"
+                  data-visualcompletion="css-img"></i>
                 <div data-visualcompletion="ignore" style="inset: -8px;"></div>
               </div>
             </span></li>
           <li class="icon"><span>
-              <div role="button" tabindex="0"><i data-visualcompletion="css-img"
-                  style="background-image: url(&quot;https://static.xx.fbcdn.net/rsrc.php/v3/yD/r/mszNyGGthUg.png&quot;); background-position: 0px -295px; background-size: auto; width: 16px; height: 16px; background-repeat: no-repeat; display: inline-block;"></i>
+              <div class="hover-icon" role="button" tabindex="0"><i id="image-icon" data-visualcompletion="css-img"></i>
                 <div data-visualcompletion="ignore" style="inset: -8px;"></div>
               </div>
             </span><input id="input-flie"
@@ -47,7 +46,26 @@
         </ul>
       </div>
     </div>
-    <div style="background-color: bisque;" class="post-comment-content">
-    </div>
+    <ul class="post-comment-content">
+      <li class="list-comment">
+        <div class="post-comment">
+          <div class="post-comment-avatar">
+            <img id="img-avatar"
+              src="https://scontent.fhph1-2.fna.fbcdn.net/v/t1.30497-1/143086968_2856368904622192_1959732218791162458_n.png?_nc_cat=1&ccb=1-3&_nc_sid=7206a8&_nc_ohc=qV3loY0JnC0AX-qMbjn&_nc_oc=AQkuTY2hl5gClakxdwuSeg8oKtlYtYL3BQovbftuPGDpsS0nASl84X99PgdvP_zFy24&_nc_ht=scontent.fhph1-2.fna&oh=e7e8b5438248aa379e7f27abb99539f3&oe=60CC4378">
+          </div>
+          <div class="post-comment-input">
+            <span class="input-comment-span">{{input}}</span>
+          </div>
+          <div class="icon-edit-report">
+            <span>
+              <div class="hover-icon" role="button" tabindex="0"><i id="edit-report-icon"
+                  data-visualcompletion="css-img"></i>
+                <div style="inset: -8px;"></div>
+              </div>
+            </span>
+          </div>
+        </div>
+      </li>
+    </ul>
   </div>
 </div>
