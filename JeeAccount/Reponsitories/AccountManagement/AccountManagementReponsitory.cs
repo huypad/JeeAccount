@@ -464,6 +464,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
             {
                 string sql = $"select UserID from AccountList where Username = '{Username}' and customerID = {customerID}";
                 var UserId = cnn.ExecuteScalar(sql);
+                if (UserId == null) return 0;
                 return long.Parse(UserId.ToString());
             }
         }

@@ -50,6 +50,8 @@ namespace JeeAccount.Services.AccountManagementService
 
         long GetUserIdByUsername(string Username, long CustomerId);
 
+        string GetUsernameByUserID(string UserID, long CustomerId);
+
         PersonalInfoCustomData GetPersonalInfoCustomData(long UserID, long CustomerID);
 
         Task<IdentityServerReturn> UpdateAvatarWithChangeUrlAvatar(string Admin_access_token, long UserId, string Username, long CustomerID, string apiUrl);
@@ -69,5 +71,11 @@ namespace JeeAccount.Services.AccountManagementService
         Task<ReturnSqlModel> UpdateTool();
 
         Task<HttpResponseMessage> ResetPasswordRootCustomer(CustomerResetPasswordModel model);
+
+        Task<IEnumerable<UserNameDTO>> GetListJustUsernameAndUserIDByCustormerID(long custormerID);
+
+        Task<IEnumerable<string>> GetListJustUsernameByCustormerID(long custormerID);
+
+        Task<IEnumerable<long>> GetListJustUserIDByCustormerID(long custormerID);
     }
 }

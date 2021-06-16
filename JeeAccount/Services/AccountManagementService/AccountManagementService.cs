@@ -430,6 +430,69 @@ namespace JeeAccount.Services.AccountManagementService
                 return await Task.FromResult(result).ConfigureAwait(false);
             }
         }
+
+        public async Task<IEnumerable<UserNameDTO>> GetListJustUsernameAndUserIDByCustormerID(long custormerID)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("CustomerID", custormerID);
+
+            string sql = @"select UserID, Username from AccountList where CustomerID=@CustomerID";
+            using (DpsConnection cnn = new DpsConnection(ConnectionString))
+            {
+                dt = cnn.CreateDataTable(sql, Conds);
+                var result = dt.AsEnumerable().Select(row => new UserNameDTO
+                {
+                    UserId = Int32.Parse(row["UserID"].ToString()),
+                    Username = row["Username"].ToString()
+                });
+
+                return await Task.FromResult(result).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<IEnumerable<string>> GetListJustUsernameByCustormerID(long custormerID)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("CustomerID", custormerID);
+
+            string sql = @"select Username from AccountList where CustomerID=@CustomerID";
+            using (DpsConnection cnn = new DpsConnection(ConnectionString))
+            {
+                dt = cnn.CreateDataTable(sql, Conds);
+                var result = dt.AsEnumerable().Select(row => row["Username"].ToString());
+
+                return await Task.FromResult(result).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<IEnumerable<long>> GetListJustUserIDByCustormerID(long custormerID)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("CustomerID", custormerID);
+
+            string sql = @"select UserID from AccountList where CustomerID=@CustomerID";
+            using (DpsConnection cnn = new DpsConnection(ConnectionString))
+            {
+                dt = cnn.CreateDataTable(sql, Conds);
+                var result = dt.AsEnumerable().Select(row => long.Parse(row["UserID"].ToString()));
+
+                return await Task.FromResult(result).ConfigureAwait(false);
+            }
+        }
+
+        public string GetUsernameByUserID(string UserID, long customerID)
+        {
+            using (DpsConnection cnn = new DpsConnection(ConnectionString))
+            {
+                string sql = $"select Username from AccountList where UserID = {UserID} and customerID = {customerID}";
+                var Username = cnn.ExecuteScalar(sql);
+                if (Username == null) return null;
+                return Username.ToString();
+            }
+        }
     }
 
     public class InsertAppListAccountModel

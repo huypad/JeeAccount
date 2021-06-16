@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JeeAccount.Controllers
@@ -72,8 +73,8 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpGet("GetCustormerIDByUserID")]
-        public async Task<ActionResult<long>> GetCustormerIDByUserID(long UserID)
+        [HttpGet("GetCustormerID")]
+        public async Task<ActionResult<long>> GetCustormerID(InputApiModel model)
         {
             try
             {
@@ -82,10 +83,22 @@ namespace JeeAccount.Controllers
                 {
                     return NotFound(MessageReturnHelper.CustomDataKhongTonTai());
                 }
-                var customerid = await accountManagementService.GetCustormerIDByUserID(UserID);
-                if (customerid == 0)
-                    return BadRequest(MessageReturnHelper.KhongTonTai("UserID"));
-                return Ok(customerid);
+
+                if (!string.IsNullOrEmpty(model.Username))
+                {
+                    var customerid = await accountManagementService.GetCustormerIDByUsername(model.Username);
+                    if (customerid != 0)
+                        return Ok(customerid);
+                }
+
+                if (!string.IsNullOrEmpty(model.Userid))
+                {
+                    var customerid = await accountManagementService.GetCustormerIDByUserID(long.Parse(model.Userid));
+                    if (customerid != 0)
+                        return Ok(customerid);
+                }
+
+                return BadRequest(MessageReturnHelper.KhongTonTai("UserID hoặc username"));
             }
             catch (Exception ex)
             {
@@ -150,8 +163,8 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpGet("GetInfoByUserID")]
-        public async Task<ActionResult<InfoUserDTO>> GetInfoByUserID(long userid)
+        [HttpGet("GetInfo")]
+        public async Task<ActionResult<InfoUserDTO>> GetInfo(InputApiModel model)
         {
             try
             {
@@ -160,8 +173,22 @@ namespace JeeAccount.Controllers
                 {
                     return NotFound(MessageReturnHelper.CustomDataKhongTonTai());
                 }
-                var infoUser = await accountManagementService.GetInfoByUserID(userid.ToString());
-                return infoUser is null ? BadRequest(MessageReturnHelper.KhongTonTai("UserID")) : Ok(infoUser);
+
+                if (!string.IsNullOrEmpty(model.Username))
+                {
+                    var infoUser = await accountManagementService.GetInfoByUsername(model.Username);
+                    if (infoUser != null)
+                        return Ok(infoUser);
+                }
+
+                if (!string.IsNullOrEmpty(model.Userid))
+                {
+                    var infoUser = await accountManagementService.GetInfoByUserID(model.Userid);
+                    if (infoUser != null)
+                        return Ok(infoUser);
+                }
+
+                return BadRequest(MessageReturnHelper.KhongTonTai("UserID hoặc username"));
             }
             catch (Exception ex)
             {
@@ -490,6 +517,127 @@ namespace JeeAccount.Controllers
             catch (Exception ex)
             {
                 return JsonResultCommon.Exception(ex);
+            }
+        }
+
+        [HttpGet("ListUsernameAndUserid")]
+        public async Task<IActionResult> ListUsernameAndUserid()
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+
+                var lstUsername = await accountManagementService.GetListJustUsernameAndUserIDByCustormerID(customData.JeeAccount.CustomerID);
+                if (lstUsername is not null)
+                {
+                    return Ok(lstUsername);
+                }
+
+                return BadRequest(MessageReturnHelper.KhongTonTai("CustomerID"));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpGet("ListUsername")]
+        public async Task<IActionResult> ListUsername()
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+
+                var lstUsername = await accountManagementService.GetListJustUsernameByCustormerID(customData.JeeAccount.CustomerID);
+                if (lstUsername is not null)
+                {
+                    return Ok(lstUsername);
+                }
+
+                return BadRequest(MessageReturnHelper.KhongTonTai("CustomerID"));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpGet("ListUserID")]
+        public async Task<IActionResult> ListUserID()
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+
+                var lstUsername = await accountManagementService.GetListJustUserIDByCustormerID(customData.JeeAccount.CustomerID);
+                if (lstUsername is not null)
+                {
+                    return Ok(lstUsername);
+                }
+
+                return BadRequest(MessageReturnHelper.KhongTonTai("CustomerID"));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpGet("UsernameOrUserID")]
+        public async Task<IActionResult> UsernameOrUserID(InputApiModel model)
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return NotFound(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+
+                if (!string.IsNullOrEmpty(model.Username) && !string.IsNullOrEmpty(model.Userid))
+                {
+                    {
+                        var result = await accountManagementService.GetListJustUsernameAndUserIDByCustormerID(customData.JeeAccount.CustomerID);
+                        var item = result.ToList().Where(ele => ele.Username.Equals(model.Username)).SingleOrDefault();
+                        if (item != null)
+                            return Ok(item);
+                        var item2 = result.ToList().Where(ele => ele.UserId == long.Parse(model.Userid)).SingleOrDefault();
+                        if (item2 != null)
+                            return Ok(item2);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(model.Username))
+                {
+                    var result = accountManagementService.GetUserIdByUsername(model.Username, customData.JeeAccount.CustomerID);
+                    if (result != 0)
+                        return Ok(result.ToString());
+                }
+
+                if (!string.IsNullOrEmpty(model.Userid))
+                {
+                    var result = accountManagementService.GetUsernameByUserID(model.Userid, customData.JeeAccount.CustomerID);
+                    if (!string.IsNullOrEmpty(result))
+                        return Ok(result);
+                }
+
+                return BadRequest(MessageReturnHelper.KhongTonTai("UserID hoặc username"));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
             }
         }
 
