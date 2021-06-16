@@ -18,5 +18,6 @@ namespace JeeAccount.Models.AccountManagement
         public string Username { get; set; }
         public override string StructureID { get; set; }
         public string ChucVuID { get; set; }
+        public string NgaySinh { get; set; }
     }
 }

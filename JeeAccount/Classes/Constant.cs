@@ -23,9 +23,8 @@ namespace JeeAccount.Classes
         public const string ERRORCODE_FORM = "104";                                         //lỗi về dữ liệu khi post thiếu dl
         public const string ERRORCODE_ROLE = "105";                                         //lỗi về quyền truy cập chức năng
         public const string ERRORCODE_EXCEPTION = "0000";                                   //EXCEPTION
-        public const string ERRORCODE_EXIST = "107";                                        //lỗi dữ liệu đã tồn tại 
+        public const string ERRORCODE_EXIST = "107";                                        //lỗi dữ liệu đã tồn tại
         public const string ERRORCODE_NOTEXIST = "108";                                     //lỗi dữ liệu không tồn tại
-
         public static string RootUpload { get { return "/Avatar/"; } }
         public static string RootUploadFile { get { return "/File/"; } }
         public static int MaxSize { get { return 30000000; } }//maximum file size 30MB
@@ -36,6 +35,7 @@ namespace JeeAccount.Classes
         //public const string ATTACHFILE_YKIEN_FOLDER = "dulieu/dinhkem/YKienXuLy";
 
         private static Random random = new Random(); // gen mật khẩu mặc định  (đang theo chuẩn của Viettel)
+
         public static string RandomString(int length)
         {
             string chars1 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -56,6 +56,7 @@ namespace JeeAccount.Classes
 
             return Str1 + Str2 + Str3 + Str4;
         }
+
         public static IConfigurationRoot getConfig()
         {
             IConfigurationBuilder builder = new ConfigurationBuilder();
@@ -63,8 +64,9 @@ namespace JeeAccount.Classes
             var root = builder.Build();
             return root;
         }
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="code">ex: JeeWorkConfig:HRConnectionString</param>
         /// <returns></returns>
@@ -77,11 +79,13 @@ namespace JeeAccount.Classes
             return value;
         }
     }
+
     public enum StateCode
     {
         NoPermit,
         CannotGetData
     }
+
     public static class ErrCode_Const
     {
         public static int SUCCESS = 0;
@@ -90,9 +94,10 @@ namespace JeeAccount.Classes
         public static int PROPERTY_IS_NULL_OR_EMPTY = 3;
 
         /// <summary>
-        /// Cannot find data form id 
+        /// Cannot find data form id
         /// </summary>
         public static int CANNOT_FIND_DATA_BY_QUERY = 4;
+
         public static int PROPERTY_IS_REQUIRED = 5;
         public static int PROPERTY_IS_INVALID = 6;
         public static int KEY_PROPS_NOT_FOUND = 7;
@@ -114,8 +119,8 @@ namespace JeeAccount.Classes
         public static int SQL_QUERY_CANNOT_PAGINATE = 24;
         public static int SQL_INSERT_FAILED = 25;
         public static int PROPERTY_IS_ENOUGH_COUT = 26;
-
     }
+
     public static class ErrMsg_Const
     {
         private static Dictionary<int, string> Dic_Error =
@@ -150,7 +155,7 @@ namespace JeeAccount.Classes
              };
 
         /// <summary>
-        /// Get error message from error 
+        /// Get error message from error
         /// </summary>
         /// <param name="pErrorCode">From ErrCode_Constant </param>
         /// <returns></returns>
@@ -167,7 +172,7 @@ namespace JeeAccount.Classes
         }
 
         /// <summary>
-        /// Get error msg with leghth of string 
+        /// Get error msg with leghth of string
         /// Example: error is asdasdasd asdasdas dasd asdiejforeng rgerogijeoijerf neroifnerofnsdv oijsdoisd
         /// We want to return a message with lenght is 50 character
         /// </summary>
@@ -186,6 +191,5 @@ namespace JeeAccount.Classes
                 return "Error_Message_Undefined";
             }
         }
-
     }
 }

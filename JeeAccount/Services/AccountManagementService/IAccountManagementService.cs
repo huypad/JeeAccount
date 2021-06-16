@@ -3,6 +3,7 @@ using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.Common;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace JeeAccount.Services.AccountManagementService
@@ -13,17 +14,21 @@ namespace JeeAccount.Services.AccountManagementService
 
         Task<long> GetCustormerIDByUsername(string username);
 
+        Task<long> GetCustormerIDByUserID(long username);
+
         Task<IEnumerable<InfoAdminDTO>> GetInfoAdminAccountByCustomerID(long customerID);
 
-        Task<InfoUserDTO> GetInfoByCustomerID(long customerID);
+        Task<InfoCustomerDTO> GetInfoByCustomerID(long customerID);
 
         Task<InfoUserDTO> GetInfoByUsername(string username);
 
-        Task<IEnumerable<AccUsernameModel>> GetListAdminsByCustomerID(long customerID);
+        Task<InfoUserDTO> GetInfoByUserID(string userid);
+
+        Task<IEnumerable<AdminModel>> GetListAdminsByCustomerID(long customerID);
 
         Task<IEnumerable<AppListDTO>> GetListAppByCustomerID(long customerID);
 
-        Task<IEnumerable<AccUsernameModel>> GetListUsernameByAppcode(long customerID, string appcode);
+        Task<IEnumerable<UserNameDTO>> GetListUsernameByAppcode(long customerID, string appcode);
 
         Task<IEnumerable<AccountManagementDTO>> GetListAccountManagement(long customerID);
 
@@ -51,10 +56,14 @@ namespace JeeAccount.Services.AccountManagementService
 
         Task<IEnumerable<AppListDTO>> GetListAppByUserID(long UserID);
 
+        Task<IEnumerable<CustomerAppDTO>> GetListCustomerAppByCustomerIDFromAccount(long CustomerID);
+
         List<int> GetAppIdByAppCode(DpsConnection cnn, List<string> AppCode);
 
         List<LoginAccountModel> GetListLogin();
 
         Task<ReturnSqlModel> UpdateTool();
+
+        Task<HttpResponseMessage> ResetPasswordRootCustomer(CustomerResetPasswordModel model);
     }
 }

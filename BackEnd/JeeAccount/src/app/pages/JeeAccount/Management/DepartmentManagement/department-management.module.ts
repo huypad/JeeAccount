@@ -35,7 +35,6 @@ const routes: Routes = [
   imports: [CommonModule, RouterModule.forChild(routes), JeeAccountModule, MatChipsModule, NgxMatSelectSearchModule, InlineSVGModule],
   providers: [
     DepartmentManagementService,
-    { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true, height: 'auto', width: '900px' } },
   ],
   entryComponents: [DepartmentManagementEditDialogComponent, DepartmentChangeTinhTrangEditDialogComponent],
   exports: [DepartmentManagementLístComponent],

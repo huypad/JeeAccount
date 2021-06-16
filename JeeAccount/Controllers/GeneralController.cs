@@ -87,7 +87,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("GetMatchipNhanvien")]
-        public BaseModel<object> GetMatchipNhanVien()
+        public object GetMatchipNhanVien()
         {
             try
             {
@@ -103,7 +103,7 @@ namespace JeeAccount.Controllers
                 string sql = "select UserID, Username, LastName + '' + FirstName as Fullname, LastName  + ' ' + FirstName + ' (' + Username + ')' as Display from AccountList " +
                     "where CustomerID =@CustomerID and (Disable != 1 or Disable is null)";
                 IEnumerable<NhanVienMatchip> data;
-                using (DpsConnection cnn = new DpsConnection(_config.GetConnectionString("DefaultConnection")))
+                using (DpsConnection cnn = new DpsConnection(_config.GetValue<string>("AppConfig:Connection")))
                 {
                     dt = cnn.CreateDataTable(sql, Conds);
                     data = dt.AsEnumerable().Select(row => new NhanVienMatchip
@@ -123,7 +123,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("GetSelectionDepartMent")]
-        public BaseModel<object> GetSelectionDepartMent()
+        public object GetSelectionDepartMent()
         {
             try
             {
@@ -139,7 +139,7 @@ namespace JeeAccount.Controllers
                 string sql = "select RowID, DepartmentName from DepartmentList " +
                     "where CustomerID =@CustomerID and (Disable != 1 or Disable is null)";
                 IEnumerable<DepartmentSelection> data;
-                using (DpsConnection cnn = new DpsConnection(_config.GetConnectionString("DefaultConnection")))
+                using (DpsConnection cnn = new DpsConnection(_config.GetValue<string>("AppConfig:Connection")))
                 {
                     dt = cnn.CreateDataTable(sql, Conds);
                     data = dt.AsEnumerable().Select(row => new DepartmentSelection

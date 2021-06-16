@@ -11,17 +11,17 @@ namespace JeeAccount.Controllers
 {
     public class IdentityServerController
     {
-        private readonly static string LINK_IDENTITY_SERVER = "https://identityserver.jee.vn";
-        private readonly static string LINK_LOGIN = LINK_IDENTITY_SERVER + "/user/login";
-        private readonly static string LINK_INFO_USER_LOGGED = LINK_IDENTITY_SERVER + "/user/me";
-        private readonly static string LINK_REFRESH_TOKEN = LINK_IDENTITY_SERVER + "/user/refresh";
-        private readonly static string LINK_LOGOUT = LINK_IDENTITY_SERVER + "/user/logout";
-        private readonly static string LINK_CHANGE_PASSWORD = LINK_IDENTITY_SERVER + "/user/changePassword";
-        private readonly static string LINK_ADD_NEWUSER = LINK_IDENTITY_SERVER + "/user/addnew";
-        private readonly static string LINK_ADD_NEWUSER_INTERNAL = LINK_IDENTITY_SERVER + "/user/addnew/internal";
-        private readonly static string LINK_UPDATE_CUSTOMDATA = LINK_IDENTITY_SERVER + "/user/updateCustomData";
-        private readonly static string LINK_UPDATE_CUSTOMDATASELF = LINK_IDENTITY_SERVER + "/user/updateCustomData/self";
-        private readonly static string LINK_CHANGE_USERSTATE = LINK_IDENTITY_SERVER + "/user/changeUserState";
+        private const string LINK_IDENTITY_SERVER = "https://identityserver.jee.vn";
+        private const string LINK_LOGIN = LINK_IDENTITY_SERVER + "/user/login";
+        private const string LINK_INFO_USER_LOGGED = LINK_IDENTITY_SERVER + "/user/me";
+        private const string LINK_REFRESH_TOKEN = LINK_IDENTITY_SERVER + "/user/refresh";
+        private const string LINK_LOGOUT = LINK_IDENTITY_SERVER + "/user/logout";
+        private const string LINK_CHANGE_PASSWORD = LINK_IDENTITY_SERVER + "/user/changePassword";
+        private const string LINK_ADD_NEWUSER = LINK_IDENTITY_SERVER + "/user/addnew";
+        private const string LINK_ADD_NEWUSER_INTERNAL = LINK_IDENTITY_SERVER + "/user/addnew/internal";
+        private const string LINK_UPDATE_CUSTOMDATA = LINK_IDENTITY_SERVER + "/user/updateCustomData";
+        private const string LINK_UPDATE_CUSTOMDATASELF = LINK_IDENTITY_SERVER + "/user/updateCustomData/self";
+        private const string LINK_CHANGE_USERSTATE = LINK_IDENTITY_SERVER + "/user/changeUserState";
 
         public async Task<AppAccount> loginUser(string username, string password)
         {
@@ -160,7 +160,7 @@ namespace JeeAccount.Controllers
             }
         }
 
-        public async Task<IdentityServerReturn> changePassword(IdentityServerChangePasswordModel identityServerChangePasswordModel)
+        public async Task<HttpResponseMessage> changePassword(IdentityServerChangePasswordModel identityServerChangePasswordModel)
         {
             string url = LINK_CHANGE_PASSWORD;
             var content = new IdentityServerChangePassword
@@ -177,16 +177,8 @@ namespace JeeAccount.Controllers
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(identityServerChangePasswordModel.USer_access_token);
 
                 var reponse = await client.PostAsync(url, httpContent);
-                if (reponse.StatusCode == System.Net.HttpStatusCode.Created)
-                {
-                    return new IdentityServerReturn();
-                }
-                else
-                {
-                    string returnValue = reponse.Content.ReadAsStringAsync().Result;
-                    var res = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
-                    return res;
-                }
+
+                return reponse;
             }
         }
 

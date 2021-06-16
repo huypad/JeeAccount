@@ -18,7 +18,7 @@ namespace JeeAccount.Reponsitories
 
         public WidgetDashBoardRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetValue<string>("AppConfig:Connection");
         }
 
         public async Task<IEnumerable<Widget>> GetAll()

@@ -16,7 +16,7 @@ import { QueryParamsModelNew } from '../../../_core/models/query-models/query-pa
 import { HttpUtilsService } from '../../../_core/utils/http-utils.service';
 import { ResultModel, ResultObjModel } from '../../../_core/models/_base.model';
 
-const API_PRODUCTS_URL = environment.ApiRoot + '/accountmanagement';
+const API_PRODUCTS_URL = environment.HOST_JEEACCOUNT_API + '/api/accountmanagement';
 
 @Injectable()
 export class AccountManagementService {

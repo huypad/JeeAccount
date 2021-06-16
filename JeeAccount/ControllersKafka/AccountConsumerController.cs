@@ -26,8 +26,7 @@ namespace JeeCustomer.ConsumerKafka
         public AccountConsumerController(IConfiguration config, IProducer producer, ILogger<AccountConsumerController> logger)
         {
             _config = config;
-            string group = _config.GetValue<string>("KafkaConfig:ProjectName") + _config.GetValue<string>("KafkaConsumer:ConsumerAddNewCustomer");
-            accountConsumer = new Consumer(_config, group);
+            accountConsumer = new Consumer(_config, _config.GetValue<string>("KafkaConfig:Consumer:JeeAccountGroup"));
             _producer = producer;
             _logger = logger;
         }
@@ -36,7 +35,7 @@ namespace JeeCustomer.ConsumerKafka
         {
             _ = Task.Run(() =>
             {
-                accountConsumer.SubscribeAsync(_config.GetValue<string>("KafkaConsumer:ConsumerAddNewCustomer"), GetValue);
+                accountConsumer.SubscribeAsync(_config.GetValue<string>("KafkaConfig:TopicConsume:JeeplatformInitializationAppupdate"), GetValue);
             }, cancellationToken);
             return Task.CompletedTask;
         }
@@ -51,29 +50,12 @@ namespace JeeCustomer.ConsumerKafka
             try
             {
                 var obj = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomData>(value);
-                if (obj == null)
-                {
-                    var d2 = new GeneralLog()
-                    {
-                        name = "jee-account",
-                        data = value,
-                        message = "jeeplatform.initialization.appupdate"
-                    };
-                    _logger.LogError(JsonConvert.SerializeObject(d2));
-                }
-                var d1 = new GeneralLog()
-                {
-                    name = "jee-account",
-                    data = value,
-                    message = "jeeplatform.initialization.appupdate"
-                };
-                _logger.LogTrace(JsonConvert.SerializeObject(d1));
 
                 var identity = new IdentityServerController();
-                string username = GetObjectDB($"select Username from AccountList where UserID = {obj.userId}", _config.GetConnectionString("DefaultConnection"));
+                string username = GetObjectDB($"select Username from AccountList where UserID = {obj.userId}", _config.GetValue<string>("AppConfig:Connection"));
                 if (!string.IsNullOrEmpty(username))
                 {
-                    var x = identity.UppdateCustomDataInternal(getSecretToken(), username, obj);
+                    var x = identity.UppdateCustomDataInternal(GetSecretToken(), username, obj);
                 }
             }
             catch (Exception ex)
@@ -82,13 +64,13 @@ namespace JeeCustomer.ConsumerKafka
                 {
                     name = "jee-account",
                     data = value,
-                    message = "jeeplatform.initialization.appupdate"
+                    message = $"jeeplatform.initialization.appupdate error {ex.Message}"
                 };
                 _logger.LogError(JsonConvert.SerializeObject(d2));
             }
         }
 
-        public string getSecretToken()
+        private string GetSecretToken()
         {
             var secret = _config.GetValue<string>("Jwt:internal_secret");
             var projectName = _config.GetValue<string>("KafkaConfig:ProjectName");
@@ -96,7 +78,7 @@ namespace JeeCustomer.ConsumerKafka
             return token;
         }
 
-        public string GetObjectDB(string sql, string connectionString)
+        private string GetObjectDB(string sql, string connectionString)
         {
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {

@@ -25,7 +25,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("GetListDepartment")]
-        public async Task<BaseModel<object>> GetListDepartment([FromQuery] QueryParams query)
+        public async Task<object> GetListDepartment([FromQuery] QueryParams query)
         {
             try
             {
@@ -45,7 +45,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpPost("CreateDepartment")]
-        public BaseModel<object> CreateDepartment(DepartmentModel depart)
+        public object CreateDepartment(DepartmentModel depart)
         {
             try
             {
@@ -75,14 +75,14 @@ namespace JeeAccount.Controllers
         }
 
         [HttpPost("ChangeTinhTrang")]
-        public Task<BaseModel<object>> changeTinhTrang(DepChangeTinhTrangModel acc)
+        public async Task<object> changeTinhTrang(DepChangeTinhTrangModel acc)
         {
             try
             {
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return Task.FromResult(JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData"));
+                    return await Task.FromResult(JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData"));
                 }
 
                 ReturnSqlModel update = departmentManagementService.ChangeTinhTrang(customData.JeeAccount.CustomerID, acc.RowID, acc.Note, customData.JeeAccount.UserID);
@@ -90,7 +90,7 @@ namespace JeeAccount.Controllers
                 {
                     if (update.ErrorCode.Equals(Constant.ERRORCODE_NOTEXIST))
                     {
-                        return Task.FromResult(JsonResultCommon.KhongTonTai("tài khoản"));
+                        return await Task.FromResult(JsonResultCommon.KhongTonTai("tài khoản"));
                     }
                     if (update.ErrorCode.Equals(Constant.ERRORCODE_EXCEPTION))
                     {
@@ -100,11 +100,11 @@ namespace JeeAccount.Controllers
                         return Task.FromResult(JsonResultCommon.ThatBai(update.ErrorMessgage));
                     }
                 }
-                return Task.FromResult(JsonResultCommon.ThanhCong(update));
+                return await Task.FromResult(JsonResultCommon.ThanhCong(update));
             }
             catch (Exception ex)
             {
-                return Task.FromResult(JsonResultCommon.Exception(ex));
+                return await Task.FromResult(JsonResultCommon.Exception(ex));
             }
         }
     }

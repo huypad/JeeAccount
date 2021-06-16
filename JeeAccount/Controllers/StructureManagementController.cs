@@ -24,7 +24,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("GetOrgStructure")]
-        public async Task<BaseModel<object>> GetOrgStructure([FromQuery] QueryParams query)
+        public async Task<object> GetOrgStructure([FromQuery] QueryParams query)
         {
             try
             {
@@ -44,7 +44,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("Sysn_Structure")]
-        public async Task<BaseModel<object>> Sysn_Structure(long CustomerID)
+        public async Task<object> Sysn_Structure(long CustomerID)
         {
             try
             {

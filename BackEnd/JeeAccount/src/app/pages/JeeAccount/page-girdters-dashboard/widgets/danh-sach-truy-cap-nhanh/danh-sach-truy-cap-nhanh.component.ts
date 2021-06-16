@@ -8,6 +8,8 @@ import { LayoutUtilsService, MessageType } from '../../../_core/utils/layout-uti
 import { QueryParamsModel } from '../../../_core/models/query-models/query-params.model';
 import { DanhMucChungService } from '../../../_core/services/danhmuc.service';
 import { PageGirdtersDashboardService } from '../../Services/page-girdters-dashboard.service';
+import { JeeCommentComponent } from '../../../_shared/jee-comment/jee-comment.component';
+
 @Component({
   selector: 'm-danh-sach-truy-cap-nhanh-widget',
   templateUrl: './danh-sach-truy-cap-nhanh.component.html',
@@ -26,10 +28,10 @@ export class DanhSachTruyCapNhanhWidgetComponent implements OnInit, OnDestroy {
     private changeDetectorRefs: ChangeDetectorRef,
     private danhmuc: DanhMucChungService,
     private pageGirdtersDashboardService: PageGirdtersDashboardService
-  ) {}
+  ) { }
 
   ngOnInit() {
-    this.resizeSub = this.resizeEvent.subscribe((widget) => {});
+    this.resizeSub = this.resizeEvent.subscribe((widget) => { });
 
     this.loadDataTruyCap();
   }

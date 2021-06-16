@@ -9,19 +9,9 @@ namespace JeeAccount.Models.AccountManagement
     {
         public string Code { get; set; }
         public string CompanyName { get; set; }
-        public string Adress { get; set; }
+        public string Address { get; set; }
         public string Phone { get; set; }
         public string TaxCode { get; set; }
         public string LogoImgURL { get; set; }
-
-        public InfoCustomerDTO(string code, string companyName, string adress, string phone, string taxCode, string logoImgURL)
-        {
-            Code = code;
-            CompanyName = companyName;
-            Adress = adress;
-            Phone = phone;
-            TaxCode = taxCode;
-            LogoImgURL = logoImgURL;
-        }
     }
 }

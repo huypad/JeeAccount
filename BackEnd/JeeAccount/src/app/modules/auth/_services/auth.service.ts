@@ -1,24 +1,18 @@
-import { Inject, Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, BehaviorSubject, of, Subscription } from 'rxjs';
-import { map, catchError, switchMap, finalize, tap } from 'rxjs/operators';
+import { map, finalize } from 'rxjs/operators';
 import { UserModel } from '../_models/user.model';
-import { AuthModel } from '../_models/auth.model';
 import { AuthHTTPService } from './auth-http';
 import { environment } from 'src/environments/environment';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TableService } from '../../../_metronic/shared/crud-table/services/table.service';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { DOCUMENT } from '@angular/common';
 import jwt_decode from 'jwt-decode';
-import { HttpUtilsService } from 'src/app/pages/JeeAccount/_core/utils/http-utils.service';
-import { error } from '@angular/compiler/src/util';
 import { AuthSSO } from '../_models/authSSO.model';
 
-const redirectUrl = environment.redirectUrl;
-const API_IDENTITY = `${environment.ApiIdentity}`;
-const API_IDENTITY_LOGOUT = `${environment.ApiIdentity_Logout}`;
-const API_IDENTITY_USER = `${environment.ApiIdentity_GetUser}`;
-const API_IDENTITY_REFESHTOKEN = `${environment.ApiIdentity_Refresh}`;
+const redirectUrl = environment.HOST_PORTAL_API + '/?redirectUrl=';
+const API_IDENTITY = `${environment.HOST_IDENTITYSERVER_API}`;
+const API_IDENTITY_LOGOUT = `${API_IDENTITY}/user/logout`;
+const API_IDENTITY_USER = `${API_IDENTITY}/user/me`;
+const API_IDENTITY_REFESHTOKEN = `${API_IDENTITY}/refresh`;
 @Injectable({
   providedIn: 'root',
 })

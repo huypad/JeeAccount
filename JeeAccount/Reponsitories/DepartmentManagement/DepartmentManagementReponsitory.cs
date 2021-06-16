@@ -18,7 +18,7 @@ namespace JeeAccount.Reponsitories
 
         public DepartmentManagementReponsitory(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetValue<string>("AppConfig:Connection");
         }
 
         public async Task<IEnumerable<DepartmentDTO>> GetListDepartment(long custormerID)

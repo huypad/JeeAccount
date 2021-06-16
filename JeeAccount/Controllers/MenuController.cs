@@ -22,12 +22,14 @@ namespace JeeAccount.Controllers
     public class MenuController : ControllerBase
     {
         private readonly IConfiguration _config;
+
         public MenuController(IConfiguration configuration)
         {
             _config = configuration;
         }
 
         #region Load menu
+
         /// <summary>
         /// Load menu
         /// </summary>
@@ -56,9 +58,9 @@ namespace JeeAccount.Controllers
                 }
                 //select menu
                 sql = $@"select title, Target, Summary, '#' as ALink, ISNULL(Icon, 'flaticon-interface-7') as Icon, '' as title_, position, Code
-                from Mainmenu where code in (select distinct groupname from Tbl_submenu where  Id_row in ({id_menu})) order by position 
+                from Mainmenu where code in (select distinct groupname from Tbl_submenu where  Id_row in ({id_menu})) order by position
                 select title, AllowPermit, Target, Tbl_submenu.id_row, PhanLoai1, PhanLoai2, GroupName, ALink, Summary, AppLink, AppIcon, '' as title_ from Tbl_submenu  where id_row in ({id_menu}) order by position";
-                using (DpsConnection cnn = new DpsConnection(_config.GetConnectionString("DefaultConnection")))
+                using (DpsConnection cnn = new DpsConnection(_config.GetValue<string>("AppConfig:Connection")))
                 {
                     ds = cnn.CreateDataSet(sql);
                     if (ds.Tables.Count == 0) return JsonResultCommon.ThatBai("Không có dữ liệu", cnn.LastError);
@@ -96,6 +98,7 @@ namespace JeeAccount.Controllers
                 return JsonResultCommon.Exception(ex);
             }
         }
-        #endregion
+
+        #endregion Load menu
     }
 }

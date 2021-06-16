@@ -3,11 +3,11 @@ using System;
 
 namespace JeeAccount.Classes
 {
-    public class JsonResultCommon
+    public static class JsonResultCommon
     {
-        public static BaseModel<object> KhongTonTai(string name = "")
+        public static object KhongTonTai(string name = "")
         {
-            return new BaseModel<object>
+            return new
             {
                 status = 0,
                 error = new ErrorModel()
@@ -18,9 +18,9 @@ namespace JeeAccount.Classes
             };
         }
 
-        public static BaseModel<object> Trung(string name)
+        public static object Trung(string name)
         {
-            return new BaseModel<object>
+            return new
             {
                 status = 0,
                 error = new ErrorModel()
@@ -31,11 +31,11 @@ namespace JeeAccount.Classes
             };
         }
 
-        public static BaseModel<object> BatBuoc(string str_required)
+        public static object BatBuoc(string str_required)
         {
             if (!string.IsNullOrEmpty(str_required))
                 str_required = str_required.ToLower();
-            return new BaseModel<object>()
+            return new
             {
                 status = 0,
                 error = new ErrorModel()
@@ -46,9 +46,9 @@ namespace JeeAccount.Classes
             };
         }
 
-        public static BaseModel<object> Custom(string str_custom)
+        public static object Custom(string str_custom)
         {
-            return new BaseModel<object>()
+            return new
             {
                 status = 0,
                 error = new ErrorModel()
@@ -59,9 +59,9 @@ namespace JeeAccount.Classes
             };
         }
 
-        public static BaseModel<object> PhanQuyen(string quyen = "")
+        public static object PhanQuyen(string quyen = "")
         {
-            return new BaseModel<object>()
+            return new
             {
                 status = 0,
                 error = new ErrorModel()
@@ -72,9 +72,9 @@ namespace JeeAccount.Classes
             };
         }
 
-        public static BaseModel<object> DangNhap()
+        public static object DangNhap()
         {
-            return new BaseModel<object>
+            return new
             {
                 status = 0,
                 error = new ErrorModel()
@@ -85,9 +85,9 @@ namespace JeeAccount.Classes
             };
         }
 
-        public static BaseModel<object> Exception(Exception last_error)
+        public static object Exception(Exception last_error)
         {
-            return new BaseModel<object>()
+            return new
             {
                 status = 0,
                 error = new ErrorModel()
@@ -99,9 +99,9 @@ namespace JeeAccount.Classes
             };
         }
 
-        public static BaseModel<object> PhanTrang()
+        public static object PhanTrang()
         {
-            return new BaseModel<object>()
+            return new
             {
                 status = 0,
                 error = new ErrorModel()
@@ -112,26 +112,26 @@ namespace JeeAccount.Classes
             };
         }
 
-        public static BaseModel<object> ThanhCong()
+        public static object ThanhCong()
         {
-            return new BaseModel<object>
+            return new
             {
                 status = 1,
             };
         }
 
-        public static BaseModel<object> ThanhCong(object data)
+        public static object ThanhCong(object data)
         {
-            return new BaseModel<object>
+            return new
             {
                 status = 1,
                 data = data
             };
         }
 
-        public static BaseModel<object> ThanhCong(object data, PageModel pageModel)
+        public static object ThanhCong(object data, PageModel pageModel)
         {
-            return new BaseModel<object>
+            return new
             {
                 status = 1,
                 data = data,
@@ -139,9 +139,9 @@ namespace JeeAccount.Classes
             };
         }
 
-        public static BaseModel<object> ThanhCong(object data, PageModel pageModel, bool Visible)
+        public static object ThanhCong(object data, PageModel pageModel, bool Visible)
         {
-            return new BaseModel<object>
+            return new
             {
                 status = 1,
                 data = data,
@@ -150,9 +150,9 @@ namespace JeeAccount.Classes
             };
         }
 
-        public static BaseModel<object> ThatBai(string message, Exception last_error)
+        public static object ThatBai(string message, Exception last_error)
         {
-            return new BaseModel<object>()
+            return new
             {
                 status = 0,
                 error = new ErrorModel()
@@ -164,9 +164,9 @@ namespace JeeAccount.Classes
             };
         }
 
-        public static BaseModel<object> ThatBai(string message)
+        public static object ThatBai(string message)
         {
-            return new BaseModel<object>()
+            return new
             {
                 status = 0,
                 error = new ErrorModel()
@@ -177,9 +177,9 @@ namespace JeeAccount.Classes
             };
         }
 
-        public static BaseModel<object> ThatBai(string message, bool Visible)
+        public static object ThatBai(string message, bool Visible)
         {
-            return new BaseModel<object>()
+            return new
             {
                 status = 0,
                 error = new ErrorModel()
@@ -191,9 +191,9 @@ namespace JeeAccount.Classes
             };
         }
 
-        public static BaseModel<object> KhongHopLe(string name = "")
+        public static object KhongHopLe(string name = "")
         {
-            return new BaseModel<object>
+            return new
             {
                 status = 0,
                 error = new ErrorModel()
@@ -204,15 +204,15 @@ namespace JeeAccount.Classes
             };
         }
 
-        public static BaseModel<object> SQL(string last_error)
+        public static object SQL(string last_error)
         {
-            return new BaseModel<object>()
+            return new
             {
                 status = 0,
                 error = new ErrorModel()
                 {
                     message = "Có gì đó không đúng, vui lòng thử lại sau",
-                    //error = last_error,
+                    LastError = last_error != null ? last_error : "",
                     code = Constant.ERRORCODE_SQL
                 }
             };

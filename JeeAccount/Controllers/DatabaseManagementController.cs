@@ -25,7 +25,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpPost("GetDSDB")]
-        public BaseModel<object> GetListDSByCustomerIDAppCode([FromBody] DBTokenModel dBTokenModel)
+        public object GetListDSByCustomerIDAppCode([FromBody] DBTokenModel dBTokenModel)
         {
             try
             {

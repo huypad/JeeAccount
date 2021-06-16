@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace JeeAccount.Reponsitories.CustomerManagement
 {
@@ -18,7 +19,7 @@ namespace JeeAccount.Reponsitories.CustomerManagement
 
         public CustomerManagementReponsitory(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetValue<string>("AppConfig:Connection");
         }
 
         public List<string> AppCodes(DpsConnection cnn, long CustomerID)
@@ -209,6 +210,93 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
                     RowID = Int32.Parse(row["RowID"].ToString()),
                     Status = Int32.Parse(row["Status"].ToString()),
                 });
+            }
+        }
+
+        public async Task<ReturnSqlModel> UpdateCustomerAppAddNumberStaff(CustomerAppAddNumberStaffModel model)
+        {
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                cnn.BeginTransaction();
+
+                foreach (var item in model.LstCustomerAppDTO)
+                {
+                    var res = UpdateCustomerAppAddNumberStaffByCustomerIDAppID(item.CustomerID, item.AppID, item.SoLuongNhanSu, cnn);
+                    if (!res.Susscess)
+                    {
+                        cnn.RollbackTransaction();
+                        cnn.EndTransaction();
+                        await Task.FromResult(res);
+                    }
+                }
+                cnn.EndTransaction();
+                return await Task.FromResult(new ReturnSqlModel());
+            }
+        }
+
+        private ReturnSqlModel UpdateCustomerAppAddNumberStaffByCustomerIDAppID(long CustomerID, long AppID, int numberSoLuong, DpsConnection cnn)
+        {
+            Hashtable val = new Hashtable();
+            SqlConditions conds = new SqlConditions();
+            try
+            {
+                conds.Add("CustomerID", CustomerID);
+                conds.Add("AppID", AppID);
+
+                val.Add("SoLuongNhanSu", numberSoLuong);
+
+                int x = cnn.Update(val, conds, "Customer_App");
+                if (x <= 0)
+                {
+                    return new ReturnSqlModel(cnn.LastError.ToString(), Constant.ERRORCODE_SQL);
+                }
+                return new ReturnSqlModel();
+            }
+            catch (Exception ex)
+            {
+                return new ReturnSqlModel(ex.Message, Constant.ERRORCODE_EXCEPTION);
+            }
+        }
+
+        public async Task<ReturnSqlModel> UpdateCustomerAppGiaHanModelCnn(CustomerAppGiaHanModel model, DpsConnection cnn)
+        {
+            cnn.BeginTransaction();
+            foreach (var app in model.LstAppCustomerID)
+            {
+                var updateApp = this.UpdateEndDateAppByCustomerIDAppID(model.CustomerID, app, model.EndDate, cnn);
+                if (!updateApp.Susscess)
+                {
+                    cnn.RollbackTransaction();
+                    cnn.EndTransaction();
+                    await Task.FromResult(updateApp);
+                }
+            }
+            cnn.EndTransaction();
+            return await Task.FromResult(new ReturnSqlModel());
+        }
+
+        private ReturnSqlModel UpdateEndDateAppByCustomerIDAppID(long CustomerID, long AppID, string EndDate, DpsConnection cnn)
+        {
+            Hashtable val = new Hashtable();
+            SqlConditions conds = new SqlConditions();
+            try
+            {
+                DateTime date = DateTime.ParseExact(EndDate, "dd/MM/yyyy", null);
+
+                conds.Add("CustomerID", CustomerID);
+                conds.Add("AppID", AppID);
+
+                val.Add("EndDate", date);
+                int x = cnn.Update(val, conds, "Customer_App");
+                if (x <= 0)
+                {
+                    return new ReturnSqlModel(cnn.LastError.ToString(), Constant.ERRORCODE_SQL);
+                }
+                return new ReturnSqlModel();
+            }
+            catch (Exception ex)
+            {
+                return new ReturnSqlModel(ex.Message, Constant.ERRORCODE_EXCEPTION);
             }
         }
     }

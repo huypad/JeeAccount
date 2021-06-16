@@ -12,7 +12,7 @@ namespace JeeAccount.Reponsitories.Mail
 
         public MailReponsitory(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetValue<string>("AppConfig:Connection");
         }
 
         public MailModel InitialData(string CustemerID)

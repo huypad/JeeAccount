@@ -6,7 +6,7 @@ import { DepartmentModel, DepChangeTinhTrangModel } from '../Model/department-ma
 import { environment } from 'src/environments/environment';
 import { HttpUtilsService } from '../../../_core/utils/http-utils.service';
 
-const API_PRODUCTS_URL = environment.ApiRoot + '/accountdepartmentmanagement';
+const API_PRODUCTS_URL = environment.HOST_JEEACCOUNT_API + '/api/accountdepartmentmanagement';
 
 @Injectable()
 export class DepartmentManagementService {
@@ -31,6 +31,7 @@ export class DepartmentManagementService {
   changeTinhTrang(acc: DepChangeTinhTrangModel): Observable<any> {
     const httpHeaders = this.httpUtils.getHTTPHeaders();
     const url = API_PRODUCTS_URL + `/ChangeTinhTrang`;
+
     return this.http.post<any>(url, acc, {
       headers: httpHeaders,
     });

@@ -8,6 +8,7 @@ using JeeAccount.Reponsitories;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace JeeAccount.Services.AccountManagementService
@@ -22,7 +23,7 @@ namespace JeeAccount.Services.AccountManagementService
         {
             this.accountManagementReponsitory = accountManagementReponsitory;
             this.identityServerController = new IdentityServerController();
-            ConnectionString = configuration.GetConnectionString("DefaultConnection");
+            ConnectionString = configuration.GetValue<string>("AppConfig:Connection");
         }
 
         public Task<IEnumerable<AccUsernameModel>> GetListUsernameByCustormerID(long customerID)
@@ -43,7 +44,7 @@ namespace JeeAccount.Services.AccountManagementService
             return listAccount;
         }
 
-        public Task<InfoUserDTO> GetInfoByCustomerID(long customerID)
+        public Task<InfoCustomerDTO> GetInfoByCustomerID(long customerID)
         {
             var user = accountManagementReponsitory.GetInfoByCustomerID(customerID);
             return user;
@@ -55,7 +56,7 @@ namespace JeeAccount.Services.AccountManagementService
             return user;
         }
 
-        public Task<IEnumerable<AccUsernameModel>> GetListAdminsByCustomerID(long customerID)
+        public Task<IEnumerable<AdminModel>> GetListAdminsByCustomerID(long customerID)
         {
             var admins = accountManagementReponsitory.GetListAdminsByCustomerID(customerID);
             return admins;
@@ -67,7 +68,7 @@ namespace JeeAccount.Services.AccountManagementService
             return appList;
         }
 
-        public Task<IEnumerable<AccUsernameModel>> GetListUsernameByAppcode(long customerID, string appcode)
+        public Task<IEnumerable<UserNameDTO>> GetListUsernameByAppcode(long customerID, string appcode)
         {
             var accUser = accountManagementReponsitory.GetListUsernameByAppcode(customerID, appcode);
             return accUser;
@@ -366,6 +367,30 @@ namespace JeeAccount.Services.AccountManagementService
                     return new ReturnSqlModel(listAccountempy, "0");
                 }
             }
+        }
+
+        public async Task<IEnumerable<CustomerAppDTO>> GetListCustomerAppByCustomerIDFromAccount(long CustomerID)
+        {
+            return await accountManagementReponsitory.GetListCustomerAppByCustomerIDFromAccount(CustomerID);
+        }
+
+        public Task<HttpResponseMessage> ResetPasswordRootCustomer(CustomerResetPasswordModel model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<long> GetCustormerIDByUserID(long UserID)
+        {
+            var customerID = await accountManagementReponsitory.GetCustormerIDByUserID(UserID);
+            return customerID;
+        }
+
+        public async Task<InfoUserDTO> GetInfoByUserID(string userid)
+        {
+            var username = GeneralService.GetUsernameByUserID(ConnectionString, userid);
+            if (username == null) return null;
+            var data = await accountManagementReponsitory.GetInfoByUsername(username.ToString());
+            return data;
         }
     }
 

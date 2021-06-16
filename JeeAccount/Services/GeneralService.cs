@@ -1,8 +1,10 @@
-﻿using JeeAccount.Classes;
+﻿using DpsLibs.Data;
+using JeeAccount.Classes;
 using JeeAccount.Models;
 using JeeAccount.Models.Common;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 
@@ -133,11 +135,69 @@ namespace JeeAccount.Services
 
         private static Random random = new Random();
 
+        public static bool IsExistCnn(string sql, DpsConnection cnn)
+        {
+            DataTable dt = new DataTable();
+            dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count == 0) return false;
+            return true;
+        }
+
+        public static bool IsExistCnn(string sql, DpsConnection cnn, SqlConditions conds)
+        {
+            DataTable dt = new DataTable();
+            dt = cnn.CreateDataTable(sql, conds);
+            if (dt.Rows.Count == 0) return false;
+            return true;
+        }
+
         public static string RandomString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghjklmnoprstuwxyz@!@!@!";
             return new string(Enumerable.Repeat(chars, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public static object GetUsernameByUserIDCnn(DpsConnection cnn, string UserID)
+        {
+            string sql = $"select username from AccountList where UserID = {UserID}";
+            DataTable dt = new DataTable();
+            dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count == 0) return null;
+            return dt.Rows[0][0].ToString();
+        }
+
+        public static object GetUsernameByUserID(string connectionString, string UserID)
+        {
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                string sql = $"select username from AccountList where UserID = {UserID}";
+                DataTable dt = new DataTable();
+                dt = cnn.CreateDataTable(sql);
+                if (dt.Rows.Count == 0) return null;
+                return dt.Rows[0][0].ToString();
+            }
+        }
+
+        public static object GetUserIDByUsernameCnn(DpsConnection cnn, string Username)
+        {
+            string sql = $"select username from AccountList where Username = '{Username}'";
+            DataTable dt = new DataTable();
+            dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count == 0) return null;
+            return Int32.Parse(dt.Rows[0][0].ToString());
+        }
+
+        public static object GetUserIDByUsername(string connectionString, string Username)
+        {
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                string sql = $"select username from AccountList where Username = '{Username}'";
+                DataTable dt = new DataTable();
+                dt = cnn.CreateDataTable(sql);
+                if (dt.Rows.Count == 0) return null;
+                return Int32.Parse(dt.Rows[0][0].ToString());
+            }
         }
     }
 }

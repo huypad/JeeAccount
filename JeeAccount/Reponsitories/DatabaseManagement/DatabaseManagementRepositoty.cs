@@ -15,7 +15,7 @@ namespace JeeAccount.Reponsitories.DatabaseManagement
 
         public DatabaseManagementRepositoty(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetValue<string>("AppConfig:Connection");
         }
 
         public DatabaseListDTO GetDBByCustomerIDAppCode(long customerID, string appCode)

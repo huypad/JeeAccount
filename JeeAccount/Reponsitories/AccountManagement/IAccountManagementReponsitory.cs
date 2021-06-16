@@ -11,19 +11,23 @@ namespace JeeAccount.Reponsitories
     {
         Task<IEnumerable<AccUsernameModel>> GetListUsernameByCustormerID(long custormerID);
 
-        Task<IEnumerable<AccUsernameModel>> GetListUsernameByAppcode(long custormerID, string appcode);
+        Task<IEnumerable<UserNameDTO>> GetListUsernameByAppcode(long custormerID, string appcode);
 
-        Task<IEnumerable<AccUsernameModel>> GetListAdminsByCustomerID(long customerID);
+        Task<IEnumerable<AdminModel>> GetListAdminsByCustomerID(long customerID);
 
         Task<long> GetCustormerIDByUsername(string username);
 
+        Task<long> GetCustormerIDByUserID(long UserID);
+
         Task<InfoUserDTO> GetInfoByUsername(string username);
 
-        Task<InfoUserDTO> GetInfoByCustomerID(long customerID);
+        Task<InfoCustomerDTO> GetInfoByCustomerID(long customerID);
 
         Task<IEnumerable<AppListDTO>> GetListAppByCustomerID(long customerID);
 
         Task<IEnumerable<AppListDTO>> GetListAppByUserID(long UserID);
+
+        Task<IEnumerable<AppListDTO>> GetListInfoAppByCustomerID(long customerID);
 
         Task<IEnumerable<InfoAdminDTO>> GetInfoAdminAccountByCustomerID(long customerID);
 
@@ -58,5 +62,7 @@ namespace JeeAccount.Reponsitories
         List<int> GetAppIdByAppCode(DpsConnection cnn, List<string> AppCode);
 
         List<LoginAccountModel> GetListLogin(DpsConnection cnn);
+
+        Task<IEnumerable<CustomerAppDTO>> GetListCustomerAppByCustomerIDFromAccount(long customerID);
     }
 }

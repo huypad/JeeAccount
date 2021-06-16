@@ -19,16 +19,14 @@ namespace JeeAccount.Controllers
     public class CustomerManagementController : ControllerBase
     {
         private IConfiguration _config;
-        private IProducer _producer;
         private ICustomerManagementService _service;
-        public string TopicAddNewCustomer;
+        private readonly string _JeeCustomerSecrectkey;
 
-        public CustomerManagementController(IConfiguration configuration, IProducer producer, ICustomerManagementService customerManagementService)
+        public CustomerManagementController(IConfiguration configuration, ICustomerManagementService customerManagementService)
         {
             _config = configuration;
             _service = customerManagementService;
-            _producer = producer;
-            TopicAddNewCustomer = _config.GetValue<string>("KafkaTopic:TopicAddNewCustomer");
+            _JeeCustomerSecrectkey = configuration.GetValue<string>("AppConfig:Secrectkey:JeeCustomer");
         }
 
         [HttpPost("Get_DSCustomer")]
@@ -37,7 +35,7 @@ namespace JeeAccount.Controllers
             try
             {
                 query = query == null ? new QueryRequestParams() : query;
-                BaseModel<object> model = new BaseModel<object>();
+                object model = new object();
                 PageModel pageModel = new PageModel();
                 ErrorModel error = new ErrorModel();
                 string orderByStr = "RowID asc";
@@ -51,7 +49,7 @@ namespace JeeAccount.Controllers
                 {
                     if (!string.IsNullOrEmpty(query.Sort.ColumnName) && filter.ContainsKey(query.Sort.ColumnName))
                     {
-                        orderByStr = filter[query.Sort.ColumnName] + " " + (query.Sort.Direction.ToLower().Equals("asc") ? "asc" : "desc");
+                        orderByStr = filter[query.Sort.ColumnName] + " " + (query.Sort.Direction.Equals("asc", StringComparison.OrdinalIgnoreCase) ? "asc" : "desc");
                     }
                 }
                 var customerlist = _service.GetListCustomer(whereStr, orderByStr);
@@ -73,7 +71,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("GetListApp")]
-        public BaseModel<object> GetListApp()
+        public object GetListApp()
         {
             try
             {
@@ -87,6 +85,8 @@ namespace JeeAccount.Controllers
             }
         }
 
+        #region api for customer
+
         [HttpPost("CreateCustomer")]
         public async Task<IActionResult> CreateCustomer([FromBody] CustomerModel model)
         {
@@ -94,11 +94,12 @@ namespace JeeAccount.Controllers
             {
                 var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
                 if (token is null) return NotFound("Secrectkey");
+                if (!token.Equals(_JeeCustomerSecrectkey)) return NotFound("Secrectkey Không hợp lệ");
 
                 var create = await _service.CreateCustomer(model);
                 if (create.statusCode == 0)
                 {
-                    return Ok(token);
+                    return Ok(create);
                 }
                 else
                 {
@@ -110,5 +111,50 @@ namespace JeeAccount.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost("UpdateCustomerAppGiaHanModel")]
+        public async Task<IActionResult> UpdateCustomerAppGiaHanModel([FromBody] CustomerAppGiaHanModel model)
+        {
+            try
+            {
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null) return NotFound("Secrectkey");
+                if (!token.Equals(_JeeCustomerSecrectkey)) return NotFound("Secrectkey Không hợp lệ");
+
+                var create = await _service.UpdateCustomerAppGiaHanModel(model);
+                if (create.Susscess)
+                {
+                    return Ok(token);
+                }
+                else
+                {
+                    return BadRequest(create.ErrorMessgage);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("UpdateCustomerAppAddNumberStaff")]
+        public async Task<IActionResult> UpdateCustomerAppAddNumberStaff(CustomerAppAddNumberStaffModel model)
+        {
+            try
+            {
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null) return NotFound("Secrectkey");
+                if (!token.Equals(_JeeCustomerSecrectkey)) return NotFound("Secrectkey Không hợp lệ");
+
+                var create = await _service.UpdateCustomerAppAddNumberStaff(model);
+                return Ok(create);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        #endregion api for customer
     }
 }

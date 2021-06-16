@@ -14,6 +14,6 @@ export class MenuServices {
 
   layMenuChucNang(): Observable<QueryResultsModel> {
     const httpHeaders = this.httpUtils.getHTTPHeaders();
-    return this.http.get<any>(environment.ApiRoot + `/menu/LayMenuChucNang`, { headers: httpHeaders });
+    return this.http.get<any>(environment.HOST_JEEACCOUNT_API + `/api/menu/LayMenuChucNang`, { headers: httpHeaders });
   }
 }

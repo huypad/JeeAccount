@@ -3,6 +3,7 @@ using JeeAccount.Classes;
 using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.Common;
+using JeeAccount.Models.CustomerManagement;
 using JeeAccount.Services;
 using JeeAccount.Services.AccountManagementService;
 using Microsoft.AspNetCore.Cors;
@@ -19,17 +20,18 @@ namespace JeeAccount.Controllers
     public class AccountManagementController : ControllerBase
     {
         private IConfiguration _config;
-        private IProducer _producer;
         private IAccountManagementService accountManagementService;
+        private readonly string _JeeCustomerSecrectkey;
 
         public AccountManagementController(IConfiguration configuration, IAccountManagementService accountManagementService)
         {
             _config = configuration;
             this.accountManagementService = accountManagementService;
+            _JeeCustomerSecrectkey = configuration.GetValue<string>("AppConfig:Secrectkey:JeeCustomer");
         }
 
         [HttpGet("usernamesByCustermerID")]
-        public async Task<BaseModel<object>> GetListUsernameByCustormerID()
+        public async Task<object> GetListUsernameByCustormerID()
         {
             try
             {
@@ -50,7 +52,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("GetCustormerIDByUsername/username={username}")]
-        public async Task<BaseModel<object>> GetCustormerIDByUsername(string username)
+        public async Task<object> GetCustormerIDByUsername(string username)
         {
             try
             {
@@ -70,8 +72,29 @@ namespace JeeAccount.Controllers
             }
         }
 
+        [HttpGet("GetCustormerIDByUserID")]
+        public async Task<ActionResult<long>> GetCustormerIDByUserID(long UserID)
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return NotFound(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+                var customerid = await accountManagementService.GetCustormerIDByUserID(UserID);
+                if (customerid == 0)
+                    return BadRequest(MessageReturnHelper.KhongTonTai("UserID"));
+                return Ok(customerid);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
         [HttpGet("GetInfoAdminAccountByCustomerID")]
-        public async Task<BaseModel<object>> GetInfoAdminAccountByCustomerID()
+        public async Task<object> GetInfoAdminAccountByCustomerID()
         {
             try
             {
@@ -90,7 +113,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("GetInfoByCustomerID")]
-        public async Task<BaseModel<object>> GetInfoByCustomerID()
+        public async Task<object> GetInfoByCustomerID()
         {
             try
             {
@@ -100,7 +123,7 @@ namespace JeeAccount.Controllers
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
                 var infoUser = await accountManagementService.GetInfoByCustomerID(customData.JeeAccount.CustomerID);
-                return infoUser.Name is null ? JsonResultCommon.KhongTonTai("CustomerID") : JsonResultCommon.ThanhCong(infoUser);
+                return infoUser is null ? JsonResultCommon.KhongTonTai("CustomerID") : JsonResultCommon.ThanhCong(infoUser);
             }
             catch (Exception ex)
             {
@@ -109,7 +132,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("GetInfoByUsername/username={username}")]
-        public async Task<BaseModel<object>> GetInfoByUsername(string username)
+        public async Task<object> GetInfoByUsername(string username)
         {
             try
             {
@@ -119,7 +142,7 @@ namespace JeeAccount.Controllers
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
                 var infoUser = await accountManagementService.GetInfoByUsername(username);
-                return infoUser.Name is null ? JsonResultCommon.KhongTonTai("CustomerID") : JsonResultCommon.ThanhCong(infoUser);
+                return infoUser is null ? JsonResultCommon.KhongTonTai("username") : JsonResultCommon.ThanhCong(infoUser);
             }
             catch (Exception ex)
             {
@@ -127,8 +150,27 @@ namespace JeeAccount.Controllers
             }
         }
 
+        [HttpGet("GetInfoByUserID")]
+        public async Task<ActionResult<InfoUserDTO>> GetInfoByUserID(long userid)
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return NotFound(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+                var infoUser = await accountManagementService.GetInfoByUserID(userid.ToString());
+                return infoUser is null ? BadRequest(MessageReturnHelper.KhongTonTai("UserID")) : Ok(infoUser);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
         [HttpGet("GetListAdminsByCustomerID")]
-        public async Task<BaseModel<object>> GetListAdminsByCustomerID()
+        public async Task<object> GetListAdminsByCustomerID()
         {
             try
             {
@@ -147,7 +189,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("GetListAppByCustomerID")]
-        public async Task<BaseModel<object>> GetListAppByCustomerID()
+        public async Task<object> GetListAppByCustomerID()
         {
             try
             {
@@ -166,7 +208,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("GetListAppByUserID")]
-        public async Task<BaseModel<object>> GetListAppByUserID(long UserID)
+        public async Task<object> GetListAppByUserID(long UserID)
         {
             try
             {
@@ -186,7 +228,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("GetListUsernameByAppcode/appcode={appcode}")]
-        public async Task<BaseModel<object>> GetListUsernameByAppcode(string appcode)
+        public async Task<object> GetListUsernameByAppcode(string appcode)
         {
             try
             {
@@ -206,7 +248,7 @@ namespace JeeAccount.Controllers
 
         [Route("GetListAccountManagement")]
         [HttpGet]
-        public async Task<BaseModel<object>> GetListAccountManagement([FromQuery] QueryParams query)
+        public async Task<object> GetListAccountManagement([FromQuery] QueryParams query)
         {
             try
             {
@@ -225,7 +267,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpPost("ChangeTinhTrang")]
-        public async Task<BaseModel<object>> changeTinhTrang(AccChangeTinhTrangModel acc)
+        public async Task<object> changeTinhTrang(AccChangeTinhTrangModel acc)
         {
             try
             {
@@ -259,7 +301,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpPost("createAccount")]
-        public async Task<BaseModel<object>> CreateAccount(AccountManagementModel account)
+        public async Task<object> CreateAccount(AccountManagementModel account)
         {
             try
             {
@@ -286,7 +328,7 @@ namespace JeeAccount.Controllers
         #region api public bên ngoài
 
         [HttpPost("UppdatePersonalInfo")]
-        public async Task<BaseModel<object>> UppdatePersonalInfo(PersonalInfoCustomData personalInfoCustom, long UserID)
+        public async Task<object> UppdatePersonalInfo(PersonalInfoCustomData personalInfoCustom, long UserID)
         {
             try
             {
@@ -310,7 +352,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpPost("UppdateCustomData")]
-        public async Task<BaseModel<object>> UppdateCustomData(ObjCustomData objCustomData)
+        public async Task<object> UppdateCustomData(ObjCustomData objCustomData)
         {
             try
             {
@@ -336,7 +378,7 @@ namespace JeeAccount.Controllers
         #endregion api public bên ngoài
 
         [HttpPost("UpdateAvatar")]
-        public BaseModel<object> UpdateAvatar(PostImgModel img)
+        public object UpdateAvatar(PostImgModel img)
         {
             try
             {
@@ -356,7 +398,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpPost("UpdateAvatarWithChangeUrlAvatar")]
-        public async Task<BaseModel<object>> UpdateAvatarWithChangeUrlAvatar(PostImgModel img)
+        public async Task<object> UpdateAvatarWithChangeUrlAvatar(PostImgModel img)
         {
             try
             {
@@ -410,5 +452,45 @@ namespace JeeAccount.Controllers
                 return JsonResultCommon.Exception(ex);
             }
         }
+
+        #region api for customer
+
+        [HttpGet("GetListCustomerAppByCustomerIDFromCustomer")]
+        public async Task<IActionResult> GetListCustomerAppByCustomerIDFromCustomer(long CustomerID)
+        {
+            try
+            {
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null) return NotFound("Secrectkey");
+                if (!token.Equals(_JeeCustomerSecrectkey)) return NotFound("Secrectkey Không hợp lệ");
+
+                var create = await accountManagementService.GetListCustomerAppByCustomerIDFromAccount(CustomerID);
+                return Ok(create);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("ResetPasswordRootCustomer")]
+        public async Task<IActionResult> ResetPasswordRootCustomer(CustomerResetPasswordModel model)
+        {
+            try
+            {
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null) return NotFound("Secrectkey");
+                if (!token.Equals(_JeeCustomerSecrectkey)) return NotFound("Secrectkey Không hợp lệ");
+
+                var response = await accountManagementService.ResetPasswordRootCustomer(model);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        #endregion api for customer
     }
 }

@@ -51,6 +51,7 @@ import { GeneralModule } from '../_metronic/partials/content/general/general.mod
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {DanhMucChungService} from './JeeAccount/_core/services/danhmuc.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { JeeCommentModule } from './JeeAccount/_shared/jee-comment/jee-comment.module';
 
 const MY_FORMATS_EDIT: any = {
   parse: {
@@ -116,7 +117,8 @@ const MY_FORMATS_EDIT: any = {
     NgbModalModule,
     NgbDatepickerModule,
     NgxMatSelectSearchModule,
-    TranslateModule
+    TranslateModule,
+    JeeCommentModule
   ],
   entryComponents: [],
   providers: [
@@ -152,6 +154,7 @@ const MY_FORMATS_EDIT: any = {
     FormsModule,
     TranslateModule,
     ReactiveFormsModule,
+    JeeCommentModule
   ],
 })
 export class JeeAccountModule {}

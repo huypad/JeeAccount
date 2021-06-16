@@ -39,7 +39,6 @@ const DEFAULT_RESPONSE: TableResponseModel_LandingPage<any> = {
 
 export abstract class TableService<T> {
   private __responseData$ = new BehaviorSubject<TableResponseModel_LandingPage<any>>(DEFAULT_RESPONSE);
-
   // Private fields
   private _items$ = new BehaviorSubject<T[]>([]);
   private _isLoading$ = new BehaviorSubject<boolean>(false);
@@ -47,9 +46,6 @@ export abstract class TableService<T> {
   private _tableState$ = new BehaviorSubject<ITableState>(DEFAULT_STATE);
   private _errorMessage = new BehaviorSubject<string>('');
   private _subscriptions: Subscription[] = [];
-  //JeeRequest -- fix bug (chỉ sử dụng cho jeeRequest, trương h)
-  private _tableStateJR$ = new BehaviorSubject<ITableState>(DEFAULT_STATE_JEEREQUEST);
-
   public authLocalStorageToken = `${environment.appVersion}-${environment.USERDATA_KEY}`;
   // Getters
   get items$() {
@@ -86,9 +82,7 @@ export abstract class TableService<T> {
 
   protected http: HttpClient;
   // API URL has to be overrided
-  API_URL = `${environment.apiUrl}/endpoint`;
-  API_JeeWork = `${environment.ApiJeeWork}`;
-  API_IDENTITY = `${environment.ApiIdentity}`;
+
   constructor(http: HttpClient) {
     this.http = http;
   }
@@ -98,7 +92,7 @@ export abstract class TableService<T> {
   create(item: BaseModel): Observable<BaseModel> {
     this._isLoading$.next(true);
     this._errorMessage.next('');
-    return this.http.post<BaseModel>(this.API_URL, item).pipe(
+    return this.http.post<BaseModel>('', item).pipe(
       catchError((err) => {
         this._errorMessage.next(err);
         console.error('CREATE ITEM', err);
@@ -110,7 +104,7 @@ export abstract class TableService<T> {
 
   // READ (Returning filtered list of entities)
   find(tableState: ITableState): Observable<TableResponseModel<T>> {
-    const url = this.API_URL + '/find';
+    const url = '' + '/find';
     this._errorMessage.next('');
     return this.http.post<TableResponseModel<T>>(url, tableState).pipe(
       catchError((err) => {
@@ -124,7 +118,7 @@ export abstract class TableService<T> {
   getItemById(id: number): Observable<BaseModel> {
     this._isLoading$.next(true);
     this._errorMessage.next('');
-    const url = `${this.API_URL}/${id}`;
+    const url = '';
     return this.http.get<BaseModel>(url).pipe(
       catchError((err) => {
         this._errorMessage.next(err);
@@ -137,7 +131,7 @@ export abstract class TableService<T> {
 
   // UPDATE
   update(item: BaseModel): Observable<any> {
-    const url = `${this.API_URL}/${item.id}`;
+    const url = '';
     this._isLoading$.next(true);
     this._errorMessage.next('');
     return this.http.put(url, item).pipe(
@@ -155,7 +149,7 @@ export abstract class TableService<T> {
     this._isLoading$.next(true);
     this._errorMessage.next('');
     const body = { ids, status };
-    const url = this.API_URL + '/updateStatus';
+    const url = '/updateStatus';
     return this.http.put(url, body).pipe(
       catchError((err) => {
         this._errorMessage.next(err);
@@ -170,7 +164,7 @@ export abstract class TableService<T> {
   delete(id: any): Observable<any> {
     this._isLoading$.next(true);
     this._errorMessage.next('');
-    const url = `${this.API_URL}/${id}`;
+    const url = '';
     return this.http.delete(url).pipe(
       catchError((err) => {
         this._errorMessage.next(err);
@@ -185,7 +179,7 @@ export abstract class TableService<T> {
   deleteItems(ids: number[] = []): Observable<any> {
     this._isLoading$.next(true);
     this._errorMessage.next('');
-    const url = this.API_URL + '/deleteItems';
+    const url = '';
     const body = { ids };
     return this.http.put(url, body).pipe(
       catchError((err) => {
@@ -255,50 +249,6 @@ export abstract class TableService<T> {
     this._tableState$.next(newState);
   }
 
-  // LandingPage
-  public fetch_Project_Team(apiRoute: string = '', nameKey: string = 'id') {
-    apiRoute = 'api/project-team/List';
-    var resItems: any = [];
-    var resTotalRow: number = 0;
-    this._isLoading$.next(true);
-    this._errorMessage.next('');
-    const request = this.find_Project_Team_Post(this._tableState$.value, apiRoute)
-      .pipe(
-        tap((res: TableResponseModel_LandingPage<T>) => {
-          if (res && res.status == 1) {
-            resItems = res.data;
-            resTotalRow = res.panigator.total;
-          }
-          this._items$.next(resItems);
-          this.__responseData$.next(res);
-          this.patchStateWithoutFetch({
-            paginator: this._tableState$.value.paginator.recalculatePaginator(resTotalRow),
-          });
-        }),
-        catchError((err) => {
-          this._errorMessage.next(err);
-          return of({
-            status: 0,
-            data: [],
-            panigator: null,
-            error: null,
-          });
-        }),
-        finalize(() => {
-          this._isLoading$.next(false);
-          const itemIds = this._items$.value.map((el: T) => {
-            const item = (el as unknown) as BaseModel;
-            return item[nameKey];
-          });
-          this.patchStateWithoutFetch({
-            grouping: this._tableState$.value.grouping.clearRows(itemIds),
-          });
-        })
-      )
-      .subscribe();
-    this._subscriptions.push(request);
-  }
-
   private setAuthFromLocalStorage(auth: AuthModel): boolean {
     if (auth && auth.accessToken) {
       localStorage.setItem(this.authLocalStorageToken, JSON.stringify(auth));
@@ -327,194 +277,4 @@ export abstract class TableService<T> {
     return p;
   }
 
-  // READ (Returning filtered list of entities)
-  find_Project_Team_Get(tableState: ITableState, routeFind: string = ''): Observable<TableResponseModel_LandingPage<T>> {
-    // routeFind = "";
-    const url = this.API_JeeWork + routeFind;
-    const httpHeader = this.getHttpHeaders();
-    this._errorMessage.next('');
-    return this.http
-      .get<TableResponseModel_LandingPage<T>>(url, { headers: httpHeader })
-      .pipe(
-        catchError((err) => {
-          this._errorMessage.next(err);
-          console.error('FIND ITEMS', err);
-          return of({ status: 0, data: [], panigator: null, error: null });
-        })
-      );
-  }
-  find_Project_Team_Post(tableState: ITableState, routeFind: string = ''): Observable<TableResponseModel_LandingPage<T>> {
-    // routeFind = "";
-    const url = this.API_JeeWork + routeFind;
-    const httpHeader = this.getHttpHeaders();
-    this._errorMessage.next('');
-    return this.http
-      .post<TableResponseModel_LandingPage<T>>(url, tableState, { headers: httpHeader })
-      .pipe(
-        catchError((err) => {
-          this._errorMessage.next(err);
-          console.error('FIND ITEMS', err);
-          return of({ status: 0, data: [], panigator: null, error: null });
-        })
-      );
-  }
-  // Base Methods
-  public patchStateLandingPage(patch: Partial<ITableState>, apiRoute: string = '') {
-    this.patchStateWithoutFetch(patch);
-    this.fetch_Project_Team(apiRoute);
-  }
-
-  getItemById_LandingPage(id: number, routeGet: string = ''): Observable<BaseModel> {
-    this._isLoading$.next(true);
-    this._errorMessage.next('');
-    const httpHeader = this.getHttpHeaders();
-    // const url = `${this.API_URL}/${id}`;
-    const url = this.API_JeeWork + routeGet + `${id}`;
-    return this.http
-      .get<BaseModel>(url, { headers: httpHeader })
-      .pipe(
-        tap((resID) => {}),
-        catchError((err) => {
-          this._errorMessage.next(err);
-          console.error('GET ITEM BY IT', id, err);
-          return of({ id: undefined });
-        }),
-        finalize(() => this._isLoading$.next(false))
-      );
-  }
-
-  getItemById_LandingPage_POST(id: number, routePost: string = ''): Observable<LP_BaseModel<T>> {
-    this._isLoading$.next(true);
-    this._errorMessage.next('');
-    const httpHeader = this.getHttpHeaders();
-    const url = this.API_JeeWork + routePost;
-    return this.http.post<LP_BaseModel<T>>(url, { htid: +id }, { headers: httpHeader }).pipe(
-      tap((resID) => {
-        this.__responseData$.next(resID);
-      }),
-      catchError((err) => {
-        this._errorMessage.next(err);
-        console.error('FIND BY ID ITEMS', err);
-        return of({ status: 0, data: [], panigator: null, error: null });
-      }),
-      finalize(() => this._isLoading$.next(false))
-    );
-  }
-
-  // CREATE
-  // server should return the object with ID
-  createLandingPage(item: any, routePost: string = ''): Observable<LP_BaseModel<T>> {
-    this._isLoading$.next(true);
-    this._errorMessage.next('');
-    const httpHeader = this.getHttpHeaders();
-    const url = this.API_JeeWork + routePost;
-    return this.http
-      .post<LP_BaseModel<T>>(url, item, { headers: httpHeader })
-      .pipe(
-        tap((res: TableResponseModel_LandingPage<T>) => {
-          this.__responseData$.next(res);
-        }),
-        catchError((err) => {
-          this._errorMessage.next(err);
-          console.error('CREATE ITEM', err);
-          return of({ status: 1, data: [], panigator: null, error: null });
-        }),
-        finalize(() => this._isLoading$.next(false))
-      );
-  }
-
-  // UPDATE
-  updateLandingPage(item: any, routePost: string = ''): Observable<LP_BaseModel_Single<any>> {
-    this._isLoading$.next(true);
-    this._errorMessage.next('');
-    const httpHeader = this.getHttpHeaders();
-    const url = this.API_JeeWork + routePost;
-    return this.http
-      .post<LP_BaseModel_Single<any>>(url, item, { headers: httpHeader })
-      .pipe(
-        tap((res: TableResponseModel_LandingPage<T>) => {
-          this.__responseData$.next(res);
-        }),
-        catchError((err) => {
-          this._errorMessage.next(err);
-          console.error('UPDATE ITEM', item, err);
-          return of({ status: 1, data: null, panigator: null, error: null });
-        }),
-        finalize(() => this._isLoading$.next(false))
-      );
-  }
-
-  // DELETE
-  deleteLandingPage(id: number, routePost: string = ''): Observable<LP_BaseModel_Single<any>> {
-    this._isLoading$.next(true);
-    this._errorMessage.next('');
-    const httpHeader = this.getHttpHeaders();
-    const url = this.API_JeeWork + routePost;
-    return this.http.post<LP_BaseModel_Single<any>>(url, { htid: id }, { headers: httpHeader }).pipe(
-      tap((res: TableResponseModel_LandingPage<T>) => {
-        this.__responseData$.next(res);
-      }),
-      catchError((err) => {
-        this._errorMessage.next(err);
-        console.error('DELETE ITEM', id, err);
-        return of({ status: 0, data: [], panigator: null, error: null });
-      }),
-      finalize(() => this._isLoading$.next(false))
-    );
-  }
-
-  // delete list of items
-  deleteItemsLandingPage(ids: number[] = [], routePost: string = ''): Observable<LP_BaseModel_Single<any>> {
-    this._isLoading$.next(true);
-    this._errorMessage.next('');
-    const httpHeader = this.getHttpHeaders();
-    const url = this.API_JeeWork + routePost;
-    ids = [...ids.map((k) => +k)];
-    return this.http.post<LP_BaseModel_Single<any>>(url, { htids: ids }, { headers: httpHeader }).pipe(
-      tap((res: TableResponseModel_LandingPage<T>) => {
-        this.__responseData$.next(res);
-      }),
-      catchError((err) => {
-        this._errorMessage.next(err);
-        console.error('DELETE SELECTED ITEMS', ids, err);
-        return of({ status: 0, data: [], panigator: null, error: null });
-      }),
-      finalize(() => this._isLoading$.next(false))
-    );
-  }
-
-  // Đăng nhập
-  // lay jwt + data tu sso_token
-  getDataUser_LandingPage(routeFind: string = '', sso_token: string = ''): Observable<BaseModel> {
-    const url = this.API_IDENTITY + routeFind;
-    const httpHeader = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: sso_token,
-    });
-    return this.http
-      .get<BaseModel>(url, { headers: httpHeader })
-      .pipe(
-        tap((res) => {}),
-        catchError((err) => {
-          this._errorMessage.next(err);
-          console.error('lỗi lấy data', err);
-          return of({ id: undefined });
-        })
-      );
-  }
-  // logout
-  logOutUser_LandingPage(routeFind: string = ''): Observable<BaseModel> {
-    const url = this.API_IDENTITY + routeFind;
-    const httpHeader = this.getHttpHeaders();
-    return this.http
-      .post<BaseModel>(url, null, { headers: httpHeader })
-      .pipe(
-        tap((res) => {}),
-        catchError((err) => {
-          this._errorMessage.next(err);
-          console.error('lỗi logout', err);
-          return of({ id: undefined });
-        })
-      );
-  }
 }

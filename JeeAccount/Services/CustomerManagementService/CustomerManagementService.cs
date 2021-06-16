@@ -4,6 +4,7 @@ using DpsLibs.Data;
 using JeeAccount.Controllers;
 using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
+using JeeAccount.Models.Common;
 using JeeAccount.Models.CustomerManagement;
 using JeeAccount.Reponsitories;
 using JeeAccount.Reponsitories.CustomerManagement;
@@ -28,7 +29,7 @@ namespace JeeAccount.Services.CustomerManagementService
         {
             this._customerManagementReponsitory = customerManagementReponsitory;
             this.identityServerController = new IdentityServerController();
-            ConnectionString = configuration.GetConnectionString("DefaultConnection");
+            ConnectionString = configuration.GetValue<string>("AppConfig:Connection");
             this._accountManagementReponsitory = accountManagementReponsitory;
             this.producer = producer;
             this.configuration = configuration;
@@ -69,7 +70,7 @@ namespace JeeAccount.Services.CustomerManagementService
         {
             using (DpsConnection cnn = new DpsConnection(ConnectionString))
             {
-                string TopicAddNewCustomer = configuration.GetValue<string>("KafkaTopic:TopicAddNewCustomer");
+                string TopicAddNewCustomer = configuration.GetValue<string>("KafkaConfig:TopicProduce:jeeplatformInitialization");
                 IdentityServerReturn identityServerReturn = new IdentityServerReturn();
                 try
                 {
@@ -177,6 +178,25 @@ namespace JeeAccount.Services.CustomerManagementService
                     return identityServerReturn;
                 }
             }
+        }
+
+        public async Task<ReturnSqlModel> UpdateCustomerAppGiaHanModel(CustomerAppGiaHanModel model)
+        {
+            using (DpsConnection cnn = new DpsConnection(ConnectionString))
+            {
+                var update = await _customerManagementReponsitory.UpdateCustomerAppGiaHanModelCnn(model, cnn);
+                if (!update.Susscess)
+                {
+                    cnn.RollbackTransaction();
+                    cnn.EndTransaction();
+                }
+                return await Task.FromResult(update);
+            }
+        }
+
+        public async Task<ReturnSqlModel> UpdateCustomerAppAddNumberStaff(CustomerAppAddNumberStaffModel model)
+        {
+            return await _customerManagementReponsitory.UpdateCustomerAppAddNumberStaff(model);
         }
     }
 }

@@ -15,7 +15,7 @@ interface IDashboardService {
   saveUserDashBoard(): void;
   getDashBoardOptions(): DashboardOptions;
 }
-const API_PRODUCTS_URL = environment.ApiRoot + '/widgetdashboard';
+const API_PRODUCTS_URL = environment.HOST_JEEACCOUNT_API + '/api/widgetdashboard';
 
 @Injectable()
 export class PageGirdtersDashboardService implements IDashboardService {

@@ -150,7 +150,7 @@ namespace JeeAccount
 
             #region add kafka consumer
 
-            services.AddHostedService<AccountConsumerController>();
+            services.AddSingleton<IHostedService, AccountConsumerController>();
 
             #endregion add kafka consumer
         }

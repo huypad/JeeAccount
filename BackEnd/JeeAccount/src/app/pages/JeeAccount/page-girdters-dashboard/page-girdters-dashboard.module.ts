@@ -21,6 +21,7 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { MatTableModule } from '@angular/material/table';
 import { DepartmentManagementService } from '../Management/DepartmentManagement/Sevices/department-management.service';
 import { AccountManagementService } from '../Management/AccountManagement/Services/account-management.service';
+import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [PageGidtersDashboardComponent, AddCloseWidgetDialogComponent, DanhSachTruyCapNhanhWidgetComponent],
@@ -46,8 +47,10 @@ import { AccountManagementService } from '../Management/AccountManagement/Servic
       },
     ]),
   ],
-  providers: [PageGirdtersDashboardService, DanhMucChungService, DepartmentManagementService, AccountManagementService],
+  providers: [PageGirdtersDashboardService, DanhMucChungService, DepartmentManagementService, AccountManagementService,
+    { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true, height: 'auto', width: '900px' } },
+  ],
   exports: [PageGidtersDashboardComponent, AddCloseWidgetDialogComponent, DanhSachTruyCapNhanhWidgetComponent],
   entryComponents: [AddCloseWidgetDialogComponent, DanhSachTruyCapNhanhWidgetComponent],
 })
-export class PageGirdtersDashboardModule {}
+export class PageGirdtersDashboardModule { }

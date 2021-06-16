@@ -24,7 +24,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("GetMailByCustomerID")]
-        public BaseModel<object> GetMailByCustomerID()
+        public object GetMailByCustomerID()
         {
             try
             {
@@ -45,7 +45,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpPost("GetMailByCustomerID/Internal")]
-        public BaseModel<object> GetMailByCustomerIDInternal(long customerID)
+        public object GetMailByCustomerIDInternal(long customerID)
         {
             try
             {

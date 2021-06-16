@@ -20,5 +20,6 @@ namespace JeeAccount.Models.AccountManagement
         public string Email { get; set; }
         public string StructureID { get; set; } // sử dụng cho JeeOffice
         public string ChucVuID { get; set; }
+        public string NgaySinh { get; set; }
     }
 }

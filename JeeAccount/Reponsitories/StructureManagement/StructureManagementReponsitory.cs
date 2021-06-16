@@ -17,7 +17,7 @@ namespace JeeAccount.Reponsitories
 
         public StructureManagementReponsitory(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetValue<string>("AppConfig:Connection");
         }
 
         public async Task<IEnumerable<StructureDTO>> GetOrgStructure([FromQuery] QueryParams query)

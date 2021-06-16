@@ -1,5 +1,6 @@
 ﻿using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
+using JeeAccount.Models.Common;
 using JeeAccount.Models.CustomerManagement;
 using System;
 using System.Collections.Generic;
@@ -19,5 +20,9 @@ namespace JeeAccount.Services.CustomerManagementService
         bool checkTrungCode(string Code);
 
         Task<IdentityServerReturn> CreateCustomer(CustomerModel customerModel);
+
+        Task<ReturnSqlModel> UpdateCustomerAppGiaHanModel(CustomerAppGiaHanModel model);
+
+        Task<ReturnSqlModel> UpdateCustomerAppAddNumberStaff(CustomerAppAddNumberStaffModel model);
     }
 }

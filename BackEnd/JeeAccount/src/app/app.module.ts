@@ -36,6 +36,8 @@ import { LayoutUtilsService } from './pages/JeeAccount/_core/utils/layout-utils.
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { JeeAccountModule } from './pages/jee-account.module';
 
+// jee-comment
+
 function appInitializer(authService: AuthService) {
   return () => {
     return new Promise((resolve) => {
@@ -70,9 +72,9 @@ function appInitializer(authService: AuthService) {
     // #fake-start#
     environment.isMockEnabled
       ? HttpClientInMemoryWebApiModule.forRoot(FakeAPIService, {
-          passThruUnknownUrl: true,
-          dataEncapsulation: false,
-        })
+        passThruUnknownUrl: true,
+        dataEncapsulation: false,
+      })
       : [],
     // #fake-end#
     AppRoutingModule,
@@ -107,4 +109,4 @@ function appInitializer(authService: AuthService) {
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

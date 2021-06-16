@@ -30,7 +30,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("Get_DSWidget")]
-        public async Task<BaseModel<object>> GetAll()
+        public async Task<object> GetAll()
         {
             try
             {
@@ -44,7 +44,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("Get/WidgetId={WidgetId}")]
-        public async Task<BaseModel<object>> GetById(long WidgetId)
+        public async Task<object> GetById(long WidgetId)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpPost("Post_UpdateWidget")]
-        public async Task<BaseModel<object>> Update([FromBody] WidgetDashBoardModel widget)
+        public async Task<object> Update([FromBody] WidgetDashBoardModel widget)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpPost("Create_Widget")]
-        public async Task<BaseModel<object>> Create([FromBody] WidgetDashBoardModel widget)
+        public async Task<object> Create([FromBody] WidgetDashBoardModel widget)
         {
             try
             {
@@ -126,7 +126,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("Delete/WidgetId={WidgetId}")]
-        public async Task<BaseModel<object>> Delete(long WidgetId)
+        public async Task<object> Delete(long WidgetId)
         {
             try
             {
