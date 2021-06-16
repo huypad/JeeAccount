@@ -8,6 +8,8 @@ using JeeAccount.Reponsitories;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -391,6 +393,42 @@ namespace JeeAccount.Services.AccountManagementService
             if (username == null) return null;
             var data = await accountManagementReponsitory.GetInfoByUsername(username.ToString());
             return data;
+        }
+
+        public async Task<string> GetDirectManagerByUsername(string username)
+        {
+            DataTable dt = new DataTable();
+
+            string sql = @$"select DirectManager from AccountList where Username = '{username}'";
+
+            using (DpsConnection cnn = new DpsConnection(ConnectionString))
+            {
+                dt = await cnn.CreateDataTableAsync(sql);
+                if (dt.Rows.Count == 0)
+                    return null;
+                var result = dt.AsEnumerable().Select(row => row["DirectManager"].ToString()).SingleOrDefault();
+
+                return await Task.FromResult(result).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<string> GetDirectManagerByUserID(string userid)
+        {
+            DataTable dt = new DataTable();
+
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("userid", userid);
+            string sql = @"select DirectManager from AccountList where userid = @userid";
+
+            using (DpsConnection cnn = new DpsConnection(ConnectionString))
+            {
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                if (dt.Rows.Count == 0)
+                    return null;
+                var result = dt.AsEnumerable().Select(row => row["DirectManager"].ToString()).SingleOrDefault();
+
+                return await Task.FromResult(result).ConfigureAwait(false);
+            }
         }
     }
 

@@ -14,7 +14,11 @@ namespace JeeAccount.Services.AccountManagementService
 
         Task<long> GetCustormerIDByUsername(string username);
 
-        Task<long> GetCustormerIDByUserID(long username);
+        Task<long> GetCustormerIDByUserID(long userid);
+
+        Task<string> GetDirectManagerByUsername(string username);
+
+        Task<string> GetDirectManagerByUserID(string userid);
 
         Task<IEnumerable<InfoAdminDTO>> GetInfoAdminAccountByCustomerID(long customerID);
 

@@ -325,6 +325,46 @@ namespace JeeAccount.Controllers
             }
         }
 
+        [HttpGet("GetInfoDirectManager")]
+        public async Task<IActionResult> GetInfoDirectManager(InputApiModel model)
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+
+                var usernameQuanLy = "";
+                if (!string.IsNullOrEmpty(model.Userid))
+                {
+                    usernameQuanLy = await accountManagementService.GetDirectManagerByUserID(model.Userid);
+                    var result = await accountManagementService.GetInfoByUsername(usernameQuanLy);
+                    if (result.Fullname != null)
+                    {
+                        return Ok(result);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(model.Username))
+                {
+                    usernameQuanLy = await accountManagementService.GetDirectManagerByUsername(model.Username);
+                    var result = await accountManagementService.GetInfoByUsername(usernameQuanLy);
+                    if (result.Fullname is not null)
+                    {
+                        return Ok(result);
+                    }
+                }
+
+                return BadRequest(MessageReturnHelper.Custom("quản lý trực tiếp không tồn tại hoặc userid và username không hợp lệ"));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
         #region api public bên ngoài
 
         [HttpPost("UppdatePersonalInfo")]
