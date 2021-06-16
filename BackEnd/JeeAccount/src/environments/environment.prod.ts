@@ -4,21 +4,8 @@ export const environment = {
   USERDATA_KEY: 'authf649fc9a5f55',
   isMockEnabled: true,
   apiUrl: 'api',
-
-  ApiRoot: 'https://jeeaccount-api.jee.vn/api',
-  ApiRootsLanding: 'https://jeeaccount-api.jee.vn/api',
-
-  ApiIdentity: 'https://identityserver.jee.vn',
-  ApiIdentity_Logout: 'https://identityserver.jee.vn/user/logout',
-  ApiIdentity_GetUser: 'https://identityserver.jee.vn/user/me',
-  ApiIdentity_Refresh: 'https://identityserver.jee.vn/user/refresh',
-  redirectUrl: 'https://portal.jee.vn/?redirectUrl=',
-  sso: 'sso_token',
-  //API JeeWork
-  ApiJeeWork: 'https://jeework-api.jee.vn/', // https://localhost:44366/;https://api-proxy.vts-demo.com/
-  //Api JeeRequest
-  ApiJeeRequest: 'https://jeerequest-api.jee.vn',
-
-  //API JeeAdmin
-  ApiJeeAdmin: 'https://jeeadmin-api.jee.vn', //'https://localhost:44360'
+  HOST_JEEACCOUNT_API: 'https://jeeaccount-api.jee.vn',
+  HOST_IDENTITYSERVER_API: 'https://identityserver.jee.vn',
+  HOST_PORTAL_API: 'https://portal.jee.vn',
+  HOST_JEECOMMENT_API: 'https://jeecomment-api.jee.vn',
 };
