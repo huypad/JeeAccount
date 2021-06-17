@@ -1,27 +1,36 @@
 $border-radius: 5px;
 $font-szie-header: 13px;
 $font-color-header: rbg(28, 30, 33);
-$hover-color-header: #f2f2f2;
-$background-top-header: white;
+$hover-color: #f2f2f2;
+$background-comment: white;
+$icon-color: black;
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.card-body {
+  padding: 0px 10px 20px 10px;
+}
 
 .comment-container {
-  border-radius: $border-radius;
   position: relative;
   box-sizing: border-box;
   flex-direction: column;
   align-items: stretch;
   direction: ltr;
   margin: 0px;
-  border-radius: 0px 0px 10px 10px;
-  background-color: white;
+  border-radius: 0px 0px 18px 18px;
+  background-color: $background-comment;
   display: block;
   line-height: 16.08px;
-  padding: 0px 10px 4px 10px;
 }
 
 .comment-header-container {
   font-family: "Roboto";
-  background-color: $background-top-header;
+  background-color: $background-comment;
   align-items: stretch;
   box-sizing: border-box;
   direction: ltr;
@@ -32,39 +41,60 @@ $background-top-header: white;
   flex-shrink: 0;
   position: relative;
   line-height: 1.34;
-  //border-top: 1px solid rgba(0, 0, 0, 0.1); // cái này settup cho JeeSocial
-  //margin-top: 2px; // cái này settup cho JeeSocial
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  margin-top: 2px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   margin-bottom: 1px;
   padding-top: 4px;
   padding-bottom: 4px;
-  .comment-header {
-    flex-basis: 0px;
-    flex-grow: 1;
-    flex-shrink: 1;
-    text-align: center;
-    justify-content: center;
-    color: $font-color-header;
-    font-size: $font-szie-header;
-    padding: 6px 2px 6px 2px;
-    font-family: "Roboto";
-    #icon-comment {
-      background-image: url(https://static.xx.fbcdn.net/rsrc.php/v3/yD/r/mszNyGGthUg.png);
-      background-position: 0px -134px;
-      background-size: auto;
-      width: 18px;
-      height: 18px;
-      background-repeat: no-repeat;
-      display: inline-block;
-      padding-right: 22px;
-    }
-  }
+}
 
-  .comment-header:hover {
-    background-color: $hover-color-header;
-    border-radius: 8px;
-    cursor: pointer;
-  }
+.comment-header {
+  flex-grow: 1;
+  flex-shrink: 1;
+  text-align: center;
+  justify-content: center;
+  font-size: $font-szie-header;
+  padding: 6px 2px 6px 2px;
+  font-family: "Roboto";
+}
+
+.icon-like {
+  background-image: url(https://static.xx.fbcdn.net/rsrc.php/v3/ym/r/2VNwseEvSnT.png);
+  background-position: -17px -353px;
+  background-size: auto;
+  width: 18px;
+  height: 18px;
+  background-repeat: no-repeat;
+  display: inline-block;
+  padding-right: 22px;
+}
+
+#icon-comment {
+  background-image: url(https://static.xx.fbcdn.net/rsrc.php/v3/yD/r/mszNyGGthUg.png);
+  background-position: 0px -134px;
+  background-size: auto;
+  width: 18px;
+  height: 18px;
+  background-repeat: no-repeat;
+  display: inline-block;
+  padding-right: 22px;
+}
+#icon-share {
+  background-image: url(https://static.xx.fbcdn.net/rsrc.php/v3/ya/r/LEGnmY9XGzE.png);
+  background-position: 0px -281px;
+  background-size: auto;
+  width: 18px;
+  height: 18px;
+  background-repeat: no-repeat;
+  display: inline-block;
+  padding-right: 22px;
+}
+
+.comment-header:hover {
+  background-color: $hover-color;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 .comment-content-container {
@@ -78,178 +108,194 @@ $background-top-header: white;
   margin: 0px;
   line-height: 1.34;
   flex-shrink: 0;
+}
 
-  .comment-filter {
-    height: 32px;
-    display: flex;
-    cursor: pointer;
-    flex-direction: row;
-    justify-content: flex-end;
-    vertical-align: middle;
-    align-items: center;
-    font-size: 15px;
-    font-weight: 500;
-    text-align: start;
+.comment-filter {
+  height: 32px;
+  display: flex;
+  cursor: pointer;
+  flex-direction: row;
+  justify-content: flex-end;
+  vertical-align: middle;
+  align-items: center;
+  font-size: 15px;
+  font-weight: 500;
+  text-align: start;
+}
 
-    .filter {
-      .text-filter {
-        color: rbg(101, 103, 107);
-      }
-      #filter-icon {
-        background-image: url(https://static.xx.fbcdn.net/rsrc.php/v3/yv/r/KSxvuHrz0Mh.png);
-        background-position: -51px -433px;
-        background-size: auto;
-        width: 16px;
-        height: 16px;
-        background-repeat: no-repeat;
-        display: inline-block;
-      }
-    }
-  }
-
-  .view-more-comment {
-    flex-basis: auto;
-    flex-grow: 1;
-    flex-shrink: 1;
-
-    .text-view-more-comment {
-      color: rbg(101, 103, 107);
-    }
-  }
-
-  .view-more-comment:hover {
-    cursor: pointer;
-
-    .text-view-more-comment {
-      text-decoration: underline;
-    }
-  }
-
-  .post-comment {
-    min-height: 44px;
-    display: flex;
-    flex-direction: row;
-    font-family: "Roboto";
-    align-items: center;
-    vertical-align: middle;
-    font-size: 13px;
-    direction: ltr;
-  }
-
-  .post-comment-avatar {
-    display: block;
-    position: relative;
-    margin-right: 6px;
-    align-self: flex-start;
-    margin-top: 6px;
-  }
-
-  #img-avatar {
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-  }
-
-  .post-comment-input {
-    direction: ltr;
-    flex-grow: 1;
-    background-color: $hover-color-header;
-    font-family: "Roboto";
-    border-radius: 18px;
-    padding-top: 6px;
-    padding-bottom: 6px;
-    min-height: 36px;
-    display: flex;
-    cursor: text;
-    justify-content: flex-end;
-    position: relative;
-    padding-right: 10px;
-    padding-left: 10px;
-  }
-
-  .textarea-input {
-    font-weight: 400;
-    width: 100%;
-    resize: none;
-    border: none;
-    width: 100%;
-    height: 100%;
-    display: block;
-    border: 0;
-    box-sizing: border-box;
-    box-shadow: none;
-    outline: none;
-    overflow: hidden;
-    background-color: $hover-color-header;
-    flex-grow: 1;
-    flex-shrink: 1;
-    text-overflow: ellipsis;
-  }
-
-  .comment-icon {
-    direction: ltr;
-    display: flex;
-    align-items: center;
-    align-self: flex-end;
-    cursor: pointer;
-    margin-inline-end: 4px;
-    margin-inline-start: -8px;
-    margin-right: 4px;
-    margin-left: -8px;
-    margin-block-end: 0;
-    margin-block-start: 0;
-
-    .icon {
-      margin-left: 6px;
-      margin-right: 6px;
-      margin-bottom: 6px;
-      width: 16px;
-      height: 16px;
-    }
-
-    #input-flie {
-      display: none;
-    }
-  }
-
-  .post-comment-content {
-    margin-top: 6px;
-  }
-
-  .list-comment {
-    .icon-edit-report {
-      display: flex;
-      width: 32px;
-      height: 32px;
-      vertical-align: middle;
-      align-items: center;
-      justify-content: center;
-      margin-left: 5px;
-      margin-right: 5px;
-    }
-
-    .post-comment-input {
-      flex-grow: 0;
-
-      .post-comment-input-span {
-        font-weight: normal;
-        font-family: "Roboto";
-      }
-    }
-  }
-
-  ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
+.filter {
+  .text-filter {
+    color: rbg(101, 103, 107);
   }
 }
 
+#filter-icon {
+  background-image: url(https://static.xx.fbcdn.net/rsrc.php/v3/yv/r/KSxvuHrz0Mh.png);
+  background-position: -51px -433px;
+  background-size: auto;
+  width: 16px;
+  height: 16px;
+  background-repeat: no-repeat;
+  display: inline-block;
+}
+.view-more-comment {
+  flex-basis: auto;
+  flex-grow: 1;
+  flex-shrink: 1;
 
-.hover-icon :hover {
+  .text-view-more-comment {
+    color: rbg(101, 103, 107);
+  }
+}
+
+.view-more-comment:hover {
+  cursor: pointer;
+
+  .text-view-more-comment {
+    text-decoration: underline;
+  }
+}
+
+.post-comment {
+  min-height: 44px;
+  display: flex;
+  flex-direction: row;
+  font-family: "Roboto";
+  align-items: center;
+  vertical-align: middle;
+  font-size: 13px;
+  direction: ltr;
+}
+
+.post-comment-avatar {
+  display: block;
+  position: relative;
+  margin-right: 6px;
+  align-self: flex-start;
+  margin-top: 6px;
+}
+
+#img-avatar {
   border-radius: 50%;
+  width: 32px;
+  height: 32px;
+}
+
+.post-comment-input {
+  direction: ltr;
+  flex-grow: 1;
+  background-color: $hover-color;
+  font-family: "Roboto";
+  border-radius: 18px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  min-height: 36px;
+  display: flex;
+  cursor: text;
+  justify-content: flex-end;
+  position: relative;
+  padding-right: 10px;
+  padding-left: 10px;
+}
+
+.textarea-input {
+  font-weight: 400;
+  width: 100%;
+  resize: none;
+  border: none;
+  width: 100%;
+  height: 100%;
+  display: block;
+  border: 0;
   box-sizing: border-box;
-  box-shadow: 0 .5rem 0.5rem 0 rgba(5, 1, 1, 0);
+  box-shadow: none;
+  outline: none;
+  overflow: hidden;
+  background-color: $hover-color;
+  flex-grow: 1;
+  flex-shrink: 1;
+  text-overflow: ellipsis;
+}
+
+.comment-icon {
+  direction: ltr;
+  display: flex;
+  align-items: center;
+  align-self: flex-end;
+  cursor: pointer;
+  margin-inline-end: 4px;
+  margin-inline-start: -8px;
+  margin-right: 4px;
+  margin-left: -8px;
+  margin-block-end: 0;
+  margin-block-start: 0;
+
+  .icon {
+    margin-left: 6px;
+    margin-right: 6px;
+    margin-bottom: 6px;
+    width: 16px;
+    height: 16px;
+  }
+
+}
+
+#input-flie {
+  display: none;
+}
+
+.post-comment-content {
+  margin-top: 6px;
+}
+
+.list-comment {
+  .icon-edit-report {
+    display: flex;
+    width: 32px;
+    height: 32px;
+    vertical-align: middle;
+    align-items: center;
+    justify-content: center;
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+
+  .post-comment-input {
+    flex-grow: 0;
+    display: flex;
+    flex-direction: column;
+
+    .post-comment-input-span {
+      font-weight: normal;
+      font-family: "Roboto";
+    }
+  }
+
+  .name {
+    font-weight: 500;
+    color: black;
+  }
+}
+
+.reply-comment {
+  display: block;
+}
+
+.hover-icon {
+  padding: 5px;
+}
+.hover-icon:hover {
+  padding: 5px;
+  border-radius: 50%;
+  background-color: $hover-color;
+}
+
+.hover-icon:hover > .show-when-hover {
+  visibility: visible;
+}
+
+.show-when-hover {
+  visibility: hidden;
 }
 
 .item-align-middle {
@@ -281,7 +327,7 @@ $background-top-header: white;
   background-position: -17px -366px;
   background-size: auto;
   width: 16px;
-  height: 16px;
+  height: 13px;
   background-repeat: no-repeat;
   display: inline-block;
 }

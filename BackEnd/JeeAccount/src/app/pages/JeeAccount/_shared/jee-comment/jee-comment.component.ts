@@ -15,6 +15,8 @@ export class JeeCommentComponent implements OnInit {
   hiddenShare: boolean = false;
   isDone$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   input: string = 'hello tôi chính là nhà tiên tri vũ trụ trần dần hello tôi chính là nhà tiên tri vũ trụ trần dần hello tôi chính là nhà tiên tri vũ trụ trần dần hello tôi chính là nhà tiên tri vũ trụ trần dần hello tôi chính là nhà tiên tri vũ trụ trần dần hello tôi chính là nhà tiên tri vũ trụ trần dần hello tôi chính là nhà tiên tri vũ trụ trần dần';
+  item: any;
+
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
 
   constructor(public service: JeeCommentService) { }
@@ -22,9 +24,5 @@ export class JeeCommentComponent implements OnInit {
   ngOnInit() {
   }
 
-
-  clickButtonComment() {
-
-  }
 
 }

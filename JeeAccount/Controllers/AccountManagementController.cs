@@ -641,6 +641,74 @@ namespace JeeAccount.Controllers
             }
         }
 
+        [HttpGet("GetListDirectManager")]
+        public async Task<IActionResult> GetListDirectManager()
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+
+                var lstUsername = await accountManagementService.GetListDirectManager(customData.JeeAccount.CustomerID);
+                if (lstUsername is not null)
+                {
+                    return Ok(lstUsername);
+                }
+
+                return BadRequest(MessageReturnHelper.KhongTonTai("CustomerID"));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpPost("ListNhanVienCapDuoiDirectManager")]
+        public async Task<IActionResult> ListNhanVienCapDuoiDirectManager(InputApiModel model)
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return NotFound(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+
+                if (!string.IsNullOrEmpty(model.Username))
+                {
+                    var result = await accountManagementService.ListNhanVienCapDuoiDirectManagerByDirectManager(model.Username);
+                    if (result.Count() > 0)
+                        return Ok(result);
+                    else
+                    {
+                        BadRequest(MessageReturnHelper.KhongTonTai("Nhân viên cấp dưới"));
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(model.Userid))
+                {
+                    var username = accountManagementService.GetUsernameByUserID(model.Userid, customData.JeeAccount.CustomerID);
+                    var result = await accountManagementService.ListNhanVienCapDuoiDirectManagerByDirectManager(username);
+
+                    if (result.Count() > 0)
+                        return Ok(result);
+                    else
+                    {
+                        BadRequest(MessageReturnHelper.KhongTonTai("Nhân viên cấp dưới"));
+                    }
+                }
+
+                return BadRequest(MessageReturnHelper.KhongTonTai("UserId hoặc Username"));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
         #region api for customer
 
         [HttpGet("GetListCustomerAppByCustomerIDFromCustomer")]

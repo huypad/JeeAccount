@@ -493,6 +493,53 @@ namespace JeeAccount.Services.AccountManagementService
                 return Username.ToString();
             }
         }
+
+        public async Task<IEnumerable<string>> GetListDirectManager(long custormerID)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("CustomerID", custormerID);
+            string sql = @"select DISTINCT DirectManager from AccountList where DirectManager is not null and CustomerID=@CustomerID";
+            using (DpsConnection cnn = new DpsConnection(ConnectionString))
+            {
+                dt = cnn.CreateDataTable(sql, Conds);
+                var result = dt.AsEnumerable().Select(row => row["DirectManager"].ToString());
+                return await Task.FromResult(result).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<IEnumerable<AccUsernameModel>> ListNhanVienCapDuoiDirectManagerByDirectManager(string DirectManager)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("DirectManager", DirectManager);
+
+            string sql = @"select UserID, Username, email, LastName +' '+FirstName as FullName
+                           , FirstName as Name, AvartarImgURL as Avatar, Jobtitle,
+                           Department, PhoneNumber, CustomerID, cocauid, ChucVuID, Birthday
+                           from AccountList where DirectManager=@DirectManager";
+            using (DpsConnection cnn = new DpsConnection(ConnectionString))
+            {
+                dt = cnn.CreateDataTable(sql, Conds);
+                var result = dt.AsEnumerable().Select(row => new AccUsernameModel
+                {
+                    UserId = Int32.Parse(row["UserID"].ToString()),
+                    Username = row["Username"].ToString(),
+                    FullName = row["FullName"].ToString(),
+                    AvartarImgURL = row["Avatar"].ToString(),
+                    CustomerID = Int32.Parse(row["CustomerID"].ToString()),
+                    Department = row["Department"].ToString(),
+                    PhoneNumber = row["PhoneNumber"].ToString(),
+                    Jobtitle = row["Jobtitle"].ToString(),
+                    Email = row["email"].ToString(),
+                    StructureID = row["cocauid"].ToString(),
+                    ChucVuID = row["ChucVuID"].ToString(),
+                    NgaySinh = (row["Birthday"] != DBNull.Value) ? ((DateTime)row["Birthday"]).ToString("dd/MM/yyyy") : "",
+                });
+
+                return await Task.FromResult(result).ConfigureAwait(false);
+            }
+        }
     }
 
     public class InsertAppListAccountModel

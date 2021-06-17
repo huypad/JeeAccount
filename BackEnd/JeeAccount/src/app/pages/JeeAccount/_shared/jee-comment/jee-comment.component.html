@@ -1,15 +1,16 @@
-<div class="comment-container">
+<div class="card-body comment-container">
   <div class="comment-header-container">
     <div *ngIf="!hiddenLike" class="comment-header">
-      <mat-icon class="item-align-middle">thumb_up</mat-icon> <span> Thích </span>
+      <mat-icon data-visualcompletion="css-img" class="icon-like item-align-middle"></mat-icon>
+      <span style="vertical-align: bottom;"> Thích </span>
     </div>
-    <div class="comment-header" (click)="clickButtonComment()">
+    <div class="comment-header">
       <mat-icon data-visualcompletion="css-img" class="item-align-middle" id="icon-comment"></mat-icon>
       <span style="vertical-align: bottom;"> Bình Luận </span>
     </div>
     <div *ngIf="!hiddenShare" class="comment-header">
-      <mat-icon class="item-align-middle" style=" transform: scaleX(-1)">reply</mat-icon>
-      <span> Chia Sẻ </span>
+      <mat-icon data-visualcompletion="css-img" id="icon-share" class="item-align-middle"></mat-icon>
+      <span style="vertical-align: bottom;"> Chia Sẻ </span>
     </div>
   </div>
   <div class="comment-content-container">
@@ -31,14 +32,11 @@
         <textarea [(value)]="input" placeholder="Viết bình luận" class="textarea-input" cdkTextareaAutosize></textarea>
         <ul class="comment-icon">
           <li class="icon"><span>
-              <div class="hover-icon" role="button" tabindex="0"><i id="emotion-icon"
-                  data-visualcompletion="css-img"></i>
-                <div data-visualcompletion="ignore" style="inset: -8px;"></div>
+              <div role="button" tabindex="0"><i id="emotion-icon"></i>
               </div>
             </span></li>
           <li class="icon"><span>
-              <div class="hover-icon" role="button" tabindex="0"><i id="image-icon" data-visualcompletion="css-img"></i>
-                <div data-visualcompletion="ignore" style="inset: -8px;"></div>
+              <div role="button" tabindex="0"><i id="image-icon"></i>
               </div>
             </span><input id="input-flie"
               accept="video/*,  video/x-m4v, video/webm, video/x-ms-wmv, video/x-msvideo, video/3gpp, video/flv, video/x-flv, video/mp4, video/quicktime, video/mpeg, video/ogv, .ts, .mkv, image/*, image/heic, image/heif"
@@ -54,16 +52,43 @@
               src="https://scontent.fhph1-2.fna.fbcdn.net/v/t1.30497-1/143086968_2856368904622192_1959732218791162458_n.png?_nc_cat=1&ccb=1-3&_nc_sid=7206a8&_nc_ohc=qV3loY0JnC0AX-qMbjn&_nc_oc=AQkuTY2hl5gClakxdwuSeg8oKtlYtYL3BQovbftuPGDpsS0nASl84X99PgdvP_zFy24&_nc_ht=scontent.fhph1-2.fna&oh=e7e8b5438248aa379e7f27abb99539f3&oe=60CC4378">
           </div>
           <div class="post-comment-input">
+            <div class="comment-name-title">
+              <span class="name">
+                Bùi Thanh Phong
+              </span>
+              <!-- <span class="title">
+                Dev
+              </span> -->
+            </div>
             <span class="input-comment-span">{{input}}</span>
           </div>
           <div class="icon-edit-report">
             <span>
-              <div class="hover-icon" role="button" tabindex="0"><i id="edit-report-icon"
-                  data-visualcompletion="css-img"></i>
-                <div style="inset: -8px;"></div>
+              <div class="hover-icon" role="button" tabindex="0">
+                <span class="show-when-hover">
+                  <i aria-hidden="true" id="edit-report-icon"></i>
+                </span>
               </div>
             </span>
           </div>
+        </div>
+        <div class="reply-comment">
+          <ul class="comment-icon reply-comment-action">
+            <li class="reply-comment-icon">
+              <mat-icon data-visualcompletion="css-img" class="icon-like item-align-middle"></mat-icon>
+              <span> Thích </span>
+            </li>
+            <li class="reply-comment-reply">
+              <span>
+                Trả lời
+              </span>
+            </li>
+            <li class="reply-comment-time">
+              <span>
+                20/06/2021 12:00
+              </span>
+            </li>
+          </ul>
         </div>
       </li>
     </ul>

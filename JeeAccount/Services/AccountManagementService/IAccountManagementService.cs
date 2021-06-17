@@ -77,5 +77,9 @@ namespace JeeAccount.Services.AccountManagementService
         Task<IEnumerable<string>> GetListJustUsernameByCustormerID(long custormerID);
 
         Task<IEnumerable<long>> GetListJustUserIDByCustormerID(long custormerID);
+
+        Task<IEnumerable<string>> GetListDirectManager(long custormerID);
+
+        Task<IEnumerable<AccUsernameModel>> ListNhanVienCapDuoiDirectManagerByDirectManager(string DirectManager);
     }
 }
