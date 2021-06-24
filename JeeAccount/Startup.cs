@@ -45,6 +45,7 @@ namespace JeeAccount
             // add Vault and get Vault for secret in another services
 
             var vaultClient = ConfigVault(services);
+
             Secret<SecretData> kafkaSecret = vaultClient.V1.Secrets.KeyValue.V2.ReadSecretAsync(path: "jwt", mountPoint: "kv").Result;
             IDictionary<string, object> kafkaDataSecret = kafkaSecret.Data.Data;
             string access_secret = kafkaDataSecret["access_secret"].ToString();
@@ -57,6 +58,13 @@ namespace JeeAccount
             string KafkaPassword = kafkaData["password"].ToString();
             Configuration["KafkaConfig:username"] = KafkaUser;
             Configuration["KafkaConfig:password"] = KafkaPassword;
+            Secret<SecretData> minioSecret = vaultClient.V1.Secrets.KeyValue.V2.ReadSecretAsync(path: "minio", mountPoint: "kv").Result;
+            IDictionary<string, object> minioData = minioSecret.Data.Data;
+            Configuration["MinioConfig:MinioAccessKey"] = minioData["access_key"].ToString();
+            System.Console.WriteLine(Configuration["MinioConfig:MinioAccessKey"]);
+            Configuration["MinioConfig:MinioSecretKey"] = minioData["secret_key"].ToString();
+            System.Console.WriteLine(Configuration["MinioConfig:MinioSecretKey"]);
+
             // add Kafka
             services.addKafkaService();
 

@@ -1,28 +1,30 @@
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { JeeAccountModule } from './../../../jee-account.module';
 import { JeeCommentService } from './jee-comment.service';
 import { JeeCommentComponent } from './jee-comment.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 import { MatChipsModule } from '@angular/material/chips';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { InlineSVGModule } from 'ng-inline-svg';
-
+import { JeeCommentPostContentComponent } from './post-comment-content/post-comment-content.component';
+import { JeeCommentReactionContentComponent } from './reaction-comment-content/reaction-comment-content.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
     JeeCommentComponent,
+    JeeCommentPostContentComponent,
+    JeeCommentReactionContentComponent
   ],
-  imports: [CommonModule, MatChipsModule, NgxMatSelectSearchModule, InlineSVGModule, MatIconModule, MatInputModule, MatFormFieldModule
+  imports: [CommonModule, MatChipsModule, NgxMatSelectSearchModule, InlineSVGModule, MatIconModule, MatInputModule,
+    MatFormFieldModule, MatTooltipModule, FormsModule
   ],
   providers: [
-    JeeCommentService,
-    { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true, height: 'auto', width: '900px' } },
-  ],
-  entryComponents: [JeeCommentComponent],
-  exports: [JeeCommentComponent],
+    JeeCommentService],
+  entryComponents: [JeeCommentComponent, JeeCommentPostContentComponent, JeeCommentReactionContentComponent],
+  exports: [JeeCommentComponent, JeeCommentPostContentComponent, JeeCommentReactionContentComponent],
 })
 export class JeeCommentModule { }

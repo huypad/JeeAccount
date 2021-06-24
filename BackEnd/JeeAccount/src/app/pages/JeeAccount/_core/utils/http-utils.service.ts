@@ -8,7 +8,7 @@ import { AuthService } from '../../../../modules/auth';
   providedIn: 'root',
 })
 export class HttpUtilsService {
-  constructor(private tokenStorage: TokenStorage, private auth: AuthService) {}
+  constructor(private tokenStorage: TokenStorage, private auth: AuthService) { }
   getFindHTTPParams(queryParams): HttpParams {
     let params = new HttpParams()
       //.set('filter',  queryParams.filter )
@@ -64,42 +64,4 @@ export class HttpUtilsService {
     return result;
   }
 
-  getHTTPHeaders_Das(isFormData?: boolean): HttpHeaders {
-    var _token = '';
-    this.tokenStorage.getAccessToken().subscribe((t) => {
-      _token = t;
-    });
-    let result = new HttpHeaders({
-      // 'Token': _token
-      Authorization: 'Bearer ' + _token,
-    });
-    if (!isFormData) {
-      result.append('Content-Type', 'application/json');
-    }
-    return result;
-  }
-
-  getFindHTTPParamsJeeRequest(queryParams): HttpParams {
-    let params = new HttpParams()
-      //.set('filter',  queryParams.filter )
-      .set('sortOrder', queryParams.sortOrder)
-      .set('sortField', queryParams.sortField)
-      .set('pageNumber', (queryParams.pageNumber + 1).toString())
-      .set('pageSize', queryParams.pageSize.toString());
-    let keys = [],
-      values = [];
-    if (queryParams.more) {
-      params = params.append('more', 'true');
-    }
-    Object.keys(queryParams.filter).forEach(function (key) {
-      if (typeof queryParams.filter[key] !== 'string' || queryParams.filter[key] !== '') {
-        keys.push(key);
-        values.push(queryParams.filter[key]);
-      }
-    });
-    if (keys.length > 0) {
-      params = params.append('filter.keys', keys.join('|')).append('filter.vals', values.join('|'));
-    }
-    return params;
-  }
 }

@@ -221,6 +221,12 @@ namespace JeeAccount.Services.AccountManagementService
                 using (DpsConnection cnn = new DpsConnection(ConnectionString))
                 {
                     username = accountManagementReponsitory.GetUsername(cnn, objCustomData.userId, customerId);
+                    if (username == null)
+                    {
+                        identity.message = "UserID không tồn tại";
+                        identity.statusCode = Int32.Parse(Constant.ERRORDATA);
+                        return identity;
+                    }
                 }
 
                 var updateCustom = await this.identityServerController.UppdateCustomData(Admin_access_token, username, objCustomData);

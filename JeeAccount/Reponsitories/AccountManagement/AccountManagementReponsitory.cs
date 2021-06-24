@@ -423,7 +423,9 @@ where Username = @Username and (Disable != 1 or Disable is null)";
         public string GetUsername(DpsConnection cnn, long userId, long customerId)
         {
             var username = cnn.ExecuteScalar($"select Username from AccountList where UserID = {userId} and CustomerID = {customerId}");
-            return username.ToString();
+            if (username != null)
+                return username.ToString();
+            return null;
         }
 
         public ReturnSqlModel UpdatePersonalInfoCustomData(DpsConnection cnn, PersonalInfoCustomData personalInfoCustom, long userId, long customerId)
@@ -616,17 +618,9 @@ where Username = @Username and (Disable != 1 or Disable is null)";
             List<int> appid = new List<int>();
             foreach (string code in AppCode)
             {
-                if (code.Equals("jee-doc"))
-                {
-                    appid.Add(6);
-                }
-                else
-                {
-                    var id = cnn.ExecuteScalar($"select AppId from AppList where AppCode = '{code}'");
-                    appid.Add(Int32.Parse(id.ToString()));
-                }
+                var id = cnn.ExecuteScalar($"select AppId from AppList where AppCode = '{code}'");
+                appid.Add(Int32.Parse(id.ToString()));
             }
-
             return appid;
         }
 
