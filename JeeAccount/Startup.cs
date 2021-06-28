@@ -53,6 +53,12 @@ namespace JeeAccount
             string internal_secret = kafkaDataSecret["internal_secret"].ToString();
             Configuration["Jwt:access_secret"] = access_secret;
             Configuration["Jwt:internal_secret"] = internal_secret;
+            System.Console.WriteLine("==============");
+            System.Console.WriteLine(access_secret);
+            System.Console.WriteLine("==============");
+            System.Console.WriteLine(internal_secret);
+            System.Console.WriteLine("==============");
+
             Secret<SecretData> kafka = vaultClient.V1.Secrets.KeyValue.V2.ReadSecretAsync(path: "kafka", mountPoint: "kv").Result;
             IDictionary<string, object> kafkaData = kafka.Data.Data;
             string KafkaUser = kafkaData["username"].ToString();

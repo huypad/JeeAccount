@@ -4,7 +4,7 @@
       <img id="img-avatar" src="{{(service.mainUser$ | async).AvartarImgURL}}">
     </div>
     <div class="post-comment-input">
-      <textarea (focus)="focusFunction()" (focusout)="focusOutFunction()" (keyup.escape)="cancleComment()"
+      <textarea #txtarea (focus)="focusFunction()" (focusout)="focusOutFunction()" (keyup.escape)="cancleComment()"
         (keydown)="onKeydown($event)" (keyup.enter)="validateCommentAndPost()" [(ngModel)]="inputTextArea"
         placeholder="Viết bình luận" class="textarea-input" cdkTextareaAutosize>
       </textarea>

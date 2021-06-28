@@ -489,6 +489,21 @@ namespace JeeAccount.Services.AccountManagementService
             }
         }
 
+        public async Task<IEnumerable<long>> GetListJustCustormerID()
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+
+            string sql = @"select RowID from CustomerList";
+            using (DpsConnection cnn = new DpsConnection(ConnectionString))
+            {
+                dt = cnn.CreateDataTable(sql, Conds);
+                var result = dt.AsEnumerable().Select(row => long.Parse(row["RowID"].ToString()));
+
+                return await Task.FromResult(result).ConfigureAwait(false);
+            }
+        }
+
         public string GetUsernameByUserID(string UserID, long customerID)
         {
             using (DpsConnection cnn = new DpsConnection(ConnectionString))

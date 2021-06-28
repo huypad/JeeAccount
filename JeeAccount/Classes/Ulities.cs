@@ -186,6 +186,24 @@ namespace JeeAccount.Classes
             }
         }
 
+        public static bool IsInternaltoken(IHeaderDictionary pHeader, string internal_secret)
+        {
+            try
+            {
+                if (pHeader == null) return false;
+                if (!pHeader.ContainsKey(HeaderNames.Authorization)) return false;
+
+                IHeaderDictionary _d = pHeader;
+                string _bearer_token, _user;
+                _bearer_token = _d[HeaderNames.Authorization].ToString().Replace("Bearer ", "");
+                return _bearer_token == internal_secret;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
         public static string GetUsernameByHeader(IHeaderDictionary pHeader)
         {
             try

@@ -1,5 +1,5 @@
 import { BehaviorSubject, of, Subject } from 'rxjs';
-import { Component, Input, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, ViewChild, ElementRef, EventEmitter, Output } from '@angular/core';
 import { CommentDTO } from '../jee-comment.model';
 import { JeeCommentService } from '../jee-comment.service';
 import { catchError, finalize, takeUntil, tap, share } from 'rxjs/operators';
@@ -16,20 +16,23 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
 
   @Input() objectID: string;
   @Input() comment: CommentDTO;
+  @Input() isReply: boolean = false;
   showSpinner$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   showEnterComment$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   ClickShowReply$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-
+  @Output() isFocus = new EventEmitter<any>();
+  isFocus$$:  BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   ngOnInit() {
   }
 
   showEnterComment() {
     this.ClickShowReply$.next(true);
     this.showEnterComment$.next(true);
+    this.isFocus.emit(true);
+    console.log(this.isFocus);
   }
 
   showReply() {
-    console.log('show replyyyyyyyyyy');
     this.showSpinner$.next(true);
     this.ClickShowReply$.next(true);
     if (this.comment.Replies.length > 0) {
@@ -39,6 +42,10 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+  }
+
+  getFocus(event) {
+    this.isFocus$$.next(true);
   }
 
   @ViewChild('videoPlayer') videoplayer: ElementRef;

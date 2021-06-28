@@ -23,12 +23,14 @@ namespace JeeAccount.Controllers
         private IConfiguration _config;
         private IAccountManagementService accountManagementService;
         private readonly string _JeeCustomerSecrectkey;
+        private readonly string _internal_secret;
 
         public AccountManagementController(IConfiguration configuration, IAccountManagementService accountManagementService)
         {
             _config = configuration;
             this.accountManagementService = accountManagementService;
             _JeeCustomerSecrectkey = configuration.GetValue<string>("AppConfig:Secrectkey:JeeCustomer");
+            _internal_secret = configuration["Jwt:internal_secret"];
         }
 
         [HttpGet("usernamesByCustermerID")]
@@ -49,6 +51,44 @@ namespace JeeAccount.Controllers
             catch (Exception ex)
             {
                 return JsonResultCommon.Exception(ex);
+            }
+        }
+
+        [HttpGet("usernamesByCustermerID/internal/{customerID}")]
+        public async Task<IActionResult> GetListUsernameByCustormerIDInternal(long customerID)
+        {
+            try
+            {
+                var isInternalToken = Ulities.IsInternaltoken(HttpContext.Request.Headers, _internal_secret);
+                if (!isInternalToken)
+                {
+                    return NotFound(MessageReturnHelper.Unauthorized());
+                }
+                var usernames = await accountManagementService.GetListUsernameByCustormerID(customerID);
+                return Ok(usernames);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpGet("GetListCustomerID/internal")]
+        public async Task<IActionResult> GetListCustomerID()
+        {
+            try
+            {
+                var isInternalToken = Ulities.IsInternaltoken(HttpContext.Request.Headers, _internal_secret);
+                if (!isInternalToken)
+                {
+                    return NotFound(MessageReturnHelper.Unauthorized());
+                }
+                var list = await accountManagementService.GetListJustCustormerID();
+                return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
             }
         }
 
