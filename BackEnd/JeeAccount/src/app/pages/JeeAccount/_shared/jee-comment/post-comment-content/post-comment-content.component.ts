@@ -2,7 +2,7 @@ import { BehaviorSubject, of, Subject } from 'rxjs';
 import { Component, Input, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommentDTO } from '../jee-comment.model';
 import { JeeCommentService } from '../jee-comment.service';
-import { catchError, finalize, takeUntil, tap } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, tap, share } from 'rxjs/operators';
 
 @Component({
   selector: 'jeecomment-post-comment-content',
@@ -14,38 +14,31 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
   private readonly onDestroy = new Subject<void>();
   constructor(public service: JeeCommentService) { }
 
-  @Input() ObjectID: string;
-  @Input() Comment: CommentDTO;
-  @Input() ShowAllReply?: boolean;
-  comment$ = new BehaviorSubject<CommentDTO>(undefined);
-  ShowSpinner$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  @Input() objectID: string;
+  @Input() comment: CommentDTO;
+  showSpinner$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  showEnterComment$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  ClickShowReply$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  postInput = '';
   ngOnInit() {
-    this.comment$.next(this.Comment);
-    if (this.ShowAllReply) {
-      this.showReply();
-    }
   }
+
+  showEnterComment() {
+    this.ClickShowReply$.next(true);
+    this.showEnterComment$.next(true);
+  }
+
   showReply() {
-    this.ShowSpinner$.next(true);
-    this.service.showFullComment(this.ObjectID, this.Comment.Id)
-      .pipe(
-        tap((res) => {
-          this.ShowSpinner$.next(false);
-          this.comment$.next(res);
-        }),
-        catchError(err => {
-          console.log(err);
-          return of();
-        }),
-        finalize(() => {
-        }),
-        takeUntil(this.onDestroy)).
-      subscribe();
+    console.log('show replyyyyyyyyyy');
+    this.showSpinner$.next(true);
+    this.ClickShowReply$.next(true);
+    if (this.comment.Replies.length > 0) {
+      this.showEnterComment$.next(true);
+    }
+    this.showSpinner$.next(false);
   }
+
   ngOnDestroy(): void {
-    this.onDestroy.next();
   }
 
   @ViewChild('videoPlayer') videoplayer: ElementRef;

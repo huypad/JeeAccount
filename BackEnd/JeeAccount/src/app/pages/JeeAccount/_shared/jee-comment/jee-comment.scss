@@ -298,3 +298,10 @@ $icon-color: black;
   //border-top-color: #000000;
   animation: spinnercustom .8s linear infinite;
 }
+
+.show-error {
+  font-family: 'Roboto';
+  color: yellowgreen;
+  text-align: center;
+  font-weight: 600;
+}

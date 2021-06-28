@@ -1,4 +1,4 @@
-<div class="card-body comment-container">
+<div class="card-body comment-container" *ngIf="!(service.isLoading$ | async)">
   <div class="comment-header-container">
     <div *ngIf="!hiddenLike" class="comment-header comment-header-like">
       <div class="comment-header-reaction">
@@ -18,42 +18,31 @@
   </div>
   <div *ngIf="ShowSpinner$.asObservable()| async; else loading" class="click-show-spinner" [class.spinner]="true">
   </div>
+  <div *ngIf="(errorMessage$| async) !== ''" class="show-error">
+    Comment không hợp lệ hoặc đã bị xoá, vui lòng thử lại sau.
+  </div>
   <ng-template #loading>
-    <div class="comment-content-container" *ngIf="(items$ | async)">
-      <div class="comment-filter" *ngIf="(ShowFilter$.asObservable()| async)">
-        <div class="view-more-comment">
-          <span class="text-filter">
-            Xem thêm bình luận</span>
+    <div class="comment-content-container" *ngIf="item">
+      <ng-container>
+        <div class="comment-filter">
+          <div class="view-more-comment">
+            <span class="text-filter">
+              Xem thêm bình luận</span>
+          </div>
+          <div class="filter">
+            <span>Toàn bộ bình luận </span>
+            <i data-visualcompletion="css-img" class="item-align-middle" id="filter-icon"></i>
+          </div>
         </div>
-        <div class="filter">
-          <span>Toàn bộ bình luận </span>
-          <i data-visualcompletion="css-img" class="item-align-middle" id="filter-icon"></i>
-        </div>
-      </div>
-      <ng-container *ngFor="let item of lstComment$ |async">
-        <jeecomment-post-comment-content [ObjectID]="objectID" [Comment]="item" [ShowAllReply]="item.LengthReply <= 3">
-        </jeecomment-post-comment-content>
+        <ng-container *ngFor="let comment of item.Comments">
+          <jeecomment-post-comment-content [objectID]="objectID" [comment]="comment">
+          </jeecomment-post-comment-content>
+        </ng-container>
       </ng-container>
-      <div class="post-comment" *ngIf="service.mainUser">
-        <div class="post-comment-avatar">
-          <img id="img-avatar" src="{{service.mainUser.AvartarImgURL}}">
-        </div>
-        <div class="post-comment-input">
-          <textarea (keydown)="onKeydown($event)" (keyup.enter)="ValidateCommentAndPost()"
-            [(ngModel)]="postComment.Text" placeholder="Viết bình luận" class="textarea-input"
-            cdkTextareaAutosize></textarea>
-          <ul class="comment-icon">
-            <li class="icon"><span>
-                <div role="button" tabindex="0"><i id="emotion-icon"></i>
-                </div>
-              </span></li>
-            <li class="icon"><span>
-                <div role="button" tabindex="0"><i id="image-icon"></i>
-                </div>
-              </span><input id="input-flie" accept="image/*, image/heic, image/heif" type="file"></li>
-          </ul>
-        </div>
-      </div>
+      <ng-container *ngIf="(errorMessage$ | async)===''">
+        <jeecomment-enter-comment-content *ngIf=" !isFirstTime" [objectID]="objectID">
+        </jeecomment-enter-comment-content>
+      </ng-container>
     </div>
   </ng-template>
 </div>

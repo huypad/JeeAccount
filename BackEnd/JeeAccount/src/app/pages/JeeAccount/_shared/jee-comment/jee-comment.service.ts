@@ -3,9 +3,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, forkJoin, BehaviorSubject, of, Subscription } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
-import { catchError, finalize, take, takeUntil, tap } from 'rxjs/operators';
+import { catchError, finalize, share, take, takeUntil, tap } from 'rxjs/operators';
 import { AuthService } from 'src/app/modules/auth';
-import { QueryFilterComment, UserCommentInfo } from './jee-comment.model';
+import { QueryFilterComment, UserCommentInfo, PostCommentModel } from './jee-comment.model';
 
 const API_JEECOMMENT_URL = environment.HOST_JEECOMMENT_API + '/api';
 const API_JEEACCOUNT_URL = environment.HOST_JEEACCOUNT_API + '/api';
@@ -14,13 +14,19 @@ const API_JEEACCOUNT_URL = environment.HOST_JEEACCOUNT_API + '/api';
 export class JeeCommentService {
   private _isLoading$ = new BehaviorSubject<boolean>(false);
   private _errorMessage$ = new BehaviorSubject<string>('');
-  public lstUser: UserCommentInfo[];
-  public mainUser: UserCommentInfo;
+  public lstUser: UserCommentInfo[] = [];
+  private _mainUser$: BehaviorSubject<UserCommentInfo> = new BehaviorSubject<UserCommentInfo>(undefined);
+
+  get isLoading$() {
+    return this._isLoading$.asObservable();
+  }
+
+  get mainUser$() {
+    return this._mainUser$.asObservable();
+  }
 
   constructor(private http: HttpClient, private httpUtils: HttpUtilsService, private _authService: AuthService) {
     this.getlstUserCommentInfo();
-    this.lstUser = [];
-    this.mainUser = new UserCommentInfo();
   }
 
   public showTopicCommentByObjectID(objectID: string, filter: QueryFilterComment): Observable<any> {
@@ -40,7 +46,6 @@ export class JeeCommentService {
       headers: httpHeaders,
     });
   }
-
 
   private getHttpParamsFilter(filter: any): HttpParams {
     let query = new HttpParams()
@@ -67,7 +72,7 @@ export class JeeCommentService {
               this.lstUser.push(item);
 
               // init main User Login
-              if (usernamelogin === item.Username) this.mainUser = item;
+              if (usernamelogin === item.Username) this._mainUser$.next(item);
             });
           } else {
             this._errorMessage$.next(res.error.message);
@@ -77,6 +82,7 @@ export class JeeCommentService {
         finalize(() => {
           this._isLoading$.next(false);
         }),
+        share()
       ).
       subscribe();
   }
@@ -100,4 +106,43 @@ export class JeeCommentService {
     if (avatar) return avatar.AvartarImgURL;
     return 'https://cdn.jee.vn/jee-account/images/avatars/default2.png';
   }
+
+  // tiếng việt icon
+  public i18n = {
+    search: 'Tìm kiếm',
+    emojilist: 'Danh sách Emoji',
+    notfound: 'Không tìm thấy Emoji ',
+    clear: 'Xoá sạch',
+    categories: {
+      search: 'Kết quả',
+      recent: 'Sử dụng thường xuyên',
+      people: 'Biểu tượng mặt cười & Con người',
+      nature: 'Động vật & Thiên nhiên',
+      foods: 'Đồ ăn & Nước uống',
+      activity: 'Hoạt động',
+      places: 'Du lịch & Nghỉ dưỡng',
+      objects: 'Đồ vật',
+      symbols: 'Biểu tượng',
+      flags: 'Cờ',
+      custom: 'Custom',
+    },
+    skintones: {
+      1: 'Default Skin Tone',
+      2: 'Light Skin Tone',
+      3: 'Medium-Light Skin Tone',
+      4: 'Medium Skin Tone',
+      5: 'Medium-Dark Skin Tone',
+      6: 'Dark Skin Tone',
+    }
+  };
+
+  public postCommentModel(model: PostCommentModel): Observable<any> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const url = API_JEEACCOUNT_URL + `/comments/postcomment`;
+    return this.http.post<any>(url, model, {
+      headers: httpHeaders
+    });
+  }
+
+
 }

@@ -1,19 +1,19 @@
-<ul class="post-comment-content" *ngIf="comment$.asObservable() | async">
+<ul class="post-comment-content" *ngIf="comment">
   <li class="list-comment">
     <div class="post-comment">
       <div class="post-comment-avatar">
-        <img id="img-avatar" src="{{service.getUriAvatar(comment$.value.Username)}}">
+        <img id="img-avatar" src="{{service.getUriAvatar(comment.Username)}}">
       </div>
       <div class="post-comment-input post-comment-input-title">
         <div class="comment-name-title">
           <span class="name">
-            {{service.getDisplay(comment$.value.Username)}}
+            {{service.getDisplay(comment.Username)}}
           </span>
           <!-- <span class="title">
               Dev
             </span> -->
         </div>
-        <span class="input-comment-span">{{comment$.value.Text}}</span>
+        <span class="input-comment-span">{{comment.Text}}</span>
       </div>
       <div class="icon-edit-report">
         <span>
@@ -26,17 +26,17 @@
       </div>
     </div>
     <div class="post-comment-image">
-      <ng-container *ngFor="let image of comment$.value.Attachs.Images">
+      <ng-container *ngFor="let image of comment.Attachs.Images">
         <img [src]="image">
       </ng-container>
     </div>
     <div class="post-comment-video">
-      <video *ngFor="let video of comment$.value.Attachs.Videos" controls (click)="toggleVideo()" #videoPlayer>
+      <video *ngFor="let video of comment.Attachs.Videos" controls (click)="toggleVideo()" #videoPlayer>
         <source src="{{video}}" type="video/mp4" />
       </video>
     </div>
     <div class="post-comment-file">
-      <div *ngFor="let file of comment$.value.Attachs.Files">
+      <div *ngFor="let file of comment.Attachs.Files">
         <img src="https://cdn.jee.vn/jee-comment/icons/facebook-comment-header/download.png">
         <a target="_self" [href]="file" [download]="file"> {{file.split('/')[file.split('/').length - 1]}} </a>
       </div>
@@ -47,22 +47,21 @@
           <div class="post-comment-reaction">
             <jeecomment-reaction-content></jeecomment-reaction-content>
           </div>
-          <span *ngIf="!comment$.value.UserReaction" class="text-filter"> Thích </span>
-          <span *ngIf="comment$.value.UserReaction" class="text-filter"
-            [style.color]="comment$.value.UserReactionColor">
-            {{comment$.value.UserReaction}} </span>
+          <span *ngIf="!comment.UserReaction" class="text-filter"> Thích </span>
+          <span *ngIf="comment.UserReaction" class="text-filter" [style.color]="comment.UserReactionColor">
+            {{comment.UserReaction}} </span>
         </li>
-        <li class="bottom-comment-like-reply">
+        <li class="bottom-comment-like-reply" (click)="showEnterComment()">
           <span class="text-filter">
             Trả lời
           </span>
         </li>
         <li>
           <span>
-            {{comment$.value.DateCreated | date:'dd/MM/yyyy hh:mm:ss'}}
+            {{comment.DateCreated | date:'dd/MM/yyyy hh:mm:ss'}}
           </span>
         </li>
-        <li *ngIf="comment$.value.IsEdit">
+        <li *ngIf="comment.IsEdit">
           <span>
             Đã sửa
           </span>
@@ -71,42 +70,26 @@
     </div>
   </li>
   <li class="list-comment list-comment-reply">
-    <div class="count-comment-reply text-filter" (click)="showReply()"
-      *ngIf="(comment$.value.Replies.length == 0) && (comment$.value.LengthReply > 0)">
-      <div *ngIf="ShowSpinner$.asObservable()| async" class=" click-show-spinner" [class.spinner]="true">
-      </div>
-      <div class="icon-reply">
-        <div role="button" tabindex="0"><i id="reply-icon"></i>
+    <ng-container *ngIf="comment.Replies.length > 0">
+      <div class="count-comment-reply text-filter" (click)="showReply()"
+        *ngIf="!(ClickShowReply$.asObservable() | async)">
+        <div *ngIf="showSpinner$.asObservable()| async" class=" click-show-spinner" [class.spinner]="true">
         </div>
+        <div class="icon-reply">
+          <div role="button" tabindex="0"><i id="reply-icon"></i>
+          </div>
+        </div>
+        <span>
+          {{comment.LengthReply}} Trả lời
+        </span>
       </div>
-      <span>
-        {{comment$.value.LengthReply}} Trả lời
-      </span>
-    </div>
-    <ng-container *ngFor="let reply of comment$.value.Replies">
-      <jeecomment-post-comment-content [Comment]="reply" [ObjectID]="ObjectID"></jeecomment-post-comment-content>
     </ng-container>
-    <div class="post-comment" *ngIf="comment$.value.Replies.length > 0">
-      <div class="post-comment-avatar">
-        <img id="img-avatar" src="{{service.mainUser.AvartarImgURL}}">
-      </div>
-      <div class="post-comment-input post-comment-input-reply">
-        <textarea [(value)]="postInput" placeholder="Viết bình luận" class="textarea-input"
-          cdkTextareaAutosize></textarea>
-        <ul class="comment-icon">
-          <li class="icon"><span>
-              <div role="button" tabindex="0"><i id="emotion-icon"></i>
-              </div>
-            </span></li>
-          <li class="icon"><span>
-              <div role="button" tabindex="0"><i id="image-icon"></i>
-              </div>
-            </span><input id="input-flie"
-              accept="video/*,  video/x-m4v, video/webm, video/x-ms-wmv, video/x-msvideo, video/3gpp, video/flv, video/x-flv, video/mp4, video/quicktime, video/mpeg, video/ogv, .ts, .mkv, image/*, image/heic, image/heif"
-              type="file">
-          </li>
-        </ul>
-      </div>
-    </div>
+    <ng-container *ngIf="ClickShowReply$.asObservable() | async">
+      <jeecomment-post-comment-content *ngFor="let reply of comment.Replies" [comment]="reply" [objectID]="objectID">
+      </jeecomment-post-comment-content>
+      <jeecomment-enter-comment-content *ngIf="(showEnterComment$.asObservable()) | async " [objectID]="objectID"
+        [commentID]="comment.Id">
+      </jeecomment-enter-comment-content>
+    </ng-container>
   </li>
 </ul>

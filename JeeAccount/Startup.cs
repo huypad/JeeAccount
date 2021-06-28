@@ -6,6 +6,7 @@ using JeeAccount.Reponsitories.CustomerManagement;
 using JeeAccount.Reponsitories.DatabaseManagement;
 using JeeAccount.Reponsitories.Mail;
 using JeeAccount.Services.AccountManagementService;
+using JeeAccount.Services.CommentService;
 using JeeAccount.Services.CustomerManagementService;
 using JeeAccount.Services.DatabaseManagementService;
 using JeeAccount.Services.DepartmentManagementService;
@@ -67,7 +68,6 @@ namespace JeeAccount
 
             // add Kafka
             services.addKafkaService();
-
             services.AddCors(o => o.AddPolicy("AllowOrigin", builder =>
             {
                 builder.AllowAnyOrigin()
@@ -153,6 +153,7 @@ namespace JeeAccount
             services.AddTransient<IDepartmentManagementService, DepartmentManagementService>();
             services.AddTransient<IMailService, MailService>();
             services.AddTransient<IStructureManagementService, StructureManagementService>();
+            services.AddTransient<ICommentService, CommentService>();
 
             #endregion add Services
 

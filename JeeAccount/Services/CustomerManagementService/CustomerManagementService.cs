@@ -70,7 +70,7 @@ namespace JeeAccount.Services.CustomerManagementService
         {
             using (DpsConnection cnn = new DpsConnection(ConnectionString))
             {
-                string TopicAddNewCustomer = configuration.GetValue<string>("KafkaConfig:TopicProduce:jeeplatformInitialization");
+                string TopicAddNewCustomer = configuration.GetValue<string>("KafkaConfig:TopicProduce:JeeplatformInitialization");
                 IdentityServerReturn identityServerReturn = new IdentityServerReturn();
                 try
                 {

@@ -22,6 +22,7 @@ import { MatTableModule } from '@angular/material/table';
 import { DepartmentManagementService } from '../Management/DepartmentManagement/Sevices/department-management.service';
 import { AccountManagementService } from '../Management/AccountManagement/Services/account-management.service';
 import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
+import { DemoCommentService } from './Services/demo-comment.service';
 
 @NgModule({
   declarations: [PageGidtersDashboardComponent, AddCloseWidgetDialogComponent, DanhSachTruyCapNhanhWidgetComponent],
@@ -47,7 +48,8 @@ import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
       },
     ]),
   ],
-  providers: [PageGirdtersDashboardService, DanhMucChungService, DepartmentManagementService, AccountManagementService,
+  providers: [PageGirdtersDashboardService, DanhMucChungService, DepartmentManagementService,
+    AccountManagementService, DemoCommentService,
     { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true, height: 'auto', width: '900px' } },
   ],
   exports: [PageGidtersDashboardComponent, AddCloseWidgetDialogComponent, DanhSachTruyCapNhanhWidgetComponent],

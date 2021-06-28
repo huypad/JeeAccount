@@ -12,19 +12,24 @@ import { JeeCommentPostContentComponent } from './post-comment-content/post-comm
 import { JeeCommentReactionContentComponent } from './reaction-comment-content/reaction-comment-content.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
+import { PickerModule } from '@ctrl/ngx-emoji-mart';
+import { JeeCommentEnterCommentContentComponent } from './enter-comment-content/enter-comment-content.component';
+import { ClickOutsideDirective } from './enter-comment-content/click-outside.directive';
 
 @NgModule({
   declarations: [
     JeeCommentComponent,
     JeeCommentPostContentComponent,
-    JeeCommentReactionContentComponent
+    JeeCommentReactionContentComponent,
+    JeeCommentEnterCommentContentComponent,
+    ClickOutsideDirective
   ],
   imports: [CommonModule, MatChipsModule, NgxMatSelectSearchModule, InlineSVGModule, MatIconModule, MatInputModule,
-    MatFormFieldModule, MatTooltipModule, FormsModule
+    MatFormFieldModule, MatTooltipModule, FormsModule, PickerModule
   ],
   providers: [
     JeeCommentService],
   entryComponents: [JeeCommentComponent, JeeCommentPostContentComponent, JeeCommentReactionContentComponent],
-  exports: [JeeCommentComponent, JeeCommentPostContentComponent, JeeCommentReactionContentComponent],
+  exports: [JeeCommentComponent, JeeCommentPostContentComponent, JeeCommentReactionContentComponent, JeeCommentEnterCommentContentComponent],
 })
 export class JeeCommentModule { }

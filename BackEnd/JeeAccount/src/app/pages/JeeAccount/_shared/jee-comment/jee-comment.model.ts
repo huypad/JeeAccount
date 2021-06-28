@@ -51,25 +51,31 @@ export class TopicCommnet {
   }
 }
 
-export class CommentModel {
+export class PostCommentModel {
   TopicCommentID: string;
   CommentID: string;
   ReplyCommentID: string;
   Text: string;
   Attachs: Attach;
-  Reactions: Reaction;
-  DateCreated: Date;
-  Replies: CommentModel[];
-
   constructor() {
     this.TopicCommentID = '';
     this.CommentID = '';
     this.ReplyCommentID = '';
     this.Text = '';
     this.Attachs = new Attach();
-    this.Reactions = new Reaction();
-    this.DateCreated = new Date();
-    this.Replies = [];
+  }
+}
+
+export class ReactionCommentModel {
+  TopicCommentID: string;
+  CommentID: string;
+  ReplyCommentID: string;
+  UserReaction: string;
+  constructor() {
+    this.TopicCommentID = '';
+    this.CommentID = '';
+    this.ReplyCommentID = '';
+    this.UserReaction = '';
   }
 }
 
