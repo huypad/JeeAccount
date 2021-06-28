@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, Input, EventEmitter, OnDestroy } from '@angular/core';
 // Material
 // RXJS
-import { Subscription, Subject, of, Observable } from 'rxjs';
+import { Subscription, Subject, of, Observable, BehaviorSubject } from 'rxjs';
 // Services
 import { LayoutUtilsService, MessageType } from '../../../_core/utils/layout-utils.service';
 // Models
@@ -18,17 +18,17 @@ import { finalize, tap, share, takeUntil, catchError } from 'rxjs/operators';
 })
 export class DanhSachTruyCapNhanhWidgetComponent implements OnInit, OnDestroy {
 
-  topicObjectID$: Observable<string>;
+  topicObjectID$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   private readonly componentName = 'm-danh-sach-truy-cap-nhanh-widget';
   private readonly onDestroy = new Subject<void>();
-
+  numbers = Array(100).fill(1).map((x, i) => x + i);
   constructor(public commentService: DemoCommentService) { }
 
   ngOnInit() {
+    console.log(this.numbers);
     this.commentService.getTopicObjectIDByComponentName(this.componentName).pipe(
       tap((res) => {
-        console.log('topic id', res);
-        this.topicObjectID$ = of(res);
+        this.topicObjectID$.next(res);
       }),
       catchError(err => {
         console.log(err);

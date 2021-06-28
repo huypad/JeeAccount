@@ -23,6 +23,7 @@ import { DepartmentManagementService } from '../Management/DepartmentManagement/
 import { AccountManagementService } from '../Management/AccountManagement/Services/account-management.service';
 import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 import { DemoCommentService } from './Services/demo-comment.service';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 @NgModule({
   declarations: [PageGidtersDashboardComponent, AddCloseWidgetDialogComponent, DanhSachTruyCapNhanhWidgetComponent],
@@ -41,6 +42,7 @@ import { DemoCommentService } from './Services/demo-comment.service';
     MatSlideToggleModule,
     PerfectScrollbarModule,
     MatTableModule,
+    ScrollingModule,
     RouterModule.forChild([
       {
         path: '',

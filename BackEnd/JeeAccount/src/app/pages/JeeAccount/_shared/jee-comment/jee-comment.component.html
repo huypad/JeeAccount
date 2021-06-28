@@ -1,3 +1,5 @@
+<div style="height: 30px; background-color: rosybrown; text-align: center;"><span
+    style="color: white; font-weight: 800;">{{number}}</span></div>
 <div class="card-body comment-container" *ngIf="!(service.isLoading$ | async)">
   <div class="comment-header-container">
     <div *ngIf="!hiddenLike" class="comment-header comment-header-like">
@@ -39,10 +41,13 @@
           </jeecomment-post-comment-content>
         </ng-container>
       </ng-container>
-      <ng-container *ngIf="(errorMessage$ | async)===''">
+      <ng-container *ngIf=" (errorMessage$ | async)===''">
         <jeecomment-enter-comment-content *ngIf=" !isFirstTime" [objectID]="objectID">
         </jeecomment-enter-comment-content>
       </ng-container>
     </div>
   </ng-template>
+  <!-- <div class="comment-content-container">
+    <jeecomment-enter-comment-content [objectID]="objectID"></jeecomment-enter-comment-content>
+  </div> -->
 </div>

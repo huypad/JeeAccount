@@ -53,14 +53,16 @@ export class JeeCommentEnterCommentContentComponent implements OnInit {
   }
 
   validateCommentAndPost() {
-    const model = this.prepareComment();
-    if (this.checkCommentIsEqualEmpty(model)) {
-      return;
-    }
-    if (this.isEdit) {
-      this.updateComment(model);
-    } else {
-      this.postComment(model);
+    if (!this.isLoading$.value) {
+      const model = this.prepareComment();
+      if (this.checkCommentIsEqualEmpty(model)) {
+        return;
+      }
+      if (this.isEdit) {
+        this.updateComment(model);
+      } else {
+        this.postComment(model);
+      }
     }
   }
 

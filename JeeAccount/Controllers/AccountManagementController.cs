@@ -315,7 +315,6 @@ namespace JeeAccount.Controllers
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
-                //if (!accountManagementService.checkUserIDInCustomerID(UserID, customData.JeeAccount.CustomerID)) return JsonResultCommon.ThatBai("Bạn không có quyền truy xuất UserID này");
                 var appList = await accountManagementService.GetListAppByCustomerID(customData.JeeAccount.CustomerID);
                 return JsonResultCommon.ThanhCong(appList);
             }

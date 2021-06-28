@@ -49,12 +49,17 @@ export class JeeCommentComponent implements OnInit {
   ViewLengthComment: number = 10;
   @Input() objectID: string;
   @Input() showCommentDefault?: boolean;
+  @Input() number: number;
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
 
   constructor(public service: JeeCommentService, public cd: ChangeDetectorRef) { }
 
   ngOnInit() {
-    if (this.showCommentDefault) this.clickButtonComment();
+    if (this.showCommentDefault) {
+      setTimeout(() => {
+        this.clickButtonComment();
+      }, 2000);
+    };
   }
 
   clickButtonComment() {

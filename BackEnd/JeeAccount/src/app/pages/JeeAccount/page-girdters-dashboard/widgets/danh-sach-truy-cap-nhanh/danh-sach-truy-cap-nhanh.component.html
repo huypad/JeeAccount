@@ -35,6 +35,12 @@
   ::ng-deep m-danh-sach-truy-cap-nhanh-widget .m-portlet--head-lg.m-portlet--full-height.m-portlet--rounded-force {
     margin: 0;
   }
+
+  .viewport {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
 </style>
 <!-- <div class="card card-custom" style="color: #4169e1;">
   <perfect-scrollbar class="m-scrollable m-scroller">
@@ -64,5 +70,8 @@
   </perfect-scrollbar>
 </div> -->
 <div class="card card-custom">
-  <app-jee-comment  [objectID]="topicObjectID$ | async"></app-jee-comment>
+  <cdk-virtual-scroll-viewport itemSize="10" class="viewport" style="height:800px;">
+    <app-jee-comment *cdkVirtualFor="let item of numbers" [number]="item" [showCommentDefault]="true"
+      [objectID]="topicObjectID$.asObservable() | async"></app-jee-comment>
+  </cdk-virtual-scroll-viewport>
 </div>
