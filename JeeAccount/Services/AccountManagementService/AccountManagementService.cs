@@ -493,8 +493,24 @@ namespace JeeAccount.Services.AccountManagementService
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
-
             string sql = @"select RowID from CustomerList";
+            using (DpsConnection cnn = new DpsConnection(ConnectionString))
+            {
+                dt = cnn.CreateDataTable(sql, Conds);
+                var result = dt.AsEnumerable().Select(row => long.Parse(row["RowID"].ToString()));
+
+                return await Task.FromResult(result).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<IEnumerable<long>> GetListJustCustormerIDAppCode(string AppCode)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            string sql = $@"select  CustomerList.RowID from CustomerList
+join Customer_App on CustomerList.RowID = Customer_App.CustomerID
+join AppList on AppList.AppID = Customer_App.AppID
+where AppList.AppCode = '{AppCode}'";
             using (DpsConnection cnn = new DpsConnection(ConnectionString))
             {
                 dt = cnn.CreateDataTable(sql, Conds);

@@ -80,6 +80,8 @@ namespace JeeAccount.Services.AccountManagementService
 
         Task<IEnumerable<long>> GetListJustCustormerID();
 
+        Task<IEnumerable<long>> GetListJustCustormerIDAppCode(string appCode);
+
         Task<IEnumerable<string>> GetListDirectManager(long custormerID);
 
         Task<IEnumerable<AccUsernameModel>> ListNhanVienCapDuoiDirectManagerByDirectManager(string DirectManager);

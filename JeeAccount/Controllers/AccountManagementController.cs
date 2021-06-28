@@ -65,6 +65,10 @@ namespace JeeAccount.Controllers
                     return NotFound(MessageReturnHelper.Unauthorized());
                 }
                 var usernames = await accountManagementService.GetListUsernameByCustormerID(customerID);
+                if (usernames.Count() == 0)
+                {
+                    return NotFound(MessageReturnHelper.Custom("Không tồn tại khách hàng này"));
+                }
                 return Ok(usernames);
             }
             catch (Exception ex)
@@ -84,6 +88,33 @@ namespace JeeAccount.Controllers
                     return NotFound(MessageReturnHelper.Unauthorized());
                 }
                 var list = await accountManagementService.GetListJustCustormerID();
+                if (list.Count() == 0)
+                {
+                    return NotFound(MessageReturnHelper.Custom("Không tồn tại khách hàng"));
+                }
+                return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpGet("GetListCustomerID/internal/{appCode}")]
+        public async Task<IActionResult> GetListCustomerIDAppCode(string appCode)
+        {
+            try
+            {
+                var isInternalToken = Ulities.IsInternaltoken(HttpContext.Request.Headers, _internal_secret);
+                if (!isInternalToken)
+                {
+                    return NotFound(MessageReturnHelper.Unauthorized());
+                }
+                var list = await accountManagementService.GetListJustCustormerIDAppCode(appCode);
+                if (list.Count() == 0)
+                {
+                    return NotFound(MessageReturnHelper.Custom("Không tồn tại khách hàng có appCode này"));
+                }
                 return Ok(list);
             }
             catch (Exception ex)
