@@ -5,7 +5,7 @@ services:
     image: ${REGISTRY_HOST}/${REGISTRY_PUBLISHER}/${PROJECT_NAME}-api:latest
     build:
       context: ../
-      dockerfile: ./JeeAccount/${DOCKERFILE_NAME}
+      dockerfile: ./JeeAccount/Dockerfile
 
   backend:
     image: ${REGISTRY_HOST}/${REGISTRY_PUBLISHER}/${PROJECT_NAME}-backend:latest
