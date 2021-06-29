@@ -168,9 +168,11 @@ ul {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: end;
   .input-comment-span {
     font-weight: normal;
     font-family: "Roboto";
+    text-align: left;
   }
 }
 
@@ -188,6 +190,8 @@ ul {
 .post-comment-image {
   padding-left: 48px;
   padding-top: 0px;
+  display: flex;
+  flex-wrap: wrap;
   img {
     border: 0;
     max-height: 37.5vh;
@@ -201,7 +205,8 @@ ul {
   padding-left: 48px;
   padding-top: 0px;
   video {
-    max-width: 35vw;
+    display: block;
+    max-width: 100%;
   }
 }
 

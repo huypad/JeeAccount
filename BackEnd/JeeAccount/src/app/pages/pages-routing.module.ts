@@ -12,6 +12,11 @@ const routes: Routes = [
         loadChildren: () => import('./builder/builder.module').then((m) => m.BuilderModule),
       },
       {
+        path: 'comments',
+        loadChildren: () =>
+          import('./JeeAccount/Management/DemoComemnt/demo-comment.module').then((m) => m.DemoCommentModule),
+      },
+      {
         path: 'dashboard',
         loadChildren: () =>
           import('./JeeAccount/page-girdters-dashboard/page-girdters-dashboard.module').then((m) => m.PageGirdtersDashboardModule),
@@ -43,4 +48,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class PagesRoutingModule {}
+export class PagesRoutingModule { }

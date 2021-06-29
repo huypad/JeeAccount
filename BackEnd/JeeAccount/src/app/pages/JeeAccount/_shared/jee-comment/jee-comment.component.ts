@@ -50,6 +50,7 @@ export class JeeCommentComponent implements OnInit {
   @Input() objectID: string;
   @Input() showCommentDefault?: boolean;
   @Input() number: number;
+  @Input() img: any;
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
 
   constructor(public service: JeeCommentService, public cd: ChangeDetectorRef) { }
