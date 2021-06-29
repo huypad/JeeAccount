@@ -21,4 +21,11 @@ export class DemoCommentService {
     });
   }
 
+  public getImgUrls(limit: number): Observable<any> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const url = `https://picsum.photos/v2/list?page=2&limit=${limit}`;
+    return this.http.get(url, {
+      headers: httpHeaders,
+    });
+  }
 }

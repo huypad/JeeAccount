@@ -1,6 +1,12 @@
-<div style="height: 30px; background-color: rosybrown; text-align: center;"><span
-    style="color: white; font-weight: 800;">{{number}}</span></div>
-<div class="card-body comment-container" *ngIf="!(service.isLoading$ | async)">
+<div style="background-color: white; text-align: center;">
+
+  <img src="{{img}}" style="max-width: 680px;">
+
+</div>
+<div style="height: 30px; background-color: #f1f1f1; text-align: center; ">
+  <span style="color: black; font-weight: 800;">{{number}}</span>
+</div>
+<div class="comment-container" *ngIf="!(service.isLoading$ | async)" style="margin-bottom: 30px;">
   <div class="comment-header-container">
     <div *ngIf="!hiddenLike" class="comment-header comment-header-like">
       <div class="comment-header-reaction">

@@ -1,12 +1,12 @@
 $border-radius: 5px;
 $font-szie-header: 13px;
-$font-color-header: rbg(28, 30, 33);
+$font-color-header: black;
 $hover-color: #f2f2f2;
 $background-comment: white;
-$icon-color: black;
 
 .card-body {
   padding: 0px 10px 20px 10px;
+
 }
 
 .comment-container {
@@ -23,7 +23,7 @@ $icon-color: black;
   align-items: stretch;
   direction: ltr;
   margin: 0px;
-  border-radius: max(0px, min(8px, ((100vw - 4px) - 100%) * 9999)) 8px;
+  border-radius: $border-radius ;
   background-color: $background-comment;
   display: block;
   line-height: 16.08px;
@@ -58,6 +58,7 @@ $icon-color: black;
   font-size: $font-szie-header;
   padding: 6px 2px 6px 2px;
   font-family: "Roboto";
+  color: $font-color-header;
 }
 
 .comment-header:hover {
@@ -301,7 +302,7 @@ $icon-color: black;
 
 .show-error {
   font-family: 'Roboto';
-  color: yellowgreen;
+  color: red;
   text-align: center;
   font-weight: 600;
 }
