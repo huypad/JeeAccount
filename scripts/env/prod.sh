@@ -5,8 +5,8 @@ export REGISTRY_PUBLISHER=hoaaq
 export REGISTRY_USERNAME=admin
 export REGISTRY_PASSWORD=registrypw123
 export PROJECT_NAME=jeeaccount
-
 export DOMAIN=jee.vn
+
 export VAULT_ENDPOINT=http://vault_vault:8200
 export VAULT_TOKEN=s.ucWXuLsJ4pRQkp7aCuL81L6R
 export KAFKA_BROKER=kafka1:9999,kafka2:9999,kafka3:9999
