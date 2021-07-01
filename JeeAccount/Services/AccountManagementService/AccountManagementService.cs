@@ -1,4 +1,5 @@
-﻿using DpsLibs.Data;
+﻿using DPSinfra.Utils;
+using DpsLibs.Data;
 using JeeAccount.Classes;
 using JeeAccount.Controllers;
 using JeeAccount.Models;
@@ -7,6 +8,7 @@ using JeeAccount.Models.Common;
 using JeeAccount.Reponsitories;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -20,12 +22,14 @@ namespace JeeAccount.Services.AccountManagementService
         private IAccountManagementReponsitory accountManagementReponsitory;
         private IdentityServerController identityServerController;
         private string ConnectionString;
+        private IConfiguration _configuration;
 
         public AccountManagementService(IAccountManagementReponsitory accountManagementReponsitory, IConfiguration configuration)
         {
             this.accountManagementReponsitory = accountManagementReponsitory;
             this.identityServerController = new IdentityServerController();
             ConnectionString = configuration.GetValue<string>("AppConfig:Connection");
+            _configuration = configuration;
         }
 
         public Task<IEnumerable<AccUsernameModel>> GetListUsernameByCustormerID(long customerID)
@@ -382,9 +386,18 @@ namespace JeeAccount.Services.AccountManagementService
             return await accountManagementReponsitory.GetListCustomerAppByCustomerIDFromAccount(CustomerID);
         }
 
-        public Task<HttpResponseMessage> ResetPasswordRootCustomer(CustomerResetPasswordModel model)
+        public async Task<HttpResponseMessage> ResetPasswordRootCustomer(CustomerResetPasswordModel model)
         {
-            throw new NotImplementedException();
+            DataTable dt = new DataTable();
+
+            string sql = @$"select min(UserID) as UserID from AccountList where CustomerID = {model.CustomerID}";
+
+            using (DpsConnection cnn = new DpsConnection(ConnectionString))
+            {
+                var userID = cnn.ExecuteScalar(sql).ToString();
+                var username = GeneralService.GetUsernameByUserIDCnn(cnn, userID).ToString();
+                return await this.identityServerController.ResetPasswordRootCustomer(getSecretToken(), username, model);
+            }
         }
 
         public async Task<long> GetCustormerIDByUserID(long UserID)
@@ -577,25 +590,108 @@ where AppList.AppCode = '{AppCode}'";
                 return await Task.FromResult(result).ConfigureAwait(false);
             }
         }
-    }
 
-    public class InsertAppListAccountModel
-    {
-        public List<string> AppCode { get; set; }
-        public List<int> AppId { get; set; }
-        public long CustomerId { get; set; }
-        public long UserId { get; set; }
-    }
+        public string getSecretToken()
+        {
+            var secret = _configuration.GetValue<string>("Jwt:internal_secret");
+            var projectName = _configuration.GetValue<string>("KafkaConfig:ProjectName");
+            var token = JsonWebToken.issueToken(new TokenClaims { projectName = projectName }, secret);
+            return token;
+        }
 
-    public class AppAccount
-    {
-        public List<string> AppCode { get; set; }
-        public long UserId { get; set; }
-    }
+        public async Task<HttpResponseMessage> UpdateOneStaffIDByInputApiModel(InputApiModel model)
+        {
+            var username = "";
+            var userID = "";
+            if (!string.IsNullOrEmpty(model.Username))
+            {
+                username = model.Username;
+                userID = GeneralService.GetUserIDByUsername(ConnectionString, model.Username).ToString();
+            }
 
-    public class LoginAccountModel
-    {
-        public string Username { get; set; }
-        public string Password { get; set; }
+            if (!string.IsNullOrEmpty(model.Userid))
+            {
+                username = GeneralService.GetUsernameByUserID(ConnectionString, model.Userid).ToString();
+                userID = model.Userid;
+            }
+
+            var appCodes = await accountManagementReponsitory.GetListAppByUserID(long.Parse(userID));
+            var appCodesName = appCodes.Select(x => x.AppCode).ToList();
+            var StaffID = 0;
+            var customerID = 0;
+            using (DpsConnection cnn = new DpsConnection(ConnectionString))
+            {
+                if (string.IsNullOrEmpty(model.StaffID))
+                {
+                    var staffidScalar = cnn.ExecuteScalar($"select StaffID from AccountList where UserID = {userID} or Username = '{username}'");
+                    if (staffidScalar is not null)
+                    {
+                        if (!staffidScalar.Equals(DBNull.Value))
+                        {
+                            StaffID = Int32.Parse(staffidScalar.ToString());
+                        }
+                    }
+                }
+                else
+                {
+                    StaffID = Int32.Parse(model.StaffID);
+                    SaveStaffID(cnn, StaffID.ToString(), userID);
+                }
+
+                customerID = Int32.Parse(cnn.ExecuteScalar($"select CustomerID from AccountList where UserID = {userID} or Username = '{username}'").ToString());
+            }
+
+            var jwt_internal = getSecretToken();
+
+            var objCustom = new ObjCustomData();
+            objCustom.userId = Int32.Parse(userID);
+            objCustom.updateField = "jee-account";
+            objCustom.fieldValue = new JeeAccountModel
+            {
+                AppCode = appCodesName,
+                CustomerID = customerID,
+                StaffID = StaffID,
+                UserID = Int32.Parse(userID)
+            };
+
+            var reponse = await identityServerController.UpdateCustomDataInternal(jwt_internal, username, objCustom);
+            return reponse;
+        }
+
+        private void SaveStaffID(DpsConnection cnn, string StaffID, string UserID)
+        {
+            Hashtable val = new Hashtable();
+            if (!string.IsNullOrEmpty(StaffID))
+            {
+                val.Add("StaffID", long.Parse(StaffID));
+            }
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("UserID", long.Parse(UserID));
+            int x = cnn.Update(val, Conds, "AccountList");
+            if (x <= 0)
+            {
+                throw cnn.LastError;
+            }
+        }
     }
+}
+
+public class InsertAppListAccountModel
+{
+    public List<string> AppCode { get; set; }
+    public List<int> AppId { get; set; }
+    public long CustomerId { get; set; }
+    public long UserId { get; set; }
+}
+
+public class AppAccount
+{
+    public List<string> AppCode { get; set; }
+    public long UserId { get; set; }
+}
+
+public class LoginAccountModel
+{
+    public string Username { get; set; }
+    public string Password { get; set; }
 }

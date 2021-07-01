@@ -19,6 +19,7 @@ namespace JeeAccount.Models.CustomerManagement
         public List<int> AppID { get; set; }
         public List<int> CurrentDBID { get; set; }
         public List<int> SoLuongNhanSu { get; set; }
+        public List<int> PakageIDs { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
     }

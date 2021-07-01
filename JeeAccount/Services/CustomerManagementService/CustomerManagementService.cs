@@ -158,6 +158,7 @@ namespace JeeAccount.Services.CustomerManagementService
                     }
                     cnn.EndTransaction();
                     // kafak
+                    var index = appcodes.FindIndex(code => code.Equals("jeehr", StringComparison.OrdinalIgnoreCase));
                     var obj = new
                     {
                         CustomerID = identity.customData.JeeAccount.CustomerID,
@@ -166,6 +167,21 @@ namespace JeeAccount.Services.CustomerManagementService
                         Username = customerModel.Username,
                         IsInitial = true,
                         IsAdmin = true,
+                        customerModel = new
+                        {
+                            Code = customerModel.Code,
+                            RegisterDate = customerModel.RegisterDate,
+                            DeadlineDate = customerModel.DeadlineDate,
+                            PakageID = customerModel.PakageIDs[index],
+                            CompanyName = customerModel.CompanyName,
+                            Address = customerModel.Address,
+                            Phone = customerModel.Phone,
+                            Note = customerModel.Note,
+                            Nguoidaidien = customerModel.RegisterName,
+                            CustomerID = identity.customData.JeeAccount.CustomerID,
+                            UsernameAdmin = customerModel.Username,
+                            PasswordAdmin = customerModel.Password,
+                        }
                     };
                     producer.PublishAsync(TopicAddNewCustomer, JsonConvert.SerializeObject(obj));
                     return addNewUser;

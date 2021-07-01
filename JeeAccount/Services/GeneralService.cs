@@ -181,7 +181,7 @@ namespace JeeAccount.Services
 
         public static object GetUserIDByUsernameCnn(DpsConnection cnn, string Username)
         {
-            string sql = $"select username from AccountList where Username = '{Username}'";
+            string sql = $"select UserID from AccountList where Username = '{Username}'";
             DataTable dt = new DataTable();
             dt = cnn.CreateDataTable(sql);
             if (dt.Rows.Count == 0) return null;
@@ -192,7 +192,7 @@ namespace JeeAccount.Services
         {
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
-                string sql = $"select username from AccountList where Username = '{Username}'";
+                string sql = $"select UserID from AccountList where Username = '{Username}'";
                 DataTable dt = new DataTable();
                 dt = cnn.CreateDataTable(sql);
                 if (dt.Rows.Count == 0) return null;

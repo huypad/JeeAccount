@@ -37,10 +37,11 @@ namespace JeeAccount.Models
     public class IdentityServerAddNewUser
     {
         [JsonProperty("username")]
-
         public string username { get; set; }
+
         [JsonProperty("password")]
         public string password { get; set; }
+
         [JsonProperty("customData")]
         public CustomData customData { get; set; }
     }
@@ -48,19 +49,20 @@ namespace JeeAccount.Models
     public class IdentityServeAddAdminNewUser
     {
         [JsonProperty("username")]
-
         public string username { get; set; }
+
         [JsonProperty("password")]
         public string password { get; set; }
+
         [JsonProperty("customData")]
         public CustomAdminData customData { get; set; }
     }
-
 
     public class IdentityServerLogin
     {
         [JsonProperty("username")]
         public string username { get; set; }
+
         [JsonProperty("password")]
         public string password { get; set; }
     }
@@ -68,8 +70,8 @@ namespace JeeAccount.Models
     public class IdentityServerChangePassword
     {
         [JsonProperty("password_old")]
-
         public string password_old { get; set; }
+
         [JsonProperty("password_new")]
         public string password_new { get; set; }
     }
@@ -77,8 +79,8 @@ namespace JeeAccount.Models
     public class IdentityServerChangeUserState
     {
         [JsonProperty("userId")]
-
         public string userId { get; set; }
+
         [JsonProperty("disabled")]
         public bool disabled { get; set; }
     }
@@ -86,7 +88,7 @@ namespace JeeAccount.Models
     public class IdentityServerReturn
     {
         public int statusCode { get; set; } = 0;
-        public string message { get; set; } 
+        public string message { get; set; }
         public AccessRefreshToken data { get; set; }
 
         public IdentityServerReturn(string Access, string Refresh)
@@ -112,8 +114,10 @@ namespace JeeAccount.Models
     {
         [JsonProperty("username")]
         public string username { get; set; }
+
         [JsonProperty("updateField")]
         public string updateField { get; set; }
+
         [JsonProperty("fieldValue")]
         public PersonalInfoCustomData fieldValue { get; set; }
     }
@@ -122,8 +126,10 @@ namespace JeeAccount.Models
     {
         [JsonProperty("username")]
         public string username { get; set; }
+
         [JsonProperty("updateField")]
         public string updateField { get; set; }
+
         [JsonProperty("fieldValue")]
         public object fieldValue { get; set; }
     }
@@ -135,14 +141,15 @@ namespace JeeAccount.Models
         public string refresh_token { get; set; }
     }
 
-    public class ObjCustomData {
+    public class ObjCustomData
+    {
         [JsonProperty("userId")]
         public long userId { get; set; }
+
         [JsonProperty("updateField")]
-
         public string updateField { get; set; }
-        [JsonProperty("fieldValue")]
 
+        [JsonProperty("fieldValue")]
         public object fieldValue { get; set; }
     }
 }

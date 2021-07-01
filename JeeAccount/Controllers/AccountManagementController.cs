@@ -1,4 +1,5 @@
 ﻿using DPSinfra.Kafka;
+using DPSinfra.Utils;
 using JeeAccount.Classes;
 using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
@@ -59,8 +60,8 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var isInternalToken = Ulities.IsInternaltoken(HttpContext.Request.Headers, _internal_secret);
-                if (!isInternalToken)
+                var isToken = Ulities.IsInternaltoken(HttpContext.Request.Headers, _config.GetValue<string>("Jwt:internal_secret"));
+                if (isToken == false)
                 {
                     return NotFound(MessageReturnHelper.Unauthorized());
                 }
@@ -82,8 +83,8 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var isInternalToken = Ulities.IsInternaltoken(HttpContext.Request.Headers, _internal_secret);
-                if (!isInternalToken)
+                var isToken = Ulities.IsInternaltoken(HttpContext.Request.Headers, _config.GetValue<string>("Jwt:internal_secret"));
+                if (isToken == false)
                 {
                     return NotFound(MessageReturnHelper.Unauthorized());
                 }
@@ -799,7 +800,7 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpGet("ResetPasswordRootCustomer")]
+        [HttpPost("ResetPasswordRootCustomer")]
         public async Task<IActionResult> ResetPasswordRootCustomer(CustomerResetPasswordModel model)
         {
             try
@@ -809,7 +810,10 @@ namespace JeeAccount.Controllers
                 if (!token.Equals(_JeeCustomerSecrectkey)) return NotFound("Secrectkey Không hợp lệ");
 
                 var response = await accountManagementService.ResetPasswordRootCustomer(model);
-                return Ok(response);
+                if (response.IsSuccessStatusCode)
+                    return Ok(response);
+
+                return Unauthorized(new { statusCode = response.StatusCode, message = response.Content.ReadAsStringAsync() });
             }
             catch (Exception ex)
             {
@@ -818,5 +822,177 @@ namespace JeeAccount.Controllers
         }
 
         #endregion api for customer
+
+        #region api for jeehr
+
+        [HttpGet("updateAllStaffID/{customerid}")]
+        public async Task<IActionResult> UpdateAllStaffID(long customerid)
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return NotFound(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+
+                var messageError = "";
+                var lstUsername = await accountManagementService.GetListJustUsernameByCustormerID(customerid);
+                if (lstUsername is null) return NotFound(MessageReturnHelper.KhongTonTai("customerid"));
+                foreach (string username in lstUsername)
+                {
+                    var model = new InputApiModel();
+                    model.Username = username;
+                    model.StaffID = null;
+                    model.Userid = null;
+                    var reponse = await accountManagementService.UpdateOneStaffIDByInputApiModel(model);
+                    if (!reponse.IsSuccessStatusCode)
+                    {
+                        if (string.IsNullOrEmpty(messageError))
+                        {
+                            messageError = model.Username;
+                        }
+                        else
+                        {
+                            messageError += " ," + model.Username;
+                        }
+                    }
+                }
+
+                if (string.IsNullOrEmpty(messageError))
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest(MessageReturnHelper.Custom($"danh sách username bị lỗi: {messageError}"));
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpGet("updateAllStaffID/internal/{customerid}")]
+        public async Task<IActionResult> UpdateAllStaffIDInternal(long customerid)
+        {
+            try
+            {
+                var isToken = Ulities.IsInternaltoken(HttpContext.Request.Headers, _config.GetValue<string>("Jwt:internal_secret"));
+                if (isToken == false)
+                {
+                    return NotFound(MessageReturnHelper.Unauthorized());
+                }
+
+                var messageError = "";
+                var lstUsername = await accountManagementService.GetListJustUsernameByCustormerID(customerid);
+                if (lstUsername is null) return NotFound(MessageReturnHelper.KhongTonTai("customerid"));
+                foreach (string username in lstUsername)
+                {
+                    var model = new InputApiModel();
+                    model.Username = username;
+                    model.StaffID = null;
+                    model.Userid = null;
+                    var reponse = await accountManagementService.UpdateOneStaffIDByInputApiModel(model);
+                    if (!reponse.IsSuccessStatusCode)
+                    {
+                        if (string.IsNullOrEmpty(messageError))
+                        {
+                            messageError = model.Username;
+                        }
+                        else
+                        {
+                            messageError += " ," + model.Username;
+                        }
+                    }
+                }
+
+                if (string.IsNullOrEmpty(messageError))
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest(MessageReturnHelper.Custom($"danh sách username bị lỗi: {messageError}"));
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpPost("updateOneStaffID")]
+        public async Task<IActionResult> updateOneStaffID(InputApiModel model)
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return NotFound(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+                if (model == null)
+                {
+                    return BadRequest(MessageReturnHelper.KhongTonTai("UserID hoặc username"));
+                }
+                var reponse = await accountManagementService.UpdateOneStaffIDByInputApiModel(model);
+                if (reponse.IsSuccessStatusCode)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest(MessageReturnHelper.Exception(new Exception(reponse.ReasonPhrase)));
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpPost("updateOneStaffID/internal")]
+        public async Task<IActionResult> updateOneStaffIDInternal(InputApiModel model)
+        {
+            try
+            {
+                var isToken = Ulities.IsInternaltoken(HttpContext.Request.Headers, _config.GetValue<string>("Jwt:internal_secret"));
+                if (isToken == false)
+                {
+                    return NotFound(MessageReturnHelper.Unauthorized());
+                }
+                if (model == null)
+                {
+                    return BadRequest(MessageReturnHelper.KhongTonTai("UserID hoặc username"));
+                }
+                var reponse = await accountManagementService.UpdateOneStaffIDByInputApiModel(model);
+                if (reponse.IsSuccessStatusCode)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest(MessageReturnHelper.Exception(new Exception(reponse.ReasonPhrase)));
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpGet("getJWToken")]
+        public string getJWToken()
+        {
+            var secret = _config.GetValue<string>("Jwt:internal_secret");
+            var projectName = _config.GetValue<string>("KafkaConfig:ProjectName");
+            //using DPSinfra.Utils;
+            var token = JsonWebToken.issueToken(new TokenClaims { projectName = projectName }, secret);
+            return token;
+        }
+
+        #endregion api for jeehr
     }
 }

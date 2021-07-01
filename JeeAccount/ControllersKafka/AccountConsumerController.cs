@@ -52,6 +52,7 @@ namespace JeeCustomer.ConsumerKafka
                 var obj = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomData>(value);
 
                 var identity = new IdentityServerController();
+
                 string username = GetObjectDB($"select Username from AccountList where UserID = {obj.userId}", _config.GetValue<string>("AppConfig:Connection"));
                 if (!string.IsNullOrEmpty(username))
                 {

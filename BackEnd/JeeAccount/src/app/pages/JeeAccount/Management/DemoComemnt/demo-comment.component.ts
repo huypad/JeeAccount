@@ -22,7 +22,6 @@ export class DemoCommentComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.commentService.getImgUrls(1).subscribe((x) => {
       this.imgsurl = x;
-      console.log(this.imgsurl);
       this.commentService.getTopicObjectIDByComponentName(this.componentName).pipe(
         tap((res) => {
           this.topicObjectID$.next(res);

@@ -22,6 +22,7 @@ namespace JeeAccount.Controllers
         private const string LINK_UPDATE_CUSTOMDATA = LINK_IDENTITY_SERVER + "/user/updateCustomData";
         private const string LINK_UPDATE_CUSTOMDATASELF = LINK_IDENTITY_SERVER + "/user/updateCustomData/self";
         private const string LINK_CHANGE_USERSTATE = LINK_IDENTITY_SERVER + "/user/changeUserState";
+        private const string LINK_CHANGEPASSWORD_INTERNAL = LINK_IDENTITY_SERVER + "/user/changePassword/internal";
 
         public async Task<AppAccount> loginUser(string username, string password)
         {
@@ -342,6 +343,50 @@ namespace JeeAccount.Controllers
                     var res = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
                     return res;
                 }
+            }
+        }
+
+        public async Task<HttpResponseMessage> UpdateCustomDataInternal(string internal_token, string Username, ObjCustomData objCustomData)
+        {
+            string url = LINK_UPDATE_CUSTOMDATA + "/internal";
+            var content = new UpdateCustomDataModel
+            {
+                username = Username,
+                updateField = objCustomData.updateField,
+                fieldValue = objCustomData.fieldValue,
+            };
+
+            var stringContent = await Task.Run(() => JsonConvert.SerializeObject(content));
+            var httpContent = new StringContent(stringContent, Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(internal_token);
+
+                var reponse = await client.PostAsync(url, httpContent);
+                return reponse;
+            }
+        }
+
+        public async Task<HttpResponseMessage> ResetPasswordRootCustomer(string internal_token, string username, CustomerResetPasswordModel model)
+        {
+            string url = LINK_CHANGEPASSWORD_INTERNAL;
+            var content = new
+            {
+                username = username,
+                password_old = model.OldPassword,
+                password_new = model.NewPassword,
+            };
+
+            var stringContent = await Task.Run(() => JsonConvert.SerializeObject(content));
+            var httpContent = new StringContent(stringContent, Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(internal_token);
+
+                var reponse = await client.PostAsync(url, httpContent);
+                return reponse;
             }
         }
     }

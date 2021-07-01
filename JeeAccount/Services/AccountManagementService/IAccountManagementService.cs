@@ -85,5 +85,7 @@ namespace JeeAccount.Services.AccountManagementService
         Task<IEnumerable<string>> GetListDirectManager(long custormerID);
 
         Task<IEnumerable<AccUsernameModel>> ListNhanVienCapDuoiDirectManagerByDirectManager(string DirectManager);
+
+        Task<HttpResponseMessage> UpdateOneStaffIDByInputApiModel(InputApiModel model);
     }
 }
