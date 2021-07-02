@@ -39,11 +39,13 @@ export class JeeCommentService {
     });
   }
 
-  public showFullComment(objectID: string, commentID: string): Observable<any> {
+  public showFullComment(objectID: string, commentID: string, filter: QueryFilterComment): Observable<any> {
     const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const httpParams = this.getHttpParamsFilter(filter);
     const url = API_JEECOMMENT_URL + `/comments/show/${objectID}/${commentID}`;
     return this.http.get<any>(url, {
       headers: httpHeaders,
+      params: httpParams
     });
   }
 

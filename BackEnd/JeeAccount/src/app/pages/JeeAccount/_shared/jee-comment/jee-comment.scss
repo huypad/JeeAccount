@@ -280,6 +280,10 @@ $background-comment: white;
   height: 30px;
 }
 
+.click-show-spinner-view-more-comment {
+  margin-left: 15px;
+}
+
 @keyframes spinnercustom {
   to {transform: rotate(360deg);}
 }
@@ -306,3 +310,4 @@ $background-comment: white;
   text-align: center;
   font-weight: 600;
 }
+

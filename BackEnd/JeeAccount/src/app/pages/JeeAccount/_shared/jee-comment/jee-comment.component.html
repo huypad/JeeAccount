@@ -34,16 +34,19 @@
       <ng-container>
         <div class="comment-filter">
           <div class="view-more-comment">
-            <span class="text-filter">
-              Xem thêm bình luận</span>
+            <span (click)="viewMoreComment()" class="text-filter">
+              Xem thêm bình luận
+            </span>
+            <span class="click-show-spinner-view-more-comment"
+              [class.spinner]="ShowSpinnerViewMore$.asObservable() | async"></span>
           </div>
-          <div class="filter">
+          <div style="display: none;" class="filter">
             <span>Toàn bộ bình luận </span>
             <i data-visualcompletion="css-img" class="item-align-middle" id="filter-icon"></i>
           </div>
         </div>
         <ng-container *ngFor="let comment of item.Comments">
-          <jeecomment-post-comment-content [objectID]="objectID" [comment]="comment">
+          <jeecomment-post-comment-content [objectID]="objectID" [comment]="comment" indexNested="1">
           </jeecomment-post-comment-content>
         </ng-container>
       </ng-container>
@@ -53,7 +56,4 @@
       </ng-container>
     </div>
   </ng-template>
-  <!-- <div class="comment-content-container">
-    <jeecomment-enter-comment-content [objectID]="objectID"></jeecomment-enter-comment-content>
-  </div> -->
 </div>

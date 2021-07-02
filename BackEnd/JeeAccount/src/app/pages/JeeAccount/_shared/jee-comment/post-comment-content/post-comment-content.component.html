@@ -1,4 +1,4 @@
-<ul class="post-comment-content" *ngIf="comment && objectID">
+<ul #postcmt class="post-comment-content" *ngIf="comment && objectID">
   <li class="list-comment">
     <div class="post-comment">
       <div class="post-comment-avatar">
@@ -70,7 +70,7 @@
     </div>
   </li>
   <li class="list-comment list-comment-reply">
-    <ng-container *ngIf="comment.Replies.length > 0">
+    <ng-container *ngIf="comment.LengthReply > 0">
       <div class="count-comment-reply text-filter" (click)="showReply()"
         *ngIf="!(ClickShowReply$.asObservable() | async)">
         <div *ngIf="showSpinner$.asObservable()| async" class=" click-show-spinner" [class.spinner]="true">
@@ -86,10 +86,11 @@
     </ng-container>
     <ng-container *ngIf="ClickShowReply$.asObservable() | async">
       <jeecomment-post-comment-content (isFocus)="getFocus($event)" *ngFor=" let reply of comment.Replies"
-        [comment]="reply" [objectID]="objectID" [isReply]="true">
+        [comment]="reply" [objectID]="objectID" indexNested="2">
       </jeecomment-post-comment-content>
-      <jeecomment-enter-comment-content [isFocus$]="isFocus$$" *ngIf="((showEnterComment$.asObservable()) | async) && !isReply"
-        [objectID]="objectID" [commentID]="comment.Id">
+      <jeecomment-enter-comment-content [isFocus$]="isFocus$$"
+        *ngIf="((showEnterComment$.asObservable()) | async) && indexNested == 1" [objectID]="objectID"
+        [commentID]="comment.Id">
       </jeecomment-enter-comment-content>
     </ng-container>
   </li>

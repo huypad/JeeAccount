@@ -27,6 +27,8 @@ export class CommentDTO {
   LengthReply: number;
   Replies: CommentDTO[];
   Attachs: Attach;
+  ViewLengthComment: number;
+  TotalLengthComment: number;
   DateCreated: Date;
 }
 

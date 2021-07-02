@@ -1,5 +1,5 @@
 import { BehaviorSubject, of, Subject, Subscription, Observable, interval } from 'rxjs';
-import { Component, Input, OnInit, ViewChild, Pipe, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, Pipe, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, HostListener } from '@angular/core';
 import { JeeCommentService } from './jee-comment.service';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { catchError, finalize, takeUntil, tap, share } from 'rxjs/operators';
@@ -46,6 +46,7 @@ export class JeeCommentComponent implements OnInit {
   isFirstTime: boolean = true;
   ShowSpinner$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   ShowFilter$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  ShowSpinnerViewMore$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   ViewLengthComment: number = 10;
   @Input() objectID: string;
   @Input() showCommentDefault?: boolean;
@@ -53,7 +54,7 @@ export class JeeCommentComponent implements OnInit {
   @Input() img: any;
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
 
-  constructor(public service: JeeCommentService, public cd: ChangeDetectorRef) { }
+  constructor(public service: JeeCommentService, public cd: ChangeDetectorRef, private elementRef: ElementRef) { }
 
   ngOnInit() {
     if (this.showCommentDefault) {
@@ -67,9 +68,10 @@ export class JeeCommentComponent implements OnInit {
     if (this.isFirstTime) {
       this.ShowSpinner$.next(true);
       if (this.objectID) {
+        this.getShowTopic();
         const source = interval(1000);
         source.pipe(takeUntil(this.onDestroy)).subscribe(() => {
-          if (this._errorMessage$.value == '') {
+          if (this._errorMessage$.value == '' && this.isScrolledIntoView()) {
             this.getShowTopic();
           }
         });
@@ -98,7 +100,6 @@ export class JeeCommentComponent implements OnInit {
           }
         }),
         catchError(err => {
-          console.log(err);
           this._errorMessage$.next(err);
           return of();
         }),
@@ -116,33 +117,46 @@ export class JeeCommentComponent implements OnInit {
   }
 
   pushItemComment(topicComment: TopicCommentDTO, topicCommentNew: TopicCommentDTO) {
-    topicCommentNew.Comments.forEach((comment) => {
+    topicCommentNew.Comments.forEach((comment, pos) => {
       const index = topicComment.Comments.findIndex(item => item.Id === comment.Id);
       if (index === -1) {
-        topicComment.Comments.push(comment);
+        topicComment.Comments.splice(pos, 0, comment);
       } else {
-        this.pushItemReplyComment(this.item.Comments[index], comment);
+        //this.pushItemReplyComment(this.item.Comments[index], comment);
       }
     });
   }
 
   pushItemReplyComment(Comment: CommentDTO, CommentNew: CommentDTO) {
-    CommentNew.Replies.forEach((reply) => {
+    CommentNew.Replies.forEach((reply, pos) => {
       const index = Comment.Replies.findIndex(item => item.Id === reply.Id);
       if (index === -1) {
-        Comment.Replies.push(reply);
+        Comment.Replies.splice(pos, 0, reply);
       }
     });
   }
 
   filter(): QueryFilterComment {
     let filter = new QueryFilterComment();
-    filter.ViewLengthComment = this.ViewLengthComment = 10;
+    filter.ViewLengthComment = this.ViewLengthComment;
     return filter;
+  }
+
+  viewMoreComment() {
+    this.ViewLengthComment += 10;
+    this.ShowSpinnerViewMore$.next(true);
+    setTimeout(() => {
+      this.ShowSpinnerViewMore$.next(false);
+    }, 750);
   }
 
   ngOnDestroy(): void {
     this.onDestroy.next();
   }
 
+  isScrolledIntoView() {
+    const rect = this.elementRef.nativeElement.getBoundingClientRect();
+    const isVisible = rect.top < window.innerHeight && rect.bottom >= 0
+    return isVisible;
+  }
 }
