@@ -29,8 +29,8 @@ namespace JeeAccount.Models
 
     public class IdentityServerChangeUserStateModel
     {
-        public string Admin_access_token { get; set; }
-        public string userId { get; set; }
+        public string Admin_access_token_or_internal_token { get; set; }
+        public string username { get; set; }
         public bool disabled { get; set; }
     }
 
@@ -78,8 +78,8 @@ namespace JeeAccount.Models
 
     public class IdentityServerChangeUserState
     {
-        [JsonProperty("userId")]
-        public string userId { get; set; }
+        [JsonProperty("username")]
+        public string username { get; set; }
 
         [JsonProperty("disabled")]
         public bool disabled { get; set; }
@@ -108,6 +108,12 @@ namespace JeeAccount.Models
             this.message = "success";
             this.data = null;
         }
+    }
+
+    public class IdentityServerReturnParse
+    {
+        public int statusCode { get; set; }
+        public string message { get; set; }
     }
 
     public class UpdateCustomDataPersonInfoModel

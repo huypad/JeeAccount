@@ -547,15 +547,16 @@ where Username = @Username and (Disable != 1 or Disable is null)";
             }
         }
 
-        public async Task<IEnumerable<AppListDTO>> GetListAppByUserID(long customerID)
+        public async Task<IEnumerable<AppListDTO>> GetListAppByUserID(long UserID)
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
-            Conds.Add("CustomerID", customerID);
+            Conds.Add("UserID", UserID);
 
-            string sql = @"select AppList.*,  Customer_App.IsDefaultApply from AppList
-                        join Customer_App on Customer_App.AppID = AppList.AppID
-                        where CustomerID = @CustomerID";
+            string sql = @"select AppList.* from AccountList
+join Account_App on Account_App.UserID = AccountList.UserID
+join AppList on AppList.AppID = Account_App.AppID
+where AccountList.UserID = @UserID";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
@@ -572,7 +573,6 @@ where Username = @Username and (Disable != 1 or Disable is null)";
                     LastUpdate = row["LastUpdate"].ToString(),
                     Note = row["Note"].ToString(),
                     ReleaseDate = row["ReleaseDate"].ToString(),
-                    IsDefaultApp = Convert.ToBoolean((bool)row["IsDefaultApply"]),
                     Icon = row["Icon"].ToString(),
                     Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
                 });

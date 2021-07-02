@@ -825,6 +825,40 @@ namespace JeeAccount.Controllers
 
         #region api for jeehr
 
+        [HttpGet("updateAllStaffIDAll")]
+        public async Task<IActionResult> UpdateAllStaffID()
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return NotFound(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+
+                var lstCutomer = await accountManagementService.GetListJustCustormerID();
+                foreach (long customerid in lstCutomer)
+                {
+                    var lstUsername = await accountManagementService.GetListJustUsernameByCustormerID(customerid);
+
+                    foreach (string username in lstUsername)
+                    {
+                        var model = new InputApiModel();
+                        model.Username = username;
+                        model.StaffID = null;
+                        model.Userid = null;
+                        var reponse = await accountManagementService.UpdateOneStaffIDByInputApiModel(model);
+                    }
+                }
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
         [HttpGet("updateAllStaffID/{customerid}")]
         public async Task<IActionResult> UpdateAllStaffID(long customerid)
         {
@@ -983,14 +1017,41 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpGet("getJWToken")]
-        public string getJWToken()
+        [HttpGet("testgetvalue")]
+        public async Task<IActionResult> testgetvalue()
         {
-            var secret = _config.GetValue<string>("Jwt:internal_secret");
-            var projectName = _config.GetValue<string>("KafkaConfig:ProjectName");
-            //using DPSinfra.Utils;
-            var token = JsonWebToken.issueToken(new TokenClaims { projectName = projectName }, secret);
-            return token;
+            try
+            {
+                var valueObj = new ObjCustomData
+                {
+                    userId = 123,
+                    updateField = "jee-hr",
+                    fieldValue = new
+                    {
+                        username = "windsora"
+                    },
+                };
+                var value = Newtonsoft.Json.JsonConvert.SerializeObject(valueObj);
+                var obj = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomData>(value);
+                if (obj.updateField.ToString().Equals("jee-hr", StringComparison.OrdinalIgnoreCase))
+                {
+                    var x_json = Newtonsoft.Json.JsonConvert.SerializeObject(obj.fieldValue);
+
+                    var x = Newtonsoft.Json.JsonConvert.DeserializeObject<FindStaffID>(x_json);
+
+                    return Ok(x);
+                }
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        public class FindStaffID
+        {
+            public long staffID { get; set; } = 0;
         }
 
         #endregion api for jeehr

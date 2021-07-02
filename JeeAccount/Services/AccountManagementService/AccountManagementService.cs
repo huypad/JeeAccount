@@ -675,23 +675,3 @@ where AppList.AppCode = '{AppCode}'";
         }
     }
 }
-
-public class InsertAppListAccountModel
-{
-    public List<string> AppCode { get; set; }
-    public List<int> AppId { get; set; }
-    public long CustomerId { get; set; }
-    public long UserId { get; set; }
-}
-
-public class AppAccount
-{
-    public List<string> AppCode { get; set; }
-    public long UserId { get; set; }
-}
-
-public class LoginAccountModel
-{
-    public string Username { get; set; }
-    public string Password { get; set; }
-}

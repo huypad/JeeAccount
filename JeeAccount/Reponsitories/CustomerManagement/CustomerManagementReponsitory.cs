@@ -69,6 +69,7 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
                     val.Add("Status", 1);
                     val.Add("IsDefaultApply", 1);
                     val.Add("SoLuongNhanSu", customerModel.SoLuongNhanSu[index]);
+                    val.Add("PackageID", customerModel.GoiSuDung[index]);
                     if (!string.IsNullOrEmpty(customerModel.DeadlineDate))
                     {
                         DateTime end = DateTime.ParseExact(customerModel.DeadlineDate, "dd/MM/yyyy", null);

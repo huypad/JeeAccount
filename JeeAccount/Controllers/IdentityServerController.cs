@@ -188,7 +188,7 @@ namespace JeeAccount.Controllers
             string url = LINK_CHANGE_USERSTATE;
             var content = new IdentityServerChangeUserState
             {
-                userId = identityServerChangeUserStateModel.userId,
+                username = identityServerChangeUserStateModel.username,
                 disabled = identityServerChangeUserStateModel.disabled,
             };
 
@@ -197,7 +197,7 @@ namespace JeeAccount.Controllers
 
             using (var client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(identityServerChangeUserStateModel.Admin_access_token);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(identityServerChangeUserStateModel.Admin_access_token_or_internal_token);
 
                 var reponse = await client.PostAsync(url, httpContent);
                 if (reponse.IsSuccessStatusCode)
@@ -220,6 +220,26 @@ namespace JeeAccount.Controllers
                     var res = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
                     return res;
                 }
+            }
+        }
+
+        public async Task<HttpResponseMessage> changeUserStateInternalAsync(IdentityServerChangeUserStateModel identityServerChangeUserStateModel)
+        {
+            string url = LINK_CHANGE_USERSTATE + "/internal";
+            var content = new IdentityServerChangeUserState
+            {
+                username = identityServerChangeUserStateModel.username,
+                disabled = identityServerChangeUserStateModel.disabled,
+            };
+
+            var stringContent = await Task.Run(() => JsonConvert.SerializeObject(content));
+            var httpContent = new StringContent(stringContent, Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(identityServerChangeUserStateModel.Admin_access_token_or_internal_token);
+
+                return await client.PostAsync(url, httpContent);
             }
         }
 

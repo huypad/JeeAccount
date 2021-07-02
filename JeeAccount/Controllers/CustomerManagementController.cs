@@ -1,11 +1,15 @@
 ﻿using DPSinfra.Kafka;
+using DPSinfra.Utils;
 using JeeAccount.Classes;
+using JeeAccount.Models;
 using JeeAccount.Models.Common;
 using JeeAccount.Models.CustomerManagement;
+using JeeAccount.Services.AccountManagementService;
 using JeeAccount.Services.CustomerManagementService;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -148,6 +152,24 @@ namespace JeeAccount.Controllers
 
                 var create = await _service.UpdateCustomerAppAddNumberStaff(model);
                 return Ok(create);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("LockUnLockCustomer/{customerid}/{state}")]
+        public async Task<IActionResult> LockUnLockCustomer(long customerid, bool state)
+        {
+            try
+            {
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null) return NotFound("Secrectkey");
+                if (!token.Equals(_JeeCustomerSecrectkey)) return NotFound("Secrectkey Không hợp lệ");
+                var messageError = await _service.LockUnLockCustomer(customerid, state);
+                if (string.IsNullOrEmpty(messageError)) return Ok();
+                return BadRequest(MessageReturnHelper.Custom(messageError));
             }
             catch (Exception ex)
             {

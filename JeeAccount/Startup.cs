@@ -62,8 +62,6 @@ namespace JeeAccount
             IDictionary<string, object> minioData = minioSecret.Data.Data;
             Configuration["MinioConfig:MinioAccessKey"] = minioData["access_key"].ToString();
             Configuration["MinioConfig:MinioSecretKey"] = minioData["secret_key"].ToString();
-            System.Console.WriteLine(Configuration["MinioConfig:MinioAccessKey"]);
-            System.Console.WriteLine(Configuration["MinioConfig:MinioSecretKey"]);
 
             // add Kafka
             services.addKafkaService();
