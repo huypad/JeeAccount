@@ -298,6 +298,7 @@ namespace JeeAccount.Controllers
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
                 var appList = await accountManagementService.GetListAppByCustomerID(customData.JeeAccount.CustomerID);
+
                 return JsonResultCommon.ThanhCong(appList);
             }
             catch (Exception ex)
@@ -307,7 +308,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("GetListAppByUserID")]
-        public async Task<object> GetListAppByUserID(long UserID)
+        public async Task<object> GetListAppByUserID()
         {
             try
             {
@@ -316,7 +317,7 @@ namespace JeeAccount.Controllers
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
-                var appList = await accountManagementService.GetListAppByCustomerID(customData.JeeAccount.CustomerID);
+                var appList = await accountManagementService.GetListAppByUserID(customData.JeeAccount.UserID);
                 return JsonResultCommon.ThanhCong(appList);
             }
             catch (Exception ex)
