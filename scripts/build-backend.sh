@@ -2,7 +2,7 @@
 
 # Build
 
-if [ $DOMAIN == "jee.vn" ]
+if [[ "${DOMAIN}" == "jee.vn" ]]
 then
     export DOCKERFILE_NAME=Dockerfile_prod
 else
