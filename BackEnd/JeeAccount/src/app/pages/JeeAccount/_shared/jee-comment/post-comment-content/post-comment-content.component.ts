@@ -68,7 +68,7 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
         this.showFullComment();
         const source = interval(1000);
         source.pipe(takeUntil(this.onDestroy)).subscribe(() => {
-          if (this._errorMessage$.value == '' && this.isScrolledIntoView()) {
+          if (this._errorMessage$.value == '' && this.isScrolledViewElement()) {
             this.showFullComment();
           }
         });
@@ -110,11 +110,12 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
-  pushItemReplyComment(Comment: CommentDTO, CommentNew: CommentDTO) {
+  pushItemReplyComment(comment: CommentDTO, CommentNew: CommentDTO) {
+    comment.TotalLengthComment = CommentNew.TotalLengthComment;
     CommentNew.Replies.forEach((reply, pos) => {
-      const index = Comment.Replies.findIndex(item => item.Id === reply.Id);
+      const index = comment.Replies.findIndex(item => item.Id === reply.Id);
       if (index === -1) {
-        Comment.Replies.splice(pos, 0, reply);
+        comment.Replies.splice(pos, 0, reply);
       }
     });
   }
@@ -146,7 +147,7 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
     this.videoplayer.nativeElement.play();
   }
 
-  isScrolledIntoView() {
+  isScrolledViewElement() {
     const rect = this.elementRef.nativeElement.getBoundingClientRect();
     const isVisible = rect.top < window.innerHeight && rect.bottom >= 0
     return isVisible;

@@ -673,5 +673,34 @@ where AppList.AppCode = '{AppCode}'";
                 throw cnn.LastError;
             }
         }
+
+        public async Task<HttpResponseMessage> UpdateOneBgColorCustomData(InputApiModel model)
+        {
+            var username = "";
+            var userID = "";
+            if (!string.IsNullOrEmpty(model.Username))
+            {
+                username = model.Username;
+                userID = GeneralService.GetUserIDByUsername(ConnectionString, model.Username).ToString();
+            }
+
+            if (!string.IsNullOrEmpty(model.Userid))
+            {
+                username = GeneralService.GetUsernameByUserID(ConnectionString, model.Userid).ToString();
+                userID = model.Userid;
+            }
+
+            var customerId = GeneralService.GetCustomerIDByUsername(ConnectionString, model.Username);
+
+            var personal = accountManagementReponsitory.GetPersonalInfoCustomData(Int32.Parse(userID), Int32.Parse(customerId.ToString()));
+            personal.BgColor = GeneralService.GetColorNameUser(personal.Name[0].ToString());
+            var jwt_internal = getSecretToken();
+
+            var objCustom = new ObjCustomData();
+            objCustom.userId = Int32.Parse(userID);
+            objCustom.updateField = "personalInfo";
+            objCustom.fieldValue = personal;
+            return await identityServerController.UpdateCustomDataInternal(jwt_internal, username, objCustom);
+        }
     }
 }

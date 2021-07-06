@@ -24,6 +24,7 @@ export class DemoCommentComponent implements OnInit, OnDestroy {
       this.imgsurl = x;
       this.commentService.getTopicObjectIDByComponentName(this.componentName).pipe(
         tap((res) => {
+          console.log(res);
           this.topicObjectID$.next(res);
         }),
         catchError(err => {

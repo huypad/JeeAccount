@@ -483,8 +483,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
                 string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name
                                 , AvartarImgURL as Avatar, Jobtitle, Department, PhoneNumber, Birthday, cocauid
                                 from AccountList
-                                where CustomerID = @CustomerID
-                                and (Disable != 1 or Disable is null)";
+                                where CustomerID = @CustomerID and UserID = @UserID";
 
                 dt = cnn.CreateDataTable(sql, Conds);
                 if (dt.Rows.Count == 0)
@@ -492,7 +491,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
                 return new PersonalInfoCustomData
                 {
                     Avatar = dt.Rows[0]["Avatar"].ToString(),
-                    Birthday = dt.Rows[0]["Birthday"].ToString(),
+                    Birthday = (dt.Rows[0]["Birthday"] != DBNull.Value) ? ((DateTime)dt.Rows[0]["Birthday"]).ToString("dd/MM/yyyy") : "",
                     Departmemt = dt.Rows[0]["Department"].ToString(),
                     Fullname = dt.Rows[0]["Fullname"].ToString(),
                     Jobtitle = dt.Rows[0]["Jobtitle"].ToString(),

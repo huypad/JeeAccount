@@ -1018,30 +1018,39 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpGet("testgetvalue")]
-        public async Task<IActionResult> testgetvalue()
+        #endregion api for jeehr
+
+        #region code cho anh Thiên
+
+        [HttpGet("UpdateAllBgColorCustomData")]
+        public async Task<IActionResult> updateBgColorAll()
         {
             try
             {
-                var valueObj = new ObjCustomData
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
                 {
-                    userId = 123,
-                    updateField = "jee-hr",
-                    fieldValue = new
-                    {
-                        username = "windsora"
-                    },
-                };
-                var value = Newtonsoft.Json.JsonConvert.SerializeObject(valueObj);
-                var obj = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomData>(value);
-                if (obj.updateField.ToString().Equals("jee-hr", StringComparison.OrdinalIgnoreCase))
-                {
-                    var x_json = Newtonsoft.Json.JsonConvert.SerializeObject(obj.fieldValue);
-
-                    var x = Newtonsoft.Json.JsonConvert.DeserializeObject<FindStaffID>(x_json);
-
-                    return Ok(x);
+                    return NotFound(MessageReturnHelper.CustomDataKhongTonTai());
                 }
+
+                var lstCutomer = await accountManagementService.GetListJustCustormerID();
+                foreach (long customerid in lstCutomer)
+                {
+                    if (customerid == 1119)
+                    {
+                        var x = 1;
+                    }
+                    var lstUsername = await accountManagementService.GetListJustUsernameByCustormerID(customerid);
+
+                    foreach (string username in lstUsername)
+                    {
+                        var model = new InputApiModel();
+                        model.Username = username;
+                        model.Userid = null;
+                        var reponse = await accountManagementService.UpdateOneBgColorCustomData(model);
+                    }
+                }
+
                 return Ok();
             }
             catch (Exception ex)
@@ -1050,11 +1059,6 @@ namespace JeeAccount.Controllers
             }
         }
 
-        public class FindStaffID
-        {
-            public long staffID { get; set; } = 0;
-        }
-
-        #endregion api for jeehr
+        #endregion code cho anh Thiên
     }
 }

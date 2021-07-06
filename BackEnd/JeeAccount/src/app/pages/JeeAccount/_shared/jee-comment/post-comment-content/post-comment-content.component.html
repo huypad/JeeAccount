@@ -85,6 +85,19 @@
       </div>
     </ng-container>
     <ng-container *ngIf="ClickShowReply$.asObservable() | async">
+      <div class="comment-filter"  *ngIf="ViewLengthComment < comment.TotalLengthComment">
+        <div class="view-more-comment">
+          <span (click)="viewMoreComment()" class="text-filter">
+            Xem thêm bình luận
+          </span>
+          <span class="click-show-spinner-view-more-comment"
+            [class.spinner]="ShowSpinnerViewMore$.asObservable() | async"></span>
+        </div>
+        <div style="display: none;" class="filter">
+          <span>Toàn bộ bình luận </span>
+          <i data-visualcompletion="css-img" class="item-align-middle" id="filter-icon"></i>
+        </div>
+      </div>
       <jeecomment-post-comment-content (isFocus)="getFocus($event)" *ngFor=" let reply of comment.Replies"
         [comment]="reply" [objectID]="objectID" indexNested="2">
       </jeecomment-post-comment-content>

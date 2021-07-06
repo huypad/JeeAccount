@@ -71,7 +71,7 @@ export class JeeCommentComponent implements OnInit {
         this.getShowTopic();
         const source = interval(1000);
         source.pipe(takeUntil(this.onDestroy)).subscribe(() => {
-          if (this._errorMessage$.value == '' && this.isScrolledIntoView()) {
+          if (this._errorMessage$.value == '' && this.isScrolledViewElement()) {
             this.getShowTopic();
           }
         });
@@ -117,6 +117,7 @@ export class JeeCommentComponent implements OnInit {
   }
 
   pushItemComment(topicComment: TopicCommentDTO, topicCommentNew: TopicCommentDTO) {
+    topicComment.TotalLengthComment= topicCommentNew.TotalLengthComment;
     topicCommentNew.Comments.forEach((comment, pos) => {
       const index = topicComment.Comments.findIndex(item => item.Id === comment.Id);
       if (index === -1) {
@@ -128,6 +129,8 @@ export class JeeCommentComponent implements OnInit {
   }
 
   pushItemReplyComment(Comment: CommentDTO, CommentNew: CommentDTO) {
+    Comment.ViewLengthComment = CommentNew.ViewLengthComment;
+    Comment.TotalLengthComment = CommentNew.TotalLengthComment;
     CommentNew.Replies.forEach((reply, pos) => {
       const index = Comment.Replies.findIndex(item => item.Id === reply.Id);
       if (index === -1) {
@@ -154,7 +157,7 @@ export class JeeCommentComponent implements OnInit {
     this.onDestroy.next();
   }
 
-  isScrolledIntoView() {
+  isScrolledViewElement() {
     const rect = this.elementRef.nativeElement.getBoundingClientRect();
     const isVisible = rect.top < window.innerHeight && rect.bottom >= 0
     return isVisible;

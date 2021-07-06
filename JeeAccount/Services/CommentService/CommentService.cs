@@ -94,7 +94,7 @@ namespace JeeAccount.Services.CommentService
             try
             {
                 val.Add($"{COMMENT_TABLE_FIELD_COMPONENTNAME}", componenName);
-                val.Add($"COMMENT_TABLE_FIELD_OBJECTID", topicID);
+                val.Add($"{COMMENT_TABLE_FIELD_OBJECTID}", topicID);
 
                 using (DpsConnection cnn = new DpsConnection(_connectionString))
                 {

@@ -124,8 +124,15 @@ namespace JeeAccount.Services.CustomerManagementService
                         identityServerReturn = GeneralService.TranformIdentityServerReturnSqlModel(createAccount);
                         return identityServerReturn;
                     }
-
                     long userId = _accountManagementReponsitory.GetLastUserID(cnn);
+                    var updateAppCode = _accountManagementReponsitory.InsertAppCodeAccount(cnn, userId, customerModel.AppID);
+                    if (!updateAppCode.Susscess)
+                    {
+                        cnn.RollbackTransaction();
+                        cnn.EndTransaction();
+                        identityServerReturn = GeneralService.TranformIdentityServerReturnSqlModel(createAccount);
+                        return identityServerReturn;
+                    }
                     IdentityServeAddAdminNewUser identity = new IdentityServeAddAdminNewUser
                     {
                         username = customerModel.Username,
@@ -163,6 +170,8 @@ namespace JeeAccount.Services.CustomerManagementService
                         cnn.EndTransaction();
                         return addNewUser;
                     }
+                    cnn.EndTransaction();
+
                     // kafak
 
                     var index = appcodes.FindIndex(code => code.Equals("jeehr", StringComparison.OrdinalIgnoreCase));
@@ -179,7 +188,7 @@ namespace JeeAccount.Services.CustomerManagementService
                             customerModel = new
                             {
                                 Code = customerModel.Code,
-                                RegisterDate = string.IsNullOrEmpty(customerModel.RegisterDate) ? customerModel.RegisterDate : "",
+                                RegisterDate = customerModel.RegisterDate,
                                 DeadlineDate = customerModel.DeadlineDate,
                                 PakageID = customerModel.GoiSuDung[index],
                                 CompanyName = customerModel.CompanyName,
@@ -193,22 +202,23 @@ namespace JeeAccount.Services.CustomerManagementService
                                 Email = customerModel.Email
                             }
                         };
-
                         await producer.PublishAsync(TopicAddNewCustomer, JsonConvert.SerializeObject(objHR));
                     }
-                    var obj = new
+                    else
                     {
-                        CustomerID = identity.customData.JeeAccount.CustomerID,
-                        AppCode = identity.customData.JeeAccount.AppCode,
-                        UserID = identity.customData.JeeAccount.UserID,
-                        Username = customerModel.Username,
-                        IsInitial = true,
-                        IsAdmin = true
-                    };
+                        var obj = new
+                        {
+                            CustomerID = identity.customData.JeeAccount.CustomerID,
+                            AppCode = identity.customData.JeeAccount.AppCode,
+                            UserID = identity.customData.JeeAccount.UserID,
+                            Username = customerModel.Username,
+                            IsInitial = true,
+                            IsAdmin = true
+                        };
 
+                        await producer.PublishAsync(TopicAddNewCustomer, JsonConvert.SerializeObject(obj));
+                    }
 
-                    await producer.PublishAsync(TopicAddNewCustomer, JsonConvert.SerializeObject(obj));
-                    cnn.EndTransaction();
                     return addNewUser;
                 }
                 catch (Exception ex)

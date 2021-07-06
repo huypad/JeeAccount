@@ -87,5 +87,7 @@ namespace JeeAccount.Services.AccountManagementService
         Task<IEnumerable<AccUsernameModel>> ListNhanVienCapDuoiDirectManagerByDirectManager(string DirectManager);
 
         Task<HttpResponseMessage> UpdateOneStaffIDByInputApiModel(InputApiModel model);
+
+        Task<HttpResponseMessage> UpdateOneBgColorCustomData(InputApiModel model);
     }
 }

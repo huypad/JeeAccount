@@ -32,7 +32,7 @@
   <ng-template #loading>
     <div class="comment-content-container" *ngIf="item">
       <ng-container>
-        <div class="comment-filter">
+        <div class="comment-filter" *ngIf="ViewLengthComment < item.TotalLengthComment">
           <div class="view-more-comment">
             <span (click)="viewMoreComment()" class="text-filter">
               Xem thêm bình luận

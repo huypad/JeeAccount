@@ -11,8 +11,16 @@ import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 
 export class JeeCommentReactionContentComponent implements OnInit {
 
+  @Input() objectID?: string;
+  @Input() commentID?: string;
+  @Input() replyCommentID?: string;
+  @Input() isEdit?: boolean = false;
+  
   constructor() { }
 
   ngOnInit() { }
 
+  postReaction(value) {
+
+  }
 }
