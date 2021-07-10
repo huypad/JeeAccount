@@ -5,6 +5,7 @@ using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.Common;
 using JeeAccount.Models.CustomerManagement;
+using JeeAccount.Reponsitories;
 using JeeAccount.Services;
 using JeeAccount.Services.AccountManagementService;
 using Microsoft.AspNetCore.Cors;
@@ -21,8 +22,8 @@ namespace JeeAccount.Controllers
     [ApiController]
     public class AccountManagementController : ControllerBase
     {
-        private IConfiguration _config;
-        private IAccountManagementService accountManagementService;
+        private readonly IConfiguration _config;
+        private readonly IAccountManagementService accountManagementService;
         private readonly string _JeeCustomerSecrectkey;
         private readonly string _internal_secret;
 
@@ -317,7 +318,7 @@ namespace JeeAccount.Controllers
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
-                var appList = await accountManagementService.GetListAppByUserID(customData.JeeAccount.UserID);
+                var appList = await accountManagementService.GetListAppByUserID(customData.JeeAccount.UserID, customData.JeeAccount.CustomerID);
                 return JsonResultCommon.ThanhCong(appList);
             }
             catch (Exception ex)
@@ -860,8 +861,8 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpGet("updateAllStaffID/{customerid}")]
-        public async Task<IActionResult> UpdateAllStaffID(long customerid)
+        [HttpGet("updateAllStaffIDAllCustomer")]
+        public async Task<IActionResult> updateAllStaffIDAllCustomer()
         {
             try
             {
@@ -872,28 +873,31 @@ namespace JeeAccount.Controllers
                 }
 
                 var messageError = "";
-                var lstUsername = await accountManagementService.GetListJustUsernameByCustormerID(customerid);
-                if (lstUsername is null) return NotFound(MessageReturnHelper.KhongTonTai("customerid"));
-                foreach (string username in lstUsername)
+                var lstCutomer = await accountManagementService.GetListJustCustormerID();
+                foreach (long customerid in lstCutomer)
                 {
-                    var model = new InputApiModel();
-                    model.Username = username;
-                    model.StaffID = null;
-                    model.Userid = null;
-                    var reponse = await accountManagementService.UpdateOneStaffIDByInputApiModel(model);
-                    if (!reponse.IsSuccessStatusCode)
+                    var lstUsername = await accountManagementService.GetListJustUsernameByCustormerID(customerid);
+                    if (lstUsername is null) return NotFound(MessageReturnHelper.KhongTonTai("customerid"));
+                    foreach (string username in lstUsername)
                     {
-                        if (string.IsNullOrEmpty(messageError))
+                        var model = new InputApiModel();
+                        model.Username = username;
+                        model.StaffID = null;
+                        model.Userid = null;
+                        var reponse = await accountManagementService.UpdateOneStaffIDByInputApiModel(model);
+                        if (!reponse.IsSuccessStatusCode)
                         {
-                            messageError = model.Username;
-                        }
-                        else
-                        {
-                            messageError += " ," + model.Username;
+                            if (string.IsNullOrEmpty(messageError))
+                            {
+                                messageError = model.Username;
+                            }
+                            else
+                            {
+                                messageError += " ," + model.Username;
+                            }
                         }
                     }
                 }
-
                 if (string.IsNullOrEmpty(messageError))
                 {
                     return Ok();
@@ -909,39 +913,46 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpGet("updateAllStaffID/internal/{customerid}")]
+        [HttpGet("updateAllStaffID")]
         public async Task<IActionResult> UpdateAllStaffIDInternal(long customerid)
         {
             try
             {
-                var isToken = Ulities.IsInternaltoken(HttpContext.Request.Headers, _config.GetValue<string>("Jwt:internal_secret"));
-                if (isToken == false)
-                {
-                    return NotFound(MessageReturnHelper.Unauthorized());
-                }
-
                 var messageError = "";
-                var lstUsername = await accountManagementService.GetListJustUsernameByCustormerID(customerid);
-                if (lstUsername is null) return NotFound(MessageReturnHelper.KhongTonTai("customerid"));
-                foreach (string username in lstUsername)
-                {
-                    var model = new InputApiModel();
-                    model.Username = username;
-                    model.StaffID = null;
-                    model.Userid = null;
-                    var reponse = await accountManagementService.UpdateOneStaffIDByInputApiModel(model);
-                    if (!reponse.IsSuccessStatusCode)
-                    {
-                        if (string.IsNullOrEmpty(messageError))
-                        {
-                            messageError = model.Username;
-                        }
-                        else
-                        {
-                            messageError += " ," + model.Username;
-                        }
-                    }
-                }
+
+                /*
+             var isToken = Ulities.IsInternaltoken(HttpContext.Request.Headers, _config.GetValue<string>("Jwt:internal_secret"));
+             if (isToken == false)
+             {
+                 return NotFound(MessageReturnHelper.Unauthorized());
+             }
+
+             var lstUsername = await accountManagementService.GetListJustUsernameByCustormerID(customerid);
+             if (lstUsername is null) return NotFound(MessageReturnHelper.KhongTonTai("customerid"));
+             foreach (string username in lstUsername)
+             {
+                 var model = new InputApiModel();
+                 model.Username = username;
+                 model.StaffID = null;
+                 model.Userid = null;
+                 var reponse = await accountManagementService.UpdateOneStaffIDByInputApiModel(model);
+                 if (!reponse.IsSuccessStatusCode)
+                 {
+                     if (string.IsNullOrEmpty(messageError))
+                     {
+                         messageError = model.Username;
+                     }
+                     else
+                     {
+                         messageError += " ," + model.Username;
+                     }
+                 }
+             }*/
+                var model = new InputApiModel();
+                model.Username = "vanluc";
+                model.StaffID = "2294";
+                model.Userid = null;
+                var reponse = await accountManagementService.UpdateOneStaffIDByInputApiModel(model);
 
                 if (string.IsNullOrEmpty(messageError))
                 {
@@ -1036,18 +1047,57 @@ namespace JeeAccount.Controllers
                 var lstCutomer = await accountManagementService.GetListJustCustormerID();
                 foreach (long customerid in lstCutomer)
                 {
-                    if (customerid == 1119)
+                    if (customerid == 25)
                     {
-                        var x = 1;
-                    }
-                    var lstUsername = await accountManagementService.GetListJustUsernameByCustormerID(customerid);
+                        var lstUsername = await accountManagementService.GetListJustUsernameByCustormerID(customerid);
 
-                    foreach (string username in lstUsername)
+                        foreach (string username in lstUsername)
+                        {
+                            if (username.Equals("vanluc"))
+                            {
+                                var model = new InputApiModel();
+                                model.Username = username;
+                                model.Userid = null;
+                                var reponse = await accountManagementService.UpdateOneBgColorCustomData(model);
+                            }
+                        }
+                    }
+                }
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpGet("UpdateAllAppCodesCustomData")]
+        public async Task<IActionResult> UpdateAllAppCodesCustomData()
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return NotFound(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+
+                var lstCutomer = await accountManagementService.GetListJustCustormerID();
+                foreach (long customerid in lstCutomer)
+                {
+                    if (customerid == 25)
                     {
-                        var model = new InputApiModel();
-                        model.Username = username;
-                        model.Userid = null;
-                        var reponse = await accountManagementService.UpdateOneBgColorCustomData(model);
+                        var lstUsername = await accountManagementService.GetListJustUsernameByCustormerID(customerid);
+                        var lstAppCode = await accountManagementService.GetListAppByCustomerID(customerid);
+                        var lstAppID = lstAppCode.Select(x => x.AppID).ToList();
+                        foreach (string username in lstUsername)
+                        {
+                            var model = new InputApiModel();
+                            model.Username = username;
+                            model.Userid = null;
+                            accountManagementService.UpdateAllAppCodesCustomData(model, lstAppID);
+                        }
                     }
                 }
 

@@ -25,7 +25,7 @@ namespace JeeAccount.Reponsitories
 
         Task<IEnumerable<AppListDTO>> GetListAppByCustomerID(long customerID);
 
-        Task<IEnumerable<AppListDTO>> GetListAppByUserID(long UserID);
+        Task<IEnumerable<AppListDTO>> GetListAppByUserID(long UserID, long CustomerID = 0);
 
         Task<IEnumerable<AppListDTO>> GetListInfoAppByCustomerID(long customerID);
 

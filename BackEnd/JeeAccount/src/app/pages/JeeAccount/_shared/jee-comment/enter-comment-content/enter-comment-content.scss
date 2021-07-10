@@ -1,14 +1,17 @@
 $color-x-button: black;
 $color-hover-x-button: #1ebcc5;
 
+.enter-post-comment {
+  padding-right: 16px;
+}
+
 .show-icon {
   position: absolute;
   bottom: 100%;
   left: 72%;
 }
 
-.post-comment-image {
-  padding-left: 48px;
+.enter-post-comment-image {
   padding-top: 0px;
   img {
     border: 0;
@@ -26,7 +29,6 @@ $color-hover-x-button: #1ebcc5;
   vertical-align: top;
 }
 
-
 .delete-preview-image {
   cursor: pointer;
   vertical-align: top;
@@ -38,12 +40,14 @@ $color-hover-x-button: #1ebcc5;
   height: 20px;
   overflow: hidden;
   &:hover {
-    &::before, &::after {
+    &::before,
+    &::after {
       background: $color-hover-x-button;
     }
   }
 
-  &::before, &::after {
+  &::before,
+  &::after {
     content: '';
     position: absolute;
     height: 2px;
@@ -59,7 +63,6 @@ $color-hover-x-button: #1ebcc5;
   &::after {
     transform: rotate(-45deg);
   }
-
 }
 
 .post-comment-cancle {
@@ -72,7 +75,6 @@ $color-hover-x-button: #1ebcc5;
   font-weight: 600;
   color: #1ebcc5;
 }
-
 
 .span-cancel-comment-not-in-textarea {
   font-weight: 600;

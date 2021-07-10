@@ -60,7 +60,6 @@ export class DepartmentChangeTinhTrangEditDialogComponent implements OnInit {
     depChangTinhTrang.clear();
     depChangTinhTrang.Note = this.itemForm.controls.GhiChu.value;
     depChangTinhTrang.RowID = this.data.RowID;
-    console.log({ depChangTinhTrang });
     return depChangTinhTrang;
   }
 

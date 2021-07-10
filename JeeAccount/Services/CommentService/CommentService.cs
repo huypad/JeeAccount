@@ -148,14 +148,19 @@ namespace JeeAccount.Services.CommentService
             var kafkaModel = new KafkaCommentModel();
 
             kafkaModel.IsComment = true;
-            kafkaModel.IsReaction = false;
-
             kafkaModel.IsAddNew = true;
-            kafkaModel.IsDelete = false;
-            kafkaModel.IsUpdate = false;
-
             kafkaModel.PostComment = postComment;
-            kafkaModel.ReactionComment = new ReactionCommentModel();
+
+            await _producer.PublishAsync(TOPIC_JeeplatformPostcomment, JsonConvert.SerializeObject(kafkaModel)).ConfigureAwait(false);
+        }
+
+        public async Task PostReactionCommentKafka(ReactionCommentModel reactionCommentModel)
+        {
+            var kafkaModel = new KafkaCommentModel();
+
+            kafkaModel.IsReaction = true;
+            kafkaModel.ReactionComment = reactionCommentModel;
+
             await _producer.PublishAsync(TOPIC_JeeplatformPostcomment, JsonConvert.SerializeObject(kafkaModel)).ConfigureAwait(false);
         }
     }

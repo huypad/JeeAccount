@@ -1,8 +1,8 @@
 import { DemoCommentService } from './demo-comment.service';
-import { Component, OnInit, ChangeDetectorRef, Input, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 // Material
 // RXJS
-import { Subscription, Subject, of, Observable, BehaviorSubject } from 'rxjs';
+import { Subject, of, BehaviorSubject } from 'rxjs';
 import { finalize, tap, share, takeUntil, catchError } from 'rxjs/operators';
 
 @Component({
@@ -24,7 +24,6 @@ export class DemoCommentComponent implements OnInit, OnDestroy {
       this.imgsurl = x;
       this.commentService.getTopicObjectIDByComponentName(this.componentName).pipe(
         tap((res) => {
-          console.log(res);
           this.topicObjectID$.next(res);
         }),
         catchError(err => {

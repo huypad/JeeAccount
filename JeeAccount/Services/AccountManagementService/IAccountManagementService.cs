@@ -60,7 +60,7 @@ namespace JeeAccount.Services.AccountManagementService
 
         bool checkUserIDInCustomerID(long UserID, long CustomerID);
 
-        Task<IEnumerable<AppListDTO>> GetListAppByUserID(long UserID);
+        Task<IEnumerable<AppListDTO>> GetListAppByUserID(long UserID, long CustomerID = 0);
 
         Task<IEnumerable<CustomerAppDTO>> GetListCustomerAppByCustomerIDFromAccount(long CustomerID);
 
@@ -89,5 +89,7 @@ namespace JeeAccount.Services.AccountManagementService
         Task<HttpResponseMessage> UpdateOneStaffIDByInputApiModel(InputApiModel model);
 
         Task<HttpResponseMessage> UpdateOneBgColorCustomData(InputApiModel model);
+
+        void UpdateAllAppCodesCustomData(InputApiModel model, List<int> lstAppCode);
     }
 }

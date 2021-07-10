@@ -18,5 +18,7 @@ namespace JeeAccount.Services.CommentService
         Attach UpdateAllFileToMinio(Attach attachs, string username);
 
         Task PostCommentKafka(PostCommentModel postComment);
+
+        Task PostReactionCommentKafka(ReactionCommentModel reactionCommentModel);
     }
 }

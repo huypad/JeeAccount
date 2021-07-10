@@ -318,9 +318,9 @@ namespace JeeAccount.Services.AccountManagementService
             return (CustomerID == customerID);
         }
 
-        public Task<IEnumerable<AppListDTO>> GetListAppByUserID(long UserID)
+        public Task<IEnumerable<AppListDTO>> GetListAppByUserID(long UserID, long CustomerID = 0)
         {
-            var listapp = accountManagementReponsitory.GetListAppByUserID(UserID);
+            var listapp = accountManagementReponsitory.GetListAppByUserID(UserID, CustomerID);
             return listapp;
         }
 
@@ -614,7 +614,6 @@ where AppList.AppCode = '{AppCode}'";
                 username = GeneralService.GetUsernameByUserID(ConnectionString, model.Userid).ToString();
                 userID = model.Userid;
             }
-
             var appCodes = await accountManagementReponsitory.GetListAppByUserID(long.Parse(userID));
             var appCodesName = appCodes.Select(x => x.AppCode).ToList();
             var StaffID = 0;
@@ -701,6 +700,29 @@ where AppList.AppCode = '{AppCode}'";
             objCustom.updateField = "personalInfo";
             objCustom.fieldValue = personal;
             return await identityServerController.UpdateCustomDataInternal(jwt_internal, username, objCustom);
+        }
+
+        public void UpdateAllAppCodesCustomData(InputApiModel model, List<int> lstAppCode)
+        {
+            var username = "";
+            var userID = "";
+            if (!string.IsNullOrEmpty(model.Username))
+            {
+                username = model.Username;
+                userID = GeneralService.GetUserIDByUsername(ConnectionString, model.Username).ToString();
+            }
+
+            if (!string.IsNullOrEmpty(model.Userid))
+            {
+                username = GeneralService.GetUsernameByUserID(ConnectionString, model.Userid).ToString();
+                userID = model.Userid;
+            }
+
+            var customerId = GeneralService.GetCustomerIDByUsername(ConnectionString, model.Username);
+            using (DpsConnection cnn = new DpsConnection(ConnectionString))
+            {
+                accountManagementReponsitory.InsertAppCodeAccount(cnn, Int32.Parse(userID), lstAppCode);
+            }
         }
     }
 }

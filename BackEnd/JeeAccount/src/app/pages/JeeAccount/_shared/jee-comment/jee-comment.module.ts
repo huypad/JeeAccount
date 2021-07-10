@@ -1,3 +1,4 @@
+import { JeeCommentReactionShowComponent } from './reaction-comment-show/reaction-comment-show.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,6 +23,7 @@ import { ClickOutsideDirective } from './enter-comment-content/click-outside.dir
     JeeCommentPostContentComponent,
     JeeCommentReactionContentComponent,
     JeeCommentEnterCommentContentComponent,
+    JeeCommentReactionShowComponent,
     ClickOutsideDirective
   ],
   imports: [CommonModule, MatChipsModule, NgxMatSelectSearchModule, InlineSVGModule, MatIconModule, MatInputModule,
@@ -29,7 +31,7 @@ import { ClickOutsideDirective } from './enter-comment-content/click-outside.dir
   ],
   providers: [
     JeeCommentService],
-  entryComponents: [JeeCommentComponent, JeeCommentPostContentComponent, JeeCommentReactionContentComponent],
-  exports: [JeeCommentComponent, JeeCommentPostContentComponent, JeeCommentReactionContentComponent, JeeCommentEnterCommentContentComponent],
+  entryComponents: [JeeCommentComponent, JeeCommentPostContentComponent, JeeCommentReactionContentComponent, JeeCommentReactionShowComponent],
+  exports: [JeeCommentComponent, JeeCommentPostContentComponent, JeeCommentReactionContentComponent, JeeCommentEnterCommentContentComponent, JeeCommentReactionShowComponent],
 })
 export class JeeCommentModule { }

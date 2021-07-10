@@ -60,7 +60,6 @@ namespace JeeAccount.Controllers
             try
             {
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
-                var access_token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return Unauthorized(NotFound(MessageReturnHelper.CustomDataKhongTonTai()));
@@ -79,18 +78,38 @@ namespace JeeAccount.Controllers
                 return BadRequest(MessageReturnHelper.Exception(ex));
             }
         }
+
+        [HttpPost("postReactionComment")]
+        public async Task<IActionResult> PostReactionComment([FromBody] ReactionCommentModel reactionCommentModel)
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(NotFound(MessageReturnHelper.CustomDataKhongTonTai()));
+                }
+                reactionCommentModel.Username = Ulities.GetUsernameByHeader(HttpContext.Request.Headers);
+
+                await _commentService.PostReactionCommentKafka(reactionCommentModel);
+                return StatusCode(200, reactionCommentModel);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
     }
 
     public class KafkaCommentModel
     {
-        public bool IsAddNew { get; set; }
-        public bool IsUpdate { get; set; }
-        public bool IsDelete { get; set; }
-        public bool IsComment { get; set; }
-        public bool IsReaction { get; set; }
-        public PostCommentModel PostComment { get; set; }
-        public ReactionCommentModel ReactionComment { get; set; }
-        public string UserTypeReaction { get; set; }
+        public bool IsAddNew { get; set; } = false;
+        public bool IsUpdate { get; set; } = false;
+        public bool IsDelete { get; set; } = false;
+        public bool IsComment { get; set; } = false;
+        public bool IsReaction { get; set; } = false;
+        public PostCommentModel PostComment { get; set; } = null;
+        public ReactionCommentModel ReactionComment { get; set; } = null;
     }
 
     public class ConvertTopic
@@ -114,7 +133,8 @@ namespace JeeAccount.Controllers
         public string CommentID { get; set; }
         public string ReplyCommentID { get; set; }
         public string Username { get; set; }
-        public string UserTypeReaction { get; set; }
+        public string UserOldReaction { get; set; }
+        public string UserReaction { get; set; }
     }
 
     public class Attach

@@ -546,37 +546,66 @@ where Username = @Username and (Disable != 1 or Disable is null)";
             }
         }
 
-        public async Task<IEnumerable<AppListDTO>> GetListAppByUserID(long UserID)
+        public async Task<IEnumerable<AppListDTO>> GetListAppByUserID(long UserID, long CustomerID = 0)
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
             Conds.Add("UserID", UserID);
-
-            string sql = @"select AppList.* from AccountList
-join Account_App on Account_App.UserID = AccountList.UserID
-join AppList on AppList.AppID = Account_App.AppID
-where AccountList.UserID = @UserID";
+            string selection = " AppList.* ";
+            string join = @"join Account_App on Account_App.UserID = AccountList.UserID
+join AppList on AppList.AppID = Account_App.AppID";
+            string where = "where AccountList.UserID = @UserID";
+            if (CustomerID > 0)
+            {
+                selection += " , Customer_App.SoLuongNhanSu";
+                join += " join Customer_App on Customer_App.AppID = AppList.AppID ";
+                where += " and Customer_App.CustomerID = @CustomerID";
+                Conds.Add("CustomerID", CustomerID);
+            }
+            string sql = @$"select {selection} from AccountList {join} {where} order by Position";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 dt = cnn.CreateDataTable(sql, Conds);
-                var result = dt.AsEnumerable().Select(row => new AppListDTO
+                if (CustomerID > 0)
                 {
-                    AppID = Int32.Parse(row["AppID"].ToString()),
-                    APIUrl = row["APIUrl"].ToString(),
-                    AppCode = row["AppCode"].ToString(),
-                    AppName = row["AppName"].ToString(),
-                    BackendURL = row["BackendURL"].ToString(),
-                    CurrentVersion = row["CurrentVersion"].ToString(),
-                    Description = row["Description"].ToString(),
-                    LastUpdate = row["LastUpdate"].ToString(),
-                    Note = row["Note"].ToString(),
-                    ReleaseDate = row["ReleaseDate"].ToString(),
-                    Icon = row["Icon"].ToString(),
-                    Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
-                });
-
-                return await Task.FromResult(result).ConfigureAwait(false);
+                    var result = dt.AsEnumerable().Select(row => new AppListDTO
+                    {
+                        AppID = Int32.Parse(row["AppID"].ToString()),
+                        APIUrl = row["APIUrl"].ToString(),
+                        AppCode = row["AppCode"].ToString(),
+                        AppName = row["AppName"].ToString(),
+                        BackendURL = row["BackendURL"].ToString(),
+                        CurrentVersion = row["CurrentVersion"].ToString(),
+                        Description = row["Description"].ToString(),
+                        LastUpdate = row["LastUpdate"].ToString(),
+                        Note = row["Note"].ToString(),
+                        ReleaseDate = row["ReleaseDate"].ToString(),
+                        Icon = row["Icon"].ToString(),
+                        Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
+                        SoLuongNhanSu = (row["SoLuongNhanSu"] != DBNull.Value) ? Int32.Parse(row["SoLuongNhanSu"].ToString()) : 0
+                    });
+                    return await Task.FromResult(result).ConfigureAwait(false);
+                }
+                else
+                {
+                    var result = dt.AsEnumerable().Select(row => new AppListDTO
+                    {
+                        AppID = Int32.Parse(row["AppID"].ToString()),
+                        APIUrl = row["APIUrl"].ToString(),
+                        AppCode = row["AppCode"].ToString(),
+                        AppName = row["AppName"].ToString(),
+                        BackendURL = row["BackendURL"].ToString(),
+                        CurrentVersion = row["CurrentVersion"].ToString(),
+                        Description = row["Description"].ToString(),
+                        LastUpdate = row["LastUpdate"].ToString(),
+                        Note = row["Note"].ToString(),
+                        ReleaseDate = row["ReleaseDate"].ToString(),
+                        Icon = row["Icon"].ToString(),
+                        Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
+                    });
+                    return await Task.FromResult(result).ConfigureAwait(false);
+                }
             }
         }
 
@@ -586,15 +615,11 @@ where AccountList.UserID = @UserID";
             SqlConditions Conds = new SqlConditions();
             Conds.Add("UserID", UserID);
 
-            string sql = @"select * from Account_App where UserID = @UserID";
-            dt = cnn.CreateDataTable(sql, Conds);
-            if (dt.Rows.Count > 0)
-            {
-                return new ReturnSqlModel();
-            }
-
             foreach (var id in AppID)
             {
+                string sql2 = @$"select AppID from Account_App where UserID = @UserID and AppID = {id}";
+                var dtnew = cnn.CreateDataTable(sql2, Conds);
+                if (dtnew.Rows.Count > 0) continue;
                 Hashtable val = new Hashtable();
                 val.Add("UserID", UserID);
                 val.Add("AppID", id);

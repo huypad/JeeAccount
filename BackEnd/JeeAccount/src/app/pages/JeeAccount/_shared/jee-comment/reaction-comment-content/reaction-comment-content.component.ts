@@ -1,6 +1,9 @@
-import { Observable, of } from 'rxjs';
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 
+import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { of, Subject } from 'rxjs';
+import { catchError, takeUntil, tap } from 'rxjs/operators';
+import { ReactionCommentModel } from '../jee-comment.model';
+import { JeeCommentService } from '../jee-comment.service';
 
 @Component({
   selector: 'jeecomment-reaction-content',
@@ -10,17 +13,49 @@ import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 })
 
 export class JeeCommentReactionContentComponent implements OnInit {
+  private readonly onDestroy = new Subject<void>();
+  @Input() objectID: string = '';
+  @Input() commentID: string = '';
+  @Input() replyCommentID: string = '';
+  @Input() userOldReaction?: string;
 
-  @Input() objectID?: string;
-  @Input() commentID?: string;
-  @Input() replyCommentID?: string;
-  @Input() isEdit?: boolean = false;
-  
-  constructor() { }
+  userReaction: string = '';
+  constructor(public service: JeeCommentService) { }
 
-  ngOnInit() { }
+  ngOnInit() {
+    if (!this.objectID) this.objectID = '';
+    if (!this.commentID) this.commentID = '';
+    if (!this.replyCommentID) this.replyCommentID = '';
+    if (!this.userOldReaction) this.userOldReaction = '';
+  }
 
-  postReaction(value) {
+  postReaction(react: string) {
+    this.userReaction = react;
+    const model = this.prepareModel();
+    this.postReactionComment(model);
+  }
 
+  postReactionComment(model: ReactionCommentModel) {
+    this.service.postReactionCommentModel(model).pipe(
+      tap(
+        (res) => { },
+        catchError((err) => { console.log(err); return of() }),
+      ),
+      takeUntil(this.onDestroy),
+    ).subscribe();
+  }
+
+  prepareModel(): ReactionCommentModel {
+    const model = new ReactionCommentModel();
+    model.TopicCommentID = this.objectID;
+    model.CommentID = this.commentID;
+    model.ReplyCommentID = this.replyCommentID;
+    model.UserReaction = this.userReaction;
+    model.UserOldReaction = this.userOldReaction;
+    return model;
+  }
+
+  ngOnDestroy(): void {
+    this.onDestroy.next();
   }
 }

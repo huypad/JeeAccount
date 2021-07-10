@@ -1,4 +1,4 @@
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, takeUntil, tap } from 'rxjs/operators';
 import { of, Subject, BehaviorSubject } from 'rxjs';
 import { ChangeDetectionStrategy, Component, Input, OnInit, ViewEncapsulation, ChangeDetectorRef, ElementRef, ViewChild } from '@angular/core';
 import { JeeCommentService } from '../jee-comment.service';
@@ -17,9 +17,9 @@ export class JeeCommentEnterCommentContentComponent implements OnInit {
   private readonly onDestroy = new Subject<void>();
   constructor(public service: JeeCommentService, public cd: ChangeDetectorRef) { }
 
-  @Input() objectID?: string;
-  @Input() commentID?: string;
-  @Input() replyCommentID?: string;
+  @Input() objectID: string = '';
+  @Input() commentID: string = '';
+  @Input() replyCommentID: string = '';
   @Input() isEdit?: boolean = false;
   @Input() isFocus$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
@@ -99,14 +99,16 @@ export class JeeCommentEnterCommentContentComponent implements OnInit {
   }
 
   updateComment(model: PostCommentModel) {
-    this.service.postCommentModel(model).subscribe();
+    this.service.postCommentModel(model)
+      .subscribe();
   }
 
   postComment(model: PostCommentModel) {
     this.isLoading$.next(true);
     this.service.postCommentModel(model).
       pipe(
-        tap((res) => console.log(res),
+        tap(
+          (res) => { },
           catchError((err) => { console.log(err); return of() }),
           () => {
             this.ngOnInit();
@@ -114,7 +116,8 @@ export class JeeCommentEnterCommentContentComponent implements OnInit {
             setTimeout(() => {
               this.isLoading$.next(false);
             }, 500);
-          })
+          }),
+        takeUntil(this.onDestroy),
       ).subscribe();
   }
 
@@ -145,7 +148,6 @@ export class JeeCommentEnterCommentContentComponent implements OnInit {
       let reader = new FileReader();
       reader.readAsDataURL(files.item(i));
       reader.onload = () => {
-        console.log(reader.result);
         this.imagesUrl.push(reader.result as string);
         this.cd.detectChanges();
       }
