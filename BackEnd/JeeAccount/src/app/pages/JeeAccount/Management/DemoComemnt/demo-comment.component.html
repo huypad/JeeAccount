@@ -1,4 +1,4 @@
-<div class="card card-custom" style="background-color: rgb(36, 37, 38)">
+<!-- <div class="card card-custom" style="background-color: rgb(36, 37, 38)">
   <cdk-virtual-scroll-viewport
     *ngIf="topicObjectID$.asObservable() | async"
     itemSize="0.1"
@@ -8,7 +8,7 @@
     <div style="height: auto; width: 680px; display: inline-block">
       <app-jee-comment
         *cdkVirtualFor="let item of numbers; let i = index"
-        [img]="imgsurl[i].download_url"
+        img="https://wallpaperaccess.com/full/628286.jpg"
         [number]="item"
         [showCommentDefault]="true"
         [objectID]="topicObjectID$.asObservable() | async"
@@ -16,4 +16,12 @@
       </app-jee-comment>
     </div>
   </cdk-virtual-scroll-viewport>
+</div> -->
+<div *ngIf="topicObjectID$.asObservable() | async" class="card card-custom" style="background-color: rgb(36, 37, 38)">
+  <app-jee-comment
+    img="https://wallpaperaccess.com/full/628286.jpg"
+    [showCommentDefault]="true"
+    [objectID]="topicObjectID$.asObservable() | async"
+  >
+  </app-jee-comment>
 </div>

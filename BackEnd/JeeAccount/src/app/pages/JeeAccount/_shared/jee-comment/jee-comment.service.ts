@@ -1,9 +1,9 @@
 import { HttpUtilsService } from './../../_core/utils/http-utils.service';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, forkJoin, BehaviorSubject, of, Subscription } from 'rxjs';
+import { Observable, BehaviorSubject, of } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
-import { catchError, finalize, share, take, takeUntil, tap } from 'rxjs/operators';
+import {  finalize, share, tap } from 'rxjs/operators';
 import { AuthService } from 'src/app/modules/auth';
 import { QueryFilterComment, UserCommentInfo, PostCommentModel, ReactionCommentModel } from './jee-comment.model';
 
@@ -14,10 +14,8 @@ const API_JEEACCOUNT_URL = environment.HOST_JEEACCOUNT_API + '/api';
 export class JeeCommentService {
   private _isLoading$ = new BehaviorSubject<boolean>(false);
   private _errorMessage$ = new BehaviorSubject<string>('');
-  public lstUser: UserCommentInfo[] = [];
-  private _mainUser$: BehaviorSubject<UserCommentInfo> = new BehaviorSubject<UserCommentInfo>(undefined);
-  public filterLstCommentID = new BehaviorSubject<string[]>([]);
-  public filterDate = new BehaviorSubject<Date>(new Date());
+  private _lstUser: UserCommentInfo[] = [];
+  private _mainUser$: BehaviorSubject<UserCommentInfo> = new BehaviorSubject<UserCommentInfo>(new UserCommentInfo());
 
   get isLoading$() {
     return this._isLoading$.asObservable();
@@ -25,6 +23,10 @@ export class JeeCommentService {
 
   get mainUser$() {
     return this._mainUser$.asObservable();
+  }
+
+  get lstUser() {
+    return this._lstUser;
   }
 
   // tiếng việt icon
@@ -123,7 +125,7 @@ export class JeeCommentService {
               item.Jobtitle = element.Jobtitle;
               item.FullName = element.FullName;
               item.Display = element.FullName ? element.FullName : element.Username;
-              this.lstUser.push(item);
+              this._lstUser.push(item);
 
               // init main User Login
               if (usernamelogin === item.Username) this._mainUser$.next(item);
@@ -149,14 +151,14 @@ export class JeeCommentService {
     });
   }
 
-
   public getDisplay(username?: string): string {
-    const object = this.lstUser.find(element => element.Username === username);
+    const object = this._lstUser.find(element => element.Username === username);
     if (object) return object.Display;
     return username;
   }
+
   public getUriAvatar(username?: string): string {
-    const avatar = this.lstUser.find(element => element.Username === username);
+    const avatar = this._lstUser.find(element => element.Username === username);
     if (avatar) return avatar.AvartarImgURL;
     return 'https://cdn.jee.vn/jee-account/images/avatars/default2.png';
   }

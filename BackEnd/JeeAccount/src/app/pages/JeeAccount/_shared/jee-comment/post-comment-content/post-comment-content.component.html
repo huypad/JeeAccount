@@ -20,12 +20,15 @@
               class="post-comment-reaction-show show-text"
               *ngIf="comment.Attachs.Images.length == 0 && comment.Attachs.Videos.length === 0"
             >
-              <jeecomment-reaction-comment-show [comment]="comment"></jeecomment-reaction-comment-show>
+              <jeecomment-reaction-comment-show
+                [isDeteachChange$]="isDeteachChangeComment$"
+                [comment]="comment"
+              ></jeecomment-reaction-comment-show>
             </div>
           </div>
           <div class="icon-edit-report">
             <span>
-              <div class="hover-icon" role="button" tabindex="0">
+              <div class="hover-icon" tabindex="0">
                 <span class="show-when-hover">
                   <i aria-hidden="true" id="edit-report-icon"></i>
                 </span>
@@ -48,7 +51,10 @@
               class="post-comment-reaction-show show-image"
               *ngIf="comment.Attachs.Images.length > 0 && comment.Attachs.Videos.length === 0"
             >
-              <jeecomment-reaction-comment-show [comment]="comment"></jeecomment-reaction-comment-show>
+              <jeecomment-reaction-comment-show
+                [isDeteachChange$]="isDeteachChangeComment$"
+                [comment]="comment"
+              ></jeecomment-reaction-comment-show>
             </div>
           </div>
           <div class="post-comment-video">
@@ -56,7 +62,10 @@
               <source src="{{ video }}" type="video/mp4" />
             </video>
             <div class="post-comment-reaction-show show-video" *ngIf="comment.Attachs.Videos.length > 0">
-              <jeecomment-reaction-comment-show [comment]="comment"></jeecomment-reaction-comment-show>
+              <jeecomment-reaction-comment-show
+                [isDeteachChange$]="isDeteachChangeComment$"
+                [comment]="comment"
+              ></jeecomment-reaction-comment-show>
             </div>
           </div>
         </div>
@@ -118,7 +127,7 @@
         *ngFor="let reply of comment.Replies"
         [comment]="reply"
         [inputLstObjectID]="lstObjectID"
-        [isDeteachChange$]="isDeteachChange$"
+        [isDeteachChange$]="isDeteachChangeComment$"
       >
       </jeecomment-post-comment-content>
       <jeecomment-enter-comment-content

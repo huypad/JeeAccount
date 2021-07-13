@@ -1,4 +1,6 @@
+import { switchMap } from 'rxjs/operators';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { async, BehaviorSubject } from 'rxjs';
 import { CommentDTO } from '../jee-comment.model';
 
 @Component({
@@ -10,6 +12,7 @@ import { CommentDTO } from '../jee-comment.model';
 })
 
 export class JeeCommentReactionShowComponent implements OnInit {
+
   showAngry: string = 'icon-reaction-show-angry';
   showSad: string = 'icon-reaction-show-sad';
   showWow: string = 'icon-reaction-show-wow';
@@ -21,11 +24,23 @@ export class JeeCommentReactionShowComponent implements OnInit {
   lstShowReaction: string[] = [];
 
   @Input() comment?: CommentDTO;
+  @Input() isDeteachChange$?: BehaviorSubject<boolean>;
 
-  constructor(public cd: ChangeDetectorRef) { }
+  constructor(private cd: ChangeDetectorRef) {
+  }
 
   ngOnInit() {
-
+    if (this.isDeteachChange$) {
+      this.isDeteachChange$
+        .pipe(
+          switchMap(async (res) => {
+            if (res) {
+              this.cd.detectChanges();
+              if (this.comment) this.showTypeReaction();
+            }
+          }))
+        .subscribe();
+    }
     if (this.comment) this.showTypeReaction();
   }
 

@@ -2,8 +2,8 @@ import { BehaviorSubject, of, Subject, interval } from 'rxjs';
 import { Component, Input, OnInit, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef } from '@angular/core';
 import { JeeCommentService } from './jee-comment.service';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
-import { catchError, finalize, takeUntil, tap, share } from 'rxjs/operators';
-import { CommentDTO, QueryFilterComment, ReturnFilterComment, TopicCommentDTO } from './jee-comment.model';
+import { catchError, finalize, takeUntil, tap, share, switchMap } from 'rxjs/operators';
+import { CommentDTO, QueryFilterComment, ReturnFilterComment, TopicCommentDTO, ChangeComment } from './jee-comment.model';
 
 @Component({
   selector: 'app-jee-comment',
@@ -32,9 +32,7 @@ export class JeeCommentComponent implements OnInit {
   ShowSpinnerViewMore$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   //filter
-  filterViewLengthComment: number = 10;
   filterDate: Date = new Date();;
-  filterLstObjectID: string[] = [];
 
   @Input() isDeteachChange$?: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   @Input() objectID: string;
@@ -81,9 +79,6 @@ export class JeeCommentComponent implements OnInit {
       .pipe(
         tap((topic: TopicCommentDTO) => {
           this.item = topic;
-          topic.Comments.forEach(element => {
-            this.filterLstObjectID.push(element.Id);
-          });
           if (topic.ViewLengthComment < topic.TotalLengthComment) {
             this.ShowFilter$.next(true);
           } else {
@@ -111,19 +106,19 @@ export class JeeCommentComponent implements OnInit {
     this._isLoading$.next(true);
     this.service.showChangeTopicCommentByObjectID(this.objectID, this.filter())
       .pipe(
-        tap((result: ReturnFilterComment) => {
-          if (result.LstCreate.length > 0 || result.LstEdit.length > 0 || result.LstStringObjectIDDelete.length > 0) {
-            this.updateLength(this.item.ViewLengthComment, result.LstCreate.length, result.LstStringObjectIDDelete.length);
-            this.updateLength(this.item.TotalLengthReaction, result.LstCreate.length, result.LstStringObjectIDDelete.length);
+        switchMap(async (result: ReturnFilterComment) => {
+          if (result.LstCreate.length > 0 || result.LstEdit.length > 0 || result.LstDelete.length > 0) {
             if (result.LstCreate.length > 0) {
               this.pushItemCommentInTopicComemnt(this.item, result.LstCreate);
             }
             if (result.LstEdit.length > 0) {
+              console.log(result.LstEdit);
               this.editItemCommentInTopicComemnt(this.item, result.LstEdit);
             }
-            if (result.LstStringObjectIDDelete.length > 0) {
-              this.deleteItemCommentInTopicComemnt(this.item, result.LstStringObjectIDDelete);
+            if (result.LstDelete.length > 0) {
+              this.deleteItemCommentInTopicComemnt(this.item, result.LstDelete);
             }
+            this.filterDate = new Date();
             this.isDeteachChange$.next(true);
           }
 
@@ -135,7 +130,6 @@ export class JeeCommentComponent implements OnInit {
           return of();
         }),
         finalize(() => {
-          this.filterDate = new Date();
           this._isLoading$.next(false);
           this.cd.detectChanges();
         }),
@@ -144,36 +138,73 @@ export class JeeCommentComponent implements OnInit {
       .subscribe();
   }
 
-  updateLength(currentLength: number, lengthLstCreate: number, lengthLstDelete: number) {
-    currentLength = currentLength + lengthLstCreate - lengthLstDelete;
+  updateLengCreate(currentLength: number, lengthLstCreate: number) {
+    console.log(currentLength, lengthLstCreate);
+    currentLength = currentLength + lengthLstCreate;
   }
 
-  pushItemCommentInTopicComemnt(topicComment: TopicCommentDTO, lstCommentDTO: CommentDTO[]) {
-    lstCommentDTO.forEach((comment) => {
-      topicComment.Comments.push(comment);
-      this.filterLstObjectID.push(comment.Id);
+  pushItemCommentInTopicComemnt(topicComment: TopicCommentDTO, lstChange: ChangeComment[]) {
+    lstChange.forEach(element => {
+      this.pushItem(topicComment.Id, topicComment.Comments, element, topicComment.TotalLengthComment, topicComment.ViewLengthComment);
     });
   }
 
-  deleteItemCommentInTopicComemnt(topicComment: TopicCommentDTO, lstStringObjectIDComment: string[]) {
-    lstStringObjectIDComment.forEach((commentID) => {
-      const index = topicComment.Comments.findIndex(item => item.Id === commentID);
-      if (index !== -1) {
-        topicComment.Comments.splice(index, 1);
-        this.filterLstObjectID.splice(index, 1);
-      }
+  pushItem(objectID_current: string, lstCommentDTO_current: CommentDTO[], changeComment: ChangeComment, totalLength: number, viewLength: number) {
+    if (objectID_current === changeComment.parentObjectID) {
+      this.updateLengCreate(totalLength, changeComment.LstChange.length);
+      this.updateLengCreate(viewLength, changeComment.LstChange.length);
+      changeComment.LstChange.forEach((comment) => {
+        lstCommentDTO_current.push(comment);
+      });
+    } else {
+      lstCommentDTO_current.forEach((comment) => {
+        this.pushItem(comment.Id, comment.Replies, changeComment, comment.TotalLengthComment, comment.ViewLengthComment);
+      });
+    }
+  }
+
+  editItemCommentInTopicComemnt(topicComment: TopicCommentDTO, lstChange: ChangeComment[]) {
+    lstChange.forEach((comment) => {
+      this.editItem(topicComment.Id, topicComment.Comments, comment);
     });
   }
 
-  editItemCommentInTopicComemnt(topicComment: TopicCommentDTO, lstCommentDTO: CommentDTO[]) {
-    if (lstCommentDTO.length > 0) console.log('lst edit', lstCommentDTO);
-    lstCommentDTO.forEach((comment) => {
-      const index = topicComment.Comments.findIndex(item => item.Id === comment.Id);
-      if (index !== -1) {
-        this.copyComment(topicComment.Comments[index], comment);
-      }
+  editItem(objectID_current: string, lstCommentDTO_current: CommentDTO[], changeComment: ChangeComment) {
+    if (objectID_current === changeComment.parentObjectID) {
+      changeComment.LstChange.forEach((comment) => {
+        const index = lstCommentDTO_current.findIndex(item => item.Id === comment.Id);
+        if (index !== -1) {
+          this.copyComment(lstCommentDTO_current[index], comment);
+        }
+      });
+    } else {
+      lstCommentDTO_current.forEach((comment) => {
+        this.editItem(comment.Id, comment.Replies, changeComment);
+      });
+    }
+  }
+
+  deleteItemCommentInTopicComemnt(topicComment: TopicCommentDTO, lstChange: ChangeComment[]) {
+    lstChange.forEach((comment) => {
+      this.deleteItem(topicComment.Id, topicComment.Comments, comment);
     });
   }
+
+  deleteItem(objectID_current: string, lstCommentDTO_current: CommentDTO[], changeComment: ChangeComment) {
+    if (objectID_current === changeComment.parentObjectID) {
+      changeComment.LstChange.forEach((comment) => {
+        const index = lstCommentDTO_current.findIndex(item => item.Id === comment.Id);
+        if (index !== -1) {
+          lstCommentDTO_current.splice(index, 1);
+        }
+      });
+    } else {
+      lstCommentDTO_current.forEach((comment) => {
+        this.deleteItem(comment.Id, comment.Replies, changeComment);
+      });
+    }
+  }
+
 
   copyComment(mainCommentDTO: CommentDTO, newCommentDTO: CommentDTO) {
     if (mainCommentDTO.Text !== newCommentDTO.Text) mainCommentDTO.Text = newCommentDTO.Text;
@@ -193,18 +224,17 @@ export class JeeCommentComponent implements OnInit {
 
   filter(): QueryFilterComment {
     let filter = new QueryFilterComment();
-    filter.LstObjectID = this.filterLstObjectID;
-    filter.ViewLengthComment = this.filterViewLengthComment;
+    filter.ViewLengthComment = this.item ? this.item.ViewLengthComment : 10;
     filter.Date = this.filterDate;
     return filter;
   }
 
   viewMoreComment() {
-    this.filterViewLengthComment += 10;
+    this.item.ViewLengthComment += 10;
     this.ShowSpinnerViewMore$.next(true);
     setTimeout(() => {
       this.ShowSpinnerViewMore$.next(false);
-    }, 750);
+    }, 1000);
   }
 
   ngOnDestroy(): void {

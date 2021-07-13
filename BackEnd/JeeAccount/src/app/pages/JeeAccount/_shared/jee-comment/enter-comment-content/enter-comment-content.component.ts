@@ -30,14 +30,21 @@ export class JeeCommentEnterCommentContentComponent implements OnInit {
   imagesUrl: string[];
   imagesUrlArray: any[];
   inputTextArea: string;
-  isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
+  private _isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  get isLoading$() { return this._isLoading$.asObservable(); }
 
   ngOnInit() {
-    this.isFocus$.subscribe((res) => {
-      if (res) {
-        this.FocusTextarea();
-      }
-    });
+    this.isFocus$
+      .pipe(
+        tap((res) => {
+          if (res) {
+            this.FocusTextarea();
+          }
+        }),
+        takeUntil(this.onDestroy),
+      ).subscribe();
+
     this.imagesUrl = [];
     this.imagesUrlArray = [];
     this.inputTextArea = '';
@@ -53,7 +60,7 @@ export class JeeCommentEnterCommentContentComponent implements OnInit {
   }
 
   validateCommentAndPost() {
-    if (!this.isLoading$.value) {
+    if (!this._isLoading$.value) {
       const model = this.prepareComment();
       if (this.checkCommentIsEqualEmpty(model)) {
         return;
@@ -80,7 +87,6 @@ export class JeeCommentEnterCommentContentComponent implements OnInit {
     return model;
   }
 
-
   checkCommentIsEqualEmpty(model: PostCommentModel): boolean {
     const empty = new PostCommentModel();
     return this.isEqual(model, empty);
@@ -104,7 +110,7 @@ export class JeeCommentEnterCommentContentComponent implements OnInit {
   }
 
   postComment(model: PostCommentModel) {
-    this.isLoading$.next(true);
+    this._isLoading$.next(true);
     this.service.postCommentModel(model).
       pipe(
         tap(
@@ -114,8 +120,8 @@ export class JeeCommentEnterCommentContentComponent implements OnInit {
             this.ngOnInit();
             this.cd.detectChanges();
             setTimeout(() => {
-              this.isLoading$.next(false);
-            }, 500);
+              this._isLoading$.next(false);
+            }, 750);
           }),
         takeUntil(this.onDestroy),
       ).subscribe();

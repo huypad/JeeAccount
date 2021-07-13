@@ -2,7 +2,7 @@ import { CommentDTO, QueryFilterComment, ReturnFilterComment } from './../jee-co
 import { BehaviorSubject, interval, of, Subject } from 'rxjs';
 import { Component, Input, OnInit, OnDestroy, ViewChild, ElementRef, EventEmitter, Output, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { JeeCommentService } from '../jee-comment.service';
-import { catchError, finalize, takeUntil, tap, share } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, tap, share, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'jeecomment-post-comment-content',
@@ -35,7 +35,6 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
   //filter
   filterViewLengthComment: number = 10;
   filterDate: Date = new Date();;
-  filterLstObjectID: string[] = [];
 
   @Input() inputLstObjectID: string[];
   public lstObjectID: string[] = [];
@@ -47,16 +46,22 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
   @Input() isDeteachChange$?: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   @Output() isFocus = new EventEmitter<any>();
 
+  isDeteachChangeComment$?: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   constructor(public service: JeeCommentService, public cd: ChangeDetectorRef, private elementRef: ElementRef) { }
 
   ngOnInit() {
-    this.isDeteachChange$.subscribe((res) => {
-      if (res) {
-        this.cd.detectChanges();
-        this.isDeteachChange$.next(false);
-      }
-    });
-
+    if (this.isDeteachChange$) {
+      this.isDeteachChange$
+        .pipe(
+          switchMap(async (res) => {
+            if (res) {
+              this.cd.detectChanges();
+              this.isDeteachChange$.next(false);
+              this.isDeteachChangeComment$.next(true);
+            }
+          }))
+        .subscribe();
+    }
     if (this.inputLstObjectID.length == 1) {
       this.initObjectID();
       this.lstObjectID.push(this.comment.Id);
@@ -89,7 +94,9 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
 
   showEnterComment() {
     this.ClickShowReply$.next(true);
-    this.showEnterComment$.next(true);
+    if (this.replyCommentID === '') {
+      this.showEnterComment$.next(true);
+    }
     this.isFocus.emit(true);
     this.clickButtonShowReply();
   }
@@ -101,12 +108,6 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
       this.showSpinner$.next(true);
       if (this.objectID && this.comment.Id) {
         this.showFullComment();
-        // const source = interval(1000);
-        // source.pipe(takeUntil(this.onDestroy)).subscribe(() => {
-        //   if (this._errorMessage$.value == '' && this.isScrolledViewElement() && this._isLoading$.value === false) {
-        //     this.getShowChangeComment();
-        //   }
-        // });
       } else {
         this.showSpinner$.next(false);
         this.isFirstTime = false;
@@ -118,10 +119,7 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
     this.service.showFullComment(this.objectID, this.commentID, this.filter()).pipe(
       tap((CommentDTO: CommentDTO) => {
         if (this.isFirstTime)
-          this.comment = CommentDTO;
-        CommentDTO.Replies.forEach(element => {
-          this.filterLstObjectID.push(element.Id);
-        });
+          this.comment.Replies = CommentDTO.Replies;
         if (this.comment.ViewLengthComment < CommentDTO.TotalLengthComment) {
           this.ShowFilter$.next(true);
         } else {
@@ -146,47 +144,6 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
-  getShowChangeComment() {
-    this._isLoading$.next(true);
-    this.service.showChangeComment(this.objectID, this.comment.Id, this.filter())
-      .pipe(
-        tap((result: ReturnFilterComment) => {
-          if (result.LstCreate.length > 0 || result.LstEdit.length > 0 || result.LstStringObjectIDDelete.length > 0) {
-            this.updateLength(this.comment.ViewLengthComment, result.LstCreate.length, result.LstStringObjectIDDelete.length);
-            this.updateLength(this.comment.TotalLengthReaction, result.LstCreate.length, result.LstStringObjectIDDelete.length);
-            if (result.LstCreate.length > 0) {
-              this.pushItemReplyCommentInComment(this.comment, result.LstCreate);
-            }
-            if (result.LstEdit.length > 0) {
-              console.log('trong nay ne');
-              this.editItemReplyCommentInComment(this.comment, result.LstEdit);
-            }
-            if (result.LstStringObjectIDDelete.length > 0) {
-              this.deleteItemReplyCommentInComment(this.comment, result.LstStringObjectIDDelete);
-            }
-            this.isDeteachChange$.next(true);
-          }
-
-        }),
-        catchError(err => {
-          console.log(err);
-          this._isLoading$.next(false);
-          this._errorMessage$.next(err);
-          return of();
-        }),
-        finalize(() => {
-          this.filterDate = new Date();
-          this._isLoading$.next(false);
-          this.cd.detectChanges();
-        }),
-        takeUntil(this.onDestroy),
-        share())
-      .subscribe();
-  }
-
-  updateLength(currentLength: number, lengthLstCreate: number, lengthLstDelete: number) {
-    currentLength = currentLength + lengthLstCreate - lengthLstDelete;
-  }
 
   pushItemReplyCommentInComment(commentDTO: CommentDTO, lstCommentDTO: CommentDTO[]) {
     lstCommentDTO.forEach((comment) => {
@@ -238,7 +195,6 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
 
   filter(): QueryFilterComment {
     let filter = new QueryFilterComment();
-    filter.LstObjectID = this.filterLstObjectID;
     filter.ViewLengthComment = this.filterViewLengthComment;
     filter.Date = this.filterDate;
     return filter;

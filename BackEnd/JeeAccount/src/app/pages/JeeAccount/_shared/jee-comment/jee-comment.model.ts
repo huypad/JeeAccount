@@ -1,19 +1,9 @@
 export class TopicCommentDTO {
   Id: string;
-  Username: string;
-  IsEdit: boolean;
-  Text: string;
-  Attachs: Attach;
-  Reactions: Reaction;
-  UserReaction: string;
-  UserReactionColor: string;
   TotalLengthReaction: number;
   Comments: CommentDTO[];
-  DateCreated: Date;
   ViewLengthComment: number;
   TotalLengthComment: number;
-  MostLengthReaction: number[];
-  MostTypeReaction: string[];
 }
 
 export class CommentDTO {
@@ -30,6 +20,7 @@ export class CommentDTO {
   ViewLengthComment: number;
   TotalLengthComment: number;
   DateCreated: Date;
+  DateEdit: Date;
   TotalLengthReaction: number;
   MostLengthReaction: number[];
   MostTypeReaction: string[];
@@ -37,22 +28,11 @@ export class CommentDTO {
 
 export class TopicCommnet {
   Id: string;
-  Username: string;
-  IsEdit: boolean;
   Comments: Comment[];
-  DateCreated: Date;
-  Text: string;
-  Attachs: Attach;
-  Reactions: Reaction;
 
   constructor() {
     this.Id = '';
-    this.Username = '';
-    this.IsEdit = false;
     this.Comments = [];
-    this.Text = '';
-    this.Attachs = new Attach();
-    this.Reactions = new Reaction();
   }
 }
 
@@ -125,19 +105,22 @@ export class UserCommentInfo {
 }
 
 export class QueryFilterComment {
-  LstObjectID: string[];
   ViewLengthComment: number;
   Date: Date;
 
   constructor() {
-    this.LstObjectID = [];
     this.ViewLengthComment = 10;
     this.Date = new Date();
   }
+
+}
+export interface ReturnFilterComment {
+  LstCreate: ChangeComment[];
+  LstEdit: ChangeComment[];
+  LstDelete: ChangeComment[];
 }
 
-export interface ReturnFilterComment {
-  LstCreate: CommentDTO[];
-  LstEdit: CommentDTO[];
-  LstStringObjectIDDelete: string[];
+export class ChangeComment {
+  parentObjectID: string;
+  LstChange: CommentDTO[];
 }

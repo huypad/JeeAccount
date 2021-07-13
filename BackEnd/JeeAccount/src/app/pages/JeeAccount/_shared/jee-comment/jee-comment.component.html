@@ -1,5 +1,5 @@
 <div style="background-color: white; text-align: center">
-  <img src="{{ img }}" style="max-width: 680px" />
+  <img src="{{ img }}" style="width: 50%" />
 </div>
 <div style="height: 30px; background-color: #f1f1f1; text-align: center">
   <span style="color: black; font-weight: 800">{{ number }}</span>
@@ -27,7 +27,7 @@
   <ng-template #loading>
     <div class="comment-content-container" *ngIf="item">
       <ng-container>
-        <div class="comment-filter" *ngIf="filterViewLengthComment < item.TotalLengthComment">
+        <div class="comment-filter" *ngIf="item.ViewLengthComment < item.TotalLengthComment">
           <div class="view-more-comment">
             <span (click)="viewMoreComment()" class="text-filter"> Xem thêm bình luận </span>
             <span class="click-show-spinner-view-more-comment" [class.spinner]="ShowSpinnerViewMore$.asObservable() | async"></span>

@@ -1,6 +1,6 @@
 
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
-import { of, Subject } from 'rxjs';
+import { Component, Input, OnInit, Output, ViewEncapsulation, EventEmitter, ElementRef } from '@angular/core';
+import { BehaviorSubject, of, Subject } from 'rxjs';
 import { catchError, takeUntil, tap } from 'rxjs/operators';
 import { ReactionCommentModel } from '../jee-comment.model';
 import { JeeCommentService } from '../jee-comment.service';
@@ -19,6 +19,10 @@ export class JeeCommentReactionContentComponent implements OnInit {
   @Input() replyCommentID: string = '';
   @Input() userOldReaction?: string;
 
+  @Output() reactionEventEmitter = new EventEmitter<any>();
+  private _isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  get isLoading$() { return this._isLoading$.asObservable(); }
+
   userReaction: string = '';
   constructor(public service: JeeCommentService) { }
 
@@ -27,6 +31,7 @@ export class JeeCommentReactionContentComponent implements OnInit {
     if (!this.commentID) this.commentID = '';
     if (!this.replyCommentID) this.replyCommentID = '';
     if (!this.userOldReaction) this.userOldReaction = '';
+
   }
 
   postReaction(react: string) {
@@ -36,10 +41,20 @@ export class JeeCommentReactionContentComponent implements OnInit {
   }
 
   postReactionComment(model: ReactionCommentModel) {
+    this._isLoading$.next(true);
     this.service.postReactionCommentModel(model).pipe(
       tap(
-        (res) => { },
-        catchError((err) => { console.log(err); return of() }),
+        (res) => {
+          setTimeout(() => {
+            this._isLoading$.next(false);
+          }, 1000);
+        },
+        catchError((err) => {
+          setTimeout(() => {
+            this._isLoading$.next(false);
+          }, 1000);
+          console.log(err); return of()
+        }),
       ),
       takeUntil(this.onDestroy),
     ).subscribe();
