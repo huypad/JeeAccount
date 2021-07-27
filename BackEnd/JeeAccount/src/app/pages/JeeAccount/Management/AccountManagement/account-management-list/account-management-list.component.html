@@ -1,33 +1,57 @@
 <div class="card card-custom gutter-b">
   <div class="card-header">
     <div class="card-title">
-      <span class="card-label">DANH SÁCH NGƯỜI DÙNG</span>
+      <span class="card-label">{{ 'ACCOUNTMANAGEMENT.DANHSACHNGUOIDUNG' | translate }}</span>
+      <!-- begin: Filtration form -->
+      <div class="form-group row">
+        <div class="col-lg-12" [formGroup]="searchGroup">
+          <small class="form-text text-muted"
+            ><b>{{ 'SEARCH.SEARCH1' | translate }}</b></small
+          >
+          <input type="text" class="form-control" name="searchText" placeholder="" value="" formControlName="searchTerm" />
+        </div>
+      </div>
+      <!-- end: Filtration form -->
     </div>
     <div class="card-toolbar">
-      <button mat-button class="ja_button ja_btn-addnew" (click)="create()">Thêm mới</button>
+      <button mat-button class="ja_button ja_btn-addnew" (click)="create()">{{ 'COMMOM.THEMMOI' | translate }}</button>
     </div>
   </div>
   <!-- body -->
   <div class="card-body">
-    <div class="table-responsive angular-bootstrap-table" [ngStyle]="{ height: getHeight() }">
+    <!-- begin: Filtration form -->
+    <!-- <div class="form form-label-right">
+      <div class="form-group row">
+        <div class="col-lg-6 ml-1" [formGroup]="searchGroup">
+          <small class="form-text text-muted"
+            ><b>{{ 'SEARCH.SEARCH1' | translate }}</b></small
+          >
+          <input type="text" class="form-control" name="searchText" placeholder="" value="" formControlName="searchTerm" />
+        </div>
+      </div>
+    </div> -->
+    <!-- end: Filtration form -->
+    <div class="table-responsive angular-bootstrap-table">
       <table
         mat-table
         class="table table-head-custom table-vertical-center overflow-hidden"
-        [dataSource]="dataSource"
-        matSort
-        matSortActive="Fullname"
-        matSortDirection="asc"
-        matSortDisableClear
+        [dataSource]="accountManagementService.items$ | async"
       >
         <ng-container matColumnDef="NhanVien">
           <th *matHeaderCellDef>
-            <span>Nhân viên</span>
+            <span>{{ 'ACCOUNTMANAGEMENT.NHANVIEN' | translate }}</span>
+            <app-sort-icon
+              column="tendoitac"
+              [activeColumn]="sorting.column"
+              [activeDirection]="sorting.direction"
+              (sort)="sort($event)"
+            ></app-sort-icon>
           </th>
           <td mat-cell *matCellDef="let r">
             <div class="row jee-avatar">
               <span (click)="hiddenfileinput.click()" style="cursor: pointer">
                 <ngx-avatar [size]="40" src="{{ r.Avatar }}" *ngIf="r.Avatar"></ngx-avatar>
-                <ngx-avatar [size]="40" [name]="r.Name" bgColor="#FF0000" *ngIf="!r.Avatar"></ngx-avatar>
+                <ngx-avatar [size]="40" [name]="r.Name" bgColor="{{ r.BgColor }}" *ngIf="!r.Avatar"></ngx-avatar>
               </span>
               <span class="jee-name">
                 {{ r.Fullname }}
@@ -45,7 +69,6 @@
             />
           </td>
         </ng-container>
-
         <ng-container matColumnDef="TenDangNhap">
           <th *matHeaderCellDef>
             <span>Tên đăng nhập</span>
@@ -120,16 +143,12 @@
         ></tr>
       </table>
     </div>
-    <!-- start: BOTTOM -->
-    <div class="mat-table__bottom">
-      <mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
-      <mat-paginator
-        [pageSize]="pageSize"
-        [pageSizeOptions]="[10, 20, 50, 100]"
-        [length]="dataSource.paginatorTotal$ | async"
-        [showFirstLastButtons]="true"
-      ></mat-paginator>
-    </div>
-    <!-- end: BOTTOM -->
+    <!-- end: Table -->
+    <app-paginator
+      class="d-flex justify-content-between align-items-center flex-wrap"
+      [paginator]="paginator"
+      [isLoading]="isLoading"
+      (paginate)="paginate($event)"
+    ></app-paginator>
   </div>
 </div>

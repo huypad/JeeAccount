@@ -17,5 +17,6 @@ namespace JeeAccount.Models.AccountManagement
         public override string Email { get; set; }
         public override string StructureID { get; set; }
         public string BgColor { get; set; } = "";
+        public string Structure { get; set; }
     }
 }

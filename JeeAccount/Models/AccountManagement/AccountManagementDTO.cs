@@ -7,16 +7,17 @@ namespace JeeAccount.Models.AccountManagement
 {
     public class AccountManagementDTO : InfoUserBase
     {
-        public override string Fullname { get ; set ; }
-        public override string Name { get ; set ; }
-        public override string Avatar { get ; set ; }
-        public override string Jobtitle { get ; set ; }
-        public override string Departmemt { get ; set ; }
+        public override string Fullname { get; set; }
+        public override string Name { get; set; }
+        public override string Avatar { get; set; }
+        public override string Jobtitle { get; set; }
+        public override string Departmemt { get; set; }
         public string Username { get; set; }
         public string DirectManager { get; set; }
         public bool IsActive { get; set; }
         public string Note { get; set; }
         public override string Email { get; set; }
         public override string StructureID { get; set; }
+        public string BgColor { get; set; }
     }
 }

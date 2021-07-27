@@ -99,6 +99,27 @@ namespace JeeAccount.Controllers
             }
         }
 
+        public async Task<HttpResponseMessage> addNewUserInternalWithoutCustomData(string username, string password, string internal_token)
+        {
+            string url = LINK_ADD_NEWUSER_INTERNAL;
+            var content = new
+            {
+                username = username,
+                password = password
+            };
+
+            var stringContent = await Task.Run(() => JsonConvert.SerializeObject(content));
+            var httpContent = new StringContent(stringContent, Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(internal_token);
+
+                var reponse = await client.PostAsync(url, httpContent);
+                return reponse;
+            }
+        }
+
         public async Task<IdentityServerReturn> addNewAdminUser(IdentityServeAddAdminNewUser identityServerUserModel, string Admin_access_token)
         {
             string url = LINK_ADD_NEWUSER;
@@ -281,6 +302,28 @@ namespace JeeAccount.Controllers
                     var res = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
                     return res;
                 }
+            }
+        }
+
+        public async Task<HttpResponseMessage> updateCustomDataPersonalInfoInternal(string internal_token, PersonalInfoCustomData personalInfoCustom, string Username)
+        {
+            string url = LINK_UPDATE_CUSTOMDATA + "/internal";
+            var content = new UpdateCustomDataPersonInfoModel
+            {
+                username = Username,
+                updateField = "personalInfo",
+                fieldValue = personalInfoCustom
+            };
+
+            var stringContent = await Task.Run(() => JsonConvert.SerializeObject(content));
+            var httpContent = new StringContent(stringContent, Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(internal_token);
+
+                var reponse = await client.PostAsync(url, httpContent);
+                return reponse;
             }
         }
 

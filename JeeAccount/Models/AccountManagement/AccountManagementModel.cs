@@ -15,7 +15,10 @@ namespace JeeAccount.Models.AccountManagement
         public string Username { get; set; }
         public string Phonemumber { get; set; }
         public string Password { get; set; }
+        public string Birthday { get; set; }
         public List<string> AppCode { get; set; }
 
+        public string Structure { get; set; }
+        public long StaffID { get; set; } = 0;
     }
 }

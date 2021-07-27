@@ -127,10 +127,21 @@ export const locale = {
       timkiemsearch3: 'Tìm theo mã, họ tên, phòng ban và chức vụ',
       timkiemsearch4: 'Tìm theo mã, tiêu đề và tình trạng',
     },
+    SEARCH: {
+      SEARCH1: 'Tìm theo tên, bộ phận, username',
+    },
+    profile: {
+      thongtincanhan: 'Thông tin cá nhân',
+      quanlytaikhoan: 'Quản lý tài khoản',
+      dangxuat: 'Đăng xuất',
+      nhacnho: 'NHẮC NHỞ',
+    },
     ACCOUNTMANAGEMENT: {
       TITLE: 'Danh sách phòng ban, nhóm',
       THEMMOITAIKHOAN: 'Thêm mới tài khoản sử dụng',
       UNGDUNGDUOCSUDUNG: 'Ứng dụng được sử dụng',
-    }
+      DANHSACHNGUOIDUNG: 'Danh sách người dùng',
+      NHANVIEN: 'Nhân viên',
+    },
   },
 };

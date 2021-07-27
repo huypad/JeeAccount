@@ -9,7 +9,7 @@ import { QueryParamsModel } from '../../_core/models/query-models/query-params.m
 import { QueryResultsModel } from '../../_core/models/query-models/query-results.model';
 import { DanhSachTruyCapNhanhWidgetComponent } from '../widgets/danh-sach-truy-cap-nhanh/danh-sach-truy-cap-nhanh.component';
 import { DepartmentManagementLístComponent } from '../../Management/DepartmentManagement/department-management-list/department-management-list.component';
-import { AccountManagementLístComponent } from '../../Management/AccountManagement/account-management-list/account-management-list.component';
+import { AccountManagementListComponent } from '../../Management/AccountManagement/account-management-list/account-management-list.component';
 
 interface IDashboardService {
   saveUserDashBoard(): void;
@@ -19,9 +19,9 @@ const API_PRODUCTS_URL = environment.HOST_JEEACCOUNT_API + '/api/widgetdashboard
 
 @Injectable()
 export class PageGirdtersDashboardService implements IDashboardService {
-  constructor(private http: HttpClient, private httpUtils: HttpUtilsService) {}
+  constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
-  saveUserDashBoard(): void {}
+  saveUserDashBoard(): void { }
 
   public getWidgets(): Widget[] {
     const listWidget: Widget[] = [
@@ -49,7 +49,7 @@ export class PageGirdtersDashboardService implements IDashboardService {
         id: '3',
         name: 'Danh sách người dùng',
         componentName: 'app-account-management-list',
-        componentType: AccountManagementLístComponent,
+        componentType: AccountManagementListComponent,
         cols: 12,
         rows: 6,
         y: 0,
@@ -118,13 +118,13 @@ export class PageGirdtersDashboardService implements IDashboardService {
       disablePushOnDrag: false,
       disablePushOnResize: false,
       pushDirections: { north: true, east: true, south: true, west: true },
-      displayGrid: function () {},
+      displayGrid: function () { },
       //displayGrid: DisplayGrid.None,
       disableWindowResize: false,
       disableWarnings: false,
       scrollToNewItems: false,
-      itemChangeCallback: function () {},
-      itemResizeCallback: function () {},
+      itemChangeCallback: function () { },
+      itemResizeCallback: function () { },
     };
   }
 

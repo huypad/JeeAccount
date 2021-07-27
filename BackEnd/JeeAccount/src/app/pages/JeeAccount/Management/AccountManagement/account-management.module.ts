@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
-import { AccountManagementLístComponent } from './account-management-list/account-management-list.component';
+import { AccountManagementListComponent } from './account-management-list/account-management-list.component';
 import { AccountManagementService } from './Services/account-management.service';
 import { AccountManagementComponent } from './account-management.component';
 import { AccountManagementEditDialogComponent } from './account-management-edit-dialog/account-management-edit-dialog.component';
@@ -19,7 +19,7 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        component: AccountManagementLístComponent,
+        component: AccountManagementListComponent,
       },
     ],
   },
@@ -27,7 +27,7 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    AccountManagementLístComponent,
+    AccountManagementListComponent,
     AccountManagementComponent,
     AccountManagementEditDialogComponent,
     QuanLytrucTiepEditDialogComponent,
@@ -46,4 +46,4 @@ const routes: Routes = [
     AccountManagementEditNoJeeHRDialogComponent,
   ],
 })
-export class AccountManagementModule {}
+export class AccountManagementModule { }

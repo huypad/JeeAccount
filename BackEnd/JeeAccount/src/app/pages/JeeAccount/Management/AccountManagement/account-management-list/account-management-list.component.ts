@@ -1,154 +1,86 @@
-import { SelectionModel } from '@angular/cdk/collections';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, ViewChild } from '@angular/core';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, merge } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { TokenStorage } from 'src/app/modules/auth/_services/token-storage.service';
+import { BehaviorSubject, of, Subscription } from 'rxjs';
 import { SubheaderService } from 'src/app/_metronic/partials/layout';
 import { AccountManagementEditDialogComponent } from '../account-management-edit-dialog/account-management-edit-dialog.component';
 import { AccountManagementDTO, PostImgModel } from '../Model/account-management.model';
-import { AccountManagementDataSource } from '../Model/data-sources/account-management.datasource';
 import { AccountManagementService } from '../Services/account-management.service';
 import { QuanLytrucTiepEditDialogComponent } from '../quan-ly-truc-tiep-edit-dialog/quan-ly-truc-tiep-edit-dialog.component';
 import { ChangeTinhTrangEditDialogComponent } from '../change-tinh-trang-edit-dialog/change-tinh-trang-edit-dialog.component';
 import { AccountManagementEditNoJeeHRDialogComponent } from '../account-management-edit-no-jeehr-dialog/account-management-edit-no-jeehr-dialog.component';
 import { LayoutUtilsService, MessageType } from '../../../_core/utils/layout-utils.service';
 import { DanhMucChungService } from '../../../_core/services/danhmuc.service';
-import { QueryParamsModelNew } from '../../../_core/models/query-models/query-params.model';
 import { DeleteEntityDialogComponent } from '../../../_shared/delete-entity-dialog/delete-entity-dialog.component';
+import { FormGroup, FormBuilder } from '@angular/forms';
+import { PaginatorState } from 'src/app/_metronic/shared/crud-table';
+import { GroupingState } from 'src/app/_metronic/shared/crud-table/grouping.model';
+import { SortState } from './../../../../../_metronic/shared/crud-table/models/sort.model';
+import { catchError, debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
+import { error } from 'protractor';
 
 @Component({
   selector: 'app-account-management-list',
   templateUrl: './account-management-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AccountManagementLístComponent implements OnInit {
+export class AccountManagementListComponent implements OnInit {
   // Table fields
   loadingSubject = new BehaviorSubject<boolean>(false);
-  dataSource: AccountManagementDataSource;
-  displayedColumns = [];
-  availableColumns = [
-    {
-      stt: 1,
-      name: 'NhanVien',
-      alwaysChecked: false,
-    },
-    {
-      stt: 2,
-      name: 'TenDangNhap',
-      alwaysChecked: false,
-    },
-    {
-      stt: 3,
-      name: 'ChucVu',
-      alwaysChecked: false,
-    },
-    {
-      stt: 4,
-      name: 'QuanLyTrucTiep',
-      alwaysChecked: false,
-    },
-    {
-      stt: 5,
-      name: 'TinhTrang',
-      alwaysChecked: false,
-    },
-    {
-      stt: 6,
-      name: 'GhiChu',
-      alwaysChecked: false,
-    },
-    {
-      stt: 99,
-      name: 'ThaoTac',
-      alwaysChecked: false,
-    },
-  ];
-  selectedColumns = new SelectionModel<any>(true, this.availableColumns);
-  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort: MatSort;
+  displayedColumns = ['NhanVien', 'TenDangNhap', 'ChucVu', 'QuanLyTrucTiep', 'TinhTrang', 'GhiChu', 'ThaoTac'];
+  filterGroup: FormGroup;
+  searchGroup: FormGroup;
+  paginator: PaginatorState;
+  sorting: SortState;
+  grouping: GroupingState;
   dataResult: AccountManagementDTO[] = [];
   imgFile: string = '';
+  isLoading: boolean = false;
+  private subscriptions: Subscription[] = [];
+
   constructor(
-    private changeDetect: ChangeDetectorRef,
-    private accountManagementService: AccountManagementService,
+    public accountManagementService: AccountManagementService,
     private translate: TranslateService,
     public subheaderService: SubheaderService,
     private layoutUtilsService: LayoutUtilsService,
-    private tokenStorage: TokenStorage,
     public dialog: MatDialog,
-    public danhmuc: DanhMucChungService
+    public danhmuc: DanhMucChungService,
+    private fb: FormBuilder
   ) {}
 
   //=================PageSize Table=====================
   pageSize: number = 50;
-  dataAccounts: any[] = [];
-  //==========Dropdown Search==============
-  filter: any = {};
 
   ngOnInit() {
-    this.tokenStorage.getPageSize().subscribe((res) => {
-      this.pageSize = +res;
+    this.searchForm();
+    this.accountManagementService.fetch();
+    this.grouping = this.accountManagementService.grouping;
+    this.paginator = this.accountManagementService.paginator;
+    this.sorting = this.accountManagementService.sorting;
+    const sb = this.accountManagementService.isLoading$.subscribe((res) => (this.isLoading = res));
+    this.subscriptions.push(sb);
+  }
+
+  // search
+  searchForm() {
+    this.searchGroup = this.fb.group({
+      searchTerm: [''],
     });
-
-    this.beginMatTable();
-  }
-
-  beginMatTable() {
-    //set show table data
-    this.applySelectedColumns();
-
-    this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-    //load data khi sort Changed
-    merge(this.sort.sortChange, this.paginator.page)
+    const searchEvent = this.searchGroup.controls.searchTerm.valueChanges
       .pipe(
-        tap(() => {
-          this.loadDataList(true);
-        })
+        /*
+      The user can type quite quickly in the input box, and that could trigger a lot of server requests. With this operator,
+      we are limiting the amount of server requests emitted to a maximum of one every 150ms
+      */
+        debounceTime(150),
+        distinctUntilChanged()
       )
-      .subscribe();
-
-    // Init DataSource
-    this.dataSource = new AccountManagementDataSource(this.accountManagementService);
-    // Read from URL itemId, for restore previous state
-    this.dataSource.entitySubject.subscribe((res) => (this.dataResult = res));
-    // First load list
-    this.loadDataList();
+      .subscribe((val) => this.search(val));
+    this.subscriptions.push(searchEvent);
   }
 
-  /*=========== Check columns of data grid ==========*/
-  applySelectedColumns() {
-    const selectedColumns: string[] = [];
-    this.selectedColumns.selected
-      .sort((a, b) => {
-        return a.stt - b.stt;
-      })
-      .forEach((col) => {
-        selectedColumns.push(col.name);
-      });
-    this.displayedColumns = selectedColumns;
-  }
-
-  /*=================================================*/
-
-  /** FILTRATION */
-  filterConfiguration(): any {
-    return this.filter;
-  }
-
-  loadDataList(page: boolean = false) {
-    const queryParams = new QueryParamsModelNew(
-      this.filterConfiguration(),
-      this.sort.direction,
-      this.sort.active,
-      page ? this.paginator.pageIndex : (this.paginator.pageIndex = 0),
-      this.paginator.pageSize
-    );
-    this.dataSource.LoadList(queryParams);
+  search(searchTerm: string) {
+    this.accountManagementService.patchState({ searchTerm });
   }
 
   create() {
@@ -159,20 +91,37 @@ export class AccountManagementLístComponent implements OnInit {
     const dialogRef = this.dialog.open(AccountManagementEditDialogComponent, {
       data: {},
     });
-    dialogRef.afterClosed().subscribe((res) => {
+    const sb = dialogRef.afterClosed().subscribe((res) => {
       if (!res) {
-        this.loadDataList();
+        this.accountManagementService.fetch();
       } else {
         this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
-        this.loadDataList();
+        this.accountManagementService.fetch();
       }
     });
+    this.subscriptions.push(sb);
   }
 
   getHeight(): any {
     let tmp_height = 0;
     tmp_height = window.innerHeight - 236;
     return tmp_height + 'px';
+  }
+
+  sort(column: string): void {
+    const sorting = this.sorting;
+    const isActiveColumn = sorting.column === column;
+    if (!isActiveColumn) {
+      sorting.column = column;
+      sorting.direction = 'asc';
+    } else {
+      sorting.direction = sorting.direction === 'asc' ? 'desc' : 'asc';
+    }
+    this.accountManagementService.fetchStateSort({ sorting });
+  }
+
+  paginate(paginator: PaginatorState) {
+    this.accountManagementService.fetchStateSort({ paginator });
   }
 
   changeTinhTrang(Username: string) {
@@ -183,14 +132,15 @@ export class AccountManagementLístComponent implements OnInit {
     const dialogRef = this.dialog.open(ChangeTinhTrangEditDialogComponent, {
       data: { Username: Username },
     });
-    dialogRef.afterClosed().subscribe((res) => {
+    const sb = dialogRef.afterClosed().subscribe((res) => {
       if (!res) {
-        this.loadDataList();
+        this.accountManagementService.fetch();
       } else {
         this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
-        this.loadDataList();
+        this.accountManagementService.fetch();
       }
     });
+    this.subscriptions.push(sb);
   }
 
   openQuanLyTrucTiepEdit(Username: string, DirectManager: string) {
@@ -202,14 +152,15 @@ export class AccountManagementLístComponent implements OnInit {
     const dialogRef = this.dialog.open(QuanLytrucTiepEditDialogComponent, {
       data: { Username, DirectManager },
     });
-    dialogRef.afterClosed().subscribe((res) => {
+    const sb = dialogRef.afterClosed().subscribe((res) => {
       if (!res) {
-        this.loadDataList();
+        this.accountManagementService.fetch();
       } else {
         this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
-        this.loadDataList();
+        this.accountManagementService.fetch();
       }
     });
+    this.subscriptions.push(sb);
   }
 
   onFileChange(event, username: string) {
@@ -224,16 +175,24 @@ export class AccountManagementLístComponent implements OnInit {
         const postimg = new PostImgModel();
         postimg.imgFile = this.imgFile;
         postimg.Username = username;
-        this.accountManagementService.UpdateAvatarWithChangeUrlAvatar(postimg).subscribe((res) => {
-          if (res && res.status === 1) {
-            this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
-            this.imgFile = '';
-            this.loadDataList();
-          } else {
-            this.layoutUtilsService.showActionNotification(res.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
-            this.imgFile = '';
-          }
-        });
+        const sb = this.accountManagementService
+          .UpdateAvatarWithChangeUrlAvatar(postimg)
+          .pipe(
+            tap((res) => {
+              console.log(res);
+              this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+              this.imgFile = '';
+              this.accountManagementService.fetch();
+            }),
+            catchError((err) => {
+              console.log(err);
+              this.layoutUtilsService.showActionNotification(err.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
+              this.imgFile = '';
+              return of();
+            })
+          )
+          .subscribe();
+        this.subscriptions.push(sb);
       };
       reader.readAsDataURL(event.target.files[0]);
     }
@@ -247,14 +206,15 @@ export class AccountManagementLístComponent implements OnInit {
     const dialogRef = this.dialog.open(AccountManagementEditNoJeeHRDialogComponent, {
       data: { item: item },
     });
-    dialogRef.afterClosed().subscribe((res) => {
+    const sb = dialogRef.afterClosed().subscribe((res) => {
       if (!res) {
-        this.loadDataList();
+        this.accountManagementService.fetch();
       } else {
         this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
-        this.loadDataList();
+        this.accountManagementService.fetch();
       }
     });
+    this.subscriptions.push(sb);
   }
 
   delete(item) {
@@ -265,13 +225,18 @@ export class AccountManagementLístComponent implements OnInit {
     const dialogRef = this.dialog.open(DeleteEntityDialogComponent, {
       data: {},
     });
-    dialogRef.afterClosed().subscribe((res) => {
+    const sb = dialogRef.afterClosed().subscribe((res) => {
       if (!res) {
-        this.loadDataList();
+        this.accountManagementService.fetch();
       } else {
         this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
-        this.loadDataList();
+        this.accountManagementService.fetch();
       }
     });
+    this.subscriptions.push(sb);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((sb) => sb.unsubscribe());
   }
 }

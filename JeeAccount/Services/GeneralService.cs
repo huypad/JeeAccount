@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace JeeAccount.Services
 {
@@ -38,58 +39,6 @@ namespace JeeAccount.Services
             int nny = (int)Math.Floor(img.Height / ratio);
             img.Resize(nnx, nny);
             return img;
-        }
-
-        public static void saveImgNhanVien(string image, string userID, long customerID)
-        {
-            byte[] ImageArray = Convert.FromBase64String(image);
-
-            string ID_NV = userID;
-
-            String pathOriginal = Environment.CurrentDirectory + "/images/nhanvien/" + customerID + "/Original/";
-
-            //Check if directory exist
-            if (!System.IO.Directory.Exists(pathOriginal))
-            {
-                System.IO.Directory.CreateDirectory(pathOriginal); //Create directory if it doesn't exist
-            }
-
-            string imageNameOriginal = ID_NV + ".jpg";
-
-            //set the image path
-            string imgPathOriginal = Path.Combine(pathOriginal, imageNameOriginal);
-
-            if (System.IO.File.Exists(imgPathOriginal))
-            {
-                System.IO.File.Delete(imgPathOriginal);
-            };
-
-            System.IO.File.WriteAllBytes(imgPathOriginal, ImageArray);
-
-            using (Aspose.Imaging.Image myImg = Aspose.Imaging.Image.Load(imgPathOriginal))
-            {
-                RezizeImage(myImg, 130);
-                String path = Environment.CurrentDirectory + "/images/nhanvien/" + customerID + "/";
-
-                //Check if directory exist
-                if (!System.IO.Directory.Exists(path))
-                {
-                    System.IO.Directory.CreateDirectory(path); //Create directory if it doesn't exist
-                }
-
-                string imageName = ID_NV + ".jpg";
-
-                //set the image path
-                string imgPath = Path.Combine(path, imageName);
-
-                //Delete if file exist
-                if (System.IO.File.Exists(imgPath))
-                {
-                    System.IO.File.Delete(imgPath);
-                };
-
-                myImg.Save(imgPath);
-            }
         }
 
         public static string getlastname(string fullname)
@@ -135,6 +84,17 @@ namespace JeeAccount.Services
 
         private static Random random = new Random();
 
+        public static bool IsExist(string sql, string connectionString)
+        {
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                DataTable dt = new DataTable();
+                dt = cnn.CreateDataTable(sql);
+                if (dt.Rows.Count == 0) return false;
+                return true;
+            }
+        }
+
         public static bool IsExistCnn(string sql, DpsConnection cnn)
         {
             DataTable dt = new DataTable();
@@ -164,6 +124,7 @@ namespace JeeAccount.Services
             DataTable dt = new DataTable();
             dt = cnn.CreateDataTable(sql);
             if (dt.Rows.Count == 0) return null;
+            if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
             return dt.Rows[0][0].ToString();
         }
 
@@ -175,6 +136,7 @@ namespace JeeAccount.Services
                 DataTable dt = new DataTable();
                 dt = cnn.CreateDataTable(sql);
                 if (dt.Rows.Count == 0) return null;
+                if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
                 return dt.Rows[0][0].ToString();
             }
         }
@@ -187,6 +149,33 @@ namespace JeeAccount.Services
                 DataTable dt = new DataTable();
                 dt = cnn.CreateDataTable(sql);
                 if (dt.Rows.Count == 0) return null;
+                if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
+                return dt.Rows[0][0].ToString();
+            }
+        }
+
+        public static object GetStaffIDByUserID(string connectionString, string UserID)
+        {
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                string sql = $"select StaffID from AccountList where UserID = {UserID}";
+                DataTable dt = new DataTable();
+                dt = cnn.CreateDataTable(sql);
+                if (dt.Rows.Count == 0) return null;
+                if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
+                return dt.Rows[0][0].ToString();
+            }
+        }
+
+        public static object GetStaffIDByUsername(string connectionString, string Username)
+        {
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                string sql = $"select StaffID from AccountList where Username = '{Username}'";
+                DataTable dt = new DataTable();
+                dt = cnn.CreateDataTable(sql);
+                if (dt.Rows.Count == 0) return null;
+                if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
                 return dt.Rows[0][0].ToString();
             }
         }
@@ -199,6 +188,7 @@ namespace JeeAccount.Services
                 DataTable dt = new DataTable();
                 dt = cnn.CreateDataTable(sql);
                 if (dt.Rows.Count == 0) return null;
+                if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
                 return dt.Rows[0][0].ToString();
             }
         }
@@ -209,7 +199,28 @@ namespace JeeAccount.Services
             DataTable dt = new DataTable();
             dt = cnn.CreateDataTable(sql);
             if (dt.Rows.Count == 0) return null;
+            if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
             return Int32.Parse(dt.Rows[0][0].ToString());
+        }
+
+        public static object GetStaffIDByUserIDCnn(DpsConnection cnn, string UserID)
+        {
+            string sql = $"select StaffID from AccountList where UserID = {UserID}";
+            DataTable dt = new DataTable();
+            dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count == 0) return null;
+            if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
+            return dt.Rows[0][0].ToString();
+        }
+
+        public static object GetStaffIDByUsernameCnn(DpsConnection cnn, string Username)
+        {
+            string sql = $"select StaffID from AccountList where Username = '{Username}'";
+            DataTable dt = new DataTable();
+            dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count == 0) return null;
+            if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
+            return dt.Rows[0][0].ToString();
         }
 
         public static object GetUserIDByUsername(string connectionString, string Username)
@@ -220,8 +231,53 @@ namespace JeeAccount.Services
                 DataTable dt = new DataTable();
                 dt = cnn.CreateDataTable(sql);
                 if (dt.Rows.Count == 0) return null;
+                if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
                 return Int32.Parse(dt.Rows[0][0].ToString());
             }
+        }
+
+        public static List<T> ConvertDataTableToList<T>(this DataTable dt)
+        {
+            List<T> data = new List<T>();
+            foreach (DataRow row in dt.Rows)
+            {
+                T item = GetItem<T>(row);
+                data.Add(item);
+            }
+            return data;
+        }
+
+        public static T GetItem<T>(DataRow dr)
+        {
+            Type temporary = typeof(T);
+            T obj = Activator.CreateInstance<T>();
+
+            foreach (DataColumn column in dr.Table.Columns)
+            {
+                foreach (PropertyInfo property in temporary.GetProperties())
+                {
+                    if (string.Equals(property.Name, column.ColumnName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var data = dr[column.ColumnName];
+                        if (data != DBNull.Value)
+                        {
+                            try
+                            {
+                                var safeValue = dr[column.ColumnName] == null ? null : Convert.ChangeType(dr[column.ColumnName], data.GetType());
+                                property.SetValue(obj, safeValue, null);
+                            }
+                            catch (Exception ex)
+                            {
+                                throw new Exception($"{ex.Message} ({column.ColumnName})");
+                            }
+                        }
+                        break;
+                    }
+                    else
+                        continue;
+                }
+            }
+            return obj;
         }
 
         public static string GetColorNameUser(string name)
@@ -317,6 +373,80 @@ namespace JeeAccount.Services
                     return result = "rgb(211, 84, 0)";
             }
             return result;
+        }
+
+        public static string ConvertDateToString(object value, bool includeHoursAndMinutes = false)
+        {
+            DateTime? dt = (value == System.DBNull.Value)
+                ? (DateTime?)null
+                : Convert.ToDateTime(value);
+
+            if (dt == null)
+                return string.Empty;
+            return value == null ? string.Empty : Convert.ToDateTime(dt).ConvertDate(includeHoursAndMinutes);
+        }
+
+        public static string ConvertToString(object value)
+        {
+            return Convert.ToString(ReturnEmptyIfNull(value));
+        }
+
+        public static int ConvertToInt(object value)
+        {
+            return Convert.ToInt32(ReturnZeroIfNull(value));
+        }
+
+        public static long ConvertToLong(object value)
+        {
+            return Convert.ToInt64(ReturnZeroIfNull(value));
+        }
+
+        public static decimal ConvertToDecimal(object value)
+        {
+            return Convert.ToDecimal(ReturnZeroIfNull(value));
+        }
+
+        public static DateTime convertToDateTime(object date)
+        {
+            return Convert.ToDateTime(ReturnDateTimeMinIfNull(date));
+        }
+
+        public static string ConvertDate(this DateTime datetTime, bool includeHoursAndMinutes = false)
+        {
+            if (datetTime != DateTime.MinValue)
+            {
+                if (!includeHoursAndMinutes)
+                    return datetTime.ToString("dd/MM/yyyy");
+                return datetTime.ToString("dd/MM/yyyy HH:mm:ss.fff");
+            }
+            return null;
+        }
+
+        public static object ReturnEmptyIfNull(this object value)
+        {
+            if (value == DBNull.Value)
+                return string.Empty;
+            if (value == null)
+                return string.Empty;
+            return value;
+        }
+
+        public static object ReturnZeroIfNull(this object value)
+        {
+            if (value == DBNull.Value)
+                return 0;
+            if (value == null)
+                return 0;
+            return value;
+        }
+
+        public static object ReturnDateTimeMinIfNull(this object value)
+        {
+            if (value == DBNull.Value)
+                return DateTime.MinValue;
+            if (value == null)
+                return DateTime.MinValue;
+            return value;
         }
     }
 }

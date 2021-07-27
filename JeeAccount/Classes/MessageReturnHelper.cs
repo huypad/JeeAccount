@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JeeAccount.Models.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,6 +17,25 @@ namespace JeeAccount.Classes
         public const int ERRORCODE_EXCEPTION = 0;                                      //lỗi exception
         public const int ERRORCODE_BADREQEST = 400;                                    //lỗi cú pháp không hợp lệ
         public const int ERRORCODE_UNAUTHORIZED = 401;                                 //lỗi không có quyền
+
+        public static object Ok(object data, PageModel pageModel)
+        {
+            return new
+            {
+                data = data,
+                panigator = pageModel
+            };
+        }
+
+        public static object Ok(object data, PageModel pageModel, bool Visible)
+        {
+            return new
+            {
+                data = data,
+                Visible = Visible,
+                panigator = pageModel
+            };
+        }
 
         public static object Unauthorized()
         {

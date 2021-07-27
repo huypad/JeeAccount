@@ -21,5 +21,6 @@ namespace JeeAccount.Models.AccountManagement
         public int Position { get; set; }
         public string Icon { get; set; }
         public int SoLuongNhanSu { get; set; }
+        public bool IsShowApp { get; set; }
     }
 }

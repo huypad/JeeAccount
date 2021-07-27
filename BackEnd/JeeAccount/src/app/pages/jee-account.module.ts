@@ -49,7 +49,7 @@ import { MatTreeModule } from '@angular/material/tree';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { GeneralModule } from '../_metronic/partials/content/general/general.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import {DanhMucChungService} from './JeeAccount/_core/services/danhmuc.service';
+import { DanhMucChungService } from './JeeAccount/_core/services/danhmuc.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { JeeCommentModule } from './JeeAccount/_shared/jee-comment/jee-comment.module';
 
@@ -118,14 +118,17 @@ const MY_FORMATS_EDIT: any = {
     NgbDatepickerModule,
     NgxMatSelectSearchModule,
     TranslateModule,
-    JeeCommentModule
+    JeeCommentModule,
+    CRUDTableModule,
+    MatMomentDateModule,
+    NgbButtonsModule,
   ],
   entryComponents: [],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'vi' },
     { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
     { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS_EDIT },
-    DanhMucChungService
+    DanhMucChungService,
   ],
   exports: [
     MatDialogModule,
@@ -154,7 +157,10 @@ const MY_FORMATS_EDIT: any = {
     FormsModule,
     TranslateModule,
     ReactiveFormsModule,
-    JeeCommentModule
+    JeeCommentModule,
+    CRUDTableModule,
+    MatMomentDateModule,
+    NgbButtonsModule,
   ],
 })
 export class JeeAccountModule {}

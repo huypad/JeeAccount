@@ -9,8 +9,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using static JeeAccount.Models.Common.Panigator;
 
 namespace JeeAccount.Reponsitories
 {
@@ -23,7 +25,22 @@ namespace JeeAccount.Reponsitories
             _connectionString = configuration.GetValue<string>("AppConfig:Connection");
         }
 
-        public async Task<IEnumerable<AccUsernameModel>> GetListUsernameByCustormerID(long custormerID)
+        public async Task<DataTable> GetAllAccountListAsync(long custormerID)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("CustomerID", custormerID);
+
+            string sql = @"select *
+                           from AccountList where CustomerID=@CustomerID";
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                dt = cnn.CreateDataTable(sql, Conds);
+                return await Task.FromResult(dt).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<DataTable> GetListUsernameByCustormerIDAsync(long custormerID)
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
@@ -35,24 +52,8 @@ namespace JeeAccount.Reponsitories
                            from AccountList where CustomerID=@CustomerID";
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = cnn.CreateDataTable(sql, Conds);
-                var result = dt.AsEnumerable().Select(row => new AccUsernameModel
-                {
-                    UserId = Int32.Parse(row["UserID"].ToString()),
-                    Username = row["Username"].ToString(),
-                    FullName = row["FullName"].ToString(),
-                    AvartarImgURL = row["Avatar"].ToString(),
-                    CustomerID = Int32.Parse(row["CustomerID"].ToString()),
-                    Department = row["Department"].ToString(),
-                    PhoneNumber = row["PhoneNumber"].ToString(),
-                    Jobtitle = row["Jobtitle"].ToString(),
-                    Email = row["email"].ToString(),
-                    StructureID = row["cocauid"].ToString(),
-                    ChucVuID = row["ChucVuID"].ToString(),
-                    NgaySinh = (row["Birthday"] != DBNull.Value) ? ((DateTime)row["Birthday"]).ToString("dd/MM/yyyy") : "",
-                });
-
-                return await Task.FromResult(result).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                return dt;
             }
         }
 
@@ -251,16 +252,19 @@ where Username = @Username and (Disable != 1 or Disable is null)";
             }
         }
 
-        public async Task<IEnumerable<AccountManagementDTO>> GetListAccountManagement(long customerID)
+        public async Task<IEnumerable<AccountManagementDTO>> GetListAccountManagement(long customerID, string where = "", string orderBy = "")
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", customerID);
 
-            string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name,
+            string where_order = "";
+            if (!string.IsNullOrEmpty(where)) where_order += $"where {where}";
+            if (!string.IsNullOrEmpty(orderBy)) where_order += $"order by {orderBy}";
+
+            string sql = @$"select LastName + ' ' + FirstName as FullName, FirstName as Name,
                         AvartarImgURL as Avatar, Jobtitle, Department, Username, DirectManager
-                        , IsActive, Note, email, cocauid from AccountList
-                        where CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
+                        , IsActive, Note, email, cocauid from AccountList {where_order}";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
@@ -279,6 +283,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
                     Username = row["Username"].ToString(),
                     Email = row["Email"].ToString(),
                     StructureID = row["cocauid"].ToString(),
+                    BgColor = GeneralService.GetColorNameUser(row["Name"].ToString().Substring(0, 1))
                 });
 
                 return await Task.FromResult(result).ConfigureAwait(false);
@@ -349,16 +354,29 @@ where Username = @Username and (Disable != 1 or Disable is null)";
                 if (account.Jobtitle is not null) val.Add("Jobtitle", account.Jobtitle);
                 if (account.Departmemt is not null) val.Add("Department", account.Departmemt);
                 if (account.Phonemumber is not null) val.Add("PhoneNumber", account.Phonemumber);
+                if (account.Email is not null) val.Add("Email", account.Email);
+                if (account.ImageAvatar is not null) val.Add("AvartarImgURL", account.ImageAvatar);
+                if (account.StaffID != 0) val.Add("StaffID", account.StaffID);
+                if (account.Birthday is not null)
+                {
+                    var date = DateTime.ParseExact(account.Birthday, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                    val.Add("Birthday", date);
+                }
                 val.Add("IsActive", 1);
                 val.Add("Disable", 0);
-                val.Add("Email", account.Email);
                 val.Add("ActiveDate", DateTime.Now);
                 val.Add("ActiveBy", userID);
                 val.Add("CreatedDate", DateTime.Now);
                 val.Add("CreatedBy", userID);
                 val.Add("CustomerID", CustomerID);
-                val.Add("Password", account.Password);
-                if (isAdmin) val.Add("IsAdmin", 1);
+                if (isAdmin)
+                {
+                    val.Add("IsAdmin", 1);
+                }
+                else
+                {
+                    val.Add("IsAdmin", 0);
+                }
 
                 #endregion val data
 
@@ -414,6 +432,24 @@ where Username = @Username and (Disable != 1 or Disable is null)";
             return new ReturnSqlModel();
         }
 
+        public void UpdateAvatar(string AvatarUrl, long userID, long CustomerID)
+        {
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                Hashtable val = new Hashtable();
+                val.Add("AvartarImgURL", AvatarUrl);
+                SqlConditions cond = new SqlConditions();
+                cond.Add("UserID", userID);
+                cond.Add("CustomerID", CustomerID);
+
+                int x = cnn.Update(val, cond, "AccountList");
+                if (x <= 0)
+                {
+                    throw new Exception(cnn.LastError.ToString());
+                }
+            }
+        }
+
         public long GetCurrentIdentity(DpsConnection cnn)
         {
             var id = cnn.ExecuteScalar("SELECT IDENT_CURRENT ('AccountList') AS Current_Identity;");
@@ -446,12 +482,17 @@ where Username = @Username and (Disable != 1 or Disable is null)";
             string lastname = "";
             if (personalInfoCustom.Fullname is not null) lastname = GeneralService.getlastname(personalInfoCustom.Fullname);
             if (personalInfoCustom.Avatar is not null) val.Add("AvartarImgURL", personalInfoCustom.Avatar);
-            if (personalInfoCustom.Birthday is not null) val.Add("Birthday", Convert.ToDateTime(personalInfoCustom.Birthday));
+            if (personalInfoCustom.Birthday is not null)
+            {
+                var date = DateTime.ParseExact(personalInfoCustom.Birthday, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                val.Add("Birthday", date);
+            }
             if (personalInfoCustom.Departmemt is not null) val.Add("Department", personalInfoCustom.Departmemt);
             if (personalInfoCustom.Jobtitle is not null) val.Add("Jobtitle", personalInfoCustom.Jobtitle);
             if (personalInfoCustom.Phonenumber is not null) val.Add("Phonenumber", personalInfoCustom.Phonenumber);
             if (personalInfoCustom.Fullname is not null) val.Add("FirstName", firstname);
             if (personalInfoCustom.Fullname is not null) val.Add("LastName", lastname);
+            if (personalInfoCustom.StructureID is not null) val.Add("CoCauID", personalInfoCustom.StructureID);
             int x = cnn.Update(val, Conds, "AccountList");
             if (x <= 0)
             {
@@ -498,6 +539,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
                     Name = dt.Rows[0]["Name"].ToString(),
                     Phonenumber = dt.Rows[0]["PhoneNumber"].ToString(),
                     StructureID = dt.Rows[0]["cocauid"].ToString(),
+                    BgColor = GeneralService.GetColorNameUser(dt.Rows[0]["Name"].ToString().Substring(0, 1)),
                 };
             }
         }
@@ -583,7 +625,8 @@ join AppList on AppList.AppID = Account_App.AppID";
                         ReleaseDate = row["ReleaseDate"].ToString(),
                         Icon = row["Icon"].ToString(),
                         Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
-                        SoLuongNhanSu = (row["SoLuongNhanSu"] != DBNull.Value) ? Int32.Parse(row["SoLuongNhanSu"].ToString()) : 0
+                        SoLuongNhanSu = (row["SoLuongNhanSu"] != DBNull.Value) ? Int32.Parse(row["SoLuongNhanSu"].ToString()) : 0,
+                        IsShowApp = Convert.ToBoolean(row["IsShowApp"])
                     });
                     return await Task.FromResult(result).ConfigureAwait(false);
                 }
@@ -603,6 +646,7 @@ join AppList on AppList.AppID = Account_App.AppID";
                         ReleaseDate = row["ReleaseDate"].ToString(),
                         Icon = row["Icon"].ToString(),
                         Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
+                        IsShowApp = Convert.ToBoolean(row["IsShowApp"])
                     });
                     return await Task.FromResult(result).ConfigureAwait(false);
                 }
@@ -626,7 +670,7 @@ join AppList on AppList.AppID = Account_App.AppID";
                 val.Add("CreatedDate", DateTime.Now);
                 val.Add("CreatedBy", 0);
                 val.Add("Disable", 0);
-
+                val.Add("IsActive", 1);
                 int x = cnn.Insert(val, "Account_App");
                 if (x <= 0)
                 {
@@ -690,6 +734,7 @@ join AppList on AppList.AppID = Account_App.AppID";
                     IsDefaultApp = Convert.ToBoolean((bool)row["IsDefaultApply"]),
                     Icon = row["Icon"].ToString(),
                     Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
+                    IsShowApp = Convert.ToBoolean(row["IsShowApp"])
                 });
 
                 return await Task.FromResult(result).ConfigureAwait(false);

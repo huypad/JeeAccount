@@ -10,7 +10,7 @@ namespace JeeAccount.Services.AccountManagementService
 {
     public interface IAccountManagementService
     {
-        Task<IEnumerable<AccUsernameModel>> GetListUsernameByCustormerID(long customerID);
+        Task<IEnumerable<AccUsernameModel>> GetListUsernameByCustormerIDAsync(long customerID);
 
         Task<long> GetCustormerIDByUsername(string username);
 
@@ -32,9 +32,9 @@ namespace JeeAccount.Services.AccountManagementService
 
         Task<IEnumerable<AppListDTO>> GetListAppByCustomerID(long customerID);
 
-        Task<IEnumerable<UserNameDTO>> GetListUsernameByAppcode(long customerID, string appcode);
+        Task<IEnumerable<AccountManagementDTO>> GetListAccountManagement(long customerID, string where, string orderby);
 
-        Task<IEnumerable<AccountManagementDTO>> GetListAccountManagement(long customerID);
+        Task<IEnumerable<UserNameDTO>> GetListUsernameByAppcode(long customerID, string appcode);
 
         ReturnSqlModel ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin);
 
@@ -54,7 +54,7 @@ namespace JeeAccount.Services.AccountManagementService
 
         PersonalInfoCustomData GetPersonalInfoCustomData(long UserID, long CustomerID);
 
-        Task<IdentityServerReturn> UpdateAvatarWithChangeUrlAvatar(string Admin_access_token, long UserId, string Username, long CustomerID, string apiUrl);
+        Task UpdateAvatarWithChangeUrlAvatar(long UserId, string Username, long CustomerID, string apiUrl);
 
         ReturnSqlModel UpdateDirectManager(string Username, string DirectManager, long customerID);
 
@@ -91,5 +91,11 @@ namespace JeeAccount.Services.AccountManagementService
         Task<HttpResponseMessage> UpdateOneBgColorCustomData(InputApiModel model);
 
         void UpdateAllAppCodesCustomData(InputApiModel model, List<int> lstAppCode);
+
+        void SaveNewAccountInAccount_AppAndAccountList(long customerID, long AdminUserID, AccountManagementModel account, List<int> ListAppID);
+
+        Task<JeeAccountCustomData> GetJeeAccountCustomDataAsync(InputApiModel model);
+
+        string UpdateAvatarCdn(string username, string base64);
     }
 }

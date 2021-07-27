@@ -7,6 +7,10 @@ export class AccountManagementDTO {
   directManager: string;
   isActive: boolean;
   note: string;
+  username: string;
+  email: string;
+  structureid: string;
+  bgcolor: string;
 }
 
 export interface AppListDTO {

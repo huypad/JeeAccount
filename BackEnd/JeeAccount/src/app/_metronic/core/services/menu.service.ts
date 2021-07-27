@@ -16,4 +16,8 @@ export class MenuServices {
     const httpHeaders = this.httpUtils.getHTTPHeaders();
     return this.http.get<any>(environment.HOST_JEEACCOUNT_API + `/api/menu/LayMenuChucNang`, { headers: httpHeaders });
   }
+  Get_DSNhacNho(): Observable<QueryResultsModel> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    return this.http.get<any>(environment.HOST_JEELANDINGPAGE_API + `/api/widgets/Get_DSNhacNho`, { headers: httpHeaders });
+  }
 }

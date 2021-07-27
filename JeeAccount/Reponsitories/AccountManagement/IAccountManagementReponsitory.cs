@@ -1,15 +1,17 @@
 ﻿using DpsLibs.Data;
 using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.Common;
-using JeeAccount.Services.AccountManagementService;
 using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 
 namespace JeeAccount.Reponsitories
 {
     public interface IAccountManagementReponsitory
     {
-        Task<IEnumerable<AccUsernameModel>> GetListUsernameByCustormerID(long custormerID);
+        Task<DataTable> GetListUsernameByCustormerIDAsync(long custormerID);
+
+        Task<DataTable> GetAllAccountListAsync(long custormerID);
 
         Task<IEnumerable<UserNameDTO>> GetListUsernameByAppcode(long custormerID, string appcode);
 
@@ -31,13 +33,15 @@ namespace JeeAccount.Reponsitories
 
         Task<IEnumerable<InfoAdminDTO>> GetInfoAdminAccountByCustomerID(long customerID);
 
-        Task<IEnumerable<AccountManagementDTO>> GetListAccountManagement(long customerID);
+        Task<IEnumerable<AccountManagementDTO>> GetListAccountManagement(long customerID, string where, string orderby);
 
         ReturnSqlModel ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin);
 
         ReturnSqlModel CreateAccount(DpsConnection cnn, AccountManagementModel account, long AdminUserID, long CustomerID, bool isAdmin = false);
 
         ReturnSqlModel UpdateAvatar(DpsConnection cnn, string AvatarUrl, long userID, long CustomerID);
+
+        void UpdateAvatar(string AvatarUrl, long userID, long CustomerID);
 
         ReturnSqlModel UpdateAvatarFirstTime(DpsConnection cnn, string AvatarUrl, long userID, long CustomerID);
 
