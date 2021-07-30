@@ -1,7 +1,7 @@
 // Dialog
 .mat-dialog-container-wrapper {
   .mat-dialog-container {
-    padding: 0;
+    padding: 0 !important;
     overflow-x: hidden;
 
     .card {
@@ -15,8 +15,22 @@
   }
 }
 
+.mat-dialog-container {
+  padding: 0 !important;
+  overflow-x: hidden;
+
+  .card {
+    margin-bottom: 0;
+
+    .card-body {
+      overflow: auto;
+      max-height: 60vh;
+    }
+  }
+}
+
 .mat-dialog-container-wrapper .mat-dialog-container {
-  padding: 0;
+  padding: 0 !important;
   overflow-x: hidden;
 
   .portlet {
@@ -57,9 +71,4 @@
 .modal3-container {
   padding-top: 24px;
   padding-bottom: 24px;
-}
-
-.mat-dialog-container {
-  padding: 0px !important;
-  font-family: 'Roboto' !important;
 }

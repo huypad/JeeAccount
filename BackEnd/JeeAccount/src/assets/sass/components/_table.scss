@@ -9,8 +9,8 @@
       font-weight: $table-head-font-weight;
       font-size: $table-head-font-size;
       border-bottom-width: 1px;
-      padding-left: 16px;
-      padding-bottom: 12px;
+      padding-top: 1rem;
+      padding-bottom: 1rem;
     }
   }
 
@@ -49,39 +49,11 @@
     thead {
       tr,
       th {
-        height: 48px;
         font-weight: $table-compact-head-font-weight;
-        color: #808080 !important;
-        font-size: 13px;
-        text-transform: capitalize;
+        color: $table-compact-head-color !important;
+        font-size: $table-compact-head-font-size;
+        text-transform: $table-compact-head-text-transform;
         letter-spacing: $table-compact-head-letter-spacing;
-        background-color: #e4e6ef !important;
-      }
-    }
-
-    td.mat-cell {
-      font-size: 12px;
-      color: #000000;
-      //padding-bottom: 12px;
-      //padding-top: 12px;
-      padding-left: 16px;
-
-      .jee-avatar {
-        padding-left: 12px;
-        padding-top: 4px;
-        padding-bottom: 4px;
-      }
-
-      .jee-name {
-        color: #000;
-        padding-left: 30px;
-        //padding-bottom: 12px;
-        padding-top: 12px;
-        font-size: 12px;
-      }
-
-      .row {
-        padding-left: 16px !important;
       }
     }
   }

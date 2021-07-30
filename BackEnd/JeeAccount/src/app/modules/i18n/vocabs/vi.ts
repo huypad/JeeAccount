@@ -105,6 +105,10 @@ export const locale = {
         },
       },
     },
+    DELETE: {
+      TITLE: 'Xoá',
+      DESCRIPTON: 'Bạn có muốn xoá đối tượng này không?',
+    },
     COMMOM: {
       THAOTAC: 'Thao tác',
       THEMMOI: 'Thêm mới',
@@ -122,6 +126,8 @@ export const locale = {
       USERNAME: 'Tên đăng nhập',
       PASSWORD: 'Mật khẩu',
       REPASSWORD: 'Nhập lại mật khẩu',
+      TINHTRANG: 'Tình trạng',
+      GHICHU: 'Ghi chú',
     },
     dropdowntimkiem: {
       timkiem1: 'Tìm kiếm theo mã và họ tên',

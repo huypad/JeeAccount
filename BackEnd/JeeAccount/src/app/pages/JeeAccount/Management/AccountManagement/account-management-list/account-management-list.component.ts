@@ -233,6 +233,7 @@ export class AccountManagementListComponent implements OnInit {
     const messageType = MessageType.Create;
     const dialogRef = this.dialog.open(DeleteEntityDialogComponent, {
       data: {},
+      width: '450px',
     });
     const sb = dialogRef.afterClosed().subscribe((res) => {
       if (!res) {

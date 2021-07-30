@@ -1,27 +1,27 @@
 //=======================CSS BUTTON======================
 .ja_button {
   font-family: 'Roboto';
-  font-weight: 400 ;
-  font-size: 1.02rem ; //12pt;
-  padding: 5px 20px 5px 20px ; //top right botton left
-  border: 0.5 ;
-  border-color: #d1d1d1 ;
-  border-radius: 3px ;
-  margin: 20px 20px 20px 20px ;
+  font-weight: 400;
+  font-size: 1.02rem; //12pt;
+  padding: 5px 20px 5px 20px; //top right botton left
+  border: 0.5;
+  border-color: #d1d1d1;
+  border-radius: 3px;
+  margin: 20px 20px 20px 20px;
 }
 
 .ja_btn-addnew {
-  background-color: #3699ff ;
-  color: #ffffff ;
+  background-color: #3699ff;
+  color: #ffffff;
   &:hover {
-    color: #ffffff ;
-    background-color: #0e72d8 ;
+    color: #ffffff;
+    background-color: #0e72d8;
   }
 }
 
 .ja_btn-dropdown {
-  background-color: #1bc5bd ;
-  color: #ffffff ;
+  background-color: #1bc5bd;
+  color: #ffffff;
   &:hover {
     background-color: #0bb7af;
   }
@@ -257,4 +257,30 @@ body .kt-portlet .kt-portlet__body {
 .status-new {
   text-align: center;
   color: #ffffff;
+}
+
+.card.card-custom .card-body {
+  padding: 0;
+  margin: 0;
+
+  th {
+    height: 48px;
+    padding: 0;
+    font-weight: 600;
+    color: #808080 !important;
+    background-color: #f0f0f0 !important;
+    letter-spacing: 0 !important;
+  }
+  td {
+    height: 48px;
+    padding: 0;
+  }
+}
+
+.pl-16 {
+  padding-left: 16px !important;
+}
+
+pl-10 {
+  padding-left: 10px !important;
 }

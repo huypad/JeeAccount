@@ -343,20 +343,6 @@ html {
   }
 }
 
-// style card-wiget
-// .style-wiget{
-//   position: absolute;
-//   left: 0;
-//   right: 0;
-//   bottom: 0;
-//   top: 76px;
-//   overflow: auto;
-//   &.card{
-//     padding: 5px;
-//     padding-top: 0;
-//   }
-// }
-
 .style-wiget-activity {
   position: absolute;
   right: 0;
@@ -434,30 +420,4 @@ html {
   color: #f4f4f4;
   background-color: #1863ad;
   border-color: #1863ad;
-}
-
-// custom css from bootstrap
-.card-header {
-  padding: 0.75rem 1.25rem;
-  margin-bottom: 0;
-  background-color: rgba(0, 0, 0, 0.03);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
-}
-.card-footer {
-  padding: 0.75rem 1.25rem;
-  background-color: rgba(0, 0, 0, 0.03);
-  border-top: 1px solid rgba(0, 0, 0, 0.125);
-}
-.user {
-  overflow: hidden;
-  float: left;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  -moz-border-radius: 50%;
-  -webkit-border-radius: 50%;
-  border-radius: 50%;
-  margin-left: -8px;
-  background: rgba(0, 0, 0, 0.1);
-  border: 2px solid #f3f3f3;
 }
