@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { environment } from './../../../../../../../environments/environment';
+import { Component, NgZone, OnInit, Output } from '@angular/core';
 import { LayoutService } from '../../../../../core';
-
+import KTLayoutQuickPanel from '../../../../../../../assets/js/layout/extended/quick-panel';
+import { ChatService } from 'src/app/pages/JeeAccount/my-chat/services/chat.service';
+const HOST_JEEChat = environment.HOST_JEECHAT;
 @Component({
   selector: 'app-quick-panel-offcanvas',
   templateUrl: './quick-panel-offcanvas.component.html',
@@ -8,17 +11,27 @@ import { LayoutService } from '../../../../../core';
 })
 export class QuickPanelOffcanvasComponent implements OnInit {
   extrasQuickPanelOffcanvasDirectionCSSClass = 'offcanvas-right';
-  activeTabId:
-    | 'kt_quick_panel_logs'
-    | 'kt_quick_panel_notifications'
-    | 'kt_quick_panel_settings' = 'kt_quick_panel_logs';
+  activeTabId: 'kt_quick_panel_notifications' | 'kt_quick_panel_settings' = 'kt_quick_panel_notifications';
 
-  constructor(private layout: LayoutService) {}
+  constructor(private layout: LayoutService, private chatService: ChatService, private _ngZone: NgZone) {}
+  elementId: string;
+  public CData: number;
+  search: string;
+  hostjeechat: string = HOST_JEEChat;
 
   ngOnInit(): void {
-    this.extrasQuickPanelOffcanvasDirectionCSSClass = `offcanvas-${this.layout.getProp(
-      'extras.quickPanel.offcanvas.direction'
-    )}`;
+    this.SetValue();
+    this.elementId = 'kt_quick_panel_close';
+    // this.elementId='';
+    this.extrasQuickPanelOffcanvasDirectionCSSClass = `offcanvas-${this.layout.getProp('extras.quickPanel.offcanvas.direction')}`;
+  }
+
+  SetValue() {
+    this._ngZone.run(() => {
+      this.chatService.search$.subscribe((res) => {
+        this.search = '';
+      });
+    });
   }
 
   setActiveTabId(tabId) {

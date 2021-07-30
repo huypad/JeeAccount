@@ -40,9 +40,8 @@
   </ng-container>
 </ng-container>
 
-<ng-container *ngIf="extraSearchDisplay">
+<!-- <ng-container *ngIf="extraSearchDisplay">
   <ng-container *ngIf="extrasSearchLayout === 'offcanvas'">
-    <!--begin::Search-->
     <div class="topbar-item">
       <div class="btn btn-icon btn-clean btn-lg mr-1" id="kt_quick_search_toggle">
         <span
@@ -52,9 +51,7 @@
         ></span>
       </div>
     </div>
-    <!--end::Search-->
   </ng-container>
-
   <ng-container *ngIf="extrasSearchLayout === 'dropdown'" id="kt_quick_search_toggle">
     <div class="dropdown" id="kt_quick_search_toggle" autoClose="outside" ngbDropdown>
       <div class="topbar-item" ngbDropdownToggle>
@@ -72,6 +69,21 @@
       </div>
     </div>
   </ng-container>
+</ng-container> -->
+
+<ng-container *ngIf="extrasQuickPanelDisplay">
+  <!--begin::Quick panel-->
+  <div class="topbar-item">
+    <div class="btn btn-icon btn-clean btn-lg mr-1" id="kt_quick_panel_toggle">
+      <span
+        [inlineSVG]="'./assets/media/svg/icons/Communication/Group-chat.svg'"
+        cacheSVG="true"
+        class="svg-icon svg-icon-xl svg-icon-primary"
+      ></span>
+    </div>
+  </div>
+  <app-quick-panel-offcanvas></app-quick-panel-offcanvas>
+  <!--end::Quick panel-->
 </ng-container>
 
 <ng-container *ngIf="extrasQuickActionsDisplay">
@@ -140,16 +152,6 @@
   </ng-container>
 </ng-container>
 
-<ng-container *ngIf="extrasQuickPanelDisplay">
-  <!--begin::Quick panel-->
-  <!-- <div class="topbar-item">
-<div class="btn btn-icon btn-clean btn-lg mr-1" id="kt_quick_panel_toggle">
-  <span [inlineSVG]="'./assets/media/svg/icons/Layout/Layout-4-blocks.svg'" cacheSVG="true"
-    class="svg-icon svg-icon-xl svg-icon-primary"></span>
-</div>
-</div> -->
-  <!--end::Quick panel-->
-</ng-container>
 <!-- <ng-container *ngIf="extrasLanguagesDisplay">
 <app-language-selector style="margin-top: 10px;"></app-language-selector>
 </ng-container> -->
