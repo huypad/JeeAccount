@@ -13,11 +13,9 @@ import { LayoutUtilsService, MessageType } from '../../../_core/utils/layout-uti
 import { DanhMucChungService } from '../../../_core/services/danhmuc.service';
 import { DeleteEntityDialogComponent } from '../../../_shared/delete-entity-dialog/delete-entity-dialog.component';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { PaginatorState } from 'src/app/_metronic/shared/crud-table';
-import { GroupingState } from 'src/app/_metronic/shared/crud-table/grouping.model';
+import { GroupingState, PaginatorState } from 'src/app/_metronic/shared/crud-table';
 import { SortState } from './../../../../../_metronic/shared/crud-table/models/sort.model';
 import { catchError, debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { error } from 'protractor';
 
 @Component({
   selector: 'app-account-management-list',
@@ -53,7 +51,7 @@ export class AccountManagementListComponent implements OnInit {
 
   ngOnInit() {
     this.searchForm();
-    this.accountManagementService.fetch();
+    //this.accountManagementService.fetch();
     this.grouping = this.accountManagementService.grouping;
     this.paginator = this.accountManagementService.paginator;
     this.sorting = this.accountManagementService.sorting;
@@ -64,9 +62,9 @@ export class AccountManagementListComponent implements OnInit {
   // search
   searchForm() {
     this.searchGroup = this.fb.group({
-      searchTerm: [''],
+      keyword: [''],
     });
-    const searchEvent = this.searchGroup.controls.searchTerm.valueChanges
+    const searchEvent = this.searchGroup.controls['keyword'].valueChanges
       .pipe(
         /*
       The user can type quite quickly in the input box, and that could trigger a lot of server requests. With this operator,
@@ -75,8 +73,19 @@ export class AccountManagementListComponent implements OnInit {
         debounceTime(150),
         distinctUntilChanged()
       )
-      .subscribe((val) => this.search(val));
+      .subscribe((val) => {
+        this.search(val);
+      });
     this.subscriptions.push(searchEvent);
+  }
+
+  filter() {
+    const filter = {};
+    const status = this.searchGroup.get('keyword').value;
+    if (status) {
+      filter['status'] = status;
+    }
+    this.accountManagementService.patchState({ filter });
   }
 
   search(searchTerm: string) {
@@ -117,11 +126,11 @@ export class AccountManagementListComponent implements OnInit {
     } else {
       sorting.direction = sorting.direction === 'asc' ? 'desc' : 'asc';
     }
-    this.accountManagementService.fetchStateSort({ sorting });
+    this.accountManagementService.patchState({ sorting });
   }
 
   paginate(paginator: PaginatorState) {
-    this.accountManagementService.fetchStateSort({ paginator });
+    this.accountManagementService.patchState({ paginator });
   }
 
   changeTinhTrang(Username: string) {
@@ -238,5 +247,6 @@ export class AccountManagementListComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.subscriptions.forEach((sb) => sb.unsubscribe());
+    this.accountManagementService.ngOnDestroy();
   }
 }

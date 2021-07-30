@@ -64,6 +64,15 @@ namespace JeeAccount.Classes
             };
         }
 
+        public static object KhongCoDuLieu(string message)
+        {
+            return new
+            {
+                statusCode = ERRORCODE,
+                message = message.ToLower() + " không có dữ liệu",
+            };
+        }
+
         public static object Trung(string message)
         {
             return new

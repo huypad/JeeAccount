@@ -1,12 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { ReplaySubject } from 'rxjs';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { map, startWith } from 'rxjs/operators';
-import { MatChipInputEvent } from '@angular/material/chips';
-import { MatSelect } from '@angular/material/select';
+import { ReplaySubject, BehaviorSubject } from 'rxjs';
 import { AccountManagementService } from '../Services/account-management.service';
 import { AccDirectManagerModel } from '../Model/account-management.model';
 import { NhanVienMatchip } from '../../../_core/models/danhmuc.model';
@@ -27,6 +22,8 @@ export class QuanLytrucTiepEditDialogComponent implements OnInit {
   // ngx-mat-search area
   quanLys: NhanVienMatchip[] = [];
   filterQuanLys: ReplaySubject<NhanVienMatchip[]> = new ReplaySubject<NhanVienMatchip[]>();
+  isLoadingSubmit$: BehaviorSubject<boolean>;
+  isLoading$: BehaviorSubject<boolean>;
   // End
 
   constructor(
@@ -40,6 +37,8 @@ export class QuanLytrucTiepEditDialogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.isLoadingSubmit$ = new BehaviorSubject(false);
+    this.isLoading$ = new BehaviorSubject(true);
     this.danhmucService.GetMatchipNhanVien().subscribe((res: ResultModel<NhanVienMatchip>) => {
       if (res && res.status === 1) {
         // ngx
@@ -54,6 +53,7 @@ export class QuanLytrucTiepEditDialogComponent implements OnInit {
           const index = this.quanLys.findIndex((x) => x.Username === this.data.DirectManager);
           this.itemForm.controls.QuanLyNhom.setValue(this.quanLys[index].Username);
         }
+        this.isLoading$.next(false);
       }
     });
   }
@@ -80,12 +80,14 @@ export class QuanLytrucTiepEditDialogComponent implements OnInit {
     }
   }
   update(directManagement: AccDirectManagerModel) {
+    this.isLoadingSubmit$.next(true);
     this.accountManagementService.UpdateDirectManager(directManagement).subscribe((res) => {
       if (res && res.status === 1) {
         this.dialogRef.close(res);
       } else {
         this.layoutUtilsService.showActionNotification(res.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
       }
+      this.isLoadingSubmit$.next(false);
     });
   }
 

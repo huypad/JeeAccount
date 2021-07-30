@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, Subscription } from 'rxjs';
 import { catchError, finalize, map, tap } from 'rxjs/operators';
 import { PaginatorState } from '../models/paginator.model';
-import { ITableState, LP_BaseModel, LP_BaseModel_Single, TableResponseModel, TableResponseModel_LandingPage } from '../models/table.model';
+import { ITableState, TableResponseModel } from '../models/table.model';
 import { BaseModel } from '../models/base.model';
 import { SortState } from '../models/sort.model';
 import { GroupingState } from '../models/grouping.model';
@@ -27,18 +27,7 @@ const DEFAULT_STATE_JEEREQUEST: ITableState = {
   entityId: undefined,
 };
 
-const DEFAULT_RESPONSE: TableResponseModel_LandingPage<any> = {
-  status: 1,
-  data: [],
-  error: {
-    code: 0,
-    msg: '',
-  },
-  panigator: null,
-};
-
 export abstract class TableService<T> {
-  private __responseData$ = new BehaviorSubject<TableResponseModel_LandingPage<any>>(DEFAULT_RESPONSE);
   // Private fields
   private _items$ = new BehaviorSubject<T[]>([]);
   private _isLoading$ = new BehaviorSubject<boolean>(false);

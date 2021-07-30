@@ -80,30 +80,10 @@ namespace JeeAccount.Models.Common
         public string sortField { get; set; } = "";
         public FilterModel filter { get; set; }
 
-        [JsonPropertyName("paginator")]
-        [JsonProperty("paginator")]
-        public Panigator panigator { get; set; }
-
         public QueryParams()
         {
             filter = new FilterModel();
         }
-
-        //[JsonPropertyName("filter")]//for derelize of NEWTON.JSON
-        //[JsonProperty("filter")]//for serilize of NEWTON.JSON
-        //public Dictionary<string, string> Filter { get; set; }
-
-        //[JsonPropertyName("paginator")]
-        //[JsonProperty("paginator")]
-        //public Panigator Panigator { get; set; }
-
-        //[JsonPropertyName("searchTerm")]
-        //[JsonProperty("searchTerm")]
-        //public string SearchValue { get; set; }
-
-        //[JsonPropertyName("sorting")]
-        //[JsonProperty("sorting")]
-        //public SortParams Sort { get; set; }
     }
 
     public class SortParams

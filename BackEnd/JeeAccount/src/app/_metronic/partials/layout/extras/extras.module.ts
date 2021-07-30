@@ -23,6 +23,7 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
 import { AvatarModule } from 'ngx-avatar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
+import { SocketioService } from 'src/app/pages/JeeAccount/_core/services/socketio.service';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
@@ -60,6 +61,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
       provide: PERFECT_SCROLLBAR_CONFIG,
       useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG,
     },
+    SocketioService,
   ],
   exports: [
     SearchDropdownInnerComponent,

@@ -35,92 +35,6 @@ namespace JeeAccount.Services.AccountManagementService
             _configuration = configuration;
         }
 
-        public async Task<IEnumerable<AccUsernameModel>> GetListUsernameByCustormerIDAsync(long customerID)
-        {
-            var dt = await _accountManagementReponsitory.GetListUsernameByCustormerIDAsync(customerID);
-            return dt.AsEnumerable().Select(row => new AccUsernameModel
-            {
-                UserId = GeneralService.ConvertToLong(row["UserID"]),
-                Username = row["Username"].ToString(),
-                FullName = row["FullName"].ToString(),
-                AvartarImgURL = row["Avatar"].ToString(),
-                CustomerID = GeneralService.ConvertToLong(row["CustomerID"]),
-                Department = row["Department"].ToString(),
-                PhoneNumber = row["PhoneNumber"].ToString(),
-                Jobtitle = row["Jobtitle"].ToString(),
-                Email = row["email"].ToString(),
-                StructureID = row["cocauid"].ToString(),
-                ChucVuID = row["ChucVuID"].ToString(),
-                NgaySinh = GeneralService.ConvertDateToString(row["Birthday"]),
-                BgColor = GeneralService.GetColorNameUser(row["Name"].ToString().Substring(0, 1)),
-                FirstName = GeneralService.getFirstname(row["FullName"].ToString()),
-                LastName = GeneralService.getlastname(row["FullName"].ToString())
-            });
-        }
-
-        public async Task<long> GetCustormerIDByUsername(string username)
-        {
-            var customerID = await _accountManagementReponsitory.GetCustormerIDByUsername(username);
-            return customerID;
-        }
-
-        public async Task<IEnumerable<InfoAdminDTO>> GetInfoAdminAccountByCustomerID(long customerID)
-        {
-            var listAccount = await _accountManagementReponsitory.GetInfoAdminAccountByCustomerID(customerID);
-            return listAccount;
-        }
-
-        public async Task<IEnumerable<AccountManagementDTO>> GetListAccountManagement(long customerID, string where, string orderby)
-        {
-            var listAccount = await _accountManagementReponsitory.GetListAccountManagement(customerID, where, orderby);
-            return listAccount;
-        }
-
-        public async Task<InfoCustomerDTO> GetInfoByCustomerID(long customerID)
-        {
-            var user = await _accountManagementReponsitory.GetInfoByCustomerID(customerID);
-            return user;
-        }
-
-        public async Task<InfoUserDTO> GetInfoByUsername(string username)
-        {
-            var user = await _accountManagementReponsitory.GetInfoByUsername(username);
-            return user;
-        }
-
-        public async Task<IEnumerable<AdminModel>> GetListAdminsByCustomerID(long customerID)
-        {
-            var admins = await _accountManagementReponsitory.GetListAdminsByCustomerID(customerID);
-            return admins;
-        }
-
-        public async Task<IEnumerable<AppListDTO>> GetListAppByCustomerID(long customerID)
-        {
-            var appList = await _accountManagementReponsitory.GetListAppByCustomerID(customerID);
-            return appList;
-        }
-
-        public async Task<IEnumerable<UserNameDTO>> GetListUsernameByAppcode(long customerID, string appcode)
-        {
-            var accUser = await _accountManagementReponsitory.GetListUsernameByAppcode(customerID, appcode);
-            return accUser;
-        }
-
-        public ReturnSqlModel ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin)
-        {
-            var update = _accountManagementReponsitory.ChangeTinhTrang(customerID, Username, Note, UserIdLogin);
-            return update;
-        }
-
-        public ReturnSqlModel UpdateAvatar(string AvatarUrl, long userID, long CustomerID)
-        {
-            using (DpsConnection cnn = new DpsConnection(_connectionString))
-            {
-                var update = _accountManagementReponsitory.UpdateAvatar(cnn, AvatarUrl, userID, CustomerID);
-                return update;
-            }
-        }
-
         public async Task<IdentityServerReturn> CreateAccount(string Admin_accessToken, long customerID, long AdminUserID, AccountManagementModel account, string apiUrl)
         {
             using (DpsConnection cnn = new DpsConnection(_connectionString))
@@ -303,21 +217,6 @@ namespace JeeAccount.Services.AccountManagementService
             }
         }
 
-        public async Task<object> login(string username, string password)
-        {
-            return await this.identityServerController.loginUser(username, password);
-        }
-
-        public long GetUserIdByUsername(string Username, long CustomerId)
-        {
-            return _accountManagementReponsitory.GetUserIdByUsername(Username, CustomerId);
-        }
-
-        public PersonalInfoCustomData GetPersonalInfoCustomData(long UserID, long CustomerID)
-        {
-            return _accountManagementReponsitory.GetPersonalInfoCustomData(UserID, CustomerID);
-        }
-
         public async Task UpdateAvatarWithChangeUrlAvatar(long UserId, string Username, long CustomerID, string base64)
         {
             var identity = new IdentityServerController();
@@ -340,86 +239,6 @@ namespace JeeAccount.Services.AccountManagementService
             }
         }
 
-        public ReturnSqlModel UpdateDirectManager(string Username, string DirectManager, long customerID)
-        {
-            var update = _accountManagementReponsitory.UpdateDirectManager(Username, DirectManager, customerID);
-            return update;
-        }
-
-        public bool checkUserIDInCustomerID(long UserID, long CustomerID)
-        {
-            long customerID = _accountManagementReponsitory.GetCustomerIDByUserID(UserID);
-            return (CustomerID == customerID);
-        }
-
-        public async Task<IEnumerable<AppListDTO>> GetListAppByUserID(long UserID, long CustomerID = 0)
-        {
-            var listapp = await _accountManagementReponsitory.GetListAppByUserID(UserID, CustomerID);
-            return listapp;
-        }
-
-        public List<int> GetAppIdByAppCode(DpsConnection cnn, List<string> AppCode)
-        {
-            return _accountManagementReponsitory.GetAppIdByAppCode(cnn, AppCode);
-        }
-
-        public List<LoginAccountModel> GetListLogin()
-        {
-            using (DpsConnection cnn = new DpsConnection(_connectionString))
-            {
-                return _accountManagementReponsitory.GetListLogin(cnn);
-            }
-        }
-
-        public async Task<ReturnSqlModel> UpdateTool()
-        {
-            using (DpsConnection cnn = new DpsConnection(_connectionString))
-            {
-                cnn.BeginTransaction();
-                var listlogin = _accountManagementReponsitory.GetListLogin(cnn);
-                string listAccountempy = "";
-                foreach (var login in listlogin)
-                {
-                    var appAccount = await identityServerController.loginUser(login.Username, login.Password);
-                    if (appAccount.AppCode is null)
-                    {
-                        if (string.IsNullOrEmpty(listAccountempy))
-                        {
-                            listAccountempy = login.Username + "/" + login.Password;
-                        }
-                        else
-                        {
-                            listAccountempy += ", " + login.Username + "/" + login.Password;
-                        }
-                        continue;
-                    }
-                    var listId = GetAppIdByAppCode(cnn, appAccount.AppCode);
-                    var insert = _accountManagementReponsitory.InsertAppCodeAccount(cnn, appAccount.UserId, listId);
-                    if (!insert.Susscess)
-                    {
-                        cnn.RollbackTransaction();
-                        cnn.EndTransaction();
-                        return insert;
-                    }
-                }
-
-                cnn.EndTransaction();
-                if (string.IsNullOrEmpty(listAccountempy))
-                {
-                    return new ReturnSqlModel();
-                }
-                else
-                {
-                    return new ReturnSqlModel(listAccountempy, "0");
-                }
-            }
-        }
-
-        public async Task<IEnumerable<CustomerAppDTO>> GetListCustomerAppByCustomerIDFromAccount(long CustomerID)
-        {
-            return await _accountManagementReponsitory.GetListCustomerAppByCustomerIDFromAccount(CustomerID);
-        }
-
         public async Task<HttpResponseMessage> ResetPasswordRootCustomer(CustomerResetPasswordModel model)
         {
             DataTable dt = new DataTable();
@@ -432,20 +251,6 @@ namespace JeeAccount.Services.AccountManagementService
                 var username = GeneralService.GetUsernameByUserIDCnn(cnn, userID).ToString();
                 return await this.identityServerController.ResetPasswordRootCustomer(getSecretToken(), username, model);
             }
-        }
-
-        public async Task<long> GetCustormerIDByUserID(long UserID)
-        {
-            var customerID = await _accountManagementReponsitory.GetCustormerIDByUserID(UserID);
-            return customerID;
-        }
-
-        public async Task<InfoUserDTO> GetInfoByUserID(string userid)
-        {
-            var username = GeneralService.GetUsernameByUserID(_connectionString, userid);
-            if (username == null) return null;
-            var data = await _accountManagementReponsitory.GetInfoByUsername(username.ToString());
-            return data;
         }
 
         public async Task<string> GetDirectManagerByUsername(string username)
@@ -648,7 +453,7 @@ where AppList.AppCode = '{AppCode}'";
                 username = GeneralService.GetUsernameByUserID(_connectionString, model.Userid).ToString();
                 userID = model.Userid;
             }
-            var appCodes = await _accountManagementReponsitory.GetListAppByUserID(long.Parse(userID));
+            var appCodes = await _accountManagementReponsitory.GetListAppByUserIDAsync(long.Parse(userID));
             var appCodesName = appCodes.Select(x => x.AppCode).ToList();
             var StaffID = 0;
             var customerID = 0;
@@ -785,7 +590,7 @@ where AppList.AppCode = '{AppCode}'";
                 {
                     custom.staffID = long.Parse(staffid.ToString());
                 }
-                var lstApp = await GetListAppByUserID(long.Parse(userID));
+                var lstApp = await _accountManagementReponsitory.GetListAppByUserIDAsync(long.Parse(userID));
                 custom.appCode = lstApp.Select(item => item.AppCode).ToList();
                 custom.userID = long.Parse(userID);
                 return custom;
@@ -810,7 +615,8 @@ where AppList.AppCode = '{AppCode}'";
             {
                 linkAvatar = $"https://{HOST_MINIOSERVER}{upload.link}";
             }
-            else {
+            else
+            {
                 throw new Exception("CDN Error");
             }
             return linkAvatar;

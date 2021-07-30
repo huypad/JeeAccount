@@ -18,14 +18,7 @@ namespace JeeAccount.Classes
     {
         public static string Remove_Multiple_Space(string p_keyword)
         {
-            try
-            {
-                return Regex.Replace(p_keyword.Trim(), @"\s+", " ", RegexOptions.Multiline);
-            }
-            catch (Exception ex)
-            {
-                return p_keyword;
-            }
+            return Regex.Replace(p_keyword.Trim(), @"\s+", " ", RegexOptions.Multiline);
         }
 
         public static string Remove_All_Space(string p_keyword)

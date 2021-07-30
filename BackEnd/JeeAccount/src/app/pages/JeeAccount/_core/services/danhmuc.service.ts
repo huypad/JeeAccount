@@ -7,14 +7,14 @@ import { QueryParamsModel } from '../models/query-models/query-params.model';
 import { QueryResultsModel } from '../models/query-models/query-results.model';
 import { environment } from '../../../../../environments/environment';
 
-const API_URL = environment.HOST_JEEACCOUNT_API + '/api/';
+const API_URL = environment.HOST_JEEACCOUNT_API + '/api';
 const API_PRODUCTS_URL = API_URL + '/dashboard';
 const API_URL_GENERAL = API_URL + '/general';
 @Injectable()
 export class DanhMucChungService {
   lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
 
-  constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
+  constructor(private http: HttpClient, private httpUtils: HttpUtilsService) {}
 
   //=================Dùng trong trang truy cập nhanh============================================
   Insert_TruyCapNhanh(item: any): Observable<any> {

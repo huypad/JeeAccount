@@ -29,8 +29,30 @@ class ErrorModel {
     this.message = _errorMessage;
   }
 }
+// jeechat
+export class QueryParamsModelNewLazy {
+  // fields
+  filter: any;
+  sortOrder: string; // asc || desc
+  sortField: string;
+  pageNumber: number;
+  pageSize: number;
+  more: boolean;
 
-//data: null
-//error: { message: "Tổng số ngày cấp phép mỗi tháng không lớn hơn số ngày đã cho", code: "107" }
-//page: null
-//status: 0
+  // constructor overrides
+  constructor(
+    _filter: any,
+    _sortOrder: string = 'asc',
+    _sortField: string = '',
+    _pageNumber: number,
+    _pageSize: number,
+    _more: boolean = false
+  ) {
+    this.filter = _filter;
+    this.sortOrder = _sortOrder;
+    this.sortField = _sortField;
+    this.pageNumber = _pageNumber;
+    this.pageSize = _pageSize;
+    this.more = _more;
+  }
+}

@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Observable } from 'rxjs';
 import { LayoutService } from '../../../../_metronic/core';
 import { AuthService } from '../../../../modules/auth/_services/auth.service';
@@ -11,11 +11,13 @@ import KTLayoutQuickPanel from '../../../../../assets/js/layout/extended/quick-p
 import KTLayoutQuickUser from '../../../../../assets/js/layout/extended/quick-user';
 import KTLayoutHeaderTopbar from '../../../../../assets/js/layout/base/header-topbar';
 import { KTUtil } from '../../../../../assets/js/components/util';
+import { SocketioService } from 'src/app/pages/JeeAccount/_core/services/socketio.service';
 
 @Component({
   selector: 'app-topbar',
   templateUrl: './topbar.component.html',
   styleUrls: ['./topbar.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TopbarComponent implements OnInit, AfterViewInit {
   user$: Observable<UserModel>;
@@ -32,37 +34,45 @@ export class TopbarComponent implements OnInit, AfterViewInit {
   extrasLanguagesDisplay: boolean;
   extrasUserDisplay: boolean;
   extrasUserLayout: 'offcanvas' | 'dropdown';
-
-  constructor(private layout: LayoutService, private auth: AuthService) {
-    this.user$ = this.auth.getAuthFromLocalStorage();
-  }
+  numberInfo: number;
+  fullname: string = '';
+  constructor(
+    private layout: LayoutService,
+    private auth: AuthService,
+    private changeDetectorRefs: ChangeDetectorRef,
+    private socketService: SocketioService
+  ) {}
 
   ngOnInit(): void {
+    this.user$ = this.auth.getAuthFromLocalStorage();
+    this.fullname = this.user$['user']['customData']['personalInfo']['Fullname'];
     // topbar extras
     this.extraSearchDisplay = this.layout.getProp('extras.search.display');
     this.extrasSearchLayout = this.layout.getProp('extras.search.layout');
-    this.extrasNotificationsDisplay = this.layout.getProp(
-      'extras.notifications.display'
-    );
-    this.extrasNotificationsLayout = this.layout.getProp(
-      'extras.notifications.layout'
-    );
-    this.extrasQuickActionsDisplay = this.layout.getProp(
-      'extras.quickActions.display'
-    );
-    this.extrasQuickActionsLayout = this.layout.getProp(
-      'extras.quickActions.layout'
-    );
+    this.extrasNotificationsDisplay = this.layout.getProp('extras.notifications.display');
+    this.extrasNotificationsLayout = this.layout.getProp('extras.notifications.layout');
+    this.extrasQuickActionsDisplay = this.layout.getProp('extras.quickActions.display');
+    this.extrasQuickActionsLayout = this.layout.getProp('extras.quickActions.layout');
     this.extrasCartDisplay = this.layout.getProp('extras.cart.display');
     this.extrasCartLayout = this.layout.getProp('extras.cart.layout');
-    this.extrasLanguagesDisplay = this.layout.getProp(
-      'extras.languages.display'
-    );
+    this.extrasLanguagesDisplay = this.layout.getProp('extras.languages.display');
     this.extrasUserDisplay = this.layout.getProp('extras.user.display');
     this.extrasUserLayout = this.layout.getProp('extras.user.layout');
-    this.extrasQuickPanelDisplay = this.layout.getProp(
-      'extras.quickPanel.display'
-    );
+    this.extrasQuickPanelDisplay = this.layout.getProp('extras.quickPanel.display');
+  }
+  updateNumberNoti(value) {
+    if (value == true) {
+      this.getNotiUnread();
+    }
+  }
+
+  getNotiUnread() {
+    this.socketService.getNotificationList('unread').subscribe((res) => {
+      let dem = 0;
+      res.forEach((x) => dem++);
+      this.numberInfo = dem;
+      this.changeDetectorRefs.detectChanges();
+    });
   }
 
   ngAfterViewInit(): void {
@@ -73,18 +83,12 @@ export class TopbarComponent implements OnInit, AfterViewInit {
         KTLayoutQuickSearch.init('kt_quick_search');
       }
 
-      if (
-        this.extrasNotificationsDisplay &&
-        this.extrasNotificationsLayout === 'offcanvas'
-      ) {
+      if (this.extrasNotificationsDisplay && this.extrasNotificationsLayout === 'offcanvas') {
         // Init Quick Notifications Offcanvas Panel
         KTLayoutQuickNotifications.init('kt_quick_notifications');
       }
 
-      if (
-        this.extrasQuickActionsDisplay &&
-        this.extrasQuickActionsLayout === 'offcanvas'
-      ) {
+      if (this.extrasQuickActionsDisplay && this.extrasQuickActionsLayout === 'offcanvas') {
         // Init Quick Actions Offcanvas Panel
         KTLayoutQuickActions.init('kt_quick_actions');
       }

@@ -60,6 +60,10 @@ export const locale = {
         INVALID_FIELD: 'Field is not valid',
       },
     },
+    Common: {
+      notify_titile: 'Thông báo',
+      xinchao: 'Xin chào',
+    },
     ECOMMERCE: {
       COMMON: {
         SELECTED_RECORDS_COUNT: 'Selected records count: ',
@@ -142,6 +146,18 @@ export const locale = {
       UNGDUNGDUOCSUDUNG: 'Ứng dụng được sử dụng',
       DANHSACHNGUOIDUNG: 'Danh sách người dùng',
       NHANVIEN: 'Nhân viên',
+      QUANLYTRUCTIEP: 'Quản lý trực tiếp',
+      KHONGTIMTHAY: 'Không tìm thấy',
+      THEMQUANLYTRUCTIEP: 'Thêm quản lý trực tiếp',
+    },
+    jeechat: {
+      send: 'Gửi',
+      sendmess: 'Gửi tin nhắn riêng',
+      taonhom: 'Tạo nhóm',
+      xemchitiet: 'Xem chi tiết tin nhắn',
+      tao: 'Tạo',
+      tennhom: 'Tên nhóm',
+      moithanhvien: 'Mời thành viên',
     },
   },
 };

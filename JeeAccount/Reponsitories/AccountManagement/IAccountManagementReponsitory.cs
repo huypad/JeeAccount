@@ -9,31 +9,33 @@ namespace JeeAccount.Reponsitories
 {
     public interface IAccountManagementReponsitory
     {
-        Task<DataTable> GetListUsernameByCustormerIDAsync(long custormerID);
+        #region giao diện JeeAccount  Management/AccountManagement
 
-        Task<DataTable> GetAllAccountListAsync(long custormerID);
+        Task<IEnumerable<AccountManagementDTO>> GetListAccountManagementAsync(long customerID, string where, string orderby);
 
-        Task<IEnumerable<UserNameDTO>> GetListUsernameByAppcode(long custormerID, string appcode);
+        #endregion giao diện JeeAccount  Management/AccountManagement
 
-        Task<IEnumerable<AdminModel>> GetListAdminsByCustomerID(long customerID);
+        Task<IEnumerable<AccUsernameModel>> GetListUsernameByCustormerIDAsync(long custormerID);
 
-        Task<long> GetCustormerIDByUsername(string username);
+        Task<IEnumerable<UserNameDTO>> GetListUsernameByAppcodeAsync(long custormerID, string appcode);
 
-        Task<long> GetCustormerIDByUserID(long UserID);
+        Task<IEnumerable<AdminModel>> GetListAdminsByCustomerIDAsync(long customerID);
 
-        Task<InfoUserDTO> GetInfoByUsername(string username);
+        Task<long> GetCustormerIDByUsernameAsync(string username);
 
-        Task<InfoCustomerDTO> GetInfoByCustomerID(long customerID);
+        Task<long> GetCustormerIDByUserIDAsync(long UserID);
 
-        Task<IEnumerable<AppListDTO>> GetListAppByCustomerID(long customerID);
+        Task<InfoUserDTO> GetInfoByUsernameAsync(string username);
 
-        Task<IEnumerable<AppListDTO>> GetListAppByUserID(long UserID, long CustomerID = 0);
+        Task<InfoCustomerDTO> GetInfoByCustomerIDAsync(long customerID);
 
-        Task<IEnumerable<AppListDTO>> GetListInfoAppByCustomerID(long customerID);
+        Task<IEnumerable<AppListDTO>> GetListAppByCustomerIDAsync(long customerID);
 
-        Task<IEnumerable<InfoAdminDTO>> GetInfoAdminAccountByCustomerID(long customerID);
+        Task<IEnumerable<AppListDTO>> GetListAppByUserIDAsync(long UserID, long CustomerID = 0);
 
-        Task<IEnumerable<AccountManagementDTO>> GetListAccountManagement(long customerID, string where, string orderby);
+        Task<IEnumerable<AppListDTO>> GetListInfoAppByCustomerIDAsync(long customerID);
+
+        Task<IEnumerable<InfoAdminDTO>> GetInfoAdminAccountByCustomerIDAsync(long customerID);
 
         ReturnSqlModel ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin);
 
@@ -67,6 +69,6 @@ namespace JeeAccount.Reponsitories
 
         List<LoginAccountModel> GetListLogin(DpsConnection cnn);
 
-        Task<IEnumerable<CustomerAppDTO>> GetListCustomerAppByCustomerIDFromAccount(long customerID);
+        Task<IEnumerable<CustomerAppDTO>> GetListCustomerAppByCustomerIDFromAccountAsync(long customerID);
     }
 }

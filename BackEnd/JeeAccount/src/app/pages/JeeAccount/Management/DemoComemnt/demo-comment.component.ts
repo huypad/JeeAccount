@@ -20,22 +20,18 @@ export class DemoCommentComponent implements OnInit, OnDestroy {
   constructor(public commentService: DemoCommentService) { }
 
   ngOnInit() {
-    this.commentService.getImgUrls(1).subscribe((x) => {
-      this.imgsurl = x;
-      this.commentService.getTopicObjectIDByComponentName(this.componentName).pipe(
-        tap((res) => {
-          this.topicObjectID$.next(res);
-        }),
-        catchError(err => {
-          console.log(err);
-          return of();
-        }),
-        finalize(() => { }),
-        share(),
-        takeUntil(this.onDestroy),
-      ).subscribe();
-    });
-
+    this.commentService.getTopicObjectIDByComponentName(this.componentName).pipe(
+      tap((res) => {
+        this.topicObjectID$.next(res);
+      }),
+      catchError(err => {
+        console.log(err);
+        return of();
+      }),
+      finalize(() => { }),
+      share(),
+      takeUntil(this.onDestroy),
+    ).subscribe();
   }
 
   ngOnDestroy(): void {

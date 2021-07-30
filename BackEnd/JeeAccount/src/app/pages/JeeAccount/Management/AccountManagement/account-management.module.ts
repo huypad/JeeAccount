@@ -46,4 +46,4 @@ const routes: Routes = [
     AccountManagementEditNoJeeHRDialogComponent,
   ],
 })
-export class AccountManagementModule { }
+export class AccountManagementModule {}

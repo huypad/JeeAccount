@@ -165,7 +165,7 @@ export class JeeCommentService {
 
   public postCommentModel(model: PostCommentModel): Observable<any> {
     const httpHeaders = this.httpUtils.getHTTPHeaders();
-    const url = API_JEEACCOUNT_URL + `/comments/postcomment`;
+    const url = API_JEECOMMENT_URL + `/comments/postcomment`;
     return this.http.post<any>(url, model, {
       headers: httpHeaders
     });
@@ -173,7 +173,7 @@ export class JeeCommentService {
 
   public postReactionCommentModel(model: ReactionCommentModel): Observable<any> {
     const httpHeaders = this.httpUtils.getHTTPHeaders();
-    const url = API_JEEACCOUNT_URL + `/comments/postReactionComment`;
+    const url = API_JEECOMMENT_URL + `/comments/postReactionComment`;
     return this.http.post<any>(url, model, {
       headers: httpHeaders
     });

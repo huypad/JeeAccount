@@ -25,22 +25,49 @@ namespace JeeAccount.Reponsitories
             _connectionString = configuration.GetValue<string>("AppConfig:Connection");
         }
 
-        public async Task<DataTable> GetAllAccountListAsync(long custormerID)
+        #region giao diện JeeAccount  Management/AccountManagement
+
+        public async Task<IEnumerable<AccountManagementDTO>> GetListAccountManagementAsync(long customerID, string where = "", string orderBy = "")
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
-            Conds.Add("CustomerID", custormerID);
+            Conds.Add("CustomerID", customerID);
 
-            string sql = @"select *
-                           from AccountList where CustomerID=@CustomerID";
+            string where_order = "";
+            if (!string.IsNullOrEmpty(where)) where_order += $"where {where}";
+            if (!string.IsNullOrEmpty(orderBy)) where_order += $"order by {orderBy}";
+
+            string sql = @$"select LastName + ' ' + FirstName as FullName, FirstName as Name,
+                        AvartarImgURL as Avatar, Jobtitle, Department, Username, DirectManager
+                        , IsActive, Note, email, cocauid from AccountList {where_order}";
+
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = cnn.CreateDataTable(sql, Conds);
-                return await Task.FromResult(dt).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
+
+                var result = dt.AsEnumerable().Select(row => new AccountManagementDTO
+                {
+                    Avatar = row["Avatar"].ToString(),
+                    Fullname = row["Fullname"].ToString(),
+                    Jobtitle = row["Jobtitle"].ToString(),
+                    Name = row["Name"].ToString(),
+                    DirectManager = row["DirectManager"].ToString(),
+                    IsActive = Convert.ToBoolean((bool)row["IsActive"]),
+                    Note = row["Note"].ToString(),
+                    Departmemt = row["Department"].ToString(),
+                    Username = row["Username"].ToString(),
+                    Email = row["Email"].ToString(),
+                    StructureID = row["cocauid"].ToString(),
+                    BgColor = GeneralService.GetColorNameUser(row["Name"].ToString().Substring(0, 1))
+                });
+
+                return result;
             }
         }
 
-        public async Task<DataTable> GetListUsernameByCustormerIDAsync(long custormerID)
+        #endregion giao diện JeeAccount  Management/AccountManagement
+
+        public async Task<IEnumerable<AccUsernameModel>> GetListUsernameByCustormerIDAsync(long custormerID)
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
@@ -52,12 +79,30 @@ namespace JeeAccount.Reponsitories
                            from AccountList where CustomerID=@CustomerID";
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
-                return dt;
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
+
+                return dt.AsEnumerable().Select(row => new AccUsernameModel
+                {
+                    UserId = GeneralService.ConvertToLong(row["UserID"]),
+                    Username = row["Username"].ToString(),
+                    FullName = row["FullName"].ToString(),
+                    AvartarImgURL = row["Avatar"].ToString(),
+                    CustomerID = GeneralService.ConvertToLong(row["CustomerID"]),
+                    Department = row["Department"].ToString(),
+                    PhoneNumber = row["PhoneNumber"].ToString(),
+                    Jobtitle = row["Jobtitle"].ToString(),
+                    Email = row["email"].ToString(),
+                    StructureID = row["cocauid"].ToString(),
+                    ChucVuID = row["ChucVuID"].ToString(),
+                    NgaySinh = GeneralService.ConvertDateToString(row["Birthday"]),
+                    BgColor = GeneralService.GetColorNameUser(row["Name"].ToString().Substring(0, 1)),
+                    FirstName = GeneralService.getFirstname(row["FullName"].ToString()),
+                    LastName = GeneralService.getlastname(row["FullName"].ToString())
+                });
             }
         }
 
-        public async Task<IEnumerable<UserNameDTO>> GetListUsernameByAppcode(long custormerID, string appcode)
+        public async Task<IEnumerable<UserNameDTO>> GetListUsernameByAppcodeAsync(long custormerID, string appcode)
         {
             DataTable dt = new DataTable();
             string sql = $@"select AccountList.UserID, AccountList.Username from AccountList
@@ -73,11 +118,11 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                     UserId = Int32.Parse(row["UserID"].ToString()),
                     Username = row["Username"].ToString()
                 });
-                return await Task.FromResult(result);
+                return result;
             }
         }
 
-        public async Task<IEnumerable<AdminModel>> GetListAdminsByCustomerID(long customerID)
+        public async Task<IEnumerable<AdminModel>> GetListAdminsByCustomerIDAsync(long customerID)
         {
             DataTable dt = new DataTable();
 
@@ -90,18 +135,18 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null) and IsAdmin
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = cnn.CreateDataTable(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 var result = dt.AsEnumerable().Select(row => new AdminModel
                 {
                     UserId = Int32.Parse(row["UserID"].ToString()),
                     Username = row["Username"].ToString(),
                     Email = row["email"].ToString(),
                 });
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return result;
             }
         }
 
-        public async Task<long> GetCustormerIDByUsername(string username)
+        public async Task<long> GetCustormerIDByUsernameAsync(string username)
         {
             DataTable dt = new DataTable();
 
@@ -112,16 +157,16 @@ where Username = @Username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = cnn.CreateDataTable(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 if (dt.Rows.Count == 0)
                     return 0;
                 var result = dt.AsEnumerable().Select(row => long.Parse(row["CustomerID"].ToString())).SingleOrDefault();
 
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return result;
             }
         }
 
-        public async Task<InfoUserDTO> GetInfoByUsername(string username)
+        public async Task<InfoUserDTO> GetInfoByUsernameAsync(string username)
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
@@ -135,7 +180,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = cnn.CreateDataTable(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 if (dt.Rows.Count == 0)
                     return new InfoUserDTO();
                 var result = new InfoUserDTO
@@ -154,11 +199,11 @@ where Username = @Username and (Disable != 1 or Disable is null)";
                     NgaySinh = (dt.Rows[0]["Birthday"] != DBNull.Value) ? ((DateTime)dt.Rows[0]["Birthday"]).ToString("dd/MM/yyyy") : "",
                 };
 
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return result;
             }
         }
 
-        public async Task<InfoCustomerDTO> GetInfoByCustomerID(long customerID)
+        public async Task<InfoCustomerDTO> GetInfoByCustomerIDAsync(long customerID)
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
@@ -170,7 +215,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = cnn.CreateDataTable(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 if (dt.Rows.Count == 0)
                     return new InfoCustomerDTO();
                 var result = new InfoCustomerDTO
@@ -183,11 +228,11 @@ where Username = @Username and (Disable != 1 or Disable is null)";
                     TaxCode = dt.Rows[0]["TaxCode"].ToString()
                 };
 
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return result;
             }
         }
 
-        public async Task<IEnumerable<AppListDTO>> GetListAppByCustomerID(long customerID)
+        public async Task<IEnumerable<AppListDTO>> GetListAppByCustomerIDAsync(long customerID)
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
@@ -199,7 +244,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = cnn.CreateDataTable(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 var result = dt.AsEnumerable().Select(row => new AppListDTO
                 {
                     AppID = Int32.Parse(row["AppID"].ToString()),
@@ -217,11 +262,11 @@ where Username = @Username and (Disable != 1 or Disable is null)";
                     Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
                 });
 
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return result;
             }
         }
 
-        public async Task<IEnumerable<InfoAdminDTO>> GetInfoAdminAccountByCustomerID(long customerID)
+        public async Task<IEnumerable<InfoAdminDTO>> GetInfoAdminAccountByCustomerIDAsync(long customerID)
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
@@ -235,7 +280,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = cnn.CreateDataTable(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
 
                 var result = dt.AsEnumerable().Select(row => new InfoAdminDTO
                 {
@@ -248,45 +293,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
                     Email = row["Email"].ToString(),
                     StructureID = row["cocauid"].ToString(),
                 });
-                return await Task.FromResult(result).ConfigureAwait(false);
-            }
-        }
-
-        public async Task<IEnumerable<AccountManagementDTO>> GetListAccountManagement(long customerID, string where = "", string orderBy = "")
-        {
-            DataTable dt = new DataTable();
-            SqlConditions Conds = new SqlConditions();
-            Conds.Add("CustomerID", customerID);
-
-            string where_order = "";
-            if (!string.IsNullOrEmpty(where)) where_order += $"where {where}";
-            if (!string.IsNullOrEmpty(orderBy)) where_order += $"order by {orderBy}";
-
-            string sql = @$"select LastName + ' ' + FirstName as FullName, FirstName as Name,
-                        AvartarImgURL as Avatar, Jobtitle, Department, Username, DirectManager
-                        , IsActive, Note, email, cocauid from AccountList {where_order}";
-
-            using (DpsConnection cnn = new DpsConnection(_connectionString))
-            {
-                dt = cnn.CreateDataTable(sql, Conds);
-
-                var result = dt.AsEnumerable().Select(row => new AccountManagementDTO
-                {
-                    Avatar = row["Avatar"].ToString(),
-                    Fullname = row["Fullname"].ToString(),
-                    Jobtitle = row["Jobtitle"].ToString(),
-                    Name = row["Name"].ToString(),
-                    DirectManager = row["DirectManager"].ToString(),
-                    IsActive = Convert.ToBoolean((bool)row["IsActive"]),
-                    Note = row["Note"].ToString(),
-                    Departmemt = row["Department"].ToString(),
-                    Username = row["Username"].ToString(),
-                    Email = row["Email"].ToString(),
-                    StructureID = row["cocauid"].ToString(),
-                    BgColor = GeneralService.GetColorNameUser(row["Name"].ToString().Substring(0, 1))
-                });
-
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return result;
             }
         }
 
@@ -588,7 +595,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
             }
         }
 
-        public async Task<IEnumerable<AppListDTO>> GetListAppByUserID(long UserID, long CustomerID = 0)
+        public async Task<IEnumerable<AppListDTO>> GetListAppByUserIDAsync(long UserID, long CustomerID = 0)
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
@@ -608,7 +615,7 @@ join AppList on AppList.AppID = Account_App.AppID";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = cnn.CreateDataTable(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 if (CustomerID > 0)
                 {
                     var result = dt.AsEnumerable().Select(row => new AppListDTO
@@ -628,7 +635,7 @@ join AppList on AppList.AppID = Account_App.AppID";
                         SoLuongNhanSu = (row["SoLuongNhanSu"] != DBNull.Value) ? Int32.Parse(row["SoLuongNhanSu"].ToString()) : 0,
                         IsShowApp = Convert.ToBoolean(row["IsShowApp"])
                     });
-                    return await Task.FromResult(result).ConfigureAwait(false);
+                    return result;
                 }
                 else
                 {
@@ -648,7 +655,7 @@ join AppList on AppList.AppID = Account_App.AppID";
                         Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
                         IsShowApp = Convert.ToBoolean(row["IsShowApp"])
                     });
-                    return await Task.FromResult(result).ConfigureAwait(false);
+                    return result;
                 }
             }
         }
@@ -706,7 +713,7 @@ join AppList on AppList.AppID = Account_App.AppID";
             }).ToList<LoginAccountModel>();
         }
 
-        public async Task<IEnumerable<AppListDTO>> GetListInfoAppByCustomerID(long customerID)
+        public async Task<IEnumerable<AppListDTO>> GetListInfoAppByCustomerIDAsync(long customerID)
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
@@ -718,7 +725,7 @@ join AppList on AppList.AppID = Account_App.AppID";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = cnn.CreateDataTable(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 var result = dt.AsEnumerable().Select(row => new AppListDTO
                 {
                     AppID = Int32.Parse(row["AppID"].ToString()),
@@ -737,11 +744,11 @@ join AppList on AppList.AppID = Account_App.AppID";
                     IsShowApp = Convert.ToBoolean(row["IsShowApp"])
                 });
 
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return result;
             }
         }
 
-        public async Task<IEnumerable<CustomerAppDTO>> GetListCustomerAppByCustomerIDFromAccount(long customerID)
+        public async Task<IEnumerable<CustomerAppDTO>> GetListCustomerAppByCustomerIDFromAccountAsync(long customerID)
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
@@ -753,7 +760,7 @@ join AppList on AppList.AppID = Account_App.AppID";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = cnn.CreateDataTable(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 var result = dt.AsEnumerable().Select(row => new CustomerAppDTO
                 {
                     AppID = Int32.Parse(row["AppID"].ToString()),
@@ -765,11 +772,11 @@ join AppList on AppList.AppID = Account_App.AppID";
                     Status = Int32.Parse(row["Status"].ToString()),
                     AppName = row["AppName"].ToString()
                 });
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return result;
             }
         }
 
-        public async Task<long> GetCustormerIDByUserID(long UserID)
+        public async Task<long> GetCustormerIDByUserIDAsync(long UserID)
         {
             DataTable dt = new DataTable();
 
@@ -784,7 +791,7 @@ join AppList on AppList.AppID = Account_App.AppID";
                     return 0;
                 var result = dt.AsEnumerable().Select(row => long.Parse(row["CustomerID"].ToString())).SingleOrDefault();
 
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return result;
             }
         }
     }

@@ -3,12 +3,12 @@
     <div class="card-title">
       <span class="card-label">{{ 'ACCOUNTMANAGEMENT.DANHSACHNGUOIDUNG' | translate }}</span>
       <!-- begin: Filtration form -->
-      <div class="form-group row">
+      <div class="form-group row" style="width: 484px">
         <div class="col-lg-12" [formGroup]="searchGroup">
           <small class="form-text text-muted"
             ><b>{{ 'SEARCH.SEARCH1' | translate }}</b></small
           >
-          <input type="text" class="form-control" name="searchText" placeholder="" value="" formControlName="searchTerm" />
+          <input type="text" class="form-control" name="searchText" placeholder="" value="" formControlName="keyword" />
         </div>
       </div>
       <!-- end: Filtration form -->
@@ -19,18 +19,6 @@
   </div>
   <!-- body -->
   <div class="card-body">
-    <!-- begin: Filtration form -->
-    <!-- <div class="form form-label-right">
-      <div class="form-group row">
-        <div class="col-lg-6 ml-1" [formGroup]="searchGroup">
-          <small class="form-text text-muted"
-            ><b>{{ 'SEARCH.SEARCH1' | translate }}</b></small
-          >
-          <input type="text" class="form-control" name="searchText" placeholder="" value="" formControlName="searchTerm" />
-        </div>
-      </div>
-    </div> -->
-    <!-- end: Filtration form -->
     <div class="table-responsive angular-bootstrap-table">
       <table
         mat-table
@@ -38,10 +26,10 @@
         [dataSource]="accountManagementService.items$ | async"
       >
         <ng-container matColumnDef="NhanVien">
-          <th *matHeaderCellDef>
+          <th mat-header-cell *matHeaderCellDef>
             <span>{{ 'ACCOUNTMANAGEMENT.NHANVIEN' | translate }}</span>
             <app-sort-icon
-              column="tendoitac"
+              column="nhanvien"
               [activeColumn]="sorting.column"
               [activeDirection]="sorting.direction"
               (sort)="sort($event)"
@@ -70,8 +58,14 @@
           </td>
         </ng-container>
         <ng-container matColumnDef="TenDangNhap">
-          <th *matHeaderCellDef>
+          <th mat-header-cell *matHeaderCellDef>
             <span>Tên đăng nhập</span>
+            <app-sort-icon
+              column="tendangnhap"
+              [activeColumn]="sorting.column"
+              [activeDirection]="sorting.direction"
+              (sort)="sort($event)"
+            ></app-sort-icon>
           </th>
           <td mat-cell *matCellDef="let r">
             <div class>
@@ -81,8 +75,14 @@
         </ng-container>
 
         <ng-container matColumnDef="ChucVu">
-          <th *matHeaderCellDef>
+          <th mat-header-cell *matHeaderCellDef>
             <span>Chức vụ</span>
+            <app-sort-icon
+              column="chucvu"
+              [activeColumn]="sorting.column"
+              [activeDirection]="sorting.direction"
+              (sort)="sort($event)"
+            ></app-sort-icon>
           </th>
           <td mat-cell *matCellDef="let r">
             <span *ngIf="r.Jobtitle != ''">{{ r.Jobtitle }}</span>
@@ -90,7 +90,7 @@
         </ng-container>
 
         <ng-container matColumnDef="QuanLyTrucTiep">
-          <th *matHeaderCellDef style="text-align: center">
+          <th mat-header-cell *matHeaderCellDef style="text-align: center">
             <span>Quản lý trực tiếp</span>
           </th>
           <td mat-cell *matCellDef="let r" style="text-align: center">
@@ -104,8 +104,14 @@
         </ng-container>
 
         <ng-container matColumnDef="TinhTrang">
-          <th *matHeaderCellDef style="text-align: center">
+          <th mat-header-cell *matHeaderCellDef style="text-align: center">
             <span>Tình trạng</span>
+            <app-sort-icon
+              column="tinhtrang"
+              [activeColumn]="sorting.column"
+              [activeDirection]="sorting.direction"
+              (sort)="sort($event)"
+            ></app-sort-icon>
           </th>
           <td mat-cell *matCellDef="let r" style="text-align: center">
             <mat-slide-toggle class="example-margin" (click)="changeTinhTrang(r.Username)" [checked]="r.IsActive"> </mat-slide-toggle>
@@ -113,7 +119,7 @@
         </ng-container>
 
         <ng-container matColumnDef="GhiChu">
-          <th *matHeaderCellDef>
+          <th mat-header-cell *matHeaderCellDef>
             <span>Ghi chú</span>
           </th>
           <td mat-cell *matCellDef="let r">
@@ -122,7 +128,7 @@
         </ng-container>
 
         <ng-container matColumnDef="ThaoTac">
-          <th *matHeaderCellDef style="text-align: center">
+          <th mat-header-cell *matHeaderCellDef style="text-align: center">
             <span>Thao tác</span>
           </th>
           <td mat-cell *matCellDef="let r" style="text-align: center">

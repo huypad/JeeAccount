@@ -105,3 +105,359 @@
   height: 3px;
   width: 100%;
 }
+
+/*font-family*/
+body,
+html {
+  font-family: Roboto, Arial, Helvetica, sans-serif !important;
+}
+
+/*font-family*/
+
+/*--- Dùng để show hide waiting div*/
+
+.nemo-process-waiting {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: grey;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  cursor: wait;
+  opacity: 0.3;
+}
+
+.nemo-process-waiting-loader {
+  position: fixed;
+  top: 45%;
+  left: 50%;
+  z-index: 10000;
+  cursor: wait;
+}
+
+.nemo-show-wait {
+  display: block;
+}
+
+.nemo-hide-wait {
+  display: none;
+}
+
+.pulse-loader:not(:required) {
+  width: 50px;
+  height: 50px;
+  -moz-animation: pulse-loader 0.7s linear infinite alternate;
+  -webkit-animation: pulse-loader 0.7s linear infinite alternate;
+  animation: pulse-loader 0.7s linear infinite alternate;
+  border: 0px solid #ae35e6ec;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+  overflow: hidden;
+  text-indent: 50px;
+}
+
+@-moz-keyframes pulse-loader {
+  0% {
+    -moz-box-shadow: #ae35e6ec 0 0 0px 20px;
+    box-shadow: #ae35e6ec 0 0 0px 20px;
+  }
+
+  40% {
+    -moz-box-shadow: none;
+    box-shadow: none;
+  }
+
+  100% {
+    -moz-box-shadow: #ae35e6ec 0 0 0px 25px inset;
+    box-shadow: #ae35e6ec 0 0 0px 25px inset;
+  }
+}
+
+@-webkit-keyframes pulse-loader {
+  0% {
+    -webkit-box-shadow: #ae35e6ec 0 0 0px 20px;
+    box-shadow: #ae35e6ec 0 0 0px 20px;
+  }
+
+  40% {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
+
+  100% {
+    -webkit-box-shadow: #ae35e6ec 0 0 0px 25px inset;
+    box-shadow: #ae35e6ec 0 0 0px 25px inset;
+  }
+}
+
+@keyframes pulse-loader {
+  0% {
+    -moz-box-shadow: #ae35e6ec 0 0 0px 20px;
+    -webkit-box-shadow: #ae35e6ec 0 0 0px 20px;
+    box-shadow: #ae35e6ec 0 0 0px 20px;
+  }
+
+  40% {
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
+
+  100% {
+    -moz-box-shadow: #ae35e6ec 0 0 0px 25px inset;
+    -webkit-box-shadow: #ae35e6ec 0 0 0px 25px inset;
+    box-shadow: #ae35e6ec 0 0 0px 25px inset;
+  }
+}
+
+/*Kết thúc waiting*/
+
+/* content  */
+.main_center {
+  background-color: #ffffff;
+  height: 100%;
+}
+
+//==============================STYLE SCROLL BAR creator: DuLam=======================
+/*
+ * Scrollbar rail styles
+ */
+.ps {
+  overflow: hidden !important;
+  overflow-anchor: none;
+  -ms-overflow-style: none;
+  touch-action: auto;
+  -ms-touch-action: auto;
+}
+
+.ps__rail-x {
+  display: none;
+  opacity: 0;
+  transition: background-color 0.2s linear, opacity 0.2s linear;
+  -webkit-transition: background-color 0.2s linear, opacity 0.2s linear;
+  height: 15px;
+  /* there must be 'bottom' or 'top' for ps__rail-x */
+  bottom: 0px;
+  /* please don't change 'position' */
+  position: absolute;
+}
+
+.ps__rail-y {
+  display: none;
+  opacity: 0;
+  transition: background-color 0.2s linear, opacity 0.2s linear;
+  -webkit-transition: background-color 0.2s linear, opacity 0.2s linear;
+  width: 15px;
+  /* there must be 'right' or 'left' for ps__rail-y */
+  right: 0;
+  /* please don't change 'position' */
+  position: absolute;
+}
+
+.ps--active-x > .ps__rail-x,
+.ps--active-y > .ps__rail-y {
+  left: auto !important;
+  display: block;
+  background-color: transparent;
+}
+
+.ps:hover > .ps__rail-x,
+.ps:hover > .ps__rail-y,
+.ps--focus > .ps__rail-x,
+.ps--focus > .ps__rail-y,
+.ps--scrolling-x > .ps__rail-x,
+.ps--scrolling-y > .ps__rail-y {
+  opacity: 0.6;
+}
+
+.ps .ps__rail-x:hover,
+.ps .ps__rail-y:hover,
+.ps .ps__rail-x:focus,
+.ps .ps__rail-y:focus,
+.ps .ps__rail-x.ps--clicking,
+.ps .ps__rail-y.ps--clicking {
+  background-color: #eee;
+  opacity: 0.9;
+}
+
+/*
+   * Scrollbar thumb styles
+   */
+.ps__thumb-x {
+  background-color: #aaa;
+  border-radius: 6px;
+  transition: background-color 0.2s linear, height 0.2s ease-in-out;
+  -webkit-transition: background-color 0.2s linear, height 0.2s ease-in-out;
+  height: 6px;
+  /* there must be 'bottom' for ps__thumb-x */
+  bottom: 2px;
+  /* please don't change 'position' */
+  position: absolute;
+}
+
+.ps__thumb-y {
+  background-color: #aaa;
+  border-radius: 6px;
+  transition: background-color 0.2s linear, width 0.2s ease-in-out;
+  -webkit-transition: background-color 0.2s linear, width 0.2s ease-in-out;
+  width: 6px;
+  /* there must be 'right' for ps__thumb-y */
+  right: 2px;
+  /* please don't change 'position' */
+  position: absolute;
+}
+
+.ps__rail-x:hover > .ps__thumb-x,
+.ps__rail-x:focus > .ps__thumb-x,
+.ps__rail-x.ps--clicking .ps__thumb-x {
+  background-color: #999;
+  height: 11px;
+}
+
+.ps__rail-y:hover > .ps__thumb-y,
+.ps__rail-y:focus > .ps__thumb-y,
+.ps__rail-y.ps--clicking .ps__thumb-y {
+  background-color: #999;
+  width: 11px;
+}
+// chỉnh sủa checkin
+//==============================END SCROLL BAR=======================
+//=================Kích thước thanh scroll==============
+@media only screen and (min-width: 1028px) {
+  ::-webkit-scrollbar {
+    width: 5px;
+    opacity: 0;
+    height: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    --webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    --webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
+  }
+}
+
+// style card-wiget
+// .style-wiget{
+//   position: absolute;
+//   left: 0;
+//   right: 0;
+//   bottom: 0;
+//   top: 76px;
+//   overflow: auto;
+//   &.card{
+//     padding: 5px;
+//     padding-top: 0;
+//   }
+// }
+
+.style-wiget-activity {
+  position: absolute;
+  right: 0;
+  left: 0;
+  padding: 20px;
+  padding-top: 0;
+  top: 0;
+  bottom: 0;
+  top: 76px;
+}
+
+//===========Css mat-menu========================
+.mat-menu-panel {
+  min-height: 0 !important;
+}
+.mat-menu-item {
+  line-height: 10px !important;
+  height: 30px !important;
+}
+.mat-menu-content {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+//color overdue
+.-red-bg {
+  color: #c34343;
+  background-color: #ffeeee;
+}
+
+.crepeated-active {
+  font-size: 30px;
+  text-align: center;
+}
+
+.btn-close-container {
+  text-align: right;
+  padding-right: 20px;
+}
+
+.btn-close-container .btn-close {
+  position: absolute;
+  margin-top: -20px;
+  z-index: 2;
+}
+
+.btn-close-container .btn-close .mat-icon {
+  height: auto;
+  width: auto;
+}
+
+.btn-trolai {
+  background-color: #aeaeae !important;
+  color: #f4f4f4;
+}
+
+.btn-luudong {
+  background-color: #77a942;
+  color: #f4f4f4;
+  border-color: #77a942;
+}
+
+.btn-themmoi {
+  color: #f4f4f4;
+  background-color: #77a942;
+  border-color: #77a942;
+}
+
+.btn-luutieptuc {
+  color: #f4f4f4;
+  background-color: #1863ad;
+  border-color: #1863ad;
+}
+
+.btn-luuthietlap {
+  color: #f4f4f4;
+  background-color: #1863ad;
+  border-color: #1863ad;
+}
+
+// custom css from bootstrap
+.card-header {
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 0;
+  background-color: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+.card-footer {
+  padding: 0.75rem 1.25rem;
+  background-color: rgba(0, 0, 0, 0.03);
+  border-top: 1px solid rgba(0, 0, 0, 0.125);
+}
+.user {
+  overflow: hidden;
+  float: left;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+  margin-left: -8px;
+  background: rgba(0, 0, 0, 0.1);
+  border: 2px solid #f3f3f3;
+}

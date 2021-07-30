@@ -86,6 +86,7 @@ export class JeeCommentComponent implements OnInit {
           }
         }),
         catchError(err => {
+          console.log(err);
           this._errorMessage$.next(err);
           return of();
         }),
