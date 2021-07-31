@@ -41,6 +41,15 @@
             ></app-sort-icon>
           </th>
           <th>
+            <span>{{ 'ACCOUNTMANAGEMENT.PHONGBAN' | translate }}</span>
+            <app-sort-icon
+              column="phongban"
+              [activeColumn]="sorting.column"
+              [activeDirection]="sorting.direction"
+              (sort)="sort($event)"
+            ></app-sort-icon>
+          </th>
+          <th>
             <span>{{ 'COMMOM.CHUCVU' | translate }}</span>
             <app-sort-icon
               column="chucvu"
@@ -73,10 +82,10 @@
             <td class="pl-8">
               <div>
                 <div class="row" (click)="hiddenfileinput.click()" style="cursor: pointer">
-                  <ngx-avatar [size]="40" src="{{ r.Avatar }}" *ngIf="r.Avatar"></ngx-avatar>
-                  <ngx-avatar [size]="40" [name]="r.Name" bgColor="{{ r.BgColor }}" *ngIf="!r.Avatar"></ngx-avatar>
+                  <ngx-avatar [size]="40" src="{{ r.AvartarImgURL }}" *ngIf="r"></ngx-avatar>
+                  <ngx-avatar [size]="40" [name]="r.FirstName" bgColor="{{ r.BgColor }}" *ngIf="!r.AvartarImgURL"></ngx-avatar>
                   <span class="pl-3" style="align-self: center">
-                    {{ r.Fullname }}
+                    {{ r.FullName }}
                   </span>
                 </div>
               </div>
@@ -97,6 +106,11 @@
               </div>
             </td>
             <td>
+              <div>
+                <span>{{ r.Department }}</span>
+              </div>
+            </td>
+            <td>
               <span>{{ r.Jobtitle }}</span>
             </td>
             <td>
@@ -108,7 +122,7 @@
               </div>
             </td>
             <td>
-              <mat-slide-toggle class="example-margin" (click)="changeTinhTrang(r.Username)" [checked]="r.IsActive"> </mat-slide-toggle>
+              <mat-slide-toggle (click)="changeTinhTrang(r.Username)" [checked]="r.IsActive"> </mat-slide-toggle>
             </td>
             <td>
               <span>{{ r.Note }}</span>

@@ -43,7 +43,7 @@ export class MessengerComponent implements OnInit, OnDestroy, OnChanges {
   listDanhBa: any[] = [];
   listmember: any[] = [];
   list_userchat: any[] = [];
-  @Input() PData: number;
+  @Input() PData: any;
   propChanges: any;
   public searchControl: FormControl = new FormControl();
   public filteredGroups: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);

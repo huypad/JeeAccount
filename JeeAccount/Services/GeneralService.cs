@@ -236,6 +236,99 @@ namespace JeeAccount.Services
             }
         }
 
+        public static List<long> GetLstCustomerid(string connectionString)
+        {
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                var ListCustomerid = new List<long>();
+                string sql = $"select RowID from CustomerList where RowID > 0";
+                DataTable dt = new DataTable();
+                dt = cnn.CreateDataTable(sql);
+                if (dt.Rows.Count == 0) return null;
+                foreach (DataRow dr in dt.Rows)
+                {
+                    ListCustomerid.Add(ConvertToLong(dr["RowID"]));
+                }
+                return ListCustomerid;
+            }
+        }
+
+        public static List<long> GetLstCustomeridCnn(DpsConnection cnn)
+        {
+            var ListCustomerid = new List<long>();
+            string sql = $"select RowID from CustomerList where RowID > 0";
+            DataTable dt = new DataTable();
+            dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count == 0) return null;
+            foreach (DataRow dr in dt.Rows)
+            {
+                ListCustomerid.Add(ConvertToLong(dr["RowID"]));
+            }
+            return ListCustomerid;
+        }
+
+        public static List<long> GetLstUserIDByCustomerid(string connectionString, long customerid)
+        {
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                var ListCustomerid = new List<long>();
+                string sql = $"select UserID from AccountList where CustomerID = {customerid}";
+                DataTable dt = new DataTable();
+                dt = cnn.CreateDataTable(sql);
+                if (dt.Rows.Count == 0) return null;
+                foreach (DataRow dr in dt.Rows)
+                {
+                    ListCustomerid.Add(ConvertToLong(dr["UserID"]));
+                }
+                return ListCustomerid;
+            }
+        }
+
+        public static List<long> GetLstUserIDByCustomeridCnn(DpsConnection cnn, long customerid)
+        {
+            var ListCustomerid = new List<long>();
+            string sql = $"select UserID from AccountList where CustomerID = {customerid}";
+            DataTable dt = new DataTable();
+            dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count == 0) return null;
+            foreach (DataRow dr in dt.Rows)
+            {
+                ListCustomerid.Add(ConvertToLong(dr["UserID"]));
+            }
+            return ListCustomerid;
+        }
+
+        public static List<string> GetLstUsernameByCustomerid(string connectionString, long customerid)
+        {
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                var lst = new List<string>();
+                string sql = $"select Username from AccountList where CustomerID = {customerid}";
+                DataTable dt = new DataTable();
+                dt = cnn.CreateDataTable(sql);
+                if (dt.Rows.Count == 0) return null;
+                foreach (DataRow dr in dt.Rows)
+                {
+                    lst.Add(dr["Username"].ToString());
+                }
+                return lst;
+            }
+        }
+
+        public static List<string> GetLstUsernameByCustomeridCnn(DpsConnection cnn, long customerid)
+        {
+            var lst = new List<string>();
+            string sql = $"select Username from AccountList where CustomerID = {customerid}";
+            DataTable dt = new DataTable();
+            dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count == 0) return null;
+            foreach (DataRow dr in dt.Rows)
+            {
+                lst.Add(dr["Username"].ToString());
+            }
+            return lst;
+        }
+
         public static List<T> ConvertDataTableToList<T>(this DataTable dt)
         {
             List<T> data = new List<T>();

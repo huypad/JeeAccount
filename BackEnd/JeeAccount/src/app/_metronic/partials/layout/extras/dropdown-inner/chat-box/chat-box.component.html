@@ -47,7 +47,7 @@
   <div style="padding: 5px" *ngIf="user.user.isGroup" class="card-header">
     <div class="d-flex">
       <div class="avatar-group">
-        <div *ngFor="let mb of user.user.ListMember | slice: 0:4; let i = index">
+        <div *ngFor="let mb of user.user.ListMember.slice(0,4); let i = index">
           <div *ngFor="let it of mb.InfoMemberUser">
             <div *ngIf="i >= 0 && i < 3">
               <ngx-avatar [size]="25" [name]="it.Fullname.slice(0, 1)" bgColor="{{ it.BgColor }}" *ngIf="!it.Avatar"></ngx-avatar>
@@ -93,7 +93,7 @@
         itemSize="30"
         style="height: 350px"
         ngx-auto-scroll
-        lock-y-offset="10"
+        [lock-y-offset]="10"
         observe-attributes
       >
         <ul class="chat chat-frame">

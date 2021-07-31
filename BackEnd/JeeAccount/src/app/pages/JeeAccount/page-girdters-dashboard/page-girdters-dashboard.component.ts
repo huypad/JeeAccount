@@ -87,7 +87,7 @@ export class PageGidtersDashboardComponent implements OnInit {
     this.options.api.optionsChanged();
   }
 
-  getInput(wiget: Widget): any {
+  getInput(wiget: any): any {
     const inputs = {
       widget: wiget,
       resizeEvent: this.resizeEvent,

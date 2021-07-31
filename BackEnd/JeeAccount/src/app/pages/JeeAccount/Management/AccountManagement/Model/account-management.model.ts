@@ -1,16 +1,27 @@
 export class AccountManagementDTO {
-  fullname: string;
-  name: string;
-  avatar: string;
-  jobtitle: string;
-  departmemt: string;
-  directManager: string;
-  isActive: boolean;
-  note: string;
-  username: string;
-  email: string;
-  structureid: string;
-  bgcolor: string;
+  UserId: number;
+  Username: string;
+  FullName: string;
+  AvartarImgURL: string;
+  CustomerID: number;
+  PhoneNumber: string;
+  Email: string;
+  Jobtitle: string;
+  JobtitleID: number;
+  NgaySinh: string;
+  BgColor: string;
+  FirstName: string;
+  LastName: string;
+  Department: string;
+  DepartmentID: number;
+  ChucVuID: string;
+  StructureID: string;
+  DirectManager: string;
+  DirectManagerUserID: number;
+  DirectManagerUsername: string;
+  IsAdmin: boolean;
+  IsActive: boolean;
+  Note: string;
 }
 
 export interface AppListDTO {

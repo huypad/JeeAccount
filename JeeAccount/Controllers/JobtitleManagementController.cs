@@ -1,7 +1,7 @@
 ﻿using JeeAccount.Classes;
 using JeeAccount.Models.Common;
-using JeeAccount.Models.DepartmentManagement;
-using JeeAccount.Reponsitories;
+using JeeAccount.Models.JobtitleManagement;
+using JeeAccount.Reponsitories.JobtitleManagement;
 using JeeAccount.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -12,23 +12,23 @@ using System.Threading.Tasks;
 namespace JeeAccount.Controllers
 {
     [EnableCors("AllowOrigin")]
-    [Route("api/accountdepartmentmanagement")]
+    [Route("api/jobtitlemanagement")]
     [ApiController]
-    public class DepartmentManagementController : ControllerBase
+    public class JobtitleManagementController : ControllerBase
     {
         private readonly IConfiguration _config;
-        private readonly IDepartmentManagementReponsitory _reponsitory;
+        private readonly IJobtitleManagementReponsitory _reponsitory;
         private readonly string _connectionString;
 
-        public DepartmentManagementController(IConfiguration configuration, IDepartmentManagementReponsitory reponsitory)
+        public JobtitleManagementController(IConfiguration configuration, IJobtitleManagementReponsitory reponsitory)
         {
             _config = configuration;
             _reponsitory = reponsitory;
             _connectionString = configuration.GetValue<string>("AppConfig:Connection");
         }
 
-        [HttpGet("GetListDepartment")]
-        public async Task<object> GetListDepartment([FromQuery] QueryParams query)
+        [HttpGet("GetListJobtitle")]
+        public async Task<object> GetListJobtitle([FromQuery] QueryParams query)
         {
             try
             {
@@ -38,7 +38,7 @@ namespace JeeAccount.Controllers
                     return JsonResultCommon.BatBuoc("Đăng nhập");
                 }
 
-                var depart = await _reponsitory.GetListDepartment(customData.JeeAccount.CustomerID);
+                var depart = await _reponsitory.GetListJobtitleAsync(customData.JeeAccount.CustomerID);
                 return JsonResultCommon.ThanhCong(depart);
             }
             catch (Exception ex)
@@ -47,8 +47,8 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpPost("CreateDepartment")]
-        public object CreateDepartment(DepartmentModel depart)
+        [HttpPost("CreateJobtitle")]
+        public object CreateJobtitle(JobtitleModel depart)
         {
             try
             {
@@ -59,7 +59,7 @@ namespace JeeAccount.Controllers
                 }
 
                 var username = GeneralService.GetUsernameByUserID(_connectionString, customData.JeeAccount.UserID.ToString());
-                _reponsitory.CreateDepartment(depart, customData.JeeAccount.CustomerID, username.ToString());
+                _reponsitory.CreateJobtitle(depart, customData.JeeAccount.CustomerID, username.ToString());
 
                 return JsonResultCommon.ThanhCong(depart);
             }
@@ -70,7 +70,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpPost("ChangeTinhTrang")]
-        public async Task<object> changeTinhTrang(DepChangeTinhTrangModel acc)
+        public async Task<object> changeTinhTrang(JobChangeTinhTrangModel acc)
         {
             try
             {
@@ -103,24 +103,25 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpGet("ApiTaoDefaultDepartment")]
-        public object ApiTaoDefaultDepartment()
+        [HttpGet("ApiTaoDefaultJobtitle")]
+        public object ApiTaoDefaultJobtitle()
         {
             try
             {
-                var depart = new DepartmentModel();
-                depart.DepartmentName = "Phòng kỹ thuật";
                 var lstCustomerid = GeneralService.GetLstCustomerid(_connectionString);
                 foreach (var customerid in lstCustomerid)
                 {
-                    if (!_reponsitory.CheckDepartmentExist(customerid, _connectionString))
+                    if (!_reponsitory.CheckJobtitleExist(customerid, _connectionString))
                     {
+                        if (customerid == 25) continue;
+                        var job1 = new JobtitleModel();
+                        job1.JobtitleName = "Developer";
                         var lstuserid = GeneralService.GetLstUserIDByCustomerid(_connectionString, customerid);
                         if (lstuserid is not null)
                         {
                             var userid = lstuserid[0];
                             var username = GeneralService.GetUsernameByUserID(_connectionString, userid.ToString());
-                            _reponsitory.CreateDepartment(depart, customerid, username.ToString());
+                            _reponsitory.CreateJobtitle(job1, customerid, username.ToString());
                         }
                     }
                 }
@@ -133,20 +134,21 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpGet("ApiGoi1lanSaveDepartmentID")]
-        public object ApiGoi1lanSaveDepartmentID()
+        [HttpGet("ApiGoi1lanSaveJobtitleID")]
+        public object ApiGoi1lanSaveJobtitleID()
         {
             try
             {
-                var depart = new DepartmentModel();
                 var lstCustomerid = GeneralService.GetLstCustomerid(_connectionString);
                 foreach (var customerid in lstCustomerid)
                 {
-                    if (_reponsitory.CheckDepartmentExist(customerid, _connectionString))
+                    if (customerid == 25) continue;
+
+                    if (_reponsitory.CheckJobtitleExist(customerid, _connectionString))
                     {
                         var lst = GeneralService.GetLstUsernameByCustomerid(_connectionString, customerid);
 
-                        _reponsitory.ApiGoi1lanSaveDepartmentID(customerid, lst);
+                        _reponsitory.ApiGoi1lanSaveJobtitleID(customerid, lst);
                     }
                 }
 

@@ -4,12 +4,12 @@ using DPSinfra.Vault;
 using JeeAccount.Reponsitories;
 using JeeAccount.Reponsitories.CustomerManagement;
 using JeeAccount.Reponsitories.DatabaseManagement;
+using JeeAccount.Reponsitories.JobtitleManagement;
 using JeeAccount.Reponsitories.Mail;
 using JeeAccount.Services.AccountManagementService;
 using JeeAccount.Services.CommentService;
 using JeeAccount.Services.CustomerManagementService;
 using JeeAccount.Services.DatabaseManagementService;
-using JeeAccount.Services.DepartmentManagementService;
 using JeeAccount.Services.MailService;
 using JeeAccount.Services.StructureManagementService;
 using JeeCustomer.ConsumerKafka;
@@ -140,6 +140,7 @@ namespace JeeAccount
             services.AddTransient<IMailReponsitory, MailReponsitory>();
             services.AddTransient<IStructureManagementReponsitory, StructureManagementReponsitory>();
             services.AddTransient<IWidgetDashBoardRepository, WidgetDashBoardRepository>();
+            services.AddTransient<IJobtitleManagementReponsitory, JobtitleManagementReponsitory>();
 
             #endregion add Repository
 
@@ -148,7 +149,6 @@ namespace JeeAccount
             services.AddTransient<IAccountManagementService, AccountManagementService>();
             services.AddTransient<ICustomerManagementService, CustomerManagementService>();
             services.AddTransient<IDatabaseManagementService, DatabaseManagementService>();
-            services.AddTransient<IDepartmentManagementService, DepartmentManagementService>();
             services.AddTransient<IMailService, MailService>();
             services.AddTransient<IStructureManagementService, StructureManagementService>();
             services.AddTransient<ICommentService, CommentService>();

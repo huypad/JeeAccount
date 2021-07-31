@@ -34,12 +34,24 @@ namespace JeeAccount.Reponsitories
             Conds.Add("CustomerID", customerID);
 
             string where_order = "";
-            if (!string.IsNullOrEmpty(where)) where_order += $"where {where}";
+            if (!string.IsNullOrEmpty(where))
+            {
+                where += " and AccountList.CustomerID = @CustomerID";
+            }
+            else
+            {
+                where += " AccountList.CustomerID = @CustomerID";
+            }
+            where_order += $"where {where} ";
             if (!string.IsNullOrEmpty(orderBy)) where_order += $"order by {orderBy}";
 
-            string sql = @$"select LastName + ' ' + FirstName as FullName, FirstName as Name,
-                        AvartarImgURL as Avatar, Jobtitle, Department, Username, DirectManager
-                        , IsActive, Note, email, cocauid from AccountList {where_order}";
+            string sql = @$"select UserID, Username, Email, LastName +' ' + FirstName as FullName
+                           , FirstName as Name, AvartarImgURL as Avatar, JobtitleList.JobtitleName, JobtitleID , DepartmentID,
+                           DepartmentList.DepartmentName, PhoneNumber, AccountList.CustomerID, cocauid, ChucVuID, Birthday, DirectManager,
+                           AccountList.IsActive, IsAdmin, AccountList.Note
+                           from AccountList
+left join DepartmentList on DepartmentList.RowID = AccountList.DepartmentID
+left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID { where_order}";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
@@ -47,18 +59,31 @@ namespace JeeAccount.Reponsitories
 
                 var result = dt.AsEnumerable().Select(row => new AccountManagementDTO
                 {
-                    Avatar = row["Avatar"].ToString(),
-                    Fullname = row["Fullname"].ToString(),
-                    Jobtitle = row["Jobtitle"].ToString(),
-                    Name = row["Name"].ToString(),
-                    DirectManager = row["DirectManager"].ToString(),
-                    IsActive = Convert.ToBoolean((bool)row["IsActive"]),
-                    Note = row["Note"].ToString(),
-                    Departmemt = row["Department"].ToString(),
+                    UserId = GeneralService.ConvertToLong(row["UserID"]),
                     Username = row["Username"].ToString(),
+                    FullName = row["FullName"].ToString(),
+                    AvartarImgURL = row["Avatar"].ToString(),
+                    CustomerID = GeneralService.ConvertToLong(row["CustomerID"]),
+                    PhoneNumber = row["PhoneNumber"].ToString(),
                     Email = row["Email"].ToString(),
+                    Jobtitle = row["JobtitleName"].ToString(),
+                    JobtitleID = GeneralService.ConvertToInt(row["JobtitleID"]),
+                    NgaySinh = GeneralService.ConvertDateToString(row["Birthday"]),
+                    BgColor = GeneralService.GetColorNameUser(row["Name"].ToString().Substring(0, 1)),
+                    FirstName = GeneralService.getFirstname(row["FullName"].ToString()),
+                    LastName = GeneralService.getlastname(row["FullName"].ToString()),
+                    Department = row["DepartmentName"].ToString(),
+                    DepartmentID = GeneralService.ConvertToInt(row["DepartmentID"]),
+                    ChucVuID = row["ChucVuID"].ToString(),
                     StructureID = row["cocauid"].ToString(),
-                    BgColor = GeneralService.GetColorNameUser(row["Name"].ToString().Substring(0, 1))
+                    DirectManager = row["DirectManager"] != DBNull.Value ? dt.AsEnumerable().Where(x => x["Username"].ToString() == row["DirectManager"].ToString())
+                                                                .Select(x => x["FullName"].ToString()).SingleOrDefault() : "",
+                    DirectManagerUserID = row["DirectManager"] != DBNull.Value ? dt.AsEnumerable().Where(x => x["Username"].ToString() == row["DirectManager"].ToString())
+                                                                .Select(x => Convert.ToInt64(x["UserID"])).SingleOrDefault() : 0,
+                    DirectManagerUsername = row["DirectManager"].ToString(),
+                    IsActive = Convert.ToBoolean(row["IsActive"]),
+                    IsAdmin = Convert.ToBoolean(row["IsAdmin"]),
+                    Note = row["Note"].ToString()
                 });
 
                 return result;
@@ -67,16 +92,185 @@ namespace JeeAccount.Reponsitories
 
         #endregion giao diện JeeAccount  Management/AccountManagement
 
+        public async Task<string> GetDirectManagerByUsername(string username)
+        {
+            DataTable dt = new DataTable();
+
+            string sql = @$"select DirectManager from AccountList where Username = '{username}'";
+
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                dt = await cnn.CreateDataTableAsync(sql);
+                if (dt.Rows.Count == 0)
+                    return null;
+                var result = dt.AsEnumerable().Select(row => row["DirectManager"].ToString()).SingleOrDefault();
+
+                return await Task.FromResult(result).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<string> GetDirectManagerByUserID(string userid)
+        {
+            DataTable dt = new DataTable();
+
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("userid", userid);
+            string sql = @"select DirectManager from AccountList where userid = @userid";
+
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                if (dt.Rows.Count == 0)
+                    return null;
+                var result = dt.AsEnumerable().Select(row => row["DirectManager"].ToString()).SingleOrDefault();
+
+                return await Task.FromResult(result).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<IEnumerable<UserNameDTO>> GetListJustUsernameAndUserIDByCustormerID(long custormerID)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("CustomerID", custormerID);
+
+            string sql = @"select UserID, Username from AccountList where CustomerID=@CustomerID";
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                dt = cnn.CreateDataTable(sql, Conds);
+                var result = dt.AsEnumerable().Select(row => new UserNameDTO
+                {
+                    UserId = Int32.Parse(row["UserID"].ToString()),
+                    Username = row["Username"].ToString()
+                });
+
+                return await Task.FromResult(result).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<IEnumerable<string>> GetListJustUsernameByCustormerID(long custormerID)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("CustomerID", custormerID);
+
+            string sql = @"select Username from AccountList where CustomerID=@CustomerID";
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                dt = cnn.CreateDataTable(sql, Conds);
+                var result = dt.AsEnumerable().Select(row => row["Username"].ToString());
+
+                return await Task.FromResult(result).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<IEnumerable<long>> GetListJustUserIDByCustormerID(long custormerID)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("CustomerID", custormerID);
+
+            string sql = @"select UserID from AccountList where CustomerID=@CustomerID";
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                dt = cnn.CreateDataTable(sql, Conds);
+                var result = dt.AsEnumerable().Select(row => long.Parse(row["UserID"].ToString()));
+
+                return await Task.FromResult(result).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<IEnumerable<long>> GetListJustCustormerID()
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            string sql = @"select RowID from CustomerList";
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                dt = cnn.CreateDataTable(sql, Conds);
+                var result = dt.AsEnumerable().Select(row => long.Parse(row["RowID"].ToString()));
+
+                return await Task.FromResult(result).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<IEnumerable<long>> GetListJustCustormerIDAppCode(string AppCode)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            string sql = $@"select  CustomerList.RowID from CustomerList
+join Customer_App on CustomerList.RowID = Customer_App.CustomerID
+join AppList on AppList.AppID = Customer_App.AppID
+where AppList.AppCode = '{AppCode}'";
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                dt = cnn.CreateDataTable(sql, Conds);
+                var result = dt.AsEnumerable().Select(row => long.Parse(row["RowID"].ToString()));
+
+                return await Task.FromResult(result).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<IEnumerable<string>> GetListDirectManager(long custormerID)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("CustomerID", custormerID);
+            string sql = @"select DISTINCT DirectManager from AccountList where DirectManager is not null and CustomerID=@CustomerID";
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                dt = cnn.CreateDataTable(sql, Conds);
+                var result = dt.AsEnumerable().Select(row => row["DirectManager"].ToString());
+                return await Task.FromResult(result).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<IEnumerable<AccUsernameModel>> ListNhanVienCapDuoiDirectManagerByDirectManager(string DirectManager)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("DirectManager", DirectManager);
+
+            string sql = @"select UserID, Username, Email, LastName +' ' + FirstName as FullName
+                           , FirstName as Name, AvartarImgURL as Avatar, JobtitleList.JobtitleName, JobtitleID , DepartmentID,
+                           DepartmentList.DepartmentName, PhoneNumber, AccountList.CustomerID, cocauid, ChucVuID, Birthday, DirectManager
+                           from AccountList
+left join DepartmentList on DepartmentList.RowID = AccountList.DepartmentID
+left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID where DirectManager=@DirectManager";
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                dt = cnn.CreateDataTable(sql, Conds);
+                var result = dt.AsEnumerable().Select(row => new AccUsernameModel
+                {
+                    UserId = Int32.Parse(row["UserID"].ToString()),
+                    Username = row["Username"].ToString(),
+                    FullName = row["FullName"].ToString(),
+                    AvartarImgURL = row["Avatar"].ToString(),
+                    CustomerID = Int32.Parse(row["CustomerID"].ToString()),
+                    Department = row["DepartmentName"].ToString(),
+                    PhoneNumber = row["PhoneNumber"].ToString(),
+                    Jobtitle = row["Jobtitle"].ToString(),
+                    Email = row["email"].ToString(),
+                    StructureID = row["cocauid"].ToString(),
+                    ChucVuID = row["ChucVuID"].ToString(),
+                    NgaySinh = (row["Birthday"] != DBNull.Value) ? ((DateTime)row["Birthday"]).ToString("dd/MM/yyyy") : "",
+                });
+
+                return await Task.FromResult(result).ConfigureAwait(false);
+            }
+        }
+
         public async Task<IEnumerable<AccUsernameModel>> GetListUsernameByCustormerIDAsync(long custormerID)
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", custormerID);
 
-            string sql = @"select UserID, Username, email, LastName +' '+FirstName as FullName
+            string sql = @"select UserID, Username, email, LastName +' ' + FirstName as FullName
                            , FirstName as Name, AvartarImgURL as Avatar, Jobtitle,
-                           Department, PhoneNumber, CustomerID, cocauid, ChucVuID, Birthday
-                           from AccountList where CustomerID=@CustomerID";
+                           DepartmentName, PhoneNumber, AccountList.CustomerID, cocauid, ChucVuID, Birthday
+                           from AccountList
+join DepartmentList on DepartmentList.RowID = AccountList.DepartmentID where AccountList.CustomerID=@CustomerID and AccountList.Disable != 1";
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 dt = await cnn.CreateDataTableAsync(sql, Conds);
@@ -88,7 +282,7 @@ namespace JeeAccount.Reponsitories
                     FullName = row["FullName"].ToString(),
                     AvartarImgURL = row["Avatar"].ToString(),
                     CustomerID = GeneralService.ConvertToLong(row["CustomerID"]),
-                    Department = row["Department"].ToString(),
+                    Department = row["DepartmentName"].ToString(),
                     PhoneNumber = row["PhoneNumber"].ToString(),
                     Jobtitle = row["Jobtitle"].ToString(),
                     Email = row["email"].ToString(),
@@ -173,9 +367,12 @@ where Username = @Username and (Disable != 1 or Disable is null)";
             Conds.Add("Username", username);
 
             string sql = @"
-                        select LastName + ' ' + FirstName as FullName, FirstName as Name, AvartarImgURL as Avatar,
-                        Jobtitle, Department, LastName, Username, Email, PhoneNumber, cocauid, ChucVuID, Birthday
-                        from AccountList
+                        select UserID, Username, Email, LastName +' ' + FirstName as FullName
+                           , FirstName as Name, AvartarImgURL as Avatar, JobtitleList.JobtitleName, JobtitleID , DepartmentID,
+                           DepartmentList.DepartmentName, PhoneNumber, AccountList.CustomerID, cocauid, ChucVuID, Birthday, DirectManager
+                           from AccountList
+left join DepartmentList on DepartmentList.RowID = AccountList.DepartmentID
+left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID
                         where Username = @username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
@@ -289,7 +486,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
                     Jobtitle = row["Jobtitle"].ToString(),
                     Name = row["Name"].ToString(),
                     Username = row["Username"].ToString(),
-                    Departmemt = row["Department"].ToString(),
+                    Departmemt = row["DepartmentName"].ToString(),
                     Email = row["Email"].ToString(),
                     StructureID = row["cocauid"].ToString(),
                 });
@@ -528,9 +725,12 @@ where Username = @Username and (Disable != 1 or Disable is null)";
                 Conds.Add("CustomerID", CustomerID);
                 Conds.Add("UserID", UserID);
 
-                string sql = @"select LastName + ' ' + FirstName as FullName, FirstName as Name
-                                , AvartarImgURL as Avatar, Jobtitle, Department, PhoneNumber, Birthday, cocauid
-                                from AccountList
+                string sql = @"select UserID, Username, Email, LastName +' ' + FirstName as FullName
+                           , FirstName as Name, AvartarImgURL as Avatar, JobtitleList.JobtitleName, JobtitleID , DepartmentID,
+                           DepartmentList.DepartmentName, PhoneNumber, AccountList.CustomerID, cocauid, ChucVuID, Birthday, DirectManager
+                           from AccountList
+left join DepartmentList on DepartmentList.RowID = AccountList.DepartmentID
+left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID
                                 where CustomerID = @CustomerID and UserID = @UserID";
 
                 dt = cnn.CreateDataTable(sql, Conds);
@@ -792,6 +992,25 @@ join AppList on AppList.AppID = Account_App.AppID";
                 var result = dt.AsEnumerable().Select(row => long.Parse(row["CustomerID"].ToString())).SingleOrDefault();
 
                 return result;
+            }
+        }
+
+        public void SaveStaffID(long UserID, long staffID)
+        {
+            Hashtable val = new Hashtable();
+
+            val.Add("StaffID", staffID);
+
+            SqlConditions conditions = new SqlConditions();
+            conditions.Add("UserID", UserID);
+
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                int x = cnn.Update(val, conditions, "AccountList");
+                if (x <= 0)
+                {
+                    throw cnn.LastError;
+                }
             }
         }
     }

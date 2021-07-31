@@ -138,7 +138,7 @@ export const locale = {
       timkiemsearch4: 'Tìm theo mã, tiêu đề và tình trạng',
     },
     SEARCH: {
-      SEARCH1: 'Tìm theo tên, bộ phận, username',
+      SEARCH1: 'Tìm theo tên, username, phòng ban, chức vụ',
     },
     profile: {
       thongtincanhan: 'Thông tin cá nhân',
@@ -155,6 +155,7 @@ export const locale = {
       QUANLYTRUCTIEP: 'Quản lý trực tiếp',
       KHONGTIMTHAY: 'Không tìm thấy',
       THEMQUANLYTRUCTIEP: 'Thêm quản lý trực tiếp',
+      PHONGBAN: ' Phòng ban',
     },
     jeechat: {
       send: 'Gửi',

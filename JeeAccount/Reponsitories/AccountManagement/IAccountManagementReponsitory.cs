@@ -15,6 +15,24 @@ namespace JeeAccount.Reponsitories
 
         #endregion giao diện JeeAccount  Management/AccountManagement
 
+        Task<IEnumerable<string>> GetListJustUsernameByCustormerID(long custormerID);
+
+        Task<string> GetDirectManagerByUsername(string username);
+
+        Task<string> GetDirectManagerByUserID(string userid);
+
+        Task<IEnumerable<UserNameDTO>> GetListJustUsernameAndUserIDByCustormerID(long custormerID);
+
+        Task<IEnumerable<long>> GetListJustUserIDByCustormerID(long custormerID);
+
+        Task<IEnumerable<long>> GetListJustCustormerID();
+
+        Task<IEnumerable<long>> GetListJustCustormerIDAppCode(string appCode);
+
+        Task<IEnumerable<string>> GetListDirectManager(long custormerID);
+
+        Task<IEnumerable<AccUsernameModel>> ListNhanVienCapDuoiDirectManagerByDirectManager(string DirectManager);
+
         Task<IEnumerable<AccUsernameModel>> GetListUsernameByCustormerIDAsync(long custormerID);
 
         Task<IEnumerable<UserNameDTO>> GetListUsernameByAppcodeAsync(long custormerID, string appcode);
@@ -24,6 +42,8 @@ namespace JeeAccount.Reponsitories
         Task<long> GetCustormerIDByUsernameAsync(string username);
 
         Task<long> GetCustormerIDByUserIDAsync(long UserID);
+
+        void SaveStaffID(long UserID, long staffID);
 
         Task<InfoUserDTO> GetInfoByUsernameAsync(string username);
 

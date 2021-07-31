@@ -68,14 +68,15 @@ namespace JeeAccount.Controllers
                 PageModel pageModel = new PageModel();
 
                 string orderByStr = "AccountList.UserID asc";
-                string whereStr = "CustomerID = @CustomerID and (Disable != 1 or Disable is null)";
+                string whereStr = " AccountList.Disable != 1 ";
 
                 Dictionary<string, string> sortableFields = new Dictionary<string, string>
                         {
                             { "nhanvien", "AccountList.LastName"},
                             { "tendangnhap", "AccountList.Username"},
                             { "tinhtrang", "AccountList.IsActive"},
-                            { "chucvu", "AccountList.Jobtitle"},
+                            { "chucvu", "AccountList.JobtitleID"},
+                            { "phongban", "Account.DepartmentID" }
                         };
 
                 if (!string.IsNullOrEmpty(query.sortField) && sortableFields.ContainsKey(query.sortField))
@@ -86,8 +87,9 @@ namespace JeeAccount.Controllers
                 if (!string.IsNullOrEmpty(query.filter["keyword"]))
                 {
                     whereStr += $" and (AccountList.LastName + ' ' + AccountList.FirstName like N'%{query.filter["keyword"]}%' " +
-                        $"or AccountList.Jobtitle like N'%{query.filter["keyword"]}%' " +
-                        $"or AccountList.Username like N'%{query.filter["keyword"]}%')";
+                        $"or JobtitleList.JobtitleName like N'%{query.filter["keyword"]}%' " +
+                        $"or AccountList.Username like N'%{query.filter["keyword"]}%'" +
+                        $"or DepartmentList.DepartmentName like N'%{query.filter["keyword"]}%')";
                 }
 
                 var lst = await _reponsitory.GetListAccountManagementAsync(customData.JeeAccount.CustomerID, whereStr, orderByStr);
@@ -188,7 +190,7 @@ namespace JeeAccount.Controllers
                 {
                     return Unauthorized(MessageReturnHelper.Unauthorized());
                 }
-                var list = await _accountManagementService.GetListJustCustormerID();
+                var list = await _reponsitory.GetListJustCustormerID();
                 if (list.Count() == 0)
                 {
                     return NotFound(MessageReturnHelper.Custom("Không tồn tại khách hàng"));
@@ -211,7 +213,7 @@ namespace JeeAccount.Controllers
                 {
                     return Unauthorized(MessageReturnHelper.Unauthorized());
                 }
-                var list = await _accountManagementService.GetListJustCustormerIDAppCode(appCode);
+                var list = await _reponsitory.GetListJustCustormerIDAppCode(appCode);
                 if (list.Count() == 0)
                 {
                     return NotFound(MessageReturnHelper.Custom("Không tồn tại khách hàng có appCode này"));
@@ -519,7 +521,7 @@ namespace JeeAccount.Controllers
                 var usernameQuanLy = "";
                 if (!string.IsNullOrEmpty(model.Userid))
                 {
-                    usernameQuanLy = await _accountManagementService.GetDirectManagerByUserID(model.Userid);
+                    usernameQuanLy = await _reponsitory.GetDirectManagerByUserID(model.Userid);
                     var result = await _reponsitory.GetInfoByUsernameAsync(usernameQuanLy);
                     if (result.Fullname != null)
                     {
@@ -529,7 +531,7 @@ namespace JeeAccount.Controllers
 
                 if (!string.IsNullOrEmpty(model.Username))
                 {
-                    usernameQuanLy = await _accountManagementService.GetDirectManagerByUsername(model.Username);
+                    usernameQuanLy = await _reponsitory.GetDirectManagerByUsername(model.Username);
                     var result = await _reponsitory.GetInfoByUsernameAsync(usernameQuanLy);
                     if (result.Fullname is not null)
                     {
@@ -637,7 +639,7 @@ namespace JeeAccount.Controllers
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
                 }
 
-                var lstUsername = await _accountManagementService.GetListJustUsernameAndUserIDByCustormerID(customData.JeeAccount.CustomerID);
+                var lstUsername = await _reponsitory.GetListJustUsernameAndUserIDByCustormerID(customData.JeeAccount.CustomerID);
                 if (lstUsername is not null)
                 {
                     return Ok(lstUsername);
@@ -662,7 +664,7 @@ namespace JeeAccount.Controllers
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
                 }
 
-                var lstUsername = await _accountManagementService.GetListJustUsernameByCustormerID(customData.JeeAccount.CustomerID);
+                var lstUsername = await _reponsitory.GetListJustUsernameByCustormerID(customData.JeeAccount.CustomerID);
                 if (lstUsername is not null)
                 {
                     return Ok(lstUsername);
@@ -687,7 +689,7 @@ namespace JeeAccount.Controllers
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
                 }
 
-                var lstUsername = await _accountManagementService.GetListJustUserIDByCustormerID(customData.JeeAccount.CustomerID);
+                var lstUsername = await _reponsitory.GetListJustUserIDByCustormerID(customData.JeeAccount.CustomerID);
                 if (lstUsername is not null)
                 {
                     return Ok(lstUsername);
@@ -715,7 +717,7 @@ namespace JeeAccount.Controllers
                 if (!string.IsNullOrEmpty(model.Username) && !string.IsNullOrEmpty(model.Userid))
                 {
                     {
-                        var result = await _accountManagementService.GetListJustUsernameAndUserIDByCustormerID(customData.JeeAccount.CustomerID);
+                        var result = await _reponsitory.GetListJustUsernameAndUserIDByCustormerID(customData.JeeAccount.CustomerID);
                         var item = result.ToList().Where(ele => ele.Username.Equals(model.Username)).SingleOrDefault();
                         if (item != null)
                             return Ok(item);
@@ -734,8 +736,8 @@ namespace JeeAccount.Controllers
 
                 if (!string.IsNullOrEmpty(model.Userid))
                 {
-                    var result = _accountManagementService.GetUsernameByUserID(model.Userid, customData.JeeAccount.CustomerID);
-                    if (!string.IsNullOrEmpty(result))
+                    var result = GeneralService.GetUsernameByUserID(_connectionString, model.Userid);
+                    if (!string.IsNullOrEmpty(result.ToString()))
                         return Ok(result);
                 }
 
@@ -758,7 +760,7 @@ namespace JeeAccount.Controllers
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
                 }
 
-                var lstUsername = await _accountManagementService.GetListDirectManager(customData.JeeAccount.CustomerID);
+                var lstUsername = await _reponsitory.GetListDirectManager(customData.JeeAccount.CustomerID);
                 if (lstUsername is not null)
                 {
                     return Ok(lstUsername);
@@ -785,7 +787,7 @@ namespace JeeAccount.Controllers
 
                 if (!string.IsNullOrEmpty(model.Username))
                 {
-                    var result = await _accountManagementService.ListNhanVienCapDuoiDirectManagerByDirectManager(model.Username);
+                    var result = await _reponsitory.ListNhanVienCapDuoiDirectManagerByDirectManager(model.Username);
                     if (result.Count() > 0)
                         return Ok(result);
                     else
@@ -796,8 +798,8 @@ namespace JeeAccount.Controllers
 
                 if (!string.IsNullOrEmpty(model.Userid))
                 {
-                    var username = _accountManagementService.GetUsernameByUserID(model.Userid, customData.JeeAccount.CustomerID);
-                    var result = await _accountManagementService.ListNhanVienCapDuoiDirectManagerByDirectManager(username);
+                    var username = GeneralService.GetUsernameByUserID(_connectionString, model.Userid);
+                    var result = await _reponsitory.ListNhanVienCapDuoiDirectManagerByDirectManager(username.ToString());
 
                     if (result.Count() > 0)
                         return Ok(result);
@@ -914,10 +916,10 @@ namespace JeeAccount.Controllers
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
                 }
 
-                var lstCutomer = await _accountManagementService.GetListJustCustormerID();
+                var lstCutomer = await _reponsitory.GetListJustCustormerID();
                 foreach (long customerid in lstCutomer)
                 {
-                    var lstUsername = await _accountManagementService.GetListJustUsernameByCustormerID(customerid);
+                    var lstUsername = await _reponsitory.GetListJustUsernameByCustormerID(customerid);
 
                     foreach (string username in lstUsername)
                     {
@@ -949,7 +951,7 @@ namespace JeeAccount.Controllers
                     return Unauthorized(MessageReturnHelper.Unauthorized());
                 }
 
-                var lstUsername = await _accountManagementService.GetListJustUsernameByCustormerID(customerid);
+                var lstUsername = await _reponsitory.GetListJustUsernameByCustormerID(customerid);
                 if (lstUsername is null) return NotFound(MessageReturnHelper.KhongTonTai("customerid"));
                 foreach (string username in lstUsername)
                 {
@@ -1061,12 +1063,12 @@ namespace JeeAccount.Controllers
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
                 }
 
-                var lstCutomer = await _accountManagementService.GetListJustCustormerID();
+                var lstCutomer = await _reponsitory.GetListJustCustormerID();
                 foreach (long customerid in lstCutomer)
                 {
                     if (customerid == 25)
                     {
-                        var lstUsername = await _accountManagementService.GetListJustUsernameByCustormerID(customerid);
+                        var lstUsername = await _reponsitory.GetListJustUsernameByCustormerID(customerid);
 
                         foreach (string username in lstUsername)
                         {
@@ -1100,12 +1102,12 @@ namespace JeeAccount.Controllers
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
                 }
 
-                var lstCutomer = await _accountManagementService.GetListJustCustormerID();
+                var lstCutomer = await _reponsitory.GetListJustCustormerID();
                 foreach (long customerid in lstCutomer)
                 {
                     if (customerid == customData.JeeAccount.CustomerID)
                     {
-                        var lstUsername = await _accountManagementService.GetListJustUsernameByCustormerID(customerid);
+                        var lstUsername = await _reponsitory.GetListJustUsernameByCustormerID(customerid);
                         var lstAppCode = await _reponsitory.GetListAppByCustomerIDAsync(customerid);
                         var lstAppID = lstAppCode.Select(x => x.AppID).ToList();
                         foreach (string username in lstUsername)
@@ -1203,7 +1205,7 @@ namespace JeeAccount.Controllers
                 var listApp = await _reponsitory.GetListAppByCustomerIDAsync(customerID);
                 var listId = listApp.Select(item => item.AppID).ToList();
                 var listfail = "";
-                var lstIdCustomer = await _accountManagementService.GetListJustUserIDByCustormerID(customerID);
+                var lstIdCustomer = await _reponsitory.GetListJustUserIDByCustormerID(customerID);
                 var ListID = new List<long>();
                 var ListIDNotExist = new List<long>();
                 if (dataJeehr.status == 1)
@@ -1212,18 +1214,13 @@ namespace JeeAccount.Controllers
                     foreach (var data in dataJeehr.data)
                     {
                         if (data.username is null) continue;
-                    }
-                }
-                foreach (var id in lstIdCustomer)
-                {
-                    if (!ListID.Contains(id))
-                    {
-                        ListIDNotExist.Add(id);
+                        var userid = long.Parse(GeneralService.GetUserIDByUsername(_connectionString, data.username).ToString());
+                        _reponsitory.SaveStaffID(userid, Convert.ToInt64(data.IDNV));
+                        listExist += ", " + data.username;
                     }
                 }
 
-                listNotExist = string.Join(",", ListIDNotExist);
-                return Ok(new { ListID = ListID, lstIdCustomer = lstIdCustomer, ListIDNotExist = ListIDNotExist, listNotExist = listNotExist });
+                return Ok(new { listExist = listExist });
             }
             catch (Exception ex)
             {
@@ -1248,7 +1245,7 @@ namespace JeeAccount.Controllers
                 var listApp = await _reponsitory.GetListAppByCustomerIDAsync(customerID);
                 var listId = listApp.Select(item => item.AppID).ToList();
                 var listfail = "";
-                var lstIdCustomer = await _accountManagementService.GetListJustUserIDByCustormerID(customerID);
+                var lstIdCustomer = await _reponsitory.GetListJustUserIDByCustormerID(customerID);
                 var ListID = new List<long>();
                 var ListIDNotExist = new List<long>();
                 var identity = new IdentityServerController();
@@ -1307,12 +1304,12 @@ namespace JeeAccount.Controllers
                 var access_token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
                 var listExist = "";
                 var listNotExist = "";
-                var customerID = 25;
+                var customerID = customData.JeeAccount.CustomerID;
                 var listApp = await _reponsitory.GetListAppByCustomerIDAsync(customerID);
                 var listId = listApp.Select(item => item.AppID).ToList();
                 var listAppCode = listApp.Select(item => item.AppCode).ToList();
                 var listfail = "";
-                var lstIdCustomer = await _accountManagementService.GetListJustUserIDByCustormerID(25);
+                var lstIdCustomer = await _reponsitory.GetListJustUserIDByCustormerID(customerID);
                 var ListID = new List<long>();
                 var ListIDNotExist = new List<long>();
                 var identity = new IdentityServerController();

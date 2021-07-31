@@ -17,30 +17,30 @@
         <div class="symbol symbol-100 mr-5">
           <ngx-avatar
             [size]="80"
-            src="{{ _user.user.customData.personalInfo.Avatar }}"
-            *ngIf="_user.user.customData.personalInfo.Avatar; else bindText"
+            src="{{ _user['user']['customData']['personalInfo'].Avatar }}"
+            *ngIf="_user['user']['customData']['personalInfo'].Avatar; else bindText"
           >
           </ngx-avatar>
           <ng-template #bindText>
             <ngx-avatar
-              textSizeRatio="2.5"
-              matTooltip="{{ _user.user.customData.personalInfo.Fullname }}"
+              [textSizeRatio]="2.5"
+              matTooltip="{{ _user['user']['customData']['personalInfo'].Fullname }}"
               [size]="80"
-              [name]="_user.user.customData.personalInfo.Name.slice(0, 1)"
-              bgColor="{{ _user.user.customData.personalInfo.BgColor }}"
+              [name]="_user['user']['customData']['personalInfo'].Name.slice(0, 1)"
+              bgColor="{{ _user['user']['customData']['personalInfo'].BgColor }}"
             >
             </ngx-avatar>
           </ng-template>
         </div>
         <div class="d-flex flex-column" style="line-height: 2">
           <!-- <a href="#" class="font-weight-bold font-size-h5 text-dark-75 text-hover-primary">
-            {{ _user.user.customData.personalInfo.Fullname }}
+            {{_user['user']['customData']['personalInfo'].Fullname }}
           </a> -->
           <div class="hoten">
-            {{ _user.user.customData.personalInfo.Fullname }}
+            {{ _user['user']['customData']['personalInfo'].Fullname }}
           </div>
           <div class="chucvu">
-            {{ _user.user.customData.personalInfo.Jobtitle }}
+            {{ _user['user']['customData']['personalInfo'].Jobtitle }}
           </div>
         </div>
       </div>
@@ -90,7 +90,7 @@
               <div class="symbol-label">
                 <span [inlineSVG]="
                     './assets/media/svg/icons/General/Notification2.svg'
-                  " cacheSVG="true" class="svg-icon svg-icon-md svg-icon-success"></span>
+                  " [cacheSVG]="true" class="svg-icon svg-icon-md svg-icon-success"></span>
               </div>
             </div>
             <div class="navi-text">
@@ -110,7 +110,7 @@
               <div class="symbol-label">
                 <span [inlineSVG]="
                     './assets/media/svg/icons/Shopping/Chart-bar1.svg'
-                  " cacheSVG="true" class="svg-icon svg-icon-md svg-icon-warning"></span>
+                  " [cacheSVG]="true" class="svg-icon svg-icon-md svg-icon-warning"></span>
               </div>
             </div>
             <div class="navi-text">
@@ -129,7 +129,7 @@
               <div class="symbol-label">
                 <span [inlineSVG]="
                     './assets/media/svg/icons/Files/Selected-file.svg'
-                  " cacheSVG="true" class="svg-icon svg-icon-md svg-icon-danger"></span>
+                  " [cacheSVG]="true" class="svg-icon svg-icon-md svg-icon-danger"></span>
               </div>
             </div>
             <div class="navi-text">
@@ -148,7 +148,7 @@
               <div class="symbol-label">
                 <span [inlineSVG]="
                     './assets/media/svg/icons/Communication/Mail-opened.svg'
-                  " cacheSVG="true" class="svg-icon svg-icon-md svg-icon-primary"></span>
+                  " [cacheSVG]="true" class="svg-icon svg-icon-md svg-icon-primary"></span>
               </div>
             </div>
             <div class="navi-text">
@@ -179,7 +179,7 @@
         <!--begin::Item-->
         <!-- <div class="d-flex align-items-center bg-light-warning rounded p-5 gutter-b">
           <span class="svg-icon svg-icon-warning mr-5">
-            <span [inlineSVG]="'./assets/media/svg/icons/Home/Library.svg'" cacheSVG="true"
+            <span [inlineSVG]="'./assets/media/svg/icons/Home/Library.svg'" [cacheSVG]="true"
               class="svg-icon svg-icon-lg"></span>
           </span>
 
@@ -196,7 +196,7 @@
         <!--begin::Item-->
         <!-- <div class="d-flex align-items-center bg-light-success rounded p-5 gutter-b">
           <span class="svg-icon svg-icon-success mr-5">
-            <span [inlineSVG]="'./assets/media/svg/icons/Communication/Write.svg'" cacheSVG="true"
+            <span [inlineSVG]="'./assets/media/svg/icons/Communication/Write.svg'" [cacheSVG]="true"
               class="svg-icon svg-icon-lg"></span>
           </span>
           <div class="d-flex flex-column flex-grow-1 mr-2">
@@ -214,7 +214,7 @@
           <span class="svg-icon svg-icon-danger mr-5">
             <span [inlineSVG]="
                 './assets/media/svg/icons/Communication/Group-chat.svg'
-              " cacheSVG="true" class="svg-icon svg-icon-lg"></span>
+              " [cacheSVG]="true" class="svg-icon svg-icon-lg"></span>
           </span>
           <div class="d-flex flex-column flex-grow-1 mr-2">
             <a href="#" class="font-weight-normel text-dark-75 text-hover-primary font-size-lg mb-1">Purpose would be to
@@ -229,7 +229,7 @@
         <!--begin::Item-->
         <!-- <div class="d-flex align-items-center bg-light-info rounded p-5">
           <span class="svg-icon svg-icon-info mr-5">
-            <span [inlineSVG]="'./assets/media/svg/icons/General/Attachment2.svg'" cacheSVG="true"
+            <span [inlineSVG]="'./assets/media/svg/icons/General/Attachment2.svg'" [cacheSVG]="true"
               class="svg-icon svg-icon-lg"></span>
           </span>
 

@@ -256,7 +256,7 @@ namespace JeeAccount.Services.CustomerManagementService
             {
                 var messageError = "";
                 var internal_token = getInternalJWToken();
-                var lstUsername = await _accountManagementService.GetListJustUsernameByCustormerID(customerid);
+                var lstUsername = await _accountManagementReponsitory.GetListJustUsernameByCustormerID(customerid);
                 cnn.BeginTransaction();
                 var valueState = 1;
                 if (!state) valueState = 0;
