@@ -1,0 +1,51 @@
+.sreach-advance-container {
+  width: 400px !important;
+  margin-left: 1rem;
+  //background-color: red;
+  background-clip: padding-box;
+  border: 1px solid #e4e6ef;
+  border-radius: 0.42rem;
+  box-shadow: none;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control {
+  display: inline-flex;
+  color: #3699ff;
+  caret-color: black;
+  height: 100%;
+  border: none;
+}
+
+.form-control:active {
+  border: none;
+}
+.form-control:focus {
+  border: none;
+}
+
+@media screen and (max-width: 1024px) {
+  .sreach-advance-container {
+    width: 372px !important;
+  }
+}
+@media screen and (max-width: 768px) {
+  .sreach-advance-container {
+    width: 272px !important;
+  }
+}
+@media screen and (max-width: 480px) {
+  .sreach-advance-container {
+    width: 172px !important;
+  }
+}
+@media screen and (max-width: 320px) {
+  .sreach-advance-container {
+    width: 272px !important;
+  }
+}
+@media screen and (max-width: 240px) {
+  .sreach-advance-container {
+    width: 272px !important;
+  }
+}

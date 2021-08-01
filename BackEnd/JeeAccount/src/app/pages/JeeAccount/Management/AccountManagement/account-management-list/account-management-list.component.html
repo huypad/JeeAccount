@@ -3,15 +3,13 @@
     <div class="card-title">
       <span class="card-label">{{ 'ACCOUNTMANAGEMENT.DANHSACHNGUOIDUNG' | translate }}</span>
       <!-- begin: Filtration form -->
-      <div class="form-group row" style="width: 484px">
+      <!-- <div class="row" style="width: 484px">
         <div class="col-lg-12" [formGroup]="searchGroup">
-          <small class="form-text text-muted"
-            ><b>{{ 'SEARCH.SEARCH1' | translate }}</b></small
-          >
           <input type="text" class="form-control" name="searchText" placeholder="" value="" formControlName="keyword" />
         </div>
-      </div>
+      </div> -->
       <!-- end: Filtration form -->
+      <app-jee-search-form></app-jee-search-form>
     </div>
     <div class="card-toolbar">
       <button mat-raised-button class="ja_button ja_btn-addnew" (click)="create()">{{ 'COMMOM.THEMMOI' | translate }}</button>

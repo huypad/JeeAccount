@@ -90,5 +90,7 @@ namespace JeeAccount.Reponsitories
         List<LoginAccountModel> GetListLogin(DpsConnection cnn);
 
         Task<IEnumerable<CustomerAppDTO>> GetListCustomerAppByCustomerIDFromAccountAsync(long customerID);
+
+        Task<IEnumerable<UsernameUserIDStaffID>> GetListJustUsername_UserID_Staffid_ByCustormerID(long custormerID);
     }
 }

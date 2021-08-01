@@ -259,21 +259,26 @@ body .kt-portlet .kt-portlet__body {
   color: #ffffff;
 }
 
-.card.card-custom .card-body {
-  padding: 0;
-  margin: 0;
-
-  th {
-    height: 48px;
-    padding: 0;
-    font-weight: 600;
-    color: #808080 !important;
-    background-color: #f0f0f0 !important;
-    letter-spacing: 0 !important;
+.card.card-custom {
+  > .card-header {
+    min-height: 65px;
   }
-  td {
-    height: 48px;
+  > .card-body {
     padding: 0;
+    margin: 0;
+
+    th {
+      height: 48px;
+      padding: 0;
+      font-weight: 600;
+      color: #808080 !important;
+      background-color: #f0f0f0 !important;
+      letter-spacing: 0 !important;
+    }
+    td {
+      height: 48px;
+      padding: 0;
+    }
   }
 }
 

@@ -329,6 +329,27 @@ namespace JeeAccount.Services
             return lst;
         }
 
+        public static bool IsUsedJeeHRCustomeridCnn(DpsConnection cnn, long customerid)
+        {
+            string sql = $"select * from Customer_App where AppID = 1 and CustomerID = {customerid}";
+            DataTable dt = new DataTable();
+            dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count == 0) return false;
+            return true;
+        }
+
+        public static bool IsUsedJeeHRCustomerid(string connectionString, long customerid)
+        {
+            string sql = $"select * from Customer_App where AppID = 1 and CustomerID = {customerid}";
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                DataTable dt = new DataTable();
+                dt = cnn.CreateDataTable(sql);
+                if (dt.Rows.Count == 0) return false;
+            }
+            return true;
+        }
+
         public static List<T> ConvertDataTableToList<T>(this DataTable dt)
         {
             List<T> data = new List<T>();
@@ -371,6 +392,12 @@ namespace JeeAccount.Services
                 }
             }
             return obj;
+        }
+
+        public static string GetColorFullNameUser(string fullname, bool tentruochosau = false)
+        {
+            if (tentruochosau) return GetColorNameUser(getlastname(fullname).Substring(0, 1));
+            return GetColorNameUser(getFirstname(fullname).Substring(0, 1));
         }
 
         public static string GetColorNameUser(string name)

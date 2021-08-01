@@ -72,9 +72,9 @@ function appInitializer(authService: AuthService) {
     // #fake-start#
     environment.isMockEnabled
       ? HttpClientInMemoryWebApiModule.forRoot(FakeAPIService, {
-        passThruUnknownUrl: true,
-        dataEncapsulation: false,
-      })
+          passThruUnknownUrl: true,
+          dataEncapsulation: false,
+        })
       : [],
     // #fake-end#
     AppRoutingModule,
@@ -109,4 +109,4 @@ function appInitializer(authService: AuthService) {
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

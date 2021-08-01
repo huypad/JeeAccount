@@ -52,6 +52,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DanhMucChungService } from './JeeAccount/_core/services/danhmuc.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { JeeCommentModule } from './JeeAccount/_shared/jee-comment/jee-comment.module';
+import { JeeSearchFormModule } from './JeeAccount/_shared/jee-search-form/jee-search-form.module';
 
 const MY_FORMATS_EDIT: any = {
   parse: {
@@ -122,6 +123,7 @@ const MY_FORMATS_EDIT: any = {
     CRUDTableModule,
     MatMomentDateModule,
     NgbButtonsModule,
+    JeeSearchFormModule,
   ],
   entryComponents: [],
   providers: [
@@ -161,6 +163,7 @@ const MY_FORMATS_EDIT: any = {
     CRUDTableModule,
     MatMomentDateModule,
     NgbButtonsModule,
+    JeeSearchFormModule,
   ],
 })
 export class JeeAccountModule {}

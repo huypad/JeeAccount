@@ -12,6 +12,7 @@ import { QuanLytrucTiepEditDialogComponent } from './quan-ly-truc-tiep-edit-dial
 import { ChangeTinhTrangEditDialogComponent } from './change-tinh-trang-edit-dialog/change-tinh-trang-edit-dialog.component';
 import { AccountManagementEditNoJeeHRDialogComponent } from './account-management-edit-no-jeehr-dialog/account-management-edit-no-jeehr-dialog.component';
 import { JeeAccountModule } from 'src/app/pages/jee-account.module';
+import { JeeSearchFormModule } from '../../_shared/jee-search-form/jee-search-form.module';
 const routes: Routes = [
   {
     path: '',

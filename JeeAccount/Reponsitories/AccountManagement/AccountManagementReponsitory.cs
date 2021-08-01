@@ -140,11 +140,32 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID { where_or
                 dt = cnn.CreateDataTable(sql, Conds);
                 var result = dt.AsEnumerable().Select(row => new UserNameDTO
                 {
-                    UserId = Int32.Parse(row["UserID"].ToString()),
+                    UserId = Int64.Parse(row["UserID"].ToString()),
                     Username = row["Username"].ToString()
                 });
 
                 return await Task.FromResult(result).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<IEnumerable<UsernameUserIDStaffID>> GetListJustUsername_UserID_Staffid_ByCustormerID(long custormerID)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("CustomerID", custormerID);
+
+            string sql = @"select UserID, Username, StaffID from AccountList where CustomerID=@CustomerID";
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                var result = dt.AsEnumerable().Select(row => new UsernameUserIDStaffID
+                {
+                    UserId = Int64.Parse(row["UserID"].ToString()),
+                    Username = row["Username"].ToString(),
+                    StaffID = row["StaffID"] != DBNull.Value ? Int64.Parse(row["StaffID"].ToString()) : 0,
+                });
+
+                return result;
             }
         }
 
