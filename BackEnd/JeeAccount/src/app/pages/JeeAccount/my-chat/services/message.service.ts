@@ -30,7 +30,7 @@ export class MessageService {
   seenMessage$ = this.seenMessageSource.asObservable();
   messageReceived: EventEmitter<Message[]> = new EventEmitter<Message[]>();
   // public messageReceived: EventEmitter<any>;///tin nhan ca nhan
-  
+
   public Newmessage = new BehaviorSubject<Message[]>([]);
   Newmessage$ = this.Newmessage.asObservable();
   // constructor(private http: HttpClient) { }
@@ -38,7 +38,7 @@ export class MessageService {
 
 
   // private hubConnection: HubConnection;
-  private onlineUsersSource = new BehaviorSubject<Member[]>([]);  
+  private onlineUsersSource = new BehaviorSubject<Member[]>([]);
   onlineUsers$ = this.onlineUsersSource.asObservable();
 
   private messageUsernameSource = new ReplaySubject<Member>(1);
@@ -46,16 +46,16 @@ export class MessageService {
 
   constructor(
     private auth:AuthService
-    
-    ) { 
-     
+
+    ) {
+
     //   connection.onclose(()=>{
     //     setTimeout(r=>{
-    //       this.reconnectToken();          
+    //       this.reconnectToken();
     //     },5000);
-    //  }) 
+    //  })
     }
-  
+
 
   connectToken(idGroup:number){
     this.hubConnection = new HubConnectionBuilder()
@@ -66,41 +66,40 @@ export class MessageService {
         .build()
         try
         {
-        
+
         this.hubConnection .start().then(()=>{
-        
+
       const data=this.auth.getAuthFromLocalStorage();
 
          var _token =`Bearer ${data.access_token}`
-     
+
          try
          {
-          this.hubConnection .invoke("onConnectedTokenAsync", _token,idGroup);  
-                     
+          this.hubConnection .invoke("onConnectedTokenAsync", _token,idGroup);
+
          }catch(err)
          {
           console.log(err)
          }
-       
-        
+
+
 
           // load mess khi
          this.hubConnection.on('ReceiveMessageThread', messages => {
-              console.log('ReceiveMessageThread',messages)
               const reversed = messages.reverse();
               this.messageThreadSource.next(reversed);
             })
-        
+
             this.hubConnection.on('SeenMessageReceived', username => {
               this.seenMessageSource.next(username);
             })
-        
+
             this.hubConnection.on('NewMessage', message => {
               // console.log('mesenger',message)
               // this.messageReceived.emit(message)
               this.messageThread$.pipe(take(1)).subscribe(messages => {
-                this.messageThreadSource.next([...messages, message[0]])   
-                 this.Newmessage.next(message);     
+                this.messageThreadSource.next([...messages, message[0]])
+                 this.Newmessage.next(message);
               })
             })
       }).catch(err => {
@@ -114,16 +113,16 @@ export class MessageService {
       console.log(err)
     }
 
-  
+
 }
 
 // NhanMess()
 // {
 //   this.hubConnection.on('NewMessage', message => {
 //     console.log('mesengeraaa',message)
-//     this.Newmessage$.next(message);    
+//     this.Newmessage$.next(message);
 //     // this.messageReceived.emit(message)
-  
+
 //   })
 // }
 
@@ -138,23 +137,22 @@ reconnectToken(): void {
   const data=this.auth.getAuthFromLocalStorage();
   let infoTokenCon = { "Token": _token,"UserID":_idUser};
   this.hubConnection .start().then((data: any) => {
-      console.log('Connect with ID',data);
       this.hubConnection .invoke("ReconnectToken", JSON.stringify(infoTokenCon)).then(()=>{
       });
     }).catch((error: any) => {
-     console.log('Could not ReconnectToken! ',error); 
-    });       
+     console.log('Could not ReconnectToken! ',error);
+    });
  ///  console.log('Connect with ID',this.proxy.id);
   }
-  
-  async sendMessage(token:string,item:Message,IdGroup:number){    
+
+  async sendMessage(token:string,item:Message,IdGroup:number){
     return  this.hubConnection .invoke('SendMessage',token,item,IdGroup)
       .catch(error => console.log(error));
   }
 
-  
 
-  // async seenMessage(recipientUsername: string){    
+
+  // async seenMessage(recipientUsername: string){
   //   return this.hubConnection.invoke('SeenMessage', recipientUsername)
   //     .catch(error => console.log(error));
   // }

@@ -1,50 +1,36 @@
 // Dialog
 .mat-dialog-container-wrapper {
-  .mat-dialog-container {
-    padding: 0 !important;
-    overflow-x: hidden;
+	.mat-dialog-container {
+	   	padding: 0;
+	   	overflow-x: hidden;
 
-    .card {
-      margin-bottom: 0;
+	   	.card {
+	       	margin-bottom: 0;
 
-      .card-body {
-        overflow: auto;
-        max-height: 60vh;
-      }
-    }
-  }
-}
-
-.mat-dialog-container {
-  padding: 0 !important;
-  overflow-x: hidden;
-
-  .card {
-    margin-bottom: 0;
-
-    .card-body {
-      overflow: auto;
-      max-height: 60vh;
-    }
-  }
+	       	.card-body {
+	       		overflow: auto;
+	       		max-height: 60vh;
+	       	}
+	   	}
+	}
 }
 
 .mat-dialog-container-wrapper .mat-dialog-container {
-  padding: 0 !important;
-  overflow-x: hidden;
+	padding: 0;
+	overflow-x: hidden;
 
-  .portlet {
-    margin-bottom: 0;
-  }
+	.portlet {
+		margin-bottom: 0;
+	}
 
-  .alert {
-    border-radius: 0 !important;
-    width: 1032px;
-  }
+	.alert {
+		border-radius: 0 !important;
+		width: 1032px;
+	}
 }
 
 .mat-dialog-actions {
-  margin-bottom: 0 !important;
+	margin-bottom: 0 !important;
 }
 
 // @include tablet-and-mobile {
@@ -63,12 +49,13 @@
 // 	}
 // }
 
+
 .modal2-container {
-  padding-top: 24px;
-  padding-bottom: 24px;
+	padding-top: 24px;
+	padding-bottom: 24px;
 }
 
 .modal3-container {
-  padding-top: 24px;
-  padding-bottom: 24px;
+	padding-top: 24px;
+	padding-bottom: 24px;
 }

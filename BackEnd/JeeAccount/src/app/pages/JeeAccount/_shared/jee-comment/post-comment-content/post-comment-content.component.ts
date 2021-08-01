@@ -1,6 +1,17 @@
 import { CommentDTO, QueryFilterComment, ReturnFilterComment } from './../jee-comment.model';
 import { BehaviorSubject, interval, of, Subject } from 'rxjs';
-import { Component, Input, OnInit, OnDestroy, ViewChild, ElementRef, EventEmitter, Output, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ElementRef,
+  EventEmitter,
+  Output,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { JeeCommentService } from '../jee-comment.service';
 import { catchError, finalize, takeUntil, tap, share, switchMap } from 'rxjs/operators';
 
@@ -9,11 +20,8 @@ import { catchError, finalize, takeUntil, tap, share, switchMap } from 'rxjs/ope
   templateUrl: 'post-comment-content.component.html',
   styleUrls: ['post-comment-content.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-
 })
-
 export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
-
   private readonly onDestroy = new Subject<void>();
   private _errorMessage$ = new BehaviorSubject<string>('');
   private _isLoading$ = new BehaviorSubject<boolean>(false);
@@ -34,7 +42,7 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
 
   //filter
   filterViewLengthComment: number = 10;
-  filterDate: Date = new Date();;
+  filterDate: Date = new Date();
 
   @Input() inputLstObjectID: string[];
   public lstObjectID: string[] = [];
@@ -47,7 +55,7 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
   @Output() isFocus = new EventEmitter<any>();
 
   isDeteachChangeComment$?: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  constructor(public service: JeeCommentService, public cd: ChangeDetectorRef, private elementRef: ElementRef) { }
+  constructor(public service: JeeCommentService, public cd: ChangeDetectorRef, private elementRef: ElementRef) {}
 
   ngOnInit() {
     if (this.isDeteachChange$) {
@@ -59,7 +67,8 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
               this.isDeteachChange$.next(false);
               this.isDeteachChangeComment$.next(true);
             }
-          }))
+          })
+        )
         .subscribe();
     }
     if (this.inputLstObjectID.length == 1) {
@@ -111,39 +120,40 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
       } else {
         this.showSpinner$.next(false);
         this.isFirstTime = false;
-      };
+      }
     }
   }
 
   showFullComment() {
-    this.service.showFullComment(this.objectID, this.commentID, this.filter()).pipe(
-      tap((CommentDTO: CommentDTO) => {
-        if (this.isFirstTime)
-          this.comment.Replies = CommentDTO.Replies;
-        if (this.comment.ViewLengthComment < CommentDTO.TotalLengthComment) {
-          this.ShowFilter$.next(true);
-        } else {
-          this.ShowFilter$.next(false);
-        }
-      }),
-      catchError(err => {
-        console.log(err);
-        this._errorMessage$.next(err);
-        return of();
-      }),
-      finalize(() => {
-        if (this.isFirstTime) {
-          this.showSpinner$.next(false);
-          this.isFirstTime = false;
-        }
-        this._isLoading$.next(false);
-        this.cd.detectChanges();
-      }),
-      takeUntil(this.onDestroy),
-      share())
+    this.service
+      .showFullComment(this.objectID, this.commentID, this.filter())
+      .pipe(
+        tap((CommentDTO: CommentDTO) => {
+          if (this.isFirstTime) this.comment.Replies = CommentDTO.Replies;
+          if (this.comment.ViewLengthComment < CommentDTO.TotalLengthComment) {
+            this.ShowFilter$.next(true);
+          } else {
+            this.ShowFilter$.next(false);
+          }
+        }),
+        catchError((err) => {
+          console.log(err);
+          this._errorMessage$.next(err);
+          return of();
+        }),
+        finalize(() => {
+          if (this.isFirstTime) {
+            this.showSpinner$.next(false);
+            this.isFirstTime = false;
+          }
+          this._isLoading$.next(false);
+          this.cd.detectChanges();
+        }),
+        takeUntil(this.onDestroy),
+        share()
+      )
       .subscribe();
   }
-
 
   pushItemReplyCommentInComment(commentDTO: CommentDTO, lstCommentDTO: CommentDTO[]) {
     lstCommentDTO.forEach((comment) => {
@@ -153,7 +163,7 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
 
   deleteItemReplyCommentInComment(commentDTO: CommentDTO, lstStringObjectIDComment: string[]) {
     lstStringObjectIDComment.forEach((commentID) => {
-      const index = commentDTO.Replies.findIndex(item => item.Id === commentID);
+      const index = commentDTO.Replies.findIndex((item) => item.Id === commentID);
       if (index !== -1) {
         commentDTO.Replies.splice(index, 1);
       }
@@ -162,7 +172,7 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
 
   editItemReplyCommentInComment(commentDTO: CommentDTO, lstCommentDTO: CommentDTO[]) {
     lstCommentDTO.forEach((comment) => {
-      const index = commentDTO.Replies.findIndex(item => item.Id === comment.Id);
+      const index = commentDTO.Replies.findIndex((item) => item.Id === comment.Id);
       if (index !== -1) {
         this.copyComment(commentDTO.Replies[index], comment);
       }
@@ -176,12 +186,17 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
     if (mainCommentDTO.DateCreated !== newCommentDTO.DateCreated) mainCommentDTO.DateCreated = newCommentDTO.DateCreated;
     if (mainCommentDTO.IsUserReply !== newCommentDTO.IsUserReply) mainCommentDTO.IsUserReply = newCommentDTO.IsUserReply;
     if (mainCommentDTO.LengthReply !== newCommentDTO.LengthReply) mainCommentDTO.LengthReply = newCommentDTO.LengthReply;
-    if (mainCommentDTO.MostLengthReaction !== newCommentDTO.MostLengthReaction) mainCommentDTO.MostLengthReaction = newCommentDTO.MostLengthReaction;
-    if (mainCommentDTO.MostTypeReaction !== newCommentDTO.MostTypeReaction) mainCommentDTO.MostTypeReaction = newCommentDTO.MostTypeReaction;
-    if (mainCommentDTO.TotalLengthComment !== newCommentDTO.TotalLengthComment) mainCommentDTO.TotalLengthComment = newCommentDTO.TotalLengthComment;
-    if (mainCommentDTO.TotalLengthReaction !== newCommentDTO.TotalLengthReaction) mainCommentDTO.TotalLengthReaction = newCommentDTO.TotalLengthReaction;
+    if (mainCommentDTO.MostLengthReaction !== newCommentDTO.MostLengthReaction)
+      mainCommentDTO.MostLengthReaction = newCommentDTO.MostLengthReaction;
+    if (mainCommentDTO.MostTypeReaction !== newCommentDTO.MostTypeReaction)
+      mainCommentDTO.MostTypeReaction = newCommentDTO.MostTypeReaction;
+    if (mainCommentDTO.TotalLengthComment !== newCommentDTO.TotalLengthComment)
+      mainCommentDTO.TotalLengthComment = newCommentDTO.TotalLengthComment;
+    if (mainCommentDTO.TotalLengthReaction !== newCommentDTO.TotalLengthReaction)
+      mainCommentDTO.TotalLengthReaction = newCommentDTO.TotalLengthReaction;
     if (mainCommentDTO.UserReaction !== newCommentDTO.UserReaction) mainCommentDTO.UserReaction = newCommentDTO.UserReaction;
-    if (mainCommentDTO.UserReactionColor !== newCommentDTO.UserReactionColor) mainCommentDTO.UserReactionColor = newCommentDTO.UserReactionColor;
+    if (mainCommentDTO.UserReactionColor !== newCommentDTO.UserReactionColor)
+      mainCommentDTO.UserReactionColor = newCommentDTO.UserReactionColor;
     this.cd.detectChanges();
   }
 
@@ -215,8 +230,7 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
 
   isScrolledViewElement() {
     const rect = this.elementRef.nativeElement.getBoundingClientRect();
-    const isVisible = rect.top < window.innerHeight && rect.bottom >= 0
+    const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
     return isVisible;
   }
-
 }

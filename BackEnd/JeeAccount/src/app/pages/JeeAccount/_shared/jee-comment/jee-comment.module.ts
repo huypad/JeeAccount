@@ -24,14 +24,33 @@ import { ClickOutsideDirective } from './enter-comment-content/click-outside.dir
     JeeCommentReactionContentComponent,
     JeeCommentEnterCommentContentComponent,
     JeeCommentReactionShowComponent,
-    ClickOutsideDirective
+    ClickOutsideDirective,
   ],
-  imports: [CommonModule, MatChipsModule, NgxMatSelectSearchModule, InlineSVGModule, MatIconModule, MatInputModule,
-    MatFormFieldModule, MatTooltipModule, FormsModule, PickerModule
+  imports: [
+    CommonModule,
+    MatChipsModule,
+    NgxMatSelectSearchModule,
+    InlineSVGModule,
+    MatIconModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatTooltipModule,
+    FormsModule,
+    PickerModule,
   ],
-  providers: [
-    JeeCommentService],
-  entryComponents: [JeeCommentComponent, JeeCommentPostContentComponent, JeeCommentReactionContentComponent, JeeCommentReactionShowComponent],
-  exports: [JeeCommentComponent, JeeCommentPostContentComponent, JeeCommentReactionContentComponent, JeeCommentEnterCommentContentComponent, JeeCommentReactionShowComponent],
+  providers: [JeeCommentService],
+  entryComponents: [
+    JeeCommentComponent,
+    JeeCommentPostContentComponent,
+    JeeCommentReactionContentComponent,
+    JeeCommentReactionShowComponent,
+  ],
+  exports: [
+    JeeCommentComponent,
+    JeeCommentPostContentComponent,
+    JeeCommentReactionContentComponent,
+    JeeCommentEnterCommentContentComponent,
+    JeeCommentReactionShowComponent,
+  ],
 })
-export class JeeCommentModule { }
+export class JeeCommentModule {}

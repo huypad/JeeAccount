@@ -167,6 +167,65 @@ namespace JeeAccount.Services
             }
         }
 
+        public static object GetUserIDByStaffID(string connectionString, string StaffID)
+        {
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                string sql = $"select UserID from AccountList where StaffID = {StaffID}";
+                DataTable dt = new DataTable();
+                dt = cnn.CreateDataTable(sql);
+                if (dt.Rows.Count == 0) return null;
+                if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
+                return dt.Rows[0][0].ToString();
+            }
+        }
+
+        public static object GetUserIDByStaffIDCnn(DpsConnection cnn, string StaffID)
+        {
+            string sql = $"select UserID from AccountList where StaffID = {StaffID}";
+            DataTable dt = new DataTable();
+            dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count == 0) return null;
+            if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
+            return dt.Rows[0][0].ToString();
+        }
+
+        public static bool CheckIsAdminByUserIDCnn(DpsConnection cnn, string UserId)
+        {
+            string sql = $"select * from AccountList where UserId = {UserId} and IsAdmin = 1";
+            DataTable dt = new DataTable();
+            dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count == 0) return false;
+            return true;
+        }
+
+        public static bool CheckIsActiveByUserIDCnn(DpsConnection cnn, string UserId)
+        {
+            string sql = $"select * from AccountList where UserId = {UserId} and IsActive = 1";
+            DataTable dt = new DataTable();
+            dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count == 0) return false;
+            return true;
+        }
+
+        public static bool CheckIsActiveByUsernameCnn(DpsConnection cnn, string username)
+        {
+            string sql = $"select * from AccountList where username = '{username}' and IsActive = 1";
+            DataTable dt = new DataTable();
+            dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count == 0) return false;
+            return true;
+        }
+
+        public static bool CheckIsAdminByUsernameCnn(DpsConnection cnn, string username)
+        {
+            string sql = $"select * from AccountList where username = '{username} 'and IsAdmin = 1";
+            DataTable dt = new DataTable();
+            dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count == 0) return false;
+            return true;
+        }
+
         public static object GetStaffIDByUsername(string connectionString, string Username)
         {
             using (DpsConnection cnn = new DpsConnection(connectionString))

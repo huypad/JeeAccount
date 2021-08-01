@@ -28,7 +28,7 @@ export class PageGidtersDashboardComponent implements OnInit {
   };
 
   public outputs = {
-    onSomething: (type) => console.log(type),
+    onSomething: (type) =>{},
   };
 
   showSetting: boolean[] = [];

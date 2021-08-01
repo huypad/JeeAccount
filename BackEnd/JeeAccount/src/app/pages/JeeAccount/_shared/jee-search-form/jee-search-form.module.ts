@@ -1,3 +1,4 @@
+import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -13,10 +14,13 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PickerModule } from '@ctrl/ngx-emoji-mart';
 import { JeeSearchFormService } from './jee-search-form.service';
 import { JeeSearchFormComponent } from './jee-search-form.component';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { ClickOutside2Directive } from './click-outside2.directive';
 
 @NgModule({
-  declarations: [JeeSearchFormComponent],
+  declarations: [JeeSearchFormComponent, ClickOutside2Directive],
   imports: [
+    MatButtonModule,
     CommonModule,
     MatChipsModule,
     NgxMatSelectSearchModule,
@@ -30,6 +34,7 @@ import { JeeSearchFormComponent } from './jee-search-form.component';
     TranslateModule,
     ReactiveFormsModule,
     MatExpansionModule,
+    MatCheckboxModule,
   ],
   providers: [JeeSearchFormService],
   entryComponents: [JeeSearchFormComponent],

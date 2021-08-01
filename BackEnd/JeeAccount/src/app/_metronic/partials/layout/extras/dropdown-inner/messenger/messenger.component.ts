@@ -70,7 +70,6 @@ export class MessengerComponent implements OnInit, OnDestroy, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     this.propChanges = changes;
     this.searchText = this.propChanges.PData.currentValue;
-    console.log(this.searchText);
   }
   ngOnDestroy(): void {
     if (this._subscriptions) {
@@ -175,7 +174,6 @@ export class MessengerComponent implements OnInit, OnDestroy, OnChanges {
   private subscribeToEvents(): void {
     this._ngZone.run(() => {
       const sb = this.presence.onlineUsers$.subscribe((res) => {
-        console.log('onlineUsers', res);
         for (let i = 0; i < res.length; i++) {
           if (res[i].JoinGroup === 'changeActive') {
             this.SetActive(res[i].UserId, true);
@@ -200,7 +198,6 @@ export class MessengerComponent implements OnInit, OnDestroy, OnChanges {
     this.listmember.push(item);
     let data = this.ItemConversation();
     this.conversation_sevices.CreateConversation(data).subscribe((res) => {
-      console.log('create conversat', res.data);
       if (res && res.status === 1) {
         this.selectUser(res.data[0]);
         this.GetContact();
@@ -252,7 +249,6 @@ export class MessengerComponent implements OnInit, OnDestroy, OnChanges {
     this.chatService.GetContactChatUser().subscribe((res) => {
       this.lstContact = res.data;
       this.filteredGroups.next(this.lstContact.slice());
-      console.log('lstContact', this.lstContact);
       this.changeDetectorRefs.detectChanges();
     });
   }

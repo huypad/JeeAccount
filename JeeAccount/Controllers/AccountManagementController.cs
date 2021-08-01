@@ -62,7 +62,11 @@ namespace JeeAccount.Controllers
                 {
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
                 }
-
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
                 query = query == null ? new QueryParams() : query;
                 BaseModel<object> model = new BaseModel<object>();
                 PageModel pageModel = new PageModel();
@@ -76,8 +80,22 @@ namespace JeeAccount.Controllers
                             { "tendangnhap", "AccountList.Username"},
                             { "tinhtrang", "AccountList.IsActive"},
                             { "chucvu", "AccountList.JobtitleID"},
-                            { "phongban", "Account.DepartmentID" }
+                            { "phongban", "AccountList.DepartmentID" }
                         };
+
+                var checkusedjeehr = GeneralService.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
+                var jeehrcontroller = new JeeHRController(HOST_JEEHR_API);
+                var ds_nv_jeehr = new List<NhanVienJeeHR>();
+                var lst = new List<AccountManagementDTO>();
+
+                if (checkusedjeehr)
+                {
+                    var ds_jeehr = await jeehrcontroller.GetDSNhanVien(token);
+                    if (ds_jeehr.status == 1)
+                    {
+                        ds_nv_jeehr = ds_jeehr.data;
+                    }
+                }
 
                 if (!string.IsNullOrEmpty(query.sortField) && sortableFields.ContainsKey(query.sortField))
                 {
@@ -90,12 +108,64 @@ namespace JeeAccount.Controllers
                         $"or JobtitleList.JobtitleName like N'%{query.filter["keyword"]}%' " +
                         $"or AccountList.Username like N'%{query.filter["keyword"]}%'" +
                         $"or DepartmentList.DepartmentName like N'%{query.filter["keyword"]}%')";
+
+                    if (checkusedjeehr)
+                    {
+                        // TO DO
+                    }
                 }
 
-                var lst = await _reponsitory.GetListAccountManagementAsync(customData.JeeAccount.CustomerID, whereStr, orderByStr);
-                int total = lst.Count();
+                if (!string.IsNullOrEmpty(query.filter["username"]))
+                {
+                    whereStr += $" and (AccountList.Username like '%{query.filter["username"]}%') ";
+                }
+
+                if (!string.IsNullOrEmpty(query.filter["tennhanvien"]))
+                {
+                    whereStr += $" and (AccountList.FirstName like N'%{query.filter["tennhanvien"]}%') ";
+                }
+
+                if (!string.IsNullOrEmpty(query.filter["phongban"]))
+                {
+                    whereStr += $" and (DepartmentList.DepartmentName like N'%{query.filter["phongban"]}%') ";
+                }
+
+                if (!string.IsNullOrEmpty(query.filter["chucvu"]))
+                {
+                    whereStr += $" and (JobtitleList.JobtitleName like N'%{query.filter["chucvu"]}%') ";
+                }
+
+                if (!string.IsNullOrEmpty(query.filter["isadmin"]))
+                {
+                    if (Convert.ToBoolean(query.filter["isadmin"]))
+                    {
+                        whereStr += $" and (AccountList.IsAdmin = 1) ";
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(query.filter["dakhoa"]))
+                {
+                    if (Convert.ToBoolean(query.filter["dakhoa"]))
+                    {
+                        whereStr += $" and (AccountList.IsActive = 0) ";
+                    }
+                }
+
+                if (!checkusedjeehr)
+                {
+                    var res = await _reponsitory.GetListAccountManagementAsync(customData.JeeAccount.CustomerID, whereStr, orderByStr);
+                    lst = res.ToList();
+                }
+                else
+                {
+                    var lstUidnamestaff = await _reponsitory.GetListJustUsername_UserID_Staffid_ByCustormerID(customData.JeeAccount.CustomerID);
+
+                    lst = TranferDataHelper.ListNhanVienJeeHRToAccountManagementDTO(ds_nv_jeehr, customData.JeeAccount.CustomerID, lstUidnamestaff.ToList(), _connectionString);
+                }
+
+                int total = lst.Count;
                 if (total == 0) return BadRequest(MessageReturnHelper.KhongCoDuLieu("danh sách tài khoản"));
-                pageModel.TotalCount = lst.Count();
+                pageModel.TotalCount = lst.Count;
                 pageModel.AllPage = (int)Math.Ceiling(total / (decimal)query.record);
                 pageModel.Size = query.record;
                 pageModel.Page = query.page;
@@ -104,9 +174,9 @@ namespace JeeAccount.Controllers
                     query.page = 1;
                     query.record = pageModel.TotalCount;
                 }
-                lst = lst.AsEnumerable().Skip((query.page - 1) * query.record).Take(query.record);
+                var list = lst.Skip((query.page - 1) * query.record).Take(query.record);
 
-                return Ok(MessageReturnHelper.Ok(lst, pageModel));
+                return Ok(MessageReturnHelper.Ok(list, pageModel));
             }
             catch (Exception ex)
             {

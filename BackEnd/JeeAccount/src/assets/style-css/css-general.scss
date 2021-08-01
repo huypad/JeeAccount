@@ -245,15 +245,6 @@ body .mat-select-required .mat-select-value {
   padding-top: 7px;
 }
 
-body .kt-portlet .kt-portlet__body {
-  padding: 20px; //0px 20px => top, bot: 0, left, right: 25
-}
-
-.kt-portlet__head--lg {
-  padding-top: 9px;
-  padding-bottom: 9px;
-}
-
 .status-new {
   text-align: center;
   color: #ffffff;
@@ -265,7 +256,6 @@ body .kt-portlet .kt-portlet__body {
   }
   > .card-body {
     padding: 0;
-    margin: 0;
 
     th {
       height: 48px;

@@ -1,5 +1,5 @@
 import { BehaviorSubject, Subject, Subscription } from 'rxjs';
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, Output, EventEmitter } from '@angular/core';
 import { JeeSearchFormService } from './jee-search-form.service';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { FormBuilder, FormGroup } from '@angular/forms';
@@ -15,7 +15,12 @@ export class JeeSearchFormComponent implements OnInit {
   private _errorMessage$ = new BehaviorSubject<string>('');
   private subscriptions: Subscription[] = [];
   searchGroup: FormGroup;
-
+  filterGroup: FormGroup;
+  @Output() keywordEvent: EventEmitter<string> = new EventEmitter<string>();
+  @Output() filterEvent: EventEmitter<any> = new EventEmitter<any>();
+  public isAdmin: boolean = false;
+  public daKhoa: boolean = false;
+  public showFilter: boolean = false;
   get isLoading$() {
     return this._isLoading$.asObservable();
   }
@@ -32,6 +37,7 @@ export class JeeSearchFormComponent implements OnInit {
 
   ngOnInit() {
     this.searchForm();
+    this.filterForm();
   }
 
   ngOnDestroy(): void {}
@@ -55,5 +61,37 @@ export class JeeSearchFormComponent implements OnInit {
     this.subscriptions.push(searchEvent);
   }
 
-  search(val) {}
+  search(val) {
+    this.keywordEvent.emit(val);
+  }
+
+  filterForm() {
+    this.filterGroup = this.fb.group({
+      keyword: [''],
+      username: [''],
+      tennhanvien: [''],
+      phongban: [''],
+      chucvu: [''],
+    });
+  }
+
+  clickSearch() {
+    const filter = {};
+    filter['keyword'] = this.filterGroup.controls['keyword'].value;
+    filter['username'] = this.filterGroup.controls['username'].value;
+    filter['tennhanvien'] = this.filterGroup.controls['tennhanvien'].value;
+    filter['phongban'] = this.filterGroup.controls['phongban'].value;
+    filter['chucvu'] = this.filterGroup.controls['chucvu'].value;
+    filter['isadmin'] = this.isAdmin;
+    filter['dakhoa'] = this.daKhoa;
+    this.filterEvent.emit(filter);
+  }
+
+  clickShowFilter(val: boolean) {
+    this.showFilter = !val;
+  }
+
+  clickOutSideFilter() {
+    this.showFilter = false;
+  }
 }

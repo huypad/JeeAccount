@@ -50,7 +50,6 @@ export class AccountManagementListComponent implements OnInit {
   pageSize: number = 50;
 
   ngOnInit() {
-    this.searchForm();
     //this.accountManagementService.fetch();
     this.grouping = this.accountManagementService.grouping;
     this.paginator = this.accountManagementService.paginator;
@@ -59,32 +58,11 @@ export class AccountManagementListComponent implements OnInit {
     this.subscriptions.push(sb);
   }
 
-  // search
-  searchForm() {
-    this.searchGroup = this.fb.group({
-      keyword: [''],
-    });
-    const searchEvent = this.searchGroup.controls['keyword'].valueChanges
-      .pipe(
-        /*
-      The user can type quite quickly in the input box, and that could trigger a lot of server requests. With this operator,
-      we are limiting the amount of server requests emitted to a maximum of one every 150ms
-      */
-        debounceTime(150),
-        distinctUntilChanged()
-      )
-      .subscribe((val) => {
-        this.search(val);
-      });
-    this.subscriptions.push(searchEvent);
+  changeKeyword(val) {
+    this.search(val);
   }
 
-  filter() {
-    const filter = {};
-    const status = this.searchGroup.get('keyword').value;
-    if (status) {
-      filter['status'] = status;
-    }
+  changeFilter(filter) {
     this.accountManagementService.patchState({ filter });
   }
 

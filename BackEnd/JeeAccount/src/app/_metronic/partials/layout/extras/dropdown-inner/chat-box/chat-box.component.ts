@@ -82,7 +82,6 @@ export class ChatBoxComponent implements AfterViewInit, OnInit, OnDestroy {
     this.viewPort.scrollToIndex(item, 'smooth');
   }
   ngOnInit(): void {
-    // console.log(this.messageService.messageThread$.le)
     this.getClass();
     // this.scroll(99)
     try {

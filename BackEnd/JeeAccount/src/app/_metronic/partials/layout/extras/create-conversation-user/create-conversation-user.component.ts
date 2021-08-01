@@ -38,7 +38,6 @@ export class CreateConversationUserComponent implements OnInit {
   CreateConverSation(item) {
     let it = this.ItemConversation(item.FullName, item);
     this.conversation_sevices.CreateConversation(it).subscribe((res) => {
-      console.log('create conversat', res.data);
       if (res && res.status === 1) {
         this.listUser = [];
         this.CloseDia(res.data);
@@ -71,7 +70,6 @@ export class CreateConversationUserComponent implements OnInit {
   GetDanhBa() {
     this.conversation_sevices.GetDanhBaNotConversation().subscribe((res) => {
       this.listDanhBa = res.data;
-      console.log('	  this.listDanhBa', this.listDanhBa);
       this.filteredGroups.next(this.listDanhBa.slice());
       this.changeDetectorRefs.detectChanges();
     });

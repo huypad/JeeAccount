@@ -138,6 +138,13 @@ export const locale = {
       timkiemsearch4: 'Tìm theo mã, tiêu đề và tình trạng',
     },
     SEARCH: {
+      KEYWORD: 'Từ khoá',
+      TENDANGNHAP: 'Tên đăng nhập',
+      TENNHANVIEN: 'Tên nhân viên',
+      PHONGBAN: 'Phòng ban',
+      CHUCVU: 'Chức vụ',
+      NOTACTIVE: 'Đã khoá',
+      TIMKIEM: 'Tìm kiếm',
       SEARCH1: 'Tìm theo tên, username, phòng ban, chức vụ',
     },
     profile: {
