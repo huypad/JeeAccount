@@ -519,28 +519,6 @@ namespace JeeAccount.Services
             return GetColorNameUser(getFirstname(fullname).Substring(0, 1));
         }
 
-        public static List<JeeHRCoCauToChuc> FlatListJeeHRCoCauToChuc(List<JeeHRCoCauToChuc> lst)
-        {
-            var flatLst = new List<JeeHRCoCauToChuc>();
-
-            foreach (var item in lst)
-            {
-                flatLst = JoinJeeHRCoCauToChuc(item, flatLst);
-            }
-            return flatLst;
-        }
-
-        public static List<JeeHRCoCauToChuc> JoinJeeHRCoCauToChuc(JeeHRCoCauToChuc jeecocaus, List<JeeHRCoCauToChuc> lst)
-        {
-            lst.Add(jeecocaus);
-
-            foreach (var jeecocau in jeecocaus.Children)
-            {
-                lst = JoinJeeHRCoCauToChuc(jeecocau, lst);
-            }
-            return lst;
-        }
-
         public static string GetColorNameUser(string name)
         {
             var result = "";

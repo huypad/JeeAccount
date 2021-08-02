@@ -83,7 +83,13 @@ namespace JeeAccount.Controllers
                 if (!checkUsedJeeHr)
                 {
                     var depart = await _reponsitory.GetListDepartment(customData.JeeAccount.CustomerID);
-                    return Ok(depart);
+                    var obj = new
+                    {
+                        tree = DBNull.Value,
+                        flat = depart,
+                        isTree = false
+                    };
+                    return Ok(obj);
                 }
                 else
                 {
@@ -94,7 +100,8 @@ namespace JeeAccount.Controllers
                         var obj = new
                         {
                             tree = list.data,
-                            flat = GeneralService.FlatListJeeHRCoCauToChuc(list.data)
+                            flat = TranferDataHelper.FlatListJeeHRCoCauToChuc(list.data),
+                            isTree = true
                         };
 
                         return Ok(obj);

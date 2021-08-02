@@ -120,5 +120,28 @@ namespace JeeAccount.Classes
             }
             return lstNhanVienDuocQuanLyTrucTiep_;
         }
+
+        public static List<FlatJeeHRCoCauToChucModel> FlatListJeeHRCoCauToChuc(List<JeeHRCoCauToChuc> lst)
+        {
+            var flatLst = new List<FlatJeeHRCoCauToChucModel>();
+
+            foreach (var item in lst)
+            {
+                flatLst = JoinJeeHRCoCauToChuc(item, flatLst);
+            }
+            return flatLst;
+        }
+
+        public static List<FlatJeeHRCoCauToChucModel> JoinJeeHRCoCauToChuc(JeeHRCoCauToChuc jeecocau, List<FlatJeeHRCoCauToChucModel> lst)
+        {
+            var copyJeeCocau = new FlatJeeHRCoCauToChucModel(jeecocau);
+            lst.Add(copyJeeCocau);
+
+            foreach (var cocau in jeecocau.Children)
+            {
+                lst = JoinJeeHRCoCauToChuc(cocau, lst);
+            }
+            return lst;
+        }
     }
 }
