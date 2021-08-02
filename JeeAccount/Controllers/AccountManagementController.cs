@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -1268,6 +1269,57 @@ namespace JeeAccount.Controllers
                     }
                 }
                 return Ok(new { listExist = listExist, listNotExist = listNotExist, listfail = listfail });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpGet("SaveAgianPersonalInfoJeehr")]
+        public async Task<IActionResult> SaveAgianPersonalInfoJeehr()
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+                var access_token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                var jeehr = new JeeHRController(HOST_JEEHR_API);
+                var dataJeehr = await jeehr.GetDSNhanVien(access_token);
+                var customerID = 25;
+                var lstok = "";
+                var lstfail = "";
+                if (dataJeehr.status == 1)
+                {
+                    using (DpsConnection cnn = new DpsConnection(_connectionString))
+                    {
+                        foreach (var nv in dataJeehr.data)
+                        {
+                            Hashtable val = new Hashtable();
+                            SqlConditions Conds = new SqlConditions();
+                            Conds.Add("CustomerID", customerID);
+                            Conds.Add("Username", nv.username);
+                            val.Add("Jobtitle", nv.TenChucVu);
+                            val.Add("JobtitleID", Convert.ToInt32(nv.jobtitleid));
+                            val.Add("Department", nv.Structure);
+                            val.Add("DepartmentID", nv.structureid);
+                            val.Add("StaffID", nv.IDNV);
+                            int x = cnn.Update(val, Conds, "AccountList");
+                            if (x <= 0)
+                            {
+                                lstfail += " ," + nv.username;
+                            }
+                            else
+                            {
+                                lstok += " ," + nv.username;
+                            }
+                        }
+                    }
+                }
+                return Ok(new { lstfail = lstfail, lstok = lstok });
             }
             catch (Exception ex)
             {

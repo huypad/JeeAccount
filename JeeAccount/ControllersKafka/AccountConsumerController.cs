@@ -64,12 +64,11 @@ namespace JeeCustomer.ConsumerKafka
                     if (staffID.staffID > 0)
                     {
                         SaveStaffID(staffID.staffID, obj.userId, _config.GetValue<string>("AppConfig:Connection"));
+                        var inputModel = new InputApiModel();
+                        inputModel.StaffID = staffID.staffID.ToString();
+                        inputModel.Userid = obj.userId.ToString();
+                        _accountManagementService.UpdateOneStaffIDByInputApiModel(inputModel);
                     }
-                    var inputModel = new InputApiModel();
-                    inputModel.StaffID = staffID.staffID.ToString();
-                    inputModel.Userid = obj.userId.ToString();
-
-                    _accountManagementService.UpdateOneStaffIDByInputApiModel(inputModel);
                 }
                 string username = GetObjectDB($"select Username from AccountList where UserID = {obj.userId}", _config.GetValue<string>("AppConfig:Connection"));
                 if (!string.IsNullOrEmpty(username))
