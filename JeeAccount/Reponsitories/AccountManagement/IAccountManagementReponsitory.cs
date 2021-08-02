@@ -11,51 +11,83 @@ namespace JeeAccount.Reponsitories
     {
         #region giao diện JeeAccount  Management/AccountManagement
 
-        Task<IEnumerable<AccountManagementDTO>> GetListAccountManagementAsync(long customerID, string where, string orderby);
+        Task<IEnumerable<AccountManagementDTO>> GetListAccountManagementDefaultAsync(long customerID, string where = "", string orderby = "");
+
+        Task<IEnumerable<AccountManagementDTO>> GetListAccountManagementIsJeeHRAsync(long customerID, string where = "", string orderBy = "");
 
         #endregion giao diện JeeAccount  Management/AccountManagement
 
-        Task<IEnumerable<string>> GetListJustUsernameByCustormerID(long custormerID);
+        #region api
 
-        Task<string> GetDirectManagerByUsername(string username);
+        Task<IEnumerable<AccUsernameModel>> GetListAccUsernameModelDefaultAsync(long custormerID);
 
-        Task<string> GetDirectManagerByUserID(string userid);
-
-        Task<IEnumerable<UserNameDTO>> GetListJustUsernameAndUserIDByCustormerID(long custormerID);
-
-        Task<IEnumerable<long>> GetListJustUserIDByCustormerID(long custormerID);
+        Task<IEnumerable<AccUsernameModel>> GetListAccUsernameModelIsJeeHRAsync(long custormerID);
 
         Task<IEnumerable<long>> GetListJustCustormerID();
 
         Task<IEnumerable<long>> GetListJustCustormerIDAppCode(string appCode);
 
-        Task<IEnumerable<string>> GetListDirectManager(long custormerID);
+        Task<long> GetCustormerIDByUsernameAsync(string username);
 
-        Task<IEnumerable<AccUsernameModel>> ListNhanVienCapDuoiDirectManagerByDirectManager(string DirectManager);
+        Task<IEnumerable<InfoAdminDTO>> GetInfoAdminAccountByCustomerIDDefaultAsync(long customerID);
 
-        Task<IEnumerable<AccUsernameModel>> GetListUsernameByCustormerIDAsync(long custormerID);
+        Task<IEnumerable<InfoAdminDTO>> GetInfoAdminAccountByCustomerIDIsJeeHRAsync(long customerID);
+
+        Task<InfoCustomerDTO> GetInfoByCustomerIDAsync(long customerID);
+
+        Task<InfoUserDTO> GetInfoByUsernameIsJeeHRAsync(string username);
+
+        Task<InfoUserDTO> GetInfoByUsernameDefaultAsync(string username);
 
         Task<IEnumerable<UserNameDTO>> GetListUsernameByAppcodeAsync(long custormerID, string appcode);
 
         Task<IEnumerable<AdminModel>> GetListAdminsByCustomerIDAsync(long customerID);
 
-        Task<long> GetCustormerIDByUsernameAsync(string username);
-
-        Task<long> GetCustormerIDByUserIDAsync(long UserID);
-
-        void SaveStaffID(long UserID, long staffID);
-
-        Task<InfoUserDTO> GetInfoByUsernameAsync(string username);
-
-        Task<InfoCustomerDTO> GetInfoByCustomerIDAsync(long customerID);
-
         Task<IEnumerable<AppListDTO>> GetListAppByCustomerIDAsync(long customerID);
 
         Task<IEnumerable<AppListDTO>> GetListAppByUserIDAsync(long UserID, long CustomerID = 0);
 
+        Task<string> GetDirectManagerByUserID(string userid);
+
+        Task<string> GetDirectManagerByUsername(string username);
+
+        Task<IEnumerable<UserNameDTO>> GetListJustUsernameAndUserIDByCustormerID(long custormerID);
+
+        Task<IEnumerable<string>> GetListJustUsernameByCustormerID(long custormerID);
+
+        Task<IEnumerable<long>> GetListJustUserIDByCustormerID(long custormerID);
+
+        Task<IEnumerable<string>> GetListDirectManager(long custormerID);
+
+        Task<IEnumerable<AccUsernameModel>> ListNhanVienCapDuoiDirectManagerByDirectManagerDefaultAsync(string DirectManager);
+
+        Task<IEnumerable<AccUsernameModel>> ListNhanVienCapDuoiDirectManagerByDirectManagerJeeHRAsync(string DirectManager);
+
+        Task<long> GetCustormerIDByUserIDAsync(long UserID);
+
         Task<IEnumerable<AppListDTO>> GetListInfoAppByCustomerIDAsync(long customerID);
 
-        Task<IEnumerable<InfoAdminDTO>> GetInfoAdminAccountByCustomerIDAsync(long customerID);
+        long GetCurrentIdentity(DpsConnection cnn);
+
+        string GetUsername(DpsConnection cnn, long userId, long customerId);
+
+        long GetUserIdByUsername(string Username, long customerId);
+
+        long GetLastUserID(DpsConnection cnn);
+
+        long GetCustomerIDByUserID(long UserID);
+
+        List<int> GetAppIdByAppCode(DpsConnection cnn, List<string> AppCode);
+
+        List<LoginAccountModel> GetListLogin(DpsConnection cnn);
+
+        Task<IEnumerable<CustomerAppDTO>> GetListCustomerAppByCustomerIDFromAccountAsync(long customerID);
+
+        Task<IEnumerable<JeeHRPersonalInfo>> GetListJeeHRPersonalInfo(long custormerID);
+
+        #endregion api
+
+        void SaveStaffID(long UserID, long staffID);
 
         ReturnSqlModel ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin);
 
@@ -69,28 +101,10 @@ namespace JeeAccount.Reponsitories
 
         ReturnSqlModel UpdatePersonalInfoCustomData(DpsConnection cnn, PersonalInfoCustomData personalInfoCustom, long userId, long customerId);
 
-        long GetCurrentIdentity(DpsConnection cnn);
-
-        string GetUsername(DpsConnection cnn, long userId, long customerId);
-
-        long GetUserIdByUsername(string Username, long customerId);
-
         PersonalInfoCustomData GetPersonalInfoCustomData(long UserID, long CustomerID);
 
         ReturnSqlModel UpdateDirectManager(string Username, string DirectManager, long customerID);
 
-        long GetLastUserID(DpsConnection cnn);
-
-        long GetCustomerIDByUserID(long UserID);
-
         ReturnSqlModel InsertAppCodeAccount(DpsConnection cnn, long UserID, List<int> AppID);
-
-        List<int> GetAppIdByAppCode(DpsConnection cnn, List<string> AppCode);
-
-        List<LoginAccountModel> GetListLogin(DpsConnection cnn);
-
-        Task<IEnumerable<CustomerAppDTO>> GetListCustomerAppByCustomerIDFromAccountAsync(long customerID);
-
-        Task<IEnumerable<JeeHRPersonalInfo>> GetListJeeHRPersonalInfo(long custormerID);
     }
 }

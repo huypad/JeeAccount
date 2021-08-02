@@ -85,23 +85,6 @@ namespace JeeAccount.Controllers
                         };
 
                 var checkusedjeehr = GeneralService.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
-                var jeehrcontroller = new JeeHRController(HOST_JEEHR_API);
-                var ds_nv_jeehr = new List<NhanVienJeeHR>();
-                var lst = new List<AccountManagementDTO>();
-
-                if (checkusedjeehr)
-                {
-                    var ds_jeehr = await jeehrcontroller.GetDSNhanVien(token);
-                    if (ds_jeehr.status == 1)
-                    {
-                        ds_nv_jeehr = ds_jeehr.data;
-                        if (ds_nv_jeehr is null) return BadRequest(MessageReturnHelper.Custom("Bạn không có quyền truy cập hoặc danh sách không có dữ liệu"));
-                    }
-                    else
-                    {
-                        return BadRequest(MessageReturnHelper.ErrorJeeHR(ds_jeehr.error));
-                    }
-                }
 
                 if (!string.IsNullOrEmpty(query.sortField) && sortableFields.ContainsKey(query.sortField))
                 {
@@ -110,14 +93,19 @@ namespace JeeAccount.Controllers
 
                 if (!string.IsNullOrEmpty(query.filter["keyword"]))
                 {
-                    whereStr += $" and (AccountList.LastName + ' ' + AccountList.FirstName like N'%{query.filter["keyword"]}%' " +
-                        $"or JobtitleList.JobtitleName like N'%{query.filter["keyword"]}%' " +
-                        $"or AccountList.Username like N'%{query.filter["keyword"]}%'" +
-                        $"or DepartmentList.DepartmentName like N'%{query.filter["keyword"]}%')";
-
-                    if (checkusedjeehr)
+                    if (!checkusedjeehr)
                     {
-                        // TO DO
+                        whereStr += $" and (AccountList.LastName + ' ' + AccountList.FirstName like N'%{query.filter["keyword"]}%' " +
+    $"or JobtitleList.JobtitleName like N'%{query.filter["keyword"]}%' " +
+    $"or AccountList.Username like N'%{query.filter["keyword"]}%'" +
+    $"or DepartmentList.DepartmentName like N'%{query.filter["keyword"]}%')";
+                    }
+                    else
+                    {
+                        whereStr += $" and (AccountList.LastName + ' ' + AccountList.FirstName like N'%{query.filter["keyword"]}%' " +
+    $"or AccountList.Jobtitle like N'%{query.filter["keyword"]}%' " +
+    $"or AccountList.Username like N'%{query.filter["keyword"]}%'" +
+    $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
                     }
                 }
 
@@ -133,7 +121,14 @@ namespace JeeAccount.Controllers
 
                 if (!string.IsNullOrEmpty(query.filter["phongban"]))
                 {
-                    whereStr += $" and (DepartmentList.DepartmentName like N'%{query.filter["phongban"]}%') ";
+                    if (!checkusedjeehr)
+                    {
+                        whereStr += $" and (DepartmentList.DepartmentName like N'%{query.filter["phongban"]}%') ";
+                    }
+                    else
+                    {
+                        whereStr += $" and (AccountList.Department like N'%{query.filter["phongban"]}%') ";
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(query.filter["phongbanid"]))
@@ -143,7 +138,14 @@ namespace JeeAccount.Controllers
 
                 if (!string.IsNullOrEmpty(query.filter["chucvu"]))
                 {
-                    whereStr += $" and (AccountList.JobtitleName like N'%{query.filter["chucvu"]}%') ";
+                    if (!checkusedjeehr)
+                    {
+                        whereStr += $" and (JobtitleList.Jobtitle like N'%{query.filter["chucvu"]}%') ";
+                    }
+                    else
+                    {
+                        whereStr += $" and (AccountList.Jobtitle like N'%{query.filter["chucvu"]}%') ";
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(query.filter["chucvuid"]))
@@ -167,15 +169,16 @@ namespace JeeAccount.Controllers
                     }
                 }
 
+                var lst = new List<AccountManagementDTO>();
                 if (!checkusedjeehr)
                 {
-                    var res = await _reponsitory.GetListAccountManagementAsync(customData.JeeAccount.CustomerID, whereStr, orderByStr);
+                    var res = await _reponsitory.GetListAccountManagementDefaultAsync(customData.JeeAccount.CustomerID, whereStr, orderByStr);
                     lst = res.ToList();
                 }
                 else
                 {
-                    var lstUidnamestaff = await _reponsitory.GetListJeeHRPersonalInfo(customData.JeeAccount.CustomerID);
-                    lst = TranferDataHelper.ListNhanVienJeeHRToAccountManagementDTO(ds_nv_jeehr, customData.JeeAccount.CustomerID, lstUidnamestaff.ToList(), _connectionString);
+                    var res = await _reponsitory.GetListAccountManagementIsJeeHRAsync(customData.JeeAccount.CustomerID, whereStr, orderByStr);
+                    lst = res.ToList();
                 }
 
                 int total = lst.Count;
@@ -221,6 +224,8 @@ namespace JeeAccount.Controllers
 
         #endregion giao diện JeeAccount  Management/AccountManagement
 
+        #region api public
+
         [HttpGet("usernamesByCustermerID")]
         public async Task<object> GetListUsernameByCustormerID()
         {
@@ -231,10 +236,21 @@ namespace JeeAccount.Controllers
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
-                var usernames = await _reponsitory.GetListUsernameByCustormerIDAsync(customData.JeeAccount.CustomerID);
-                if (usernames is null)
-                    return JsonResultCommon.KhongTonTai("CustomerID");
-                return JsonResultCommon.ThanhCong(usernames);
+                var checkusedjeehr = GeneralService.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
+                if (checkusedjeehr)
+                {
+                    var usernames = await _reponsitory.GetListAccUsernameModelIsJeeHRAsync(customData.JeeAccount.CustomerID);
+                    if (usernames is null)
+                        return JsonResultCommon.KhongTonTai("Danh sách thông tin");
+                    return JsonResultCommon.ThanhCong(usernames);
+                }
+                else
+                {
+                    var usernames = await _reponsitory.GetListAccUsernameModelDefaultAsync(customData.JeeAccount.CustomerID);
+                    if (usernames is null)
+                        return JsonResultCommon.KhongTonTai("Danh sách thông tin");
+                    return JsonResultCommon.ThanhCong(usernames);
+                }
             }
             catch (Exception ex)
             {
@@ -252,17 +268,22 @@ namespace JeeAccount.Controllers
                 {
                     return Unauthorized(MessageReturnHelper.Unauthorized());
                 }
-                var isJeehr = GeneralService.IsUsedJeeHRCustomerid(_connectionString, customerID);
-                if (isJeehr)
+
+                var checkusedjeehr = GeneralService.IsUsedJeeHRCustomerid(_connectionString, customerID);
+                if (checkusedjeehr)
                 {
-                    return BadRequest(MessageReturnHelper.Custom("Không thể gọi api này vì khách hàng này dùng jeehr"));
+                    var usernames = await _reponsitory.GetListAccUsernameModelIsJeeHRAsync(customerID);
+                    if (usernames is null)
+                        return BadRequest(MessageReturnHelper.KhongTonTai("Danh sách thông tin"));
+                    return Ok(usernames);
                 }
-                var usernames = await _reponsitory.GetListUsernameByCustormerIDAsync(customerID);
-                if (usernames.Count() == 0)
+                else
                 {
-                    return NotFound(MessageReturnHelper.Custom("Không tồn tại khách hàng này"));
+                    var usernames = await _reponsitory.GetListAccUsernameModelDefaultAsync(customerID);
+                    if (usernames is null)
+                        return BadRequest(MessageReturnHelper.KhongTonTai("Danh sách thông tin"));
+                    return Ok(usernames);
                 }
-                return Ok(usernames);
             }
             catch (Exception ex)
             {
@@ -380,8 +401,22 @@ namespace JeeAccount.Controllers
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
-                var infoAdminDTOs = await _reponsitory.GetInfoAdminAccountByCustomerIDAsync(customData.JeeAccount.CustomerID);
-                return JsonResultCommon.ThanhCong(infoAdminDTOs);
+
+                var checkusedjeehr = GeneralService.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
+                if (checkusedjeehr)
+                {
+                    var infoAdminDTOs = await _reponsitory.GetInfoAdminAccountByCustomerIDIsJeeHRAsync(customData.JeeAccount.CustomerID);
+                    if (infoAdminDTOs is null)
+                        return JsonResultCommon.KhongTonTai("Danh sách admin");
+                    return JsonResultCommon.ThanhCong(infoAdminDTOs);
+                }
+                else
+                {
+                    var infoAdminDTOs = await _reponsitory.GetInfoAdminAccountByCustomerIDDefaultAsync(customData.JeeAccount.CustomerID);
+                    if (infoAdminDTOs is null)
+                        return JsonResultCommon.KhongTonTai("Danh sách admin");
+                    return JsonResultCommon.ThanhCong(infoAdminDTOs);
+                }
             }
             catch (Exception ex)
             {
@@ -418,8 +453,11 @@ namespace JeeAccount.Controllers
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
-                var infoUser = await _reponsitory.GetInfoByUsernameAsync(username);
-                return infoUser is null ? JsonResultCommon.KhongTonTai("username") : JsonResultCommon.ThanhCong(infoUser);
+
+                var infoUser = await _accountManagementService.GetInfoByUsernameAsync(username, customData.JeeAccount.CustomerID);
+                if (infoUser is null)
+                    return JsonResultCommon.KhongTonTai("Username");
+                return JsonResultCommon.ThanhCong(infoUser);
             }
             catch (Exception ex)
             {
@@ -437,22 +475,18 @@ namespace JeeAccount.Controllers
                 {
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
                 }
-
+                var username = "";
                 if (!string.IsNullOrEmpty(model.Username))
                 {
-                    var infoUser = await _reponsitory.GetInfoByUsernameAsync(model.Username);
-                    if (infoUser != null)
-                        return Ok(infoUser);
+                    username = model.Username;
                 }
-
                 if (!string.IsNullOrEmpty(model.Userid))
                 {
-                    var username = GeneralService.GetUsernameByUserID(_connectionString, model.Userid);
-                    var infoUser = await _reponsitory.GetInfoByUsernameAsync(username.ToString());
-                    if (infoUser != null)
-                        return Ok(infoUser);
+                    username = GeneralService.GetUsernameByUserID(_connectionString, model.Userid).ToString();
                 }
-
+                var infoUser = await _accountManagementService.GetInfoByUsernameAsync(username, customData.JeeAccount.CustomerID);
+                if (infoUser is not null)
+                    return Ok(infoUser);
                 return BadRequest(MessageReturnHelper.KhongTonTai("UserID hoặc username"));
             }
             catch (Exception ex)
@@ -538,65 +572,6 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpPost("ChangeTinhTrang")]
-        public object ChangeTinhTrang(AccChangeTinhTrangModel acc)
-        {
-            try
-            {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
-                if (customData is null)
-                {
-                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
-                }
-
-                ReturnSqlModel update = _reponsitory.ChangeTinhTrang(customData.JeeAccount.CustomerID, acc.Username, acc.Note, customData.JeeAccount.UserID);
-                if (!update.Susscess)
-                {
-                    if (update.ErrorCode.Equals(Constant.ERRORCODE_NOTEXIST))
-                    {
-                        return JsonResultCommon.KhongTonTai("tài khoản");
-                    }
-                    if (update.ErrorCode.Equals(Constant.ERRORCODE_EXCEPTION))
-                    {
-                        // TODO: bổ sung ghi log sau
-                        string logMessage = update.ErrorMessgage;
-
-                        return JsonResultCommon.ThatBai(update.ErrorMessgage);
-                    }
-                }
-                return JsonResultCommon.ThanhCong(update);
-            }
-            catch (Exception ex)
-            {
-                return JsonResultCommon.Exception(ex);
-            }
-        }
-
-        [HttpPost("createAccount")]
-        public async Task<object> CreateAccount(AccountManagementModel account)
-        {
-            try
-            {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
-                if (customData is null)
-                {
-                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
-                }
-                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
-                string apiUrl = _config.GetValue<string>("JeeAccount:API");
-                var create = await _accountManagementService.CreateAccount(token, customData.JeeAccount.CustomerID, customData.JeeAccount.UserID, account, apiUrl);
-                if (create.data is null)
-                {
-                    return JsonResultCommon.ThatBai(create.message);
-                }
-                return JsonResultCommon.ThanhCong(create.data);
-            }
-            catch (Exception ex)
-            {
-                return JsonResultCommon.Exception(ex);
-            }
-        }
-
         [HttpPost("GetInfoDirectManager")]
         public async Task<IActionResult> GetInfoDirectManager(InputApiModel model)
         {
@@ -612,23 +587,14 @@ namespace JeeAccount.Controllers
                 if (!string.IsNullOrEmpty(model.Userid))
                 {
                     usernameQuanLy = await _reponsitory.GetDirectManagerByUserID(model.Userid);
-                    var result = await _reponsitory.GetInfoByUsernameAsync(usernameQuanLy);
-                    if (result.Fullname != null)
-                    {
-                        return Ok(result);
-                    }
                 }
 
                 if (!string.IsNullOrEmpty(model.Username))
                 {
                     usernameQuanLy = await _reponsitory.GetDirectManagerByUsername(model.Username);
-                    var result = await _reponsitory.GetInfoByUsernameAsync(usernameQuanLy);
-                    if (result.Fullname is not null)
-                    {
-                        return Ok(result);
-                    }
                 }
-
+                var infoUser = await _accountManagementService.GetInfoByUsernameAsync(usernameQuanLy, customData.JeeAccount.CustomerID);
+                if (infoUser is not null) return Ok(infoUser);
                 return BadRequest(MessageReturnHelper.Custom("quản lý trực tiếp không tồn tại hoặc userid và username không hợp lệ"));
             }
             catch (Exception ex)
@@ -636,8 +602,6 @@ namespace JeeAccount.Controllers
                 return BadRequest(MessageReturnHelper.Exception(ex));
             }
         }
-
-        #region api public bên ngoài
 
         [HttpPost("UppdatePersonalInfo")]
         public async Task<object> UppdatePersonalInfo(PersonalInfoCustomData personalInfoCustom, long UserID)
@@ -680,37 +644,6 @@ namespace JeeAccount.Controllers
                     return JsonResultCommon.ThatBai(update.message);
                 }
                 return JsonResultCommon.ThanhCong(update.data);
-            }
-            catch (Exception ex)
-            {
-                return JsonResultCommon.Exception(ex);
-            }
-        }
-
-        #endregion api public bên ngoài
-
-        [HttpPost("UpdateDirectManager")]
-        public object UpdateDirectManager(AccDirectManagerModel acc)
-        {
-            try
-            {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
-                if (customData is null)
-                {
-                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
-                }
-                var update = _reponsitory.UpdateDirectManager(acc.Username, acc.DirectManager, customData.JeeAccount.CustomerID);
-                if (!update.Susscess)
-                {
-                    if (update.ErrorCode.Equals(Constant.ERRORCODE_EXCEPTION))
-                    {
-                        // TODO: bổ sung ghi log sau
-                        string logMessage = update.ErrorMessgage;
-
-                        return JsonResultCommon.ThatBai(update.ErrorMessgage);
-                    }
-                }
-                return JsonResultCommon.ThanhCong(update);
             }
             catch (Exception ex)
             {
@@ -874,31 +807,18 @@ namespace JeeAccount.Controllers
                 {
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
                 }
-
+                var username = "";
                 if (!string.IsNullOrEmpty(model.Username))
                 {
-                    var result = await _reponsitory.ListNhanVienCapDuoiDirectManagerByDirectManager(model.Username);
-                    if (result.Count() > 0)
-                        return Ok(result);
-                    else
-                    {
-                        return BadRequest(MessageReturnHelper.KhongTonTai("Nhân viên cấp dưới"));
-                    }
+                    username = model.Username;
                 }
 
                 if (!string.IsNullOrEmpty(model.Userid))
                 {
-                    var username = GeneralService.GetUsernameByUserID(_connectionString, model.Userid);
-                    var result = await _reponsitory.ListNhanVienCapDuoiDirectManagerByDirectManager(username.ToString());
-
-                    if (result.Count() > 0)
-                        return Ok(result);
-                    else
-                    {
-                        return BadRequest(MessageReturnHelper.KhongTonTai("Nhân viên cấp dưới"));
-                    }
+                    username = GeneralService.GetUsernameByUserID(_connectionString, model.Userid).ToString();
                 }
-
+                var lst = await _accountManagementService.ListNhanVienCapDuoiDirectManagerByDirectManager(username, customData.JeeAccount.CustomerID);
+                if (lst is not null) return Ok(lst);
                 return BadRequest(MessageReturnHelper.KhongTonTai("UserId hoặc Username"));
             }
             catch (Exception ex)
@@ -949,6 +869,96 @@ namespace JeeAccount.Controllers
                 return BadRequest(MessageReturnHelper.Exception(ex));
             }
         }
+
+        [HttpPost("ChangeTinhTrang")]
+        public object ChangeTinhTrang(AccChangeTinhTrangModel acc)
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
+                }
+
+                ReturnSqlModel update = _reponsitory.ChangeTinhTrang(customData.JeeAccount.CustomerID, acc.Username, acc.Note, customData.JeeAccount.UserID);
+                if (!update.Susscess)
+                {
+                    if (update.ErrorCode.Equals(Constant.ERRORCODE_NOTEXIST))
+                    {
+                        return JsonResultCommon.KhongTonTai("tài khoản");
+                    }
+                    if (update.ErrorCode.Equals(Constant.ERRORCODE_EXCEPTION))
+                    {
+                        // TODO: bổ sung ghi log sau
+                        string logMessage = update.ErrorMessgage;
+
+                        return JsonResultCommon.ThatBai(update.ErrorMessgage);
+                    }
+                }
+                return JsonResultCommon.ThanhCong(update);
+            }
+            catch (Exception ex)
+            {
+                return JsonResultCommon.Exception(ex);
+            }
+        }
+
+        [HttpPost("createAccount")]
+        public async Task<object> CreateAccount(AccountManagementModel account)
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
+                }
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                string apiUrl = _config.GetValue<string>("JeeAccount:API");
+                var create = await _accountManagementService.CreateAccount(token, customData.JeeAccount.CustomerID, customData.JeeAccount.UserID, account, apiUrl);
+                if (create.data is null)
+                {
+                    return JsonResultCommon.ThatBai(create.message);
+                }
+                return JsonResultCommon.ThanhCong(create.data);
+            }
+            catch (Exception ex)
+            {
+                return JsonResultCommon.Exception(ex);
+            }
+        }
+
+        [HttpPost("UpdateDirectManager")]
+        public object UpdateDirectManager(AccDirectManagerModel acc)
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
+                }
+                var update = _reponsitory.UpdateDirectManager(acc.Username, acc.DirectManager, customData.JeeAccount.CustomerID);
+                if (!update.Susscess)
+                {
+                    if (update.ErrorCode.Equals(Constant.ERRORCODE_EXCEPTION))
+                    {
+                        // TODO: bổ sung ghi log sau
+                        string logMessage = update.ErrorMessgage;
+
+                        return JsonResultCommon.ThatBai(update.ErrorMessgage);
+                    }
+                }
+                return JsonResultCommon.ThanhCong(update);
+            }
+            catch (Exception ex)
+            {
+                return JsonResultCommon.Exception(ex);
+            }
+        }
+
+        #endregion api public
 
         #region api for customer
 
@@ -1029,7 +1039,7 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpGet("updateAllStaffID")]
+        [HttpGet("updateAllStaffIDAll/internal")]
         public async Task<IActionResult> UpdateAllStaffIDInternal(long customerid)
         {
             try
@@ -1296,6 +1306,8 @@ namespace JeeAccount.Controllers
                 {
                     using (DpsConnection cnn = new DpsConnection(_connectionString))
                     {
+                        var lst = GeneralService.GetListUserNameDTOByCustomeridCnn(cnn, 25);
+
                         foreach (var nv in dataJeehr.data)
                         {
                             Hashtable val = new Hashtable();
@@ -1307,6 +1319,11 @@ namespace JeeAccount.Controllers
                             val.Add("Department", nv.Structure);
                             val.Add("DepartmentID", nv.structureid);
                             val.Add("StaffID", nv.IDNV);
+                            var item = lst.Find(data => data.StaffID == nv.managerid);
+                            if (item is not null)
+                            {
+                                val.Add("DirectManager", item.Username);
+                            }
                             int x = cnn.Update(val, Conds, "AccountList");
                             if (x <= 0)
                             {

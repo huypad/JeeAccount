@@ -184,7 +184,7 @@ namespace JeeAccount.Services
             {
                 Username = row["Username"].ToString(),
                 UserId = Convert.ToInt64(row["UserID"]),
-                StaffID = Convert.ToInt64(row["StaffID"])
+                StaffID = row["StaffID"] != DBNull.Value ? Convert.ToInt64(row["StaffID"]) : 0
             }).ToList<UserNameDTO>();
         }
 

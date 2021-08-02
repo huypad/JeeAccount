@@ -20,7 +20,7 @@ namespace JeeAccount.Services.AccountManagementService
 {
     public class AccountManagementService : IAccountManagementService
     {
-        private IAccountManagementReponsitory _accountManagementReponsitory;
+        private IAccountManagementReponsitory _reponsitory;
         private IdentityServerController identityServerController;
         private readonly string _connectionString;
         private IConfiguration _configuration;
@@ -28,11 +28,41 @@ namespace JeeAccount.Services.AccountManagementService
 
         public AccountManagementService(IAccountManagementReponsitory reponsitory, IConfiguration configuration)
         {
-            _accountManagementReponsitory = reponsitory;
+            _reponsitory = reponsitory;
             identityServerController = new IdentityServerController();
             HOST_MINIOSERVER = configuration.GetValue<string>("MinioConfig:MinioServer");
             _connectionString = configuration.GetValue<string>("AppConfig:Connection");
             _configuration = configuration;
+        }
+
+        public async Task<InfoUserDTO> GetInfoByUsernameAsync(string username, long customerid)
+        {
+            var checkusedjeehr = GeneralService.IsUsedJeeHRCustomerid(_connectionString, customerid);
+            if (checkusedjeehr)
+            {
+                var infoUser = await _reponsitory.GetInfoByUsernameIsJeeHRAsync(username);
+                return infoUser;
+            }
+            else
+            {
+                var infoUser = await _reponsitory.GetInfoByUsernameDefaultAsync(username);
+                return infoUser;
+            }
+        }
+
+        public async Task<IEnumerable<AccUsernameModel>> ListNhanVienCapDuoiDirectManagerByDirectManager(string username, long customerid)
+        {
+            var checkusedjeehr = GeneralService.IsUsedJeeHRCustomerid(_connectionString, customerid);
+            if (checkusedjeehr)
+            {
+                var accs = await _reponsitory.ListNhanVienCapDuoiDirectManagerByDirectManagerJeeHRAsync(username);
+                return accs;
+            }
+            else
+            {
+                var accs = await _reponsitory.ListNhanVienCapDuoiDirectManagerByDirectManagerDefaultAsync(username);
+                return accs;
+            }
         }
 
         public async Task<IdentityServerReturn> CreateAccount(string Admin_accessToken, long customerID, long AdminUserID, AccountManagementModel account, string apiUrl)
@@ -43,7 +73,7 @@ namespace JeeAccount.Services.AccountManagementService
                 try
                 {
                     cnn.BeginTransaction();
-                    var create = _accountManagementReponsitory.CreateAccount(cnn, account, AdminUserID, customerID);
+                    var create = _reponsitory.CreateAccount(cnn, account, AdminUserID, customerID);
                     if (create.Susscess)
                     {
                         var identity = InitIdentityServerUserModel(cnn, customerID, account);
@@ -52,7 +82,7 @@ namespace JeeAccount.Services.AccountManagementService
                         string urlAvatar = apiUrl + $"images/nhanvien/{customerID}/{userId}.jpg";
                         identity.customData.PersonalInfo.Avatar = urlAvatar;
                         var createUser = await this.identityServerController.addNewUser(identity, Admin_accessToken);
-                        var updateAvatar = _accountManagementReponsitory.UpdateAvatarFirstTime(cnn, urlAvatar, long.Parse(userId), customerID);
+                        var updateAvatar = _reponsitory.UpdateAvatarFirstTime(cnn, urlAvatar, long.Parse(userId), customerID);
                         if (createUser.statusCode != 0)
                         {
                             cnn.RollbackTransaction();
@@ -88,11 +118,11 @@ namespace JeeAccount.Services.AccountManagementService
                 try
                 {
                     cnn.BeginTransaction();
-                    var create = _accountManagementReponsitory.CreateAccount(cnn, account, AdminUserID, customerID);
+                    var create = _reponsitory.CreateAccount(cnn, account, AdminUserID, customerID);
                     if (create.Susscess)
                     {
                         var userid = long.Parse(GeneralService.GetUserIDByUsernameCnn(cnn, account.Username).ToString());
-                        var saveAppList = _accountManagementReponsitory.InsertAppCodeAccount(cnn, userid, ListAppID);
+                        var saveAppList = _reponsitory.InsertAppCodeAccount(cnn, userid, ListAppID);
                         if (!saveAppList.Susscess)
                         {
                             cnn.RollbackTransaction();
@@ -131,7 +161,7 @@ namespace JeeAccount.Services.AccountManagementService
             personalInfo.Jobtitle = account.Jobtitle;
             personalInfo.Birthday = "";
             personalInfo.Phonenumber = account.Phonemumber;
-            long idUser = _accountManagementReponsitory.GetCurrentIdentity(cnn);
+            long idUser = _reponsitory.GetCurrentIdentity(cnn);
             JeeAccountModel jee = new JeeAccountModel();
             jee.AppCode = account.AppCode;
             jee.CustomerID = customerID;
@@ -151,10 +181,10 @@ namespace JeeAccount.Services.AccountManagementService
                 try
                 {
                     cnn.BeginTransaction();
-                    var update = _accountManagementReponsitory.UpdatePersonalInfoCustomData(cnn, personalInfoCustom, userId, customerId);
+                    var update = _reponsitory.UpdatePersonalInfoCustomData(cnn, personalInfoCustom, userId, customerId);
                     if (update.Susscess)
                     {
-                        string username = _accountManagementReponsitory.GetUsername(cnn, userId, customerId);
+                        string username = _reponsitory.GetUsername(cnn, userId, customerId);
                         var updateCustom = await this.identityServerController.updateCustomDataPersonalInfo(Admin_access_token, personalInfoCustom, username);
                         if (updateCustom.data is null)
                         {
@@ -193,7 +223,7 @@ namespace JeeAccount.Services.AccountManagementService
 
                 using (DpsConnection cnn = new DpsConnection(_connectionString))
                 {
-                    username = _accountManagementReponsitory.GetUsername(cnn, objCustomData.userId, customerId);
+                    username = _reponsitory.GetUsername(cnn, objCustomData.userId, customerId);
                     if (username == null)
                     {
                         identity.message = "UserID không tồn tại";
@@ -224,8 +254,8 @@ namespace JeeAccount.Services.AccountManagementService
             {
                 string avatar = UpdateAvatarCdn(Username, base64);
 
-                _accountManagementReponsitory.UpdateAvatar(avatar, UserId, CustomerID);
-                var personal = _accountManagementReponsitory.GetPersonalInfoCustomData(UserId, CustomerID);
+                _reponsitory.UpdateAvatar(avatar, UserId, CustomerID);
+                var personal = _reponsitory.GetPersonalInfoCustomData(UserId, CustomerID);
                 var res = await identity.updateCustomDataPersonalInfoInternal(getSecretToken(), personal, Username);
                 if (!res.IsSuccessStatusCode)
                 {
@@ -276,7 +306,7 @@ namespace JeeAccount.Services.AccountManagementService
                 username = GeneralService.GetUsernameByUserID(_connectionString, model.Userid).ToString();
                 userID = model.Userid;
             }
-            var appCodes = await _accountManagementReponsitory.GetListAppByUserIDAsync(long.Parse(userID));
+            var appCodes = await _reponsitory.GetListAppByUserIDAsync(long.Parse(userID));
             var appCodesName = appCodes.Select(x => x.AppCode).ToList();
             var StaffID = 0;
             var customerID = 0;
@@ -353,7 +383,7 @@ namespace JeeAccount.Services.AccountManagementService
 
             var customerId = GeneralService.GetCustomerIDByUsername(_connectionString, username);
 
-            var personal = _accountManagementReponsitory.GetPersonalInfoCustomData(Int32.Parse(userID), Int32.Parse(customerId.ToString()));
+            var personal = _reponsitory.GetPersonalInfoCustomData(Int32.Parse(userID), Int32.Parse(customerId.ToString()));
             personal.BgColor = GeneralService.GetColorNameUser(personal.Name[0].ToString());
             var jwt_internal = getSecretToken();
 
@@ -383,7 +413,7 @@ namespace JeeAccount.Services.AccountManagementService
             var customerId = GeneralService.GetCustomerIDByUsername(_connectionString, username);
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                _accountManagementReponsitory.InsertAppCodeAccount(cnn, Int32.Parse(userID), lstAppCode);
+                _reponsitory.InsertAppCodeAccount(cnn, Int32.Parse(userID), lstAppCode);
             }
         }
 
@@ -413,7 +443,7 @@ namespace JeeAccount.Services.AccountManagementService
                 {
                     custom.staffID = long.Parse(staffid.ToString());
                 }
-                var lstApp = await _accountManagementReponsitory.GetListAppByUserIDAsync(long.Parse(userID));
+                var lstApp = await _reponsitory.GetListAppByUserIDAsync(long.Parse(userID));
                 custom.appCode = lstApp.Select(item => item.AppCode).ToList();
                 custom.userID = long.Parse(userID);
                 return custom;

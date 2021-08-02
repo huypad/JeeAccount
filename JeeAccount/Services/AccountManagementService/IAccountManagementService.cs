@@ -10,6 +10,10 @@ namespace JeeAccount.Services.AccountManagementService
 {
     public interface IAccountManagementService
     {
+        Task<InfoUserDTO> GetInfoByUsernameAsync(string username, long customerid);
+
+        Task<IEnumerable<AccUsernameModel>> ListNhanVienCapDuoiDirectManagerByDirectManager(string username, long customerid);
+
         Task<IdentityServerReturn> CreateAccount(string Admin_accessToken, long customerID, long AdminUserID, AccountManagementModel account, string apiUrl);
 
         Task<IdentityServerReturn> UpdatePersonalInfoCustomData(string Admin_access_token, PersonalInfoCustomData personalInfoCustom, long userId, long customerId);
