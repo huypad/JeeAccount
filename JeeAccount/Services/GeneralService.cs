@@ -1,7 +1,9 @@
 ﻿using DpsLibs.Data;
 using JeeAccount.Classes;
 using JeeAccount.Models;
+using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.Common;
+using JeeAccount.Models.JeeHR;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -139,6 +141,64 @@ namespace JeeAccount.Services
                 if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
                 return dt.Rows[0][0].ToString();
             }
+        }
+
+        public static UserNameDTO GetUsernameAndUserIDByStaffID(string connectionString, long Staffid)
+        {
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                string sql = $"select Username, UserID from AccountList where StaffID = {Staffid}";
+                DataTable dt = new DataTable();
+                dt = cnn.CreateDataTable(sql);
+                return dt.AsEnumerable().Select(row => new UserNameDTO
+                {
+                    Username = row["Username"].ToString(),
+                    UserId = Convert.ToInt64(row["UserID"]),
+                    StaffID = Staffid
+                }).SingleOrDefault();
+            }
+        }
+
+        public static List<UserNameDTO> GetListUserNameDTOByCustomerid(string connectionString, long customerid)
+        {
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                string sql = $"select Username, UserID, StaffID from AccountList where CustomerID = {customerid}";
+                DataTable dt = new DataTable();
+                dt = cnn.CreateDataTable(sql);
+                return dt.AsEnumerable().Select(row => new UserNameDTO
+                {
+                    Username = row["Username"].ToString(),
+                    UserId = Convert.ToInt64(row["UserID"]),
+                    StaffID = Convert.ToInt64(row["StaffID"])
+                }).ToList<UserNameDTO>();
+            }
+        }
+
+        public static List<UserNameDTO> GetListUserNameDTOByCustomeridCnn(DpsConnection cnn, long customerid)
+        {
+            string sql = $"select Username, UserID, StaffID from AccountList where CustomerID = {customerid}";
+            DataTable dt = new DataTable();
+            dt = cnn.CreateDataTable(sql);
+            return dt.AsEnumerable().Select(row => new UserNameDTO
+            {
+                Username = row["Username"].ToString(),
+                UserId = Convert.ToInt64(row["UserID"]),
+                StaffID = Convert.ToInt64(row["StaffID"])
+            }).ToList<UserNameDTO>();
+        }
+
+        public static UserNameDTO GetUsernameAndUserIDByStaffIDCnn(DpsConnection cnn, long Staffid)
+        {
+            string sql = $"select Username, UserID from AccountList where StaffID = {Staffid}";
+            DataTable dt = new DataTable();
+            dt = cnn.CreateDataTable(sql);
+            return dt.AsEnumerable().Select(row => new UserNameDTO
+            {
+                Username = row["Username"].ToString(),
+                UserId = Convert.ToInt64(row["UserID"]),
+                StaffID = Staffid
+            }).SingleOrDefault();
         }
 
         public static object GetCustomerIDByUserID(string connectionString, string UserID)
@@ -457,6 +517,28 @@ namespace JeeAccount.Services
         {
             if (tentruochosau) return GetColorNameUser(getlastname(fullname).Substring(0, 1));
             return GetColorNameUser(getFirstname(fullname).Substring(0, 1));
+        }
+
+        public static List<JeeHRCoCauToChuc> FlatListJeeHRCoCauToChuc(List<JeeHRCoCauToChuc> lst)
+        {
+            var flatLst = new List<JeeHRCoCauToChuc>();
+
+            foreach (var item in lst)
+            {
+                flatLst = JoinJeeHRCoCauToChuc(item, flatLst);
+            }
+            return flatLst;
+        }
+
+        public static List<JeeHRCoCauToChuc> JoinJeeHRCoCauToChuc(JeeHRCoCauToChuc jeecocaus, List<JeeHRCoCauToChuc> lst)
+        {
+            lst.Add(jeecocaus);
+
+            foreach (var jeecocau in jeecocaus.Children)
+            {
+                lst = JoinJeeHRCoCauToChuc(jeecocau, lst);
+            }
+            return lst;
         }
 
         public static string GetColorNameUser(string name)

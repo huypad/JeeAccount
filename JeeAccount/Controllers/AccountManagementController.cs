@@ -94,6 +94,11 @@ namespace JeeAccount.Controllers
                     if (ds_jeehr.status == 1)
                     {
                         ds_nv_jeehr = ds_jeehr.data;
+                        if (ds_nv_jeehr is null) return BadRequest(MessageReturnHelper.Custom("Bạn không có quyền truy cập hoặc danh sách không có dữ liệu"));
+                    }
+                    else
+                    {
+                        return BadRequest(MessageReturnHelper.ErrorJeeHR(ds_jeehr.error));
                     }
                 }
 
@@ -130,9 +135,19 @@ namespace JeeAccount.Controllers
                     whereStr += $" and (DepartmentList.DepartmentName like N'%{query.filter["phongban"]}%') ";
                 }
 
+                if (!string.IsNullOrEmpty(query.filter["phongbanid"]))
+                {
+                    whereStr += $" and (AccountList.DepartmentID  = {query.filter["phongbanid"]}) ";
+                }
+
                 if (!string.IsNullOrEmpty(query.filter["chucvu"]))
                 {
-                    whereStr += $" and (JobtitleList.JobtitleName like N'%{query.filter["chucvu"]}%') ";
+                    whereStr += $" and (AccountList.JobtitleName like N'%{query.filter["chucvu"]}%') ";
+                }
+
+                if (!string.IsNullOrEmpty(query.filter["chucvuid"]))
+                {
+                    whereStr += $" and (AccountList.JobtitleID like N'%{query.filter["chucvuid"]}%') ";
                 }
 
                 if (!string.IsNullOrEmpty(query.filter["isadmin"]))
@@ -158,8 +173,7 @@ namespace JeeAccount.Controllers
                 }
                 else
                 {
-                    var lstUidnamestaff = await _reponsitory.GetListJustUsername_UserID_Staffid_ByCustormerID(customData.JeeAccount.CustomerID);
-
+                    var lstUidnamestaff = await _reponsitory.GetListJeeHRPersonalInfo(customData.JeeAccount.CustomerID);
                     lst = TranferDataHelper.ListNhanVienJeeHRToAccountManagementDTO(ds_nv_jeehr, customData.JeeAccount.CustomerID, lstUidnamestaff.ToList(), _connectionString);
                 }
 
@@ -211,41 +225,15 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var jeehrController = new JeeHRController(HOST_JEEHR_API);
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
-                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
-
-                if (token is null)
-                {
-                    return JsonResultCommon.DangNhap();
-                }
-                var isJeehr = GeneralService.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
-                if (isJeehr)
-                {
-                    var lst_ds_jeehr = await jeehrController.GetDSNhanVien(token);
-                    if (lst_ds_jeehr.status == 1)
-                    {
-                        var lstUidnamestaff = await _reponsitory.GetListJustUsername_UserID_Staffid_ByCustormerID(customData.JeeAccount.CustomerID);
-                        var lstdata = TranferDataHelper.ListNhanVienJeeHRToListAccUsernameModel(lst_ds_jeehr.data, customData.JeeAccount.CustomerID, lstUidnamestaff.ToList());
-                        return JsonResultCommon.ThanhCong(lstdata);
-                    }
-                    else
-                    {
-                        var error = JsonConvert.SerializeObject(lst_ds_jeehr.error);
-                        return JsonResultCommon.ThatBai(error);
-                    }
-                }
-                else
-                {
-                    var usernames = await _reponsitory.GetListUsernameByCustormerIDAsync(customData.JeeAccount.CustomerID);
-                    if (usernames is null)
-                        return JsonResultCommon.KhongTonTai("CustomerID");
-                    return JsonResultCommon.ThanhCong(usernames);
-                }
+                var usernames = await _reponsitory.GetListUsernameByCustormerIDAsync(customData.JeeAccount.CustomerID);
+                if (usernames is null)
+                    return JsonResultCommon.KhongTonTai("CustomerID");
+                return JsonResultCommon.ThanhCong(usernames);
             }
             catch (Exception ex)
             {
@@ -947,7 +935,7 @@ namespace JeeAccount.Controllers
                 var data = await jeehrController.GetDSNhanVienTheoQuanLyTrucTiep(access_token, staffid);
                 if (data.status > 0)
                 {
-                    var res = jeehrController.ConverNhanVienDuocQuanLyTrucTiep_(data.data);
+                    var res = TranferDataHelper.ListNhanVienDuocQuanLyTrucTiep_FromNhanVienDuocQuanLyTrucTiep(data.data);
                     return Ok(res);
                 }
                 else

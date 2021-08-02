@@ -11,7 +11,7 @@ namespace JeeAccount.Classes
 {
     public static class TranferDataHelper
     {
-        public static List<AccUsernameModel> ListNhanVienJeeHRToListAccUsernameModel(List<NhanVienJeeHR> nhanviens, long customerid, List<UsernameUserIDStaffID> lstUsers)
+        public static List<AccUsernameModel> ListNhanVienJeeHRToListAccUsernameModel(List<NhanVienJeeHR> nhanviens, long customerid, List<JeeHRPersonalInfo> lstUsers)
         {
             var lst = new List<AccUsernameModel>();
             foreach (var nv in nhanviens)
@@ -20,9 +20,10 @@ namespace JeeAccount.Classes
                 {
                     if (item.StaffID == nv.IDNV)
                     {
-                        var acc = NhanVienJeeHRToAccUsernameModel(nv, customerid, item.UserId, item.Username);
+                        var acc = NhanVienJeeHRToAccUsernameModel(nv, customerid, item);
                         lst.Add(acc);
                         lstUsers.Remove(item);
+
                         break;
                     }
                 }
@@ -30,7 +31,7 @@ namespace JeeAccount.Classes
             return lst;
         }
 
-        public static AccUsernameModel NhanVienJeeHRToAccUsernameModel(NhanVienJeeHR nhanvien, long customerid, long userid, string username)
+        public static AccUsernameModel NhanVienJeeHRToAccUsernameModel(NhanVienJeeHR nhanvien, long customerid, JeeHRPersonalInfo jeeHRPersonalInfo)
         {
             var acc = new AccUsernameModel();
             acc.AvartarImgURL = nhanvien.avatar;
@@ -46,23 +47,25 @@ namespace JeeAccount.Classes
             acc.NgaySinh = nhanvien.NgaySinh;
             acc.PhoneNumber = nhanvien.PhoneNumber;
             acc.StructureID = nhanvien.structureid.ToString();
-            acc.UserId = userid;
-            acc.Username = username;
+            acc.UserId = jeeHRPersonalInfo.UserId;
+            acc.Username = jeeHRPersonalInfo.Username;
             return acc;
         }
 
-        public static List<AccountManagementDTO> ListNhanVienJeeHRToAccountManagementDTO(List<NhanVienJeeHR> nhanviens, long customerid, List<UsernameUserIDStaffID> lstUsers, string connectString)
+        public static List<AccountManagementDTO> ListNhanVienJeeHRToAccountManagementDTO(List<NhanVienJeeHR> nhanviens, long customerid, List<JeeHRPersonalInfo> lstUsers, string connectString)
         {
             using (DpsConnection cnn = new DpsConnection(connectString))
             {
                 var lst = new List<AccountManagementDTO>();
+                var lstUserscopy = lstUsers.ToList();
                 foreach (var nv in nhanviens)
                 {
                     foreach (var item in lstUsers)
                     {
                         if (item.StaffID == nv.IDNV)
                         {
-                            var acc = NhanVienJeeHRToAccountManagementDTO(nv, customerid, item.UserId, item.Username, cnn);
+                            var usernameDTOManager = lstUserscopy.Find(dto => dto.StaffID == nv.managerid);
+                            var acc = NhanVienJeeHRToAccountManagementDTO(nv, customerid, item, usernameDTOManager, cnn);
                             lst.Add(acc);
                             lstUsers.Remove(item);
                             break;
@@ -73,11 +76,11 @@ namespace JeeAccount.Classes
             }
         }
 
-        public static AccountManagementDTO NhanVienJeeHRToAccountManagementDTO(NhanVienJeeHR nhanvien, long customerid, long userid, string username, DpsConnection cnn)
+        public static AccountManagementDTO NhanVienJeeHRToAccountManagementDTO(NhanVienJeeHR nhanvien, long customerid, JeeHRPersonalInfo jeeHRPersonalInfo, UserNameDTO userNameDTOManager, DpsConnection cnn)
         {
             var acc = new AccountManagementDTO();
             acc.AvartarImgURL = nhanvien.avatar;
-            acc.BgColor = GeneralService.GetColorFullNameUser(nhanvien.HoTen);
+            acc.BgColor = jeeHRPersonalInfo.BgColor;
             acc.ChucVuID = Convert.ToInt32(nhanvien.jobtitleid).ToString();
             acc.CustomerID = customerid;
             acc.Department = nhanvien.Structure;
@@ -89,21 +92,33 @@ namespace JeeAccount.Classes
             acc.NgaySinh = nhanvien.NgaySinh;
             acc.PhoneNumber = nhanvien.PhoneNumber;
             acc.StructureID = nhanvien.structureid.ToString();
-            acc.UserId = userid;
-            acc.Username = username;
+            acc.UserId = jeeHRPersonalInfo.UserId;
+            acc.Username = jeeHRPersonalInfo.Username;
             acc.DepartmentID = (int)nhanvien.structureid;
             acc.DirectManager = nhanvien.manager;
-            acc.DirectManagerUserID = long.Parse(GeneralService.GetUserIDByStaffIDCnn(cnn, nhanvien.managerid.ToString()).ToString());
-            acc.DirectManagerUsername = GeneralService.GetUsernameByUserIDCnn(cnn, acc.DirectManagerUserID.ToString()).ToString();
-            acc.Note = null;
-            acc.PhoneNumber = "";
-            acc.IsActive = GeneralService.CheckIsActiveByUserIDCnn(cnn, userid.ToString());
-            acc.IsAdmin = GeneralService.CheckIsAdminByUserIDCnn(cnn, userid.ToString());
-            acc.UserId = userid;
-            acc.Username = username;
+            acc.DirectManagerUserID = userNameDTOManager.UserId;
+            acc.DirectManagerUsername = userNameDTOManager.Username;
+            acc.Note = jeeHRPersonalInfo.Note;
+            acc.PhoneNumber = jeeHRPersonalInfo.Phonenumber;
+            acc.IsActive = jeeHRPersonalInfo.IsActive;
+            acc.IsAdmin = jeeHRPersonalInfo.IsAdmin;
+            acc.UserId = jeeHRPersonalInfo.UserId;
+            acc.Username = jeeHRPersonalInfo.Username;
             acc.NgaySinh = nhanvien.NgaySinh;
             acc.JobtitleID = Convert.ToInt32(nhanvien.jobtitleid);
             return acc;
+        }
+
+        public static List<NhanVienDuocQuanLyTrucTiep_> ListNhanVienDuocQuanLyTrucTiep_FromNhanVienDuocQuanLyTrucTiep(List<NhanVienDuocQuanLyTrucTiep> lst)
+        {
+            var lstNhanVienDuocQuanLyTrucTiep_ = new List<NhanVienDuocQuanLyTrucTiep_>();
+
+            foreach (var nv in lst)
+            {
+                var obj = new NhanVienDuocQuanLyTrucTiep_(nv);
+                lstNhanVienDuocQuanLyTrucTiep_.Add(obj);
+            }
+            return lstNhanVienDuocQuanLyTrucTiep_;
         }
     }
 }

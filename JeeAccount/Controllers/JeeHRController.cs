@@ -19,6 +19,7 @@ namespace JeeAccount.Controllers
         private readonly string _HOST_API_JEEHR;
         private const string GET_DSNHANVIEN = "api/interaction/Get_DSNhanVien?more=true";
         private const string GET_DSNHANVIEN_THEOQUANLYTRUCTIEP = "api/interaction/getDSNhanVienTheoQLTT";
+        private const string GET_COCAUTOCHUC = "api/interaction/getCoCauToChuc";
 
         public async Task<ReturnJeeHR<NhanVienJeeHR>> GetDSNhanVien(string access_token)
         {
@@ -48,16 +49,18 @@ namespace JeeAccount.Controllers
             }
         }
 
-        public List<NhanVienDuocQuanLyTrucTiep_> ConverNhanVienDuocQuanLyTrucTiep_(List<NhanVienDuocQuanLyTrucTiep> lst)
+        public async Task<ReturnJeeHR<JeeHRCoCauToChuc>> GetDSCoCauToChuc(string access_token)
         {
-            var lstNhanVienDuocQuanLyTrucTiep_ = new List<NhanVienDuocQuanLyTrucTiep_>();
+            string url = $"{_HOST_API_JEEHR}/{GET_COCAUTOCHUC}";
 
-            foreach (var nv in lst)
+            using (var client = new HttpClient())
             {
-                var obj = new NhanVienDuocQuanLyTrucTiep_(nv);
-                lstNhanVienDuocQuanLyTrucTiep_.Add(obj);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(access_token);
+                var reponse = await client.GetAsync(url);
+                string returnValue = reponse.Content.ReadAsStringAsync().Result;
+                var res = JsonConvert.DeserializeObject<ReturnJeeHR<JeeHRCoCauToChuc>>(returnValue);
+                return res;
             }
-            return lstNhanVienDuocQuanLyTrucTiep_;
         }
     }
 }

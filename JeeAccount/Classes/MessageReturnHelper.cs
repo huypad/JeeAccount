@@ -1,4 +1,5 @@
 ﻿using JeeAccount.Models.Common;
+using JeeAccount.Models.JeeHR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -125,6 +126,17 @@ namespace JeeAccount.Classes
                 statusCode = ERRORCODE_EXCEPTION,
                 message = "Lỗi " + last_error.Message,
                 error = last_error
+            };
+        }
+
+        public static object ErrorJeeHR(ErrorJeeHR errorJeehr)
+        {
+            return new
+            {
+                statusCode = errorJeehr.code,
+                message = errorJeehr.message,
+                error = errorJeehr.LastError,
+                allowForce = errorJeehr.allowForce
             };
         }
 

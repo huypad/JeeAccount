@@ -148,21 +148,37 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID { where_or
             }
         }
 
-        public async Task<IEnumerable<UsernameUserIDStaffID>> GetListJustUsername_UserID_Staffid_ByCustormerID(long custormerID)
+        public async Task<IEnumerable<JeeHRPersonalInfo>> GetListJeeHRPersonalInfo(long custormerID)
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", custormerID);
 
-            string sql = @"select UserID, Username, StaffID from AccountList where CustomerID=@CustomerID";
+            string sql = @$"select UserID, Username, StaffID, Email, LastName +' ' + FirstName as FullName
+                           , FirstName as Name, AvartarImgURL as Avatar,
+                           PhoneNumber, Birthday,
+                           AccountList.IsActive, AccountList.IsAdmin, AccountList.Note
+                           from AccountList where CustomerID=@CustomerID";
+
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 dt = await cnn.CreateDataTableAsync(sql, Conds);
-                var result = dt.AsEnumerable().Select(row => new UsernameUserIDStaffID
+
+                var result = dt.AsEnumerable().Select(row => new JeeHRPersonalInfo
                 {
-                    UserId = Int64.Parse(row["UserID"].ToString()),
+                    UserId = GeneralService.ConvertToLong(row["UserID"]),
                     Username = row["Username"].ToString(),
-                    StaffID = row["StaffID"] != DBNull.Value ? Int64.Parse(row["StaffID"].ToString()) : 0,
+                    Fullname = row["FullName"].ToString(),
+                    Avatar = row["Avatar"].ToString(),
+                    Phonenumber = row["PhoneNumber"].ToString(),
+                    Email = row["Email"].ToString(),
+                    Name = row["Name"].ToString(),
+                    Birthday = GeneralService.ConvertDateToString(row["Birthday"]),
+                    BgColor = GeneralService.GetColorNameUser(row["Name"].ToString().Substring(0, 1)),
+                    StaffID = row["StaffID"] != DBNull.Value ? Convert.ToInt64(row["StaffID"]) : 0,
+                    IsActive = Convert.ToBoolean(row["IsActive"]),
+                    IsAdmin = Convert.ToBoolean(row["IsAdmin"]),
+                    Note = row["Note"].ToString()
                 });
 
                 return result;
@@ -287,11 +303,11 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID where Dire
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", custormerID);
 
-            string sql = @"select UserID, Username, email, LastName +' ' + FirstName as FullName
+            string sql = @"select UserID, Username, email, LastName +' '+FirstName as FullName
                            , FirstName as Name, AvartarImgURL as Avatar, Jobtitle,
-                           DepartmentName, PhoneNumber, AccountList.CustomerID, cocauid, ChucVuID, Birthday
-                           from AccountList
-join DepartmentList on DepartmentList.RowID = AccountList.DepartmentID where AccountList.CustomerID=@CustomerID and AccountList.Disable != 1";
+                           Department, PhoneNumber, CustomerID, cocauid, ChucVuID, Birthday
+                           from AccountList where CustomerID=@CustomerID";
+
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 dt = await cnn.CreateDataTableAsync(sql, Conds);
@@ -303,7 +319,7 @@ join DepartmentList on DepartmentList.RowID = AccountList.DepartmentID where Acc
                     FullName = row["FullName"].ToString(),
                     AvartarImgURL = row["Avatar"].ToString(),
                     CustomerID = GeneralService.ConvertToLong(row["CustomerID"]),
-                    Department = row["DepartmentName"].ToString(),
+                    Department = row["Department"].ToString(),
                     PhoneNumber = row["PhoneNumber"].ToString(),
                     Jobtitle = row["Jobtitle"].ToString(),
                     Email = row["email"].ToString(),

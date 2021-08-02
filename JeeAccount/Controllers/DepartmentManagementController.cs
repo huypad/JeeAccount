@@ -6,6 +6,7 @@ using JeeAccount.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
@@ -19,12 +20,14 @@ namespace JeeAccount.Controllers
         private readonly IConfiguration _config;
         private readonly IDepartmentManagementReponsitory _reponsitory;
         private readonly string _connectionString;
+        private readonly string HOST_JEEHR_API;
 
         public DepartmentManagementController(IConfiguration configuration, IDepartmentManagementReponsitory reponsitory)
         {
             _config = configuration;
             _reponsitory = reponsitory;
             _connectionString = configuration.GetValue<string>("AppConfig:Connection");
+            HOST_JEEHR_API = configuration.GetValue<string>("Host:JeeHR_API");
         }
 
         [HttpGet("GetListDepartment")]
@@ -35,15 +38,76 @@ namespace JeeAccount.Controllers
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                    return JsonResultCommon.BatBuoc("Thông tin customData");
                 }
-
-                var depart = await _reponsitory.GetListDepartment(customData.JeeAccount.CustomerID);
-                return JsonResultCommon.ThanhCong(depart);
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return JsonResultCommon.DangNhap();
+                }
+                var checkUsedJeeHr = GeneralService.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
+                if (!checkUsedJeeHr)
+                {
+                    var depart = await _reponsitory.GetListDepartment(customData.JeeAccount.CustomerID);
+                    return JsonResultCommon.ThanhCong(depart);
+                }
+                else
+                {
+                    var jeehrController = new JeeHRController(HOST_JEEHR_API);
+                    var list = await jeehrController.GetDSCoCauToChuc(token);
+                    return list;
+                }
             }
             catch (Exception ex)
             {
                 return JsonResultCommon.Exception(ex);
+            }
+        }
+
+        [HttpGet("GetDSPhongban")]
+        public async Task<IActionResult> GetDSPhongban([FromQuery] QueryParams query)
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Ok(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return Ok(MessageReturnHelper.DangNhap());
+                }
+                var checkUsedJeeHr = GeneralService.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
+                if (!checkUsedJeeHr)
+                {
+                    var depart = await _reponsitory.GetListDepartment(customData.JeeAccount.CustomerID);
+                    return Ok(depart);
+                }
+                else
+                {
+                    var jeehrController = new JeeHRController(HOST_JEEHR_API);
+                    var list = await jeehrController.GetDSCoCauToChuc(token);
+                    if (list.status == 1)
+                    {
+                        var obj = new
+                        {
+                            tree = list.data,
+                            flat = GeneralService.FlatListJeeHRCoCauToChuc(list.data)
+                        };
+
+                        return Ok(obj);
+                    }
+                    else
+                    {
+                        return BadRequest(MessageReturnHelper.ErrorJeeHR(list.error));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
             }
         }
 

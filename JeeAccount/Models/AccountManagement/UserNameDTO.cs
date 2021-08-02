@@ -9,5 +9,6 @@ namespace JeeAccount.Models.AccountManagement
     {
         public long UserId { get; set; }
         public string Username { get; set; }
+        public long StaffID { get; set; }
     }
 }
