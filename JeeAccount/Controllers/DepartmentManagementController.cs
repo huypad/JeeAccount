@@ -45,7 +45,7 @@ namespace JeeAccount.Controllers
                 {
                     return JsonResultCommon.DangNhap();
                 }
-                var checkUsedJeeHr = GeneralService.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
+                var checkUsedJeeHr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
                 if (!checkUsedJeeHr)
                 {
                     var depart = await _reponsitory.GetListDepartment(customData.JeeAccount.CustomerID);
@@ -79,7 +79,7 @@ namespace JeeAccount.Controllers
                 {
                     return Ok(MessageReturnHelper.DangNhap());
                 }
-                var checkUsedJeeHr = GeneralService.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
+                var checkUsedJeeHr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
                 if (!checkUsedJeeHr)
                 {
                     var depart = await _reponsitory.GetListDepartment(customData.JeeAccount.CustomerID);
@@ -129,8 +129,8 @@ namespace JeeAccount.Controllers
                     return JsonResultCommon.BatBuoc("Đăng nhập");
                 }
 
-                var username = GeneralService.GetUsernameByUserID(_connectionString, customData.JeeAccount.UserID.ToString());
-                _reponsitory.CreateDepartment(depart, customData.JeeAccount.CustomerID, username.ToString());
+                var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, customData.JeeAccount.UserID);
+                _reponsitory.CreateDepartment(depart, customData.JeeAccount.CustomerID, commonInfo.Username);
 
                 return JsonResultCommon.ThanhCong(depart);
             }
@@ -171,61 +171,6 @@ namespace JeeAccount.Controllers
             catch (Exception ex)
             {
                 return await Task.FromResult(JsonResultCommon.Exception(ex));
-            }
-        }
-
-        [HttpGet("ApiTaoDefaultDepartment")]
-        public object ApiTaoDefaultDepartment()
-        {
-            try
-            {
-                var depart = new DepartmentModel();
-                depart.DepartmentName = "Phòng kỹ thuật";
-                var lstCustomerid = GeneralService.GetLstCustomerid(_connectionString);
-                foreach (var customerid in lstCustomerid)
-                {
-                    if (!_reponsitory.CheckDepartmentExist(customerid, _connectionString))
-                    {
-                        var lstuserid = GeneralService.GetLstUserIDByCustomerid(_connectionString, customerid);
-                        if (lstuserid is not null)
-                        {
-                            var userid = lstuserid[0];
-                            var username = GeneralService.GetUsernameByUserID(_connectionString, userid.ToString());
-                            _reponsitory.CreateDepartment(depart, customerid, username.ToString());
-                        }
-                    }
-                }
-
-                return JsonResultCommon.ThanhCong();
-            }
-            catch (Exception ex)
-            {
-                return JsonResultCommon.Exception(ex);
-            }
-        }
-
-        [HttpGet("ApiGoi1lanSaveDepartmentID")]
-        public object ApiGoi1lanSaveDepartmentID()
-        {
-            try
-            {
-                var depart = new DepartmentModel();
-                var lstCustomerid = GeneralService.GetLstCustomerid(_connectionString);
-                foreach (var customerid in lstCustomerid)
-                {
-                    if (_reponsitory.CheckDepartmentExist(customerid, _connectionString))
-                    {
-                        var lst = GeneralService.GetLstUsernameByCustomerid(_connectionString, customerid);
-
-                        _reponsitory.ApiGoi1lanSaveDepartmentID(customerid, lst);
-                    }
-                }
-
-                return JsonResultCommon.ThanhCong();
-            }
-            catch (Exception ex)
-            {
-                return JsonResultCommon.Exception(ex);
             }
         }
     }

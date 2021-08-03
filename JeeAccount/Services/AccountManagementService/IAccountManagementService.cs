@@ -10,17 +10,55 @@ namespace JeeAccount.Services.AccountManagementService
 {
     public interface IAccountManagementService
     {
-        #region api giao diện
-
         Task<IEnumerable<AccountManagementDTO>> GetListAccountManagement(QueryParams query, long customerid);
 
         Task UpdateAvatarWithChangeUrlAvatar(long UserId, string Username, long CustomerID, string apiUrl);
 
-        #endregion api giao diện
+        Task<IEnumerable<AccUsernameModel>> GetListAccUsernameModel(long CustomerID);
+
+        Task<IEnumerable<long>> GetListJustCustormerID();
+
+        Task<IEnumerable<long>> GetListJustCustormerIDAppCode(string appCode);
+
+        Task<long> GetCustormerIDByUsernameAsync(string username);
+
+        Task<long> GetCustormerIDByUserIDAsync(long UserId);
+
+        Task<long> GetCustormerID(InputApiModel model);
+
+        Task<IEnumerable<InfoAdminDTO>> GetInfoAdminAccountByCustomerIDAsync(long customerID);
+
+        Task<InfoCustomerDTO> GetInfoByCustomerIDAsync(long customerID);
+
+        Task<IEnumerable<AdminModel>> GetListAdminsByCustomerIDAsync(long customerID);
+
+        Task<IEnumerable<AppListDTO>> GetListAppByCustomerIDAsync(long customerID);
+
+        Task<IEnumerable<UserNameDTO>> GetListUsernameByAppcodeAsync(long custormerID, string appcode);
+
+        Task<string> GetDirectManagerByUserID(string userid);
+
+        Task<string> GetDirectManagerByUsername(string username);
+
+        Task<IEnumerable<UserNameDTO>> GetListJustUsernameAndUserIDByCustormerID(long custormerID);
+
+        Task<IEnumerable<string>> GetListJustUsernameByCustormerID(long custormerID);
+
+        Task<IEnumerable<long>> GetListJustUserIDByCustormerID(long custormerID);
+
+        Task<IEnumerable<string>> GetListDirectManager(long custormerID);
 
         Task<InfoUserDTO> GetInfoByUsernameAsync(string username, long customerid);
 
         Task<IEnumerable<AccUsernameModel>> ListNhanVienCapDuoiDirectManagerByDirectManager(string username, long customerid);
+
+        Task<IEnumerable<CustomerAppDTO>> GetListCustomerAppByCustomerIDFromAccountAsync(long customerID);
+
+        Task<JeeAccountCustomData> GetJeeAccountCustomDataAsync(InputApiModel model);
+
+        ReturnSqlModel ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin);
+
+        ReturnSqlModel UpdateDirectManager(string Username, string DirectManager, long customerID);
 
         Task<IdentityServerReturn> CreateAccount(string Admin_accessToken, long customerID, long AdminUserID, AccountManagementModel account, string apiUrl);
 
@@ -30,15 +68,11 @@ namespace JeeAccount.Services.AccountManagementService
 
         Task<HttpResponseMessage> ResetPasswordRootCustomer(CustomerResetPasswordModel model);
 
-        Task<HttpResponseMessage> UpdateOneStaffIDByInputApiModel(InputApiModel model);
-
         Task<HttpResponseMessage> UpdateOneBgColorCustomData(InputApiModel model);
 
         void UpdateAllAppCodesCustomData(InputApiModel model, List<int> lstAppCode);
 
         void SaveNewAccountInAccount_AppAndAccountList(long customerID, long AdminUserID, AccountManagementModel account, List<int> ListAppID);
-
-        Task<JeeAccountCustomData> GetJeeAccountCustomDataAsync(InputApiModel model);
 
         string UpdateAvatarCdn(string username, string base64);
     }

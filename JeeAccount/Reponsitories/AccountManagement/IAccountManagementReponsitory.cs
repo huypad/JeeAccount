@@ -29,6 +29,10 @@ namespace JeeAccount.Reponsitories
 
         Task<long> GetCustormerIDByUsernameAsync(string username);
 
+        Task<long> GetCustormerIDByUserIDAsync(long UserID);
+
+        Task<IEnumerable<AdminModel>> GetListAdminsByCustomerIDAsync(long customerID);
+
         Task<IEnumerable<InfoAdminDTO>> GetInfoAdminAccountByCustomerIDDefaultAsync(long customerID);
 
         Task<IEnumerable<InfoAdminDTO>> GetInfoAdminAccountByCustomerIDIsJeeHRAsync(long customerID);
@@ -41,11 +45,7 @@ namespace JeeAccount.Reponsitories
 
         Task<IEnumerable<UserNameDTO>> GetListUsernameByAppcodeAsync(long custormerID, string appcode);
 
-        Task<IEnumerable<AdminModel>> GetListAdminsByCustomerIDAsync(long customerID);
-
         Task<IEnumerable<AppListDTO>> GetListAppByCustomerIDAsync(long customerID);
-
-        Task<IEnumerable<AppListDTO>> GetListAppByUserIDAsync(long UserID, long CustomerID = 0);
 
         Task<string> GetDirectManagerByUserID(string userid);
 
@@ -63,31 +63,17 @@ namespace JeeAccount.Reponsitories
 
         Task<IEnumerable<AccUsernameModel>> ListNhanVienCapDuoiDirectManagerByDirectManagerJeeHRAsync(string DirectManager);
 
-        Task<long> GetCustormerIDByUserIDAsync(long UserID);
-
         Task<IEnumerable<AppListDTO>> GetListInfoAppByCustomerIDAsync(long customerID);
 
         long GetCurrentIdentity(DpsConnection cnn);
 
-        string GetUsername(DpsConnection cnn, long userId, long customerId);
-
-        long GetUserIdByUsername(string Username, long customerId);
-
         long GetLastUserID(DpsConnection cnn);
-
-        long GetCustomerIDByUserID(long UserID);
 
         List<int> GetAppIdByAppCode(DpsConnection cnn, List<string> AppCode);
 
-        List<LoginAccountModel> GetListLogin(DpsConnection cnn);
-
         Task<IEnumerable<CustomerAppDTO>> GetListCustomerAppByCustomerIDFromAccountAsync(long customerID);
 
-        Task<IEnumerable<JeeHRPersonalInfo>> GetListJeeHRPersonalInfo(long custormerID);
-
         #endregion api
-
-        void SaveStaffID(long UserID, long staffID);
 
         ReturnSqlModel ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin);
 

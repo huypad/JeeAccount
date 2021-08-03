@@ -1,9 +1,11 @@
-﻿using DpsLibs.Data;
+﻿using DPSinfra.Utils;
+using DpsLibs.Data;
 using JeeAccount.Classes;
 using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.Common;
 using JeeAccount.Models.JeeHR;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -69,50 +71,6 @@ namespace JeeAccount.Services
                 return firstName;
             }
             return fullname;
-        }
-
-        public static List<T> ConvertDataTableToList<T>(this DataTable dt)
-        {
-            List<T> data = new List<T>();
-            foreach (DataRow row in dt.Rows)
-            {
-                T item = GetItem<T>(row);
-                data.Add(item);
-            }
-            return data;
-        }
-
-        public static T GetItem<T>(DataRow dr)
-        {
-            Type temporary = typeof(T);
-            T obj = Activator.CreateInstance<T>();
-
-            foreach (DataColumn column in dr.Table.Columns)
-            {
-                foreach (PropertyInfo property in temporary.GetProperties())
-                {
-                    if (string.Equals(property.Name, column.ColumnName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        var data = dr[column.ColumnName];
-                        if (data != DBNull.Value)
-                        {
-                            try
-                            {
-                                var safeValue = dr[column.ColumnName] == null ? null : Convert.ChangeType(dr[column.ColumnName], data.GetType());
-                                property.SetValue(obj, safeValue, null);
-                            }
-                            catch (Exception ex)
-                            {
-                                throw new Exception($"{ex.Message} ({column.ColumnName})");
-                            }
-                        }
-                        break;
-                    }
-                    else
-                        continue;
-                }
-            }
-            return obj;
         }
 
         public static string GetColorFullNameUser(string fullname, bool tentruochosau = false)
@@ -288,6 +246,14 @@ namespace JeeAccount.Services
             if (value == null)
                 return DateTime.MinValue;
             return value;
+        }
+
+        public static string GetInternalToken(IConfiguration config)
+        {
+            var secret = config.GetValue<string>("Jwt:internal_secret");
+            var projectName = config.GetValue<string>("KafkaConfig:ProjectName");
+            var token = JsonWebToken.issueToken(new TokenClaims { projectName = projectName }, secret);
+            return token;
         }
     }
 }

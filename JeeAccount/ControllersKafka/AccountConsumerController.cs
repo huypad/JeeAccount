@@ -5,6 +5,7 @@ using DpsLibs.Data;
 using JeeAccount.Controllers;
 using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
+using JeeAccount.Reponsitories;
 using JeeAccount.Services.AccountManagementService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -67,14 +68,14 @@ namespace JeeCustomer.ConsumerKafka
                         var inputModel = new InputApiModel();
                         inputModel.StaffID = staffID.staffID.ToString();
                         inputModel.Userid = obj.userId.ToString();
-                        _accountManagementService.UpdateOneStaffIDByInputApiModel(inputModel);
+                        _ = GeneralReponsitory.UpdateJeeAccountCustomDataByInputApiModel(inputModel, _config.GetValue<string>("AppConfig:Connection"), GetSecretToken());
                     }
                 }
                 string username = GetObjectDB($"select Username from AccountList where UserID = {obj.userId}", _config.GetValue<string>("AppConfig:Connection"));
                 if (!string.IsNullOrEmpty(username))
                 {
                     var identity = new IdentityServerController();
-                    var x = identity.UppdateCustomDataInternal(GetSecretToken(), username, obj);
+                    _ = identity.UppdateCustomDataInternal(GetSecretToken(), username, obj);
                 }
             }
             catch (Exception ex)

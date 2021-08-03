@@ -1,6 +1,7 @@
 ﻿using JeeAccount.Classes;
 using JeeAccount.Models.Common;
 using JeeAccount.Models.JobtitleManagement;
+using JeeAccount.Reponsitories;
 using JeeAccount.Reponsitories.JobtitleManagement;
 using JeeAccount.Services;
 using Microsoft.AspNetCore.Cors;
@@ -57,9 +58,9 @@ namespace JeeAccount.Controllers
                 {
                     return JsonResultCommon.BatBuoc("Đăng nhập");
                 }
-
-                var username = GeneralService.GetUsernameByUserID(_connectionString, customData.JeeAccount.UserID.ToString());
-                _reponsitory.CreateJobtitle(depart, customData.JeeAccount.CustomerID, username.ToString());
+                var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, customData.JeeAccount.UserID);
+                var username = commonInfo.Username;
+                _reponsitory.CreateJobtitle(depart, customData.JeeAccount.CustomerID, username);
 
                 return JsonResultCommon.ThanhCong(depart);
             }
@@ -100,63 +101,6 @@ namespace JeeAccount.Controllers
             catch (Exception ex)
             {
                 return await Task.FromResult(JsonResultCommon.Exception(ex));
-            }
-        }
-
-        [HttpGet("ApiTaoDefaultJobtitle")]
-        public object ApiTaoDefaultJobtitle()
-        {
-            try
-            {
-                var lstCustomerid = GeneralService.GetLstCustomerid(_connectionString);
-                foreach (var customerid in lstCustomerid)
-                {
-                    if (!_reponsitory.CheckJobtitleExist(customerid, _connectionString))
-                    {
-                        if (customerid == 25) continue;
-                        var job1 = new JobtitleModel();
-                        job1.JobtitleName = "Developer";
-                        var lstuserid = GeneralService.GetLstUserIDByCustomerid(_connectionString, customerid);
-                        if (lstuserid is not null)
-                        {
-                            var userid = lstuserid[0];
-                            var username = GeneralService.GetUsernameByUserID(_connectionString, userid.ToString());
-                            _reponsitory.CreateJobtitle(job1, customerid, username.ToString());
-                        }
-                    }
-                }
-
-                return JsonResultCommon.ThanhCong();
-            }
-            catch (Exception ex)
-            {
-                return JsonResultCommon.Exception(ex);
-            }
-        }
-
-        [HttpGet("ApiGoi1lanSaveJobtitleID")]
-        public object ApiGoi1lanSaveJobtitleID()
-        {
-            try
-            {
-                var lstCustomerid = GeneralService.GetLstCustomerid(_connectionString);
-                foreach (var customerid in lstCustomerid)
-                {
-                    if (customerid == 25) continue;
-
-                    if (_reponsitory.CheckJobtitleExist(customerid, _connectionString))
-                    {
-                        var lst = GeneralService.GetLstUsernameByCustomerid(_connectionString, customerid);
-
-                        _reponsitory.ApiGoi1lanSaveJobtitleID(customerid, lst);
-                    }
-                }
-
-                return JsonResultCommon.ThanhCong();
-            }
-            catch (Exception ex)
-            {
-                return JsonResultCommon.Exception(ex);
             }
         }
     }

@@ -152,9 +152,80 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
             return lst;
         }
 
-        #endregion api giao diện
+        public async Task<IEnumerable<AccUsernameModel>> GetListAccUsernameModel(long customerid)
+        {
+            var lst = Enumerable.Empty<AccUsernameModel>();
 
-        #region api new
+            var checkusedjeehr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customerid);
+            if (checkusedjeehr)
+            {
+                lst = await _reponsitory.GetListAccUsernameModelIsJeeHRAsync(customerid).ConfigureAwait(false);
+            }
+            else
+            {
+                lst = await _reponsitory.GetListAccUsernameModelDefaultAsync(customerid).ConfigureAwait(false);
+            }
+
+            return lst;
+        }
+
+        public async Task<IEnumerable<long>> GetListJustCustormerID()
+        {
+            return await _reponsitory.GetListJustCustormerID().ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<long>> GetListJustCustormerIDAppCode(string appCode)
+        {
+            return await _reponsitory.GetListJustCustormerIDAppCode(appCode).ConfigureAwait(false);
+        }
+
+        public async Task<long> GetCustormerID(InputApiModel model)
+        {
+            if (!string.IsNullOrEmpty(model.Username))
+            {
+                var customerid = await GetCustormerIDByUsernameAsync(model.Username);
+                if (customerid != 0)
+                    return customerid;
+            }
+
+            if (!string.IsNullOrEmpty(model.Userid))
+            {
+                var customerid = await GetCustormerIDByUserIDAsync(long.Parse(model.Userid));
+                if (customerid != 0)
+                    return customerid;
+            }
+            return 0;
+        }
+
+        public async Task<long> GetCustormerIDByUsernameAsync(string username)
+        {
+            return await _reponsitory.GetCustormerIDByUsernameAsync(username).ConfigureAwait(false);
+        }
+
+        public async Task<long> GetCustormerIDByUserIDAsync(long UserId)
+        {
+            return await _reponsitory.GetCustormerIDByUserIDAsync(UserId).ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<InfoAdminDTO>> GetInfoAdminAccountByCustomerIDAsync(long customerID)
+        {
+            var checkusedjeehr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customerID);
+            if (checkusedjeehr)
+            {
+                var infoAdminDTOs = await _reponsitory.GetInfoAdminAccountByCustomerIDIsJeeHRAsync(customerID);
+                return infoAdminDTOs;
+            }
+            else
+            {
+                var infoAdminDTOs = await _reponsitory.GetInfoAdminAccountByCustomerIDDefaultAsync(customerID);
+                return infoAdminDTOs;
+            }
+        }
+
+        public async Task<InfoCustomerDTO> GetInfoByCustomerIDAsync(long customerID)
+        {
+            return await _reponsitory.GetInfoByCustomerIDAsync(customerID).ConfigureAwait(false);
+        }
 
         public async Task<InfoUserDTO> GetInfoByUsernameAsync(string username, long customerid)
         {
@@ -170,6 +241,70 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
                 return infoUser;
             }
         }
+
+        public async Task<IEnumerable<AdminModel>> GetListAdminsByCustomerIDAsync(long customerID)
+        {
+            return await _reponsitory.GetListAdminsByCustomerIDAsync(customerID).ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<AppListDTO>> GetListAppByCustomerIDAsync(long customerID)
+        {
+            return await _reponsitory.GetListAppByCustomerIDAsync(customerID).ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<UserNameDTO>> GetListUsernameByAppcodeAsync(long custormerID, string appcode)
+        {
+            return await _reponsitory.GetListUsernameByAppcodeAsync(custormerID, appcode).ConfigureAwait(false);
+        }
+
+        public async Task<string> GetDirectManagerByUserID(string userid)
+        {
+            return await _reponsitory.GetDirectManagerByUserID(userid).ConfigureAwait(false);
+        }
+
+        public async Task<string> GetDirectManagerByUsername(string username)
+        {
+            return await _reponsitory.GetDirectManagerByUsername(username).ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<UserNameDTO>> GetListJustUsernameAndUserIDByCustormerID(long custormerID)
+        {
+            return await _reponsitory.GetListJustUsernameAndUserIDByCustormerID(custormerID).ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<string>> GetListJustUsernameByCustormerID(long custormerID)
+        {
+            return await _reponsitory.GetListJustUsernameByCustormerID(custormerID).ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<long>> GetListJustUserIDByCustormerID(long custormerID)
+        {
+            return await _reponsitory.GetListJustUserIDByCustormerID(custormerID).ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<string>> GetListDirectManager(long custormerID)
+        {
+            return await _reponsitory.GetListDirectManager(custormerID).ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<CustomerAppDTO>> GetListCustomerAppByCustomerIDFromAccountAsync(long customerID)
+        {
+            return await _reponsitory.GetListCustomerAppByCustomerIDFromAccountAsync(customerID).ConfigureAwait(false);
+        }
+
+        #endregion api giao diện
+
+        public ReturnSqlModel ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin)
+        {
+            return _reponsitory.ChangeTinhTrang(customerID, Username, Note, UserIdLogin);
+        }
+
+        public ReturnSqlModel UpdateDirectManager(string Username, string DirectManager, long customerID)
+        {
+            return _reponsitory.UpdateDirectManager(Username, DirectManager, customerID);
+        }
+
+        #region api new
 
         public async Task<IEnumerable<AccUsernameModel>> ListNhanVienCapDuoiDirectManagerByDirectManager(string username, long customerid)
         {
@@ -242,7 +377,8 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
                     var create = _reponsitory.CreateAccount(cnn, account, AdminUserID, customerID);
                     if (create.Susscess)
                     {
-                        var userid = long.Parse(GeneralReponsitory.GetUserIDByUsernameCnn(cnn, account.Username).ToString());
+                        var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, 0, account.Username);
+                        var userid = commonInfo.UserID;
                         var saveAppList = _reponsitory.InsertAppCodeAccount(cnn, userid, ListAppID);
                         if (!saveAppList.Susscess)
                         {
@@ -306,8 +442,9 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
                     var update = _reponsitory.UpdatePersonalInfoCustomData(cnn, personalInfoCustom, userId, customerId);
                     if (update.Susscess)
                     {
-                        string username = _reponsitory.GetUsername(cnn, userId, customerId);
-                        var updateCustom = await this.identityServerController.updateCustomDataPersonalInfo(Admin_access_token, personalInfoCustom, username);
+                        var commonInfo = GeneralReponsitory.GetCommonInfoCnn(cnn, userId);
+                        string username = commonInfo.Username;
+                        var updateCustom = await identityServerController.updateCustomDataPersonalInfo(Admin_access_token, personalInfoCustom, username);
                         if (updateCustom.data is null)
                         {
                             cnn.RollbackTransaction();
@@ -345,7 +482,8 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
 
                 using (DpsConnection cnn = new DpsConnection(_connectionString))
                 {
-                    username = _reponsitory.GetUsername(cnn, objCustomData.userId, customerId);
+                    var commonInfo = GeneralReponsitory.GetCommonInfoCnn(cnn, objCustomData.userId);
+                    username = commonInfo.Username;
                     if (username == null)
                     {
                         identity.message = "UserID không tồn tại";
@@ -400,8 +538,9 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 var userID = cnn.ExecuteScalar(sql).ToString();
-                var username = GeneralReponsitory.GetUsernameByUserIDCnn(cnn, userID).ToString();
-                return await this.identityServerController.ResetPasswordRootCustomer(getSecretToken(), username, model);
+                var commoninfo = GeneralReponsitory.GetCommonInfoCnn(cnn, long.Parse(userID));
+                var username = commoninfo.Username;
+                return await identityServerController.ResetPasswordRootCustomer(getSecretToken(), username, model).ConfigureAwait(false);
             }
         }
 
@@ -411,64 +550,6 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
             var projectName = _configuration.GetValue<string>("KafkaConfig:ProjectName");
             var token = JsonWebToken.issueToken(new TokenClaims { projectName = projectName }, secret);
             return token;
-        }
-
-        public async Task<HttpResponseMessage> UpdateOneStaffIDByInputApiModel(InputApiModel model)
-        {
-            var username = "";
-            var userID = "";
-            if (!string.IsNullOrEmpty(model.Username))
-            {
-                username = model.Username;
-                userID = GeneralReponsitory.GetUserIDByUsername(_connectionString, model.Username).ToString();
-            }
-
-            if (!string.IsNullOrEmpty(model.Userid))
-            {
-                username = GeneralReponsitory.GetUsernameByUserID(_connectionString, model.Userid).ToString();
-                userID = model.Userid;
-            }
-            var appCodes = await _reponsitory.GetListAppByUserIDAsync(long.Parse(userID));
-            var appCodesName = appCodes.Select(x => x.AppCode).ToList();
-            var StaffID = 0;
-            var customerID = 0;
-            using (DpsConnection cnn = new DpsConnection(_connectionString))
-            {
-                if (string.IsNullOrEmpty(model.StaffID))
-                {
-                    var staffidScalar = cnn.ExecuteScalar($"select StaffID from AccountList where UserID = {userID} or Username = '{username}'");
-                    if (staffidScalar is not null)
-                    {
-                        if (!staffidScalar.Equals(DBNull.Value))
-                        {
-                            StaffID = Int32.Parse(staffidScalar.ToString());
-                        }
-                    }
-                }
-                else
-                {
-                    StaffID = Int32.Parse(model.StaffID);
-                    SaveStaffID(cnn, StaffID.ToString(), userID);
-                }
-
-                customerID = Int32.Parse(cnn.ExecuteScalar($"select CustomerID from AccountList where UserID = {userID} or Username = '{username}'").ToString());
-            }
-
-            var jwt_internal = getSecretToken();
-
-            var objCustom = new ObjCustomData();
-            objCustom.userId = Int32.Parse(userID);
-            objCustom.updateField = "jee-account";
-            objCustom.fieldValue = new JeeAccountModel
-            {
-                AppCode = appCodesName,
-                CustomerID = customerID,
-                StaffID = StaffID,
-                UserID = Int32.Parse(userID)
-            };
-
-            var reponse = await identityServerController.UpdateCustomDataInternal(jwt_internal, username, objCustom);
-            return reponse;
         }
 
         private void SaveStaffID(DpsConnection cnn, string StaffID, string UserID)
@@ -489,53 +570,25 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
 
         public async Task<HttpResponseMessage> UpdateOneBgColorCustomData(InputApiModel model)
         {
-            var username = "";
-            var userID = "";
-            if (!string.IsNullOrEmpty(model.Username))
-            {
-                username = model.Username;
-                userID = GeneralReponsitory.GetUserIDByUsername(_connectionString, model.Username).ToString();
-            }
+            var commonInfo = GeneralReponsitory.GetCommonInfoByInputApiModel(_connectionString, model);
 
-            if (!string.IsNullOrEmpty(model.Userid))
-            {
-                username = GeneralReponsitory.GetUsernameByUserID(_connectionString, model.Userid).ToString();
-                userID = model.Userid;
-            }
-
-            var customerId = GeneralReponsitory.GetCustomerIDByUsername(_connectionString, username);
-
-            var personal = GeneralReponsitory.GetPersonalInfoCustomData(Int32.Parse(userID), Int32.Parse(customerId.ToString()), _connectionString);
+            var personal = GeneralReponsitory.GetPersonalInfoCustomData(commonInfo.UserID, commonInfo.CustomerID, _connectionString);
             personal.BgColor = GeneralService.GetColorNameUser(personal.Name[0].ToString());
             var jwt_internal = getSecretToken();
 
             var objCustom = new ObjCustomData();
-            objCustom.userId = Int32.Parse(userID);
+            objCustom.userId = commonInfo.UserID;
             objCustom.updateField = "personalInfo";
             objCustom.fieldValue = personal;
-            return await identityServerController.UpdateCustomDataInternal(jwt_internal, username, objCustom);
+            return await identityServerController.UpdateCustomDataInternal(jwt_internal, commonInfo.Username, objCustom);
         }
 
         public void UpdateAllAppCodesCustomData(InputApiModel model, List<int> lstAppCode)
         {
-            var username = "";
-            var userID = "";
-            if (!string.IsNullOrEmpty(model.Username))
-            {
-                username = model.Username;
-                userID = GeneralReponsitory.GetUserIDByUsername(_connectionString, model.Username).ToString();
-            }
-
-            if (!string.IsNullOrEmpty(model.Userid))
-            {
-                username = GeneralReponsitory.GetUsernameByUserID(_connectionString, model.Userid).ToString();
-                userID = model.Userid;
-            }
-
-            var customerId = GeneralReponsitory.GetCustomerIDByUsername(_connectionString, username);
+            var commonInfo = GeneralReponsitory.GetCommonInfoByInputApiModel(_connectionString, model);
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                _reponsitory.InsertAppCodeAccount(cnn, Int32.Parse(userID), lstAppCode);
+                _reponsitory.InsertAppCodeAccount(cnn, commonInfo.UserID, lstAppCode);
             }
         }
 
@@ -543,31 +596,14 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
         {
             try
             {
-                var username = "";
-                var userID = "";
-                if (!string.IsNullOrEmpty(model.Username))
-                {
-                    username = model.Username;
-                    userID = GeneralReponsitory.GetUserIDByUsername(_connectionString, model.Username).ToString();
-                }
-
-                if (!string.IsNullOrEmpty(model.Userid))
-                {
-                    username = GeneralReponsitory.GetUsernameByUserID(_connectionString, model.Userid).ToString();
-                    userID = model.Userid;
-                }
-                var customerId = GeneralReponsitory.GetCustomerIDByUsername(_connectionString, username);
-                var staffid = GeneralReponsitory.GetStaffIDByUserID(_connectionString, userID);
+                var commonInfo = GeneralReponsitory.GetCommonInfoByInputApiModel(_connectionString, model);
 
                 var custom = new JeeAccountCustomData();
-                custom.customerID = long.Parse(customerId.ToString());
-                if (staffid is not null)
-                {
-                    custom.staffID = long.Parse(staffid.ToString());
-                }
-                var lstApp = await _reponsitory.GetListAppByUserIDAsync(long.Parse(userID));
+                custom.customerID = commonInfo.CustomerID;
+                custom.staffID = commonInfo.StaffID;
+                var lstApp = await GeneralReponsitory.GetListAppByUserIDAsync(_connectionString, commonInfo.UserID);
                 custom.appCode = lstApp.Select(item => item.AppCode).ToList();
-                custom.userID = long.Parse(userID);
+                custom.userID = commonInfo.UserID;
                 return custom;
             }
             catch (Exception ex)

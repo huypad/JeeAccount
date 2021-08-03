@@ -1,16 +1,20 @@
 ﻿using DpsLibs.Data;
 using JeeAccount.Classes;
+using JeeAccount.Controllers;
 using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.Common;
 using JeeAccount.Models.JeeHR;
 using JeeAccount.Services;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace JeeAccount.Reponsitories
 {
@@ -41,136 +45,6 @@ namespace JeeAccount.Reponsitories
             dt = cnn.CreateDataTable(sql, conds);
             if (dt.Rows.Count == 0) return false;
             return true;
-        }
-
-        public static object GetUsernameByUserIDCnn(DpsConnection cnn, string UserID)
-        {
-            string sql = $"select username from AccountList where UserID = {UserID}";
-            DataTable dt = new DataTable();
-            dt = cnn.CreateDataTable(sql);
-            if (dt.Rows.Count == 0) return null;
-            if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
-            return dt.Rows[0][0].ToString();
-        }
-
-        public static object GetUsernameByUserID(string connectionString, string UserID)
-        {
-            using (DpsConnection cnn = new DpsConnection(connectionString))
-            {
-                string sql = $"select username from AccountList where UserID = {UserID}";
-                DataTable dt = new DataTable();
-                dt = cnn.CreateDataTable(sql);
-                if (dt.Rows.Count == 0) return null;
-                if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
-                return dt.Rows[0][0].ToString();
-            }
-        }
-
-        public static UserNameDTO GetUsernameAndUserIDByStaffID(string connectionString, long Staffid)
-        {
-            using (DpsConnection cnn = new DpsConnection(connectionString))
-            {
-                string sql = $"select Username, UserID from AccountList where StaffID = {Staffid}";
-                DataTable dt = new DataTable();
-                dt = cnn.CreateDataTable(sql);
-                return dt.AsEnumerable().Select(row => new UserNameDTO
-                {
-                    Username = row["Username"].ToString(),
-                    UserId = Convert.ToInt64(row["UserID"]),
-                    StaffID = Staffid
-                }).SingleOrDefault();
-            }
-        }
-
-        public static List<UserNameDTO> GetListUserNameDTOByCustomerid(string connectionString, long customerid)
-        {
-            using (DpsConnection cnn = new DpsConnection(connectionString))
-            {
-                string sql = $"select Username, UserID, StaffID from AccountList where CustomerID = {customerid}";
-                DataTable dt = new DataTable();
-                dt = cnn.CreateDataTable(sql);
-                return dt.AsEnumerable().Select(row => new UserNameDTO
-                {
-                    Username = row["Username"].ToString(),
-                    UserId = Convert.ToInt64(row["UserID"]),
-                    StaffID = Convert.ToInt64(row["StaffID"])
-                }).ToList<UserNameDTO>();
-            }
-        }
-
-        public static List<UserNameDTO> GetListUserNameDTOByCustomeridCnn(DpsConnection cnn, long customerid)
-        {
-            string sql = $"select Username, UserID, StaffID from AccountList where CustomerID = {customerid}";
-            DataTable dt = new DataTable();
-            dt = cnn.CreateDataTable(sql);
-            return dt.AsEnumerable().Select(row => new UserNameDTO
-            {
-                Username = row["Username"].ToString(),
-                UserId = Convert.ToInt64(row["UserID"]),
-                StaffID = row["StaffID"] != DBNull.Value ? Convert.ToInt64(row["StaffID"]) : 0
-            }).ToList<UserNameDTO>();
-        }
-
-        public static UserNameDTO GetUsernameAndUserIDByStaffIDCnn(DpsConnection cnn, long Staffid)
-        {
-            string sql = $"select Username, UserID from AccountList where StaffID = {Staffid}";
-            DataTable dt = new DataTable();
-            dt = cnn.CreateDataTable(sql);
-            return dt.AsEnumerable().Select(row => new UserNameDTO
-            {
-                Username = row["Username"].ToString(),
-                UserId = Convert.ToInt64(row["UserID"]),
-                StaffID = Staffid
-            }).SingleOrDefault();
-        }
-
-        public static object GetCustomerIDByUserID(string connectionString, string UserID)
-        {
-            using (DpsConnection cnn = new DpsConnection(connectionString))
-            {
-                string sql = $"select CustomerID from AccountList where UserID = {UserID}";
-                DataTable dt = new DataTable();
-                dt = cnn.CreateDataTable(sql);
-                if (dt.Rows.Count == 0) return null;
-                if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
-                return dt.Rows[0][0].ToString();
-            }
-        }
-
-        public static object GetStaffIDByUserID(string connectionString, string UserID)
-        {
-            using (DpsConnection cnn = new DpsConnection(connectionString))
-            {
-                string sql = $"select StaffID from AccountList where UserID = {UserID}";
-                DataTable dt = new DataTable();
-                dt = cnn.CreateDataTable(sql);
-                if (dt.Rows.Count == 0) return null;
-                if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
-                return dt.Rows[0][0].ToString();
-            }
-        }
-
-        public static object GetUserIDByStaffID(string connectionString, string StaffID)
-        {
-            using (DpsConnection cnn = new DpsConnection(connectionString))
-            {
-                string sql = $"select UserID from AccountList where StaffID = {StaffID}";
-                DataTable dt = new DataTable();
-                dt = cnn.CreateDataTable(sql);
-                if (dt.Rows.Count == 0) return null;
-                if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
-                return dt.Rows[0][0].ToString();
-            }
-        }
-
-        public static object GetUserIDByStaffIDCnn(DpsConnection cnn, string StaffID)
-        {
-            string sql = $"select UserID from AccountList where StaffID = {StaffID}";
-            DataTable dt = new DataTable();
-            dt = cnn.CreateDataTable(sql);
-            if (dt.Rows.Count == 0) return null;
-            if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
-            return dt.Rows[0][0].ToString();
         }
 
         public static bool CheckIsAdminByUserIDCnn(DpsConnection cnn, string UserId)
@@ -209,72 +83,100 @@ namespace JeeAccount.Reponsitories
             return true;
         }
 
-        public static object GetStaffIDByUsername(string connectionString, string Username)
+        public static CommonInfo GetCommonInfoCnn(DpsConnection cnn, long UserID = 0, string Username = "", long StaffID = 0)
         {
-            using (DpsConnection cnn = new DpsConnection(connectionString))
+            string where = "";
+
+            if (UserID > 0)
             {
-                string sql = $"select StaffID from AccountList where Username = '{Username}'";
-                DataTable dt = new DataTable();
-                dt = cnn.CreateDataTable(sql);
-                if (dt.Rows.Count == 0) return null;
-                if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
-                return dt.Rows[0][0].ToString();
+                if (string.IsNullOrEmpty(where))
+                {
+                    where += $" UserID = {UserID}";
+                }
             }
-        }
-
-        public static object GetCustomerIDByUsername(string connectionString, string Username)
-        {
-            using (DpsConnection cnn = new DpsConnection(connectionString))
+            if (!string.IsNullOrEmpty(Username))
             {
-                string sql = $"select CustomerID from AccountList where Username = '{Username}'";
-                DataTable dt = new DataTable();
-                dt = cnn.CreateDataTable(sql);
-                if (dt.Rows.Count == 0) return null;
-                if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
-                return dt.Rows[0][0].ToString();
+                if (string.IsNullOrEmpty(where))
+                {
+                    where += $" Username = '{Username}'";
+                }
+                else
+                {
+                    where += $" or Username = '{Username}'";
+                }
             }
-        }
-
-        public static object GetUserIDByUsernameCnn(DpsConnection cnn, string Username)
-        {
-            string sql = $"select UserID from AccountList where Username = '{Username}'";
+            if (StaffID > 0)
+            {
+                if (string.IsNullOrEmpty(where))
+                {
+                    where += $" StaffID = {StaffID}";
+                }
+                else
+                {
+                    where += $" or StaffID = {StaffID}";
+                }
+            }
+            if (string.IsNullOrEmpty(where)) throw new ArgumentNullException("UserID or Username or Staffid");
+            string sql = $"select UserID, Username, StaffID, CustomerID from AccountList where {where}";
             DataTable dt = new DataTable();
             dt = cnn.CreateDataTable(sql);
-            if (dt.Rows.Count == 0) return null;
-            if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
-            return Int32.Parse(dt.Rows[0][0].ToString());
+            if (dt.Rows.Count == 0) throw new ArgumentNullException("UserID or Username or Staffid");
+            return dt.AsEnumerable().Select(row => new CommonInfo
+            {
+                CustomerID = Convert.ToInt32(row["CustomerID"]),
+                StaffID = row["StaffID"] != DBNull.Value ? Convert.ToInt64(row["StaffID"]) : 0,
+                UserID = Convert.ToInt64(row["UserID"]),
+                Username = row["Username"].ToString()
+            }).SingleOrDefault();
         }
 
-        public static object GetStaffIDByUserIDCnn(DpsConnection cnn, string UserID)
+        public static CommonInfo GetCommonInfo(string connectionString, long UserID = 0, string Username = "", long StaffID = 0)
         {
-            string sql = $"select StaffID from AccountList where UserID = {UserID}";
+            string where = "";
+
+            if (UserID > 0)
+            {
+                if (string.IsNullOrEmpty(where))
+                {
+                    where += $" UserID = {UserID}";
+                }
+            }
+            if (!string.IsNullOrEmpty(Username))
+            {
+                if (string.IsNullOrEmpty(where))
+                {
+                    where += $" Username = '{Username}'";
+                }
+                else
+                {
+                    where += $" or Username = '{Username}'";
+                }
+            }
+            if (StaffID > 0)
+            {
+                if (string.IsNullOrEmpty(where))
+                {
+                    where += $" StaffID = {StaffID}";
+                }
+                else
+                {
+                    where += $" or StaffID = {StaffID}";
+                }
+            }
+            if (string.IsNullOrEmpty(where)) throw new ArgumentNullException("UserID or Username or Staffid");
+            string sql = $"select UserID, Username, StaffID, CustomerID from AccountList where {where}";
             DataTable dt = new DataTable();
-            dt = cnn.CreateDataTable(sql);
-            if (dt.Rows.Count == 0) return null;
-            if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
-            return dt.Rows[0][0].ToString();
-        }
-
-        public static object GetStaffIDByUsernameCnn(DpsConnection cnn, string Username)
-        {
-            string sql = $"select StaffID from AccountList where Username = '{Username}'";
-            DataTable dt = new DataTable();
-            dt = cnn.CreateDataTable(sql);
-            if (dt.Rows.Count == 0) return null;
-            if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
-            return dt.Rows[0][0].ToString();
-        }
-
-        public static object GetUserIDByUsername(string connectionString, string Username)
-        {
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
-                string sql = $"select UserID from AccountList where Username = '{Username}'";
-                DataTable dt = new DataTable();
                 dt = cnn.CreateDataTable(sql);
-                if (dt.Rows.Count == 0) return null;
-                if (string.IsNullOrEmpty(dt.Rows[0][0].ToString())) return null;
-                return Int32.Parse(dt.Rows[0][0].ToString());
+                if (dt.Rows.Count == 0) throw new ArgumentNullException("UserID or Username or Staffid");
+                return dt.AsEnumerable().Select(row => new CommonInfo
+                {
+                    CustomerID = Convert.ToInt32(row["CustomerID"]),
+                    StaffID = row["StaffID"] != DBNull.Value ? Convert.ToInt64(row["StaffID"]) : 0,
+                    UserID = Convert.ToInt64(row["UserID"]),
+                    Username = row["Username"].ToString()
+                }).SingleOrDefault();
             }
         }
 
@@ -293,6 +195,34 @@ namespace JeeAccount.Reponsitories
                 }
                 return ListCustomerid;
             }
+        }
+
+        public static CommonInfo GetCommonInfoByInputApiModel(string connectionString, InputApiModel model)
+        {
+            var commonInfo = new CommonInfo();
+            if (!string.IsNullOrEmpty(model.Username) && string.IsNullOrEmpty(model.Userid))
+            {
+                commonInfo = GetCommonInfo(connectionString, 0, model.Username);
+            }
+            else
+            {
+                commonInfo = GetCommonInfo(connectionString, long.Parse(model.Userid));
+            }
+            return commonInfo;
+        }
+
+        public static CommonInfo GetCommonInfoByInputApiModelCnn(DpsConnection cnn, InputApiModel model)
+        {
+            var commonInfo = new CommonInfo();
+            if (!string.IsNullOrEmpty(model.Username) && string.IsNullOrEmpty(model.Userid))
+            {
+                commonInfo = GetCommonInfoCnn(cnn, 0, model.Username);
+            }
+            else
+            {
+                commonInfo = GetCommonInfoCnn(cnn, long.Parse(model.Userid));
+            }
+            return commonInfo;
         }
 
         public static List<long> GetLstCustomeridCnn(DpsConnection cnn)
@@ -432,6 +362,131 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID
             catch (Exception)
             {
                 throw;
+            }
+        }
+
+        public static async Task<HttpResponseMessage> UpdateJeeAccountCustomDataByInputApiModel(InputApiModel model, string connectionString, string jwt_internal)
+        {
+            try
+            {
+                var indentityController = new IdentityServerController();
+                var commonInfo = GetCommonInfoByInputApiModel(connectionString, model);
+                var appCodes = await GetListAppByUserIDAsync(connectionString, commonInfo.UserID);
+                var appCodesName = appCodes.Select(x => x.AppCode).ToList();
+                var objCustom = new ObjCustomData();
+                objCustom.userId = commonInfo.UserID;
+                objCustom.updateField = "jee-account";
+                objCustom.fieldValue = new JeeAccountModel
+                {
+                    AppCode = appCodesName,
+                    CustomerID = commonInfo.CustomerID,
+                    StaffID = commonInfo.StaffID,
+                    UserID = commonInfo.UserID
+                };
+                var reponse = await indentityController.UpdateCustomDataInternal(jwt_internal, commonInfo.Username, objCustom).ConfigureAwait(false);
+                return reponse;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public static void SaveStaffID(long UserID, long staffID, string connectionString)
+        {
+            Hashtable val = new Hashtable();
+
+            val.Add("StaffID", staffID);
+
+            SqlConditions conditions = new SqlConditions();
+            conditions.Add("UserID", UserID);
+
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                int x = cnn.Update(val, conditions, "AccountList");
+                if (x <= 0)
+                {
+                    throw cnn.LastError;
+                }
+            }
+        }
+
+        public static void SaveStaffIDCnn(long UserID, long staffID, DpsConnection cnn)
+        {
+            Hashtable val = new Hashtable();
+            val.Add("StaffID", staffID);
+            SqlConditions conditions = new SqlConditions();
+            conditions.Add("UserID", UserID);
+
+            int x = cnn.Update(val, conditions, "AccountList");
+            if (x <= 0)
+            {
+                throw cnn.LastError;
+            }
+        }
+
+        public static async Task<IEnumerable<AppListDTO>> GetListAppByUserIDAsync(string connectionString, long UserID, long CustomerID = 0)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("UserID", UserID);
+            string selection = " AppList.* ";
+            string join = @"join Account_App on Account_App.UserID = AccountList.UserID
+join AppList on AppList.AppID = Account_App.AppID";
+            string where = "where AccountList.UserID = @UserID";
+            if (CustomerID > 0)
+            {
+                selection += " , Customer_App.SoLuongNhanSu";
+                join += " join Customer_App on Customer_App.AppID = AppList.AppID ";
+                where += " and Customer_App.CustomerID = @CustomerID";
+                Conds.Add("CustomerID", CustomerID);
+            }
+            string sql = @$"select {selection} from AccountList {join} {where} order by Position";
+
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                if (CustomerID > 0)
+                {
+                    var result = dt.AsEnumerable().Select(row => new AppListDTO
+                    {
+                        AppID = Int32.Parse(row["AppID"].ToString()),
+                        APIUrl = row["APIUrl"].ToString(),
+                        AppCode = row["AppCode"].ToString(),
+                        AppName = row["AppName"].ToString(),
+                        BackendURL = row["BackendURL"].ToString(),
+                        CurrentVersion = row["CurrentVersion"].ToString(),
+                        Description = row["Description"].ToString(),
+                        LastUpdate = row["LastUpdate"].ToString(),
+                        Note = row["Note"].ToString(),
+                        ReleaseDate = row["ReleaseDate"].ToString(),
+                        Icon = row["Icon"].ToString(),
+                        Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
+                        SoLuongNhanSu = (row["SoLuongNhanSu"] != DBNull.Value) ? Int32.Parse(row["SoLuongNhanSu"].ToString()) : 0,
+                        IsShowApp = Convert.ToBoolean(row["IsShowApp"])
+                    });
+                    return result;
+                }
+                else
+                {
+                    var result = dt.AsEnumerable().Select(row => new AppListDTO
+                    {
+                        AppID = Int32.Parse(row["AppID"].ToString()),
+                        APIUrl = row["APIUrl"].ToString(),
+                        AppCode = row["AppCode"].ToString(),
+                        AppName = row["AppName"].ToString(),
+                        BackendURL = row["BackendURL"].ToString(),
+                        CurrentVersion = row["CurrentVersion"].ToString(),
+                        Description = row["Description"].ToString(),
+                        LastUpdate = row["LastUpdate"].ToString(),
+                        Note = row["Note"].ToString(),
+                        ReleaseDate = row["ReleaseDate"].ToString(),
+                        Icon = row["Icon"].ToString(),
+                        Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
+                        IsShowApp = Convert.ToBoolean(row["IsShowApp"])
+                    });
+                    return result;
+                }
             }
         }
     }
