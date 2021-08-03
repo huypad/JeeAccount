@@ -32,4 +32,10 @@ namespace JeeAccount.Models.JeeHR
             Position = item.Position;
         }
     }
+
+    public class JeeHRCoCauToChucModelFromDB
+    {
+        public int RowID { get; set; }
+        public string Title { get; set; }
+    }
 }

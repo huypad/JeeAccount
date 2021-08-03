@@ -433,7 +433,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID
             string selection = " AppList.* ";
             string join = @"join Account_App on Account_App.UserID = AccountList.UserID
 join AppList on AppList.AppID = Account_App.AppID";
-            string where = "where AccountList.UserID = @UserID";
+            string where = "where AccountList.UserID = @UserID and (AccountList.Disable = 0 or AccountList.Disable is null)";
             if (CustomerID > 0)
             {
                 selection += " , Customer_App.SoLuongNhanSu";

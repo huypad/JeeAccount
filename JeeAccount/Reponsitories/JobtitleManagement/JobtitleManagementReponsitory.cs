@@ -132,7 +132,7 @@ namespace JeeAccount.Reponsitories.JobtitleManagement
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", customerID);
             Conds.Add("RowID", RowID);
-            string sql = $"select IsActive from JobtitleList where CustomerID=@CustomerID and RowID=@RowID";
+            string sql = $"select IsActive from JobtitleList where CustomerID=@CustomerID and RowID=@RowID and (Disable = 0 or Disable is null)";
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 DataTable dt = cnn.CreateDataTable(sql, Conds);
@@ -140,7 +140,7 @@ namespace JeeAccount.Reponsitories.JobtitleManagement
                 {
                     return new ReturnSqlModel("RowID không tồn tại", Constant.ERRORCODE_NOTEXIST);
                 }
-                string sqlGetUsernameLogin = $"select Username from AccountList where CustomerID=@CustomerID and UserID=@UserID";
+                string sqlGetUsernameLogin = $"select Username from AccountList where CustomerID=@CustomerID and UserID=@UserID and (Disable = 0 or Disable is null)";
                 SqlConditions CondsLogin = new SqlConditions();
                 CondsLogin.Add("UserID", UserIdLogin);
                 CondsLogin.Add("CustomerID", customerID);

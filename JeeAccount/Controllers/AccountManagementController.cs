@@ -67,7 +67,6 @@ namespace JeeAccount.Controllers
                 {
                     return Unauthorized(MessageReturnHelper.DangNhap());
                 }
-                BaseModel<object> model = new BaseModel<object>();
                 PageModel pageModel = new PageModel();
                 var lst = await _service.GetListAccountManagement(query, customData.JeeAccount.CustomerID).ConfigureAwait(false);
                 int total = lst.Count();

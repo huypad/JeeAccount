@@ -2,6 +2,7 @@
 using JeeAccount.Classes;
 using JeeAccount.Models.Common;
 using JeeAccount.Models.DepartmentManagement;
+using JeeAccount.Models.JeeHR;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections;
@@ -21,17 +22,17 @@ namespace JeeAccount.Reponsitories
             _connectionString = configuration.GetValue<string>("AppConfig:Connection");
         }
 
-        public async Task<IEnumerable<DepartmentDTO>> GetListDepartment(long custormerID)
+        public async Task<IEnumerable<DepartmentDTO>> GetListDepartmentDefaultAsync(long custormerID)
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", custormerID);
 
             string sql = "select RowID, IsActive, DepartmentManager, DepartmentName, Note from DepartmentList " +
-                "where CustomerID=@CustomerID and (Disable != 1 or Disable is null)";
+                " where CustomerID=@CustomerID and (Disable != 1 or Disable is null)";
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = cnn.CreateDataTable(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
                 var result = dt.AsEnumerable().Select(row => new DepartmentDTO
                 {
                     RowID = long.Parse(row["RowID"].ToString()),
@@ -40,7 +41,27 @@ namespace JeeAccount.Reponsitories
                     DepartmentName = row["DepartmentName"].ToString(),
                     Note = row["Note"].ToString(),
                 });
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return result;
+            }
+        }
+
+        public async Task<IEnumerable<JeeHRCoCauToChucModelFromDB>> GetListDepartmentIsJeeHRtAsync(long custormerID)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("CustomerID", custormerID);
+
+            string sql = "select DISTINCT DepartmentID, Department, Disable from AccountList" +
+                " where CustomerID=@CustomerID and DepartmentID is not null and (Disable != 1 or Disable is null)";
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                var result = dt.AsEnumerable().Select(row => new JeeHRCoCauToChucModelFromDB
+                {
+                    RowID = int.Parse(row["DepartmentID"].ToString()),
+                    Title = row["Department"].ToString()
+                });
+                return result;
             }
         }
 
@@ -79,7 +100,7 @@ namespace JeeAccount.Reponsitories
                             var id = Int32.Parse(cnn.ExecuteScalar("SELECT IDENT_CURRENT ('DepartmentList') AS Current_Identity;").ToString());
                             foreach (string username in departmentModel.ThanhVien)
                             {
-                                updateDepartmentForAccountList(cnn, id, username);
+                                UpdateDepartmentForAccountList(cnn, id, username);
                             }
                         }
                     }
@@ -93,7 +114,7 @@ namespace JeeAccount.Reponsitories
             }
         }
 
-        private void updateDepartmentForAccountList(DpsConnection cnn, int RowIdDepartment, string AccountUsername)
+        private void UpdateDepartmentForAccountList(DpsConnection cnn, int RowIdDepartment, string AccountUsername)
         {
             Hashtable val = new Hashtable();
             SqlConditions conds = new SqlConditions();
@@ -105,22 +126,6 @@ namespace JeeAccount.Reponsitories
                 cnn.RollbackTransaction();
                 cnn.EndTransaction();
                 throw cnn.LastError;
-            }
-        }
-
-        public async Task ApiGoi1lanSaveDepartmentID(long customerid, List<string> usernames)
-        {
-            var lst = await GetListDepartment(customerid);
-            if (lst.Count() > 0)
-            {
-                var iddepartment = (int)lst.First().RowID;
-                foreach (var username in usernames)
-                {
-                    using (DpsConnection cnn = new DpsConnection(_connectionString))
-                    {
-                        updateDepartmentForAccountList(cnn, iddepartment, username);
-                    }
-                }
             }
         }
 
@@ -172,7 +177,7 @@ namespace JeeAccount.Reponsitories
 
         public bool CheckDepartmentExist(long CustomerID, string connectionString)
         {
-            string sql = $"select * from DepartmentList where CustomerID = {CustomerID}";
+            string sql = $"select * from DepartmentList where CustomerID = {CustomerID} and (Disable = 0 or Disable is null)";
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
                 DataTable dt = cnn.CreateDataTable(sql);

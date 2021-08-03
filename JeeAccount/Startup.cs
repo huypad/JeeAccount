@@ -10,6 +10,7 @@ using JeeAccount.Services.AccountManagementService;
 using JeeAccount.Services.CommentService;
 using JeeAccount.Services.CustomerManagementService;
 using JeeAccount.Services.DatabaseManagementService;
+using JeeAccount.Services.DepartmentManagement;
 using JeeAccount.Services.MailService;
 using JeeAccount.Services.StructureManagementService;
 using JeeCustomer.ConsumerKafka;
@@ -147,6 +148,7 @@ namespace JeeAccount
             #region add Services
 
             services.AddTransient<IAccountManagementService, AccountManagementService>();
+            services.AddTransient<IDepartmentManagementService, DepartmentManagementService>();
             services.AddTransient<ICustomerManagementService, CustomerManagementService>();
             services.AddTransient<IDatabaseManagementService, DatabaseManagementService>();
             services.AddTransient<IMailService, MailService>();

@@ -3,6 +3,7 @@ using JeeAccount.Models.Common;
 using JeeAccount.Models.DepartmentManagement;
 using JeeAccount.Reponsitories;
 using JeeAccount.Services;
+using JeeAccount.Services.DepartmentManagement;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -18,14 +19,14 @@ namespace JeeAccount.Controllers
     public class DepartmentManagementController : ControllerBase
     {
         private readonly IConfiguration _config;
-        private readonly IDepartmentManagementReponsitory _reponsitory;
+        private readonly IDepartmentManagementService _service;
         private readonly string _connectionString;
         private readonly string HOST_JEEHR_API;
 
-        public DepartmentManagementController(IConfiguration configuration, IDepartmentManagementReponsitory reponsitory)
+        public DepartmentManagementController(IConfiguration configuration, IDepartmentManagementService service)
         {
             _config = configuration;
-            _reponsitory = reponsitory;
+            _service = service;
             _connectionString = configuration.GetValue<string>("AppConfig:Connection");
             HOST_JEEHR_API = configuration.GetValue<string>("Host:JeeHR_API");
         }
@@ -48,7 +49,7 @@ namespace JeeAccount.Controllers
                 var checkUsedJeeHr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
                 if (!checkUsedJeeHr)
                 {
-                    var depart = await _reponsitory.GetListDepartment(customData.JeeAccount.CustomerID);
+                    var depart = await _service.GetListDepartmentDefaultAsync(customData.JeeAccount.CustomerID);
                     return JsonResultCommon.ThanhCong(depart);
                 }
                 else
@@ -65,7 +66,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("GetDSPhongban")]
-        public async Task<IActionResult> GetDSPhongban([FromQuery] QueryParams query)
+        public async Task<IActionResult> GetDSPhongban(bool notcalljeehr)
         {
             try
             {
@@ -79,10 +80,11 @@ namespace JeeAccount.Controllers
                 {
                     return Ok(MessageReturnHelper.DangNhap());
                 }
+
                 var checkUsedJeeHr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
                 if (!checkUsedJeeHr)
                 {
-                    var depart = await _reponsitory.GetListDepartment(customData.JeeAccount.CustomerID);
+                    var depart = await _service.GetListDepartmentDefaultAsync(customData.JeeAccount.CustomerID);
                     var obj = new
                     {
                         tree = DBNull.Value,
@@ -93,22 +95,36 @@ namespace JeeAccount.Controllers
                 }
                 else
                 {
-                    var jeehrController = new JeeHRController(HOST_JEEHR_API);
-                    var list = await jeehrController.GetDSCoCauToChuc(token);
-                    if (list.status == 1)
+                    if (!notcalljeehr)
                     {
-                        var obj = new
+                        var jeehrController = new JeeHRController(HOST_JEEHR_API);
+                        var list = await jeehrController.GetDSCoCauToChuc(token);
+                        if (list.status == 1)
                         {
-                            tree = list.data,
-                            flat = TranferDataHelper.FlatListJeeHRCoCauToChuc(list.data),
-                            isTree = true
-                        };
+                            var obj = new
+                            {
+                                tree = list.data,
+                                flat = TranferDataHelper.FlatListJeeHRCoCauToChuc(list.data),
+                                isTree = true
+                            };
 
-                        return Ok(obj);
+                            return Ok(obj);
+                        }
+                        else
+                        {
+                            return BadRequest(MessageReturnHelper.ErrorJeeHR(list.error));
+                        }
                     }
                     else
                     {
-                        return BadRequest(MessageReturnHelper.ErrorJeeHR(list.error));
+                        var depart = await _service.GetListDepartmentIsJeeHRtAsync(customData.JeeAccount.CustomerID);
+                        var obj = new
+                        {
+                            tree = DBNull.Value,
+                            flat = depart,
+                            isTree = false
+                        };
+                        return Ok(obj);
                     }
                 }
             }
@@ -130,7 +146,7 @@ namespace JeeAccount.Controllers
                 }
 
                 var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, customData.JeeAccount.UserID);
-                _reponsitory.CreateDepartment(depart, customData.JeeAccount.CustomerID, commonInfo.Username);
+                _service.CreateDepartment(depart, customData.JeeAccount.CustomerID, commonInfo.Username);
 
                 return JsonResultCommon.ThanhCong(depart);
             }
@@ -151,7 +167,7 @@ namespace JeeAccount.Controllers
                     return await Task.FromResult(JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData"));
                 }
 
-                ReturnSqlModel update = _reponsitory.ChangeTinhTrang(customData.JeeAccount.CustomerID, acc.RowID, acc.Note, customData.JeeAccount.UserID);
+                ReturnSqlModel update = _service.ChangeTinhTrang(customData.JeeAccount.CustomerID, acc.RowID, acc.Note, customData.JeeAccount.UserID);
                 if (!update.Susscess)
                 {
                     if (update.ErrorCode.Equals(Constant.ERRORCODE_NOTEXIST))

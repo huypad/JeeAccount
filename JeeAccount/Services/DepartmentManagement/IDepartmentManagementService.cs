@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace JeeAccount.Reponsitories
+namespace JeeAccount.Services.DepartmentManagement
 {
-    public interface IDepartmentManagementReponsitory
+    public interface IDepartmentManagementService
     {
         Task<IEnumerable<DepartmentDTO>> GetListDepartmentDefaultAsync(long custormerID);
 
