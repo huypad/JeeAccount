@@ -10,6 +10,14 @@ namespace JeeAccount.Services.AccountManagementService
 {
     public interface IAccountManagementService
     {
+        #region api giao diện
+
+        Task<IEnumerable<AccountManagementDTO>> GetListAccountManagement(QueryParams query, long customerid);
+
+        Task UpdateAvatarWithChangeUrlAvatar(long UserId, string Username, long CustomerID, string apiUrl);
+
+        #endregion api giao diện
+
         Task<InfoUserDTO> GetInfoByUsernameAsync(string username, long customerid);
 
         Task<IEnumerable<AccUsernameModel>> ListNhanVienCapDuoiDirectManagerByDirectManager(string username, long customerid);
@@ -19,8 +27,6 @@ namespace JeeAccount.Services.AccountManagementService
         Task<IdentityServerReturn> UpdatePersonalInfoCustomData(string Admin_access_token, PersonalInfoCustomData personalInfoCustom, long userId, long customerId);
 
         Task<IdentityServerReturn> UppdateCustomData(string Admin_access_token, ObjCustomData objCustomData, long customerId);
-
-        Task UpdateAvatarWithChangeUrlAvatar(long UserId, string Username, long CustomerID, string apiUrl);
 
         Task<HttpResponseMessage> ResetPasswordRootCustomer(CustomerResetPasswordModel model);
 

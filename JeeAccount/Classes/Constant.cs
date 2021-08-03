@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace JeeAccount.Classes
 {
-    public class Constant
+    public static class Constant
     {
         /// <summary>
         /// Variable for JWT type
@@ -66,7 +66,7 @@ namespace JeeAccount.Classes
         }
 
         /// <summary>
-        ///
+        /// getConfig
         /// </summary>
         /// <param name="code">ex: JeeWorkConfig:HRConnectionString</param>
         /// <returns></returns>
@@ -165,7 +165,7 @@ namespace JeeAccount.Classes
             {
                 return Dic_Error.ContainsKey(pErrorCode) ? Dic_Error[pErrorCode] : "Error has been not defined";
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return "Error_Undefined";
             }
@@ -186,7 +186,7 @@ namespace JeeAccount.Classes
             {
                 return pErrorCode.ToString() + " - " + Ulities.TruncateString(pExtraMsg, pLength);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return "Error_Message_Undefined";
             }

@@ -1,5 +1,7 @@
 ﻿using DpsLibs.Data;
+using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
+using JeeAccount.Models.Common;
 using JeeAccount.Models.JeeHR;
 using JeeAccount.Services;
 using System;
@@ -40,8 +42,8 @@ namespace JeeAccount.Classes
             acc.CustomerID = customerid;
             acc.Department = nhanvien.Structure;
             acc.Email = nhanvien.Email;
-            acc.FirstName = GeneralService.getFirstname(nhanvien.HoTen);
-            acc.LastName = GeneralService.getlastname(nhanvien.HoTen);
+            acc.FirstName = GeneralService.GetFirstname(nhanvien.HoTen);
+            acc.LastName = GeneralService.Getlastname(nhanvien.HoTen);
             acc.FullName = nhanvien.HoTen;
             acc.Jobtitle = nhanvien.TenChucVu;
             acc.NgaySinh = nhanvien.NgaySinh;
@@ -85,8 +87,8 @@ namespace JeeAccount.Classes
             acc.CustomerID = customerid;
             acc.Department = nhanvien.Structure;
             acc.Email = nhanvien.Email;
-            acc.FirstName = GeneralService.getFirstname(nhanvien.HoTen);
-            acc.LastName = GeneralService.getlastname(nhanvien.HoTen);
+            acc.FirstName = GeneralService.GetFirstname(nhanvien.HoTen);
+            acc.LastName = GeneralService.Getlastname(nhanvien.HoTen);
             acc.FullName = nhanvien.HoTen;
             acc.Jobtitle = nhanvien.TenChucVu;
             acc.NgaySinh = nhanvien.NgaySinh;
@@ -142,6 +144,21 @@ namespace JeeAccount.Classes
                 lst = JoinJeeHRCoCauToChuc(cocau, lst);
             }
             return lst;
+        }
+
+        public static IdentityServerReturn TranformIdentityServerReturnSqlModel(ReturnSqlModel returnSql)
+        {
+            IdentityServerReturn identity = new IdentityServerReturn();
+            identity.statusCode = Int32.Parse(returnSql.ErrorCode);
+            identity.message = returnSql.ErrorMessgage;
+            return identity;
+        }
+
+        public static IdentityServerReturn TranformIdentityServerException(Exception ex)
+        {
+            IdentityServerReturn identity = new IdentityServerReturn();
+            identity.statusCode = Int32.Parse(Constant.ERRORCODE_EXCEPTION);
+            return identity;
         }
     }
 }

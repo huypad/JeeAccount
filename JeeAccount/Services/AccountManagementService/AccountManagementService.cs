@@ -35,9 +35,130 @@ namespace JeeAccount.Services.AccountManagementService
             _configuration = configuration;
         }
 
+        #region api giao diện
+
+        public async Task<IEnumerable<AccountManagementDTO>> GetListAccountManagement(QueryParams query, long customerid)
+        {
+            query = query == null ? new QueryParams() : query;
+
+            string orderByStr = "AccountList.UserID asc";
+            string whereStr = " AccountList.Disable != 1 ";
+
+            Dictionary<string, string> sortableFields = new Dictionary<string, string>
+                        {
+                            { "nhanvien", "AccountList.LastName"},
+                            { "tendangnhap", "AccountList.Username"},
+                            { "tinhtrang", "AccountList.IsActive"},
+                            { "chucvu", "AccountList.JobtitleID"},
+                            { "phongban", "AccountList.DepartmentID" }
+                        };
+
+            var checkusedjeehr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customerid);
+
+            if (!string.IsNullOrEmpty(query.sortField) && sortableFields.ContainsKey(query.sortField))
+            {
+                orderByStr = sortableFields[query.sortField] + ("desc".Equals(query.sortOrder) ? " desc" : " asc");
+            }
+
+            if (!string.IsNullOrEmpty(query.filter["keyword"]))
+            {
+                if (!checkusedjeehr)
+                {
+                    whereStr += $" and (AccountList.LastName + ' ' + AccountList.FirstName like N'%{query.filter["keyword"]}%' " +
+$"or JobtitleList.JobtitleName like N'%{query.filter["keyword"]}%' " +
+$"or AccountList.Username like N'%{query.filter["keyword"]}%'" +
+$"or DepartmentList.DepartmentName like N'%{query.filter["keyword"]}%')";
+                }
+                else
+                {
+                    whereStr += $" and (AccountList.LastName + ' ' + AccountList.FirstName like N'%{query.filter["keyword"]}%' " +
+$"or AccountList.Jobtitle like N'%{query.filter["keyword"]}%' " +
+$"or AccountList.Username like N'%{query.filter["keyword"]}%'" +
+$"or AccountList.Department like N'%{query.filter["keyword"]}%')";
+                }
+            }
+
+            if (!string.IsNullOrEmpty(query.filter["username"]))
+            {
+                whereStr += $" and (AccountList.Username like '%{query.filter["username"]}%') ";
+            }
+
+            if (!string.IsNullOrEmpty(query.filter["tennhanvien"]))
+            {
+                whereStr += $" and (AccountList.FirstName like N'%{query.filter["tennhanvien"]}%') ";
+            }
+
+            if (!string.IsNullOrEmpty(query.filter["phongban"]))
+            {
+                if (!checkusedjeehr)
+                {
+                    whereStr += $" and (DepartmentList.DepartmentName like N'%{query.filter["phongban"]}%') ";
+                }
+                else
+                {
+                    whereStr += $" and (AccountList.Department like N'%{query.filter["phongban"]}%') ";
+                }
+            }
+
+            if (!string.IsNullOrEmpty(query.filter["phongbanid"]))
+            {
+                whereStr += $" and (AccountList.DepartmentID  = {query.filter["phongbanid"]}) ";
+            }
+
+            if (!string.IsNullOrEmpty(query.filter["chucvu"]))
+            {
+                if (!checkusedjeehr)
+                {
+                    whereStr += $" and (JobtitleList.Jobtitle like N'%{query.filter["chucvu"]}%') ";
+                }
+                else
+                {
+                    whereStr += $" and (AccountList.Jobtitle like N'%{query.filter["chucvu"]}%') ";
+                }
+            }
+
+            if (!string.IsNullOrEmpty(query.filter["chucvuid"]))
+            {
+                whereStr += $" and (AccountList.JobtitleID like N'%{query.filter["chucvuid"]}%') ";
+            }
+
+            if (!string.IsNullOrEmpty(query.filter["isadmin"]))
+            {
+                if (Convert.ToBoolean(query.filter["isadmin"]))
+                {
+                    whereStr += $" and (AccountList.IsAdmin = 1) ";
+                }
+            }
+
+            if (!string.IsNullOrEmpty(query.filter["dakhoa"]))
+            {
+                if (Convert.ToBoolean(query.filter["dakhoa"]))
+                {
+                    whereStr += $" and (AccountList.IsActive = 0) ";
+                }
+            }
+
+            var lst = Enumerable.Empty<AccountManagementDTO>();
+            if (!checkusedjeehr)
+            {
+                var res = await _reponsitory.GetListAccountManagementDefaultAsync(customerid, whereStr, orderByStr);
+                lst = res;
+            }
+            else
+            {
+                var res = await _reponsitory.GetListAccountManagementIsJeeHRAsync(customerid, whereStr, orderByStr);
+                lst = res;
+            }
+            return lst;
+        }
+
+        #endregion api giao diện
+
+        #region api new
+
         public async Task<InfoUserDTO> GetInfoByUsernameAsync(string username, long customerid)
         {
-            var checkusedjeehr = GeneralService.IsUsedJeeHRCustomerid(_connectionString, customerid);
+            var checkusedjeehr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customerid);
             if (checkusedjeehr)
             {
                 var infoUser = await _reponsitory.GetInfoByUsernameIsJeeHRAsync(username);
@@ -52,7 +173,7 @@ namespace JeeAccount.Services.AccountManagementService
 
         public async Task<IEnumerable<AccUsernameModel>> ListNhanVienCapDuoiDirectManagerByDirectManager(string username, long customerid)
         {
-            var checkusedjeehr = GeneralService.IsUsedJeeHRCustomerid(_connectionString, customerid);
+            var checkusedjeehr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customerid);
             if (checkusedjeehr)
             {
                 var accs = await _reponsitory.ListNhanVienCapDuoiDirectManagerByDirectManagerJeeHRAsync(username);
@@ -97,7 +218,7 @@ namespace JeeAccount.Services.AccountManagementService
                     {
                         cnn.RollbackTransaction();
                         cnn.EndTransaction();
-                        identityServerReturn = GeneralService.TranformIdentityServerReturnSqlModel(create);
+                        identityServerReturn = TranferDataHelper.TranformIdentityServerReturnSqlModel(create);
                         return identityServerReturn;
                     }
                 }
@@ -105,7 +226,7 @@ namespace JeeAccount.Services.AccountManagementService
                 {
                     cnn.RollbackTransaction();
                     cnn.EndTransaction();
-                    identityServerReturn = GeneralService.TranformIdentityServerException(ex);
+                    identityServerReturn = TranferDataHelper.TranformIdentityServerException(ex);
                     return identityServerReturn;
                 }
             }
@@ -121,7 +242,7 @@ namespace JeeAccount.Services.AccountManagementService
                     var create = _reponsitory.CreateAccount(cnn, account, AdminUserID, customerID);
                     if (create.Susscess)
                     {
-                        var userid = long.Parse(GeneralService.GetUserIDByUsernameCnn(cnn, account.Username).ToString());
+                        var userid = long.Parse(GeneralReponsitory.GetUserIDByUsernameCnn(cnn, account.Username).ToString());
                         var saveAppList = _reponsitory.InsertAppCodeAccount(cnn, userid, ListAppID);
                         if (!saveAppList.Susscess)
                         {
@@ -138,10 +259,11 @@ namespace JeeAccount.Services.AccountManagementService
                     }
                     cnn.EndTransaction();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     cnn.RollbackTransaction();
                     cnn.EndTransaction();
+                    throw;
                 }
             }
         }
@@ -154,7 +276,7 @@ namespace JeeAccount.Services.AccountManagementService
 
             CustomData customData = new CustomData();
             PersonalInfoCustomData personalInfo = new PersonalInfoCustomData();
-            personalInfo.Name = GeneralService.getFirstname(account.Fullname);
+            personalInfo.Name = GeneralService.GetFirstname(account.Fullname);
             personalInfo.Avatar = account.ImageAvatar;
             personalInfo.Departmemt = account.Departmemt;
             personalInfo.Fullname = account.Fullname;
@@ -199,7 +321,7 @@ namespace JeeAccount.Services.AccountManagementService
                     {
                         cnn.RollbackTransaction();
                         cnn.EndTransaction();
-                        identity = GeneralService.TranformIdentityServerReturnSqlModel(update);
+                        identity = TranferDataHelper.TranformIdentityServerReturnSqlModel(update);
                         return identity;
                     }
                 }
@@ -255,7 +377,7 @@ namespace JeeAccount.Services.AccountManagementService
                 string avatar = UpdateAvatarCdn(Username, base64);
 
                 _reponsitory.UpdateAvatar(avatar, UserId, CustomerID);
-                var personal = _reponsitory.GetPersonalInfoCustomData(UserId, CustomerID);
+                var personal = GeneralReponsitory.GetPersonalInfoCustomData(UserId, CustomerID, _connectionString);
                 var res = await identity.updateCustomDataPersonalInfoInternal(getSecretToken(), personal, Username);
                 if (!res.IsSuccessStatusCode)
                 {
@@ -278,7 +400,7 @@ namespace JeeAccount.Services.AccountManagementService
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 var userID = cnn.ExecuteScalar(sql).ToString();
-                var username = GeneralService.GetUsernameByUserIDCnn(cnn, userID).ToString();
+                var username = GeneralReponsitory.GetUsernameByUserIDCnn(cnn, userID).ToString();
                 return await this.identityServerController.ResetPasswordRootCustomer(getSecretToken(), username, model);
             }
         }
@@ -298,12 +420,12 @@ namespace JeeAccount.Services.AccountManagementService
             if (!string.IsNullOrEmpty(model.Username))
             {
                 username = model.Username;
-                userID = GeneralService.GetUserIDByUsername(_connectionString, model.Username).ToString();
+                userID = GeneralReponsitory.GetUserIDByUsername(_connectionString, model.Username).ToString();
             }
 
             if (!string.IsNullOrEmpty(model.Userid))
             {
-                username = GeneralService.GetUsernameByUserID(_connectionString, model.Userid).ToString();
+                username = GeneralReponsitory.GetUsernameByUserID(_connectionString, model.Userid).ToString();
                 userID = model.Userid;
             }
             var appCodes = await _reponsitory.GetListAppByUserIDAsync(long.Parse(userID));
@@ -372,18 +494,18 @@ namespace JeeAccount.Services.AccountManagementService
             if (!string.IsNullOrEmpty(model.Username))
             {
                 username = model.Username;
-                userID = GeneralService.GetUserIDByUsername(_connectionString, model.Username).ToString();
+                userID = GeneralReponsitory.GetUserIDByUsername(_connectionString, model.Username).ToString();
             }
 
             if (!string.IsNullOrEmpty(model.Userid))
             {
-                username = GeneralService.GetUsernameByUserID(_connectionString, model.Userid).ToString();
+                username = GeneralReponsitory.GetUsernameByUserID(_connectionString, model.Userid).ToString();
                 userID = model.Userid;
             }
 
-            var customerId = GeneralService.GetCustomerIDByUsername(_connectionString, username);
+            var customerId = GeneralReponsitory.GetCustomerIDByUsername(_connectionString, username);
 
-            var personal = _reponsitory.GetPersonalInfoCustomData(Int32.Parse(userID), Int32.Parse(customerId.ToString()));
+            var personal = GeneralReponsitory.GetPersonalInfoCustomData(Int32.Parse(userID), Int32.Parse(customerId.ToString()), _connectionString);
             personal.BgColor = GeneralService.GetColorNameUser(personal.Name[0].ToString());
             var jwt_internal = getSecretToken();
 
@@ -401,16 +523,16 @@ namespace JeeAccount.Services.AccountManagementService
             if (!string.IsNullOrEmpty(model.Username))
             {
                 username = model.Username;
-                userID = GeneralService.GetUserIDByUsername(_connectionString, model.Username).ToString();
+                userID = GeneralReponsitory.GetUserIDByUsername(_connectionString, model.Username).ToString();
             }
 
             if (!string.IsNullOrEmpty(model.Userid))
             {
-                username = GeneralService.GetUsernameByUserID(_connectionString, model.Userid).ToString();
+                username = GeneralReponsitory.GetUsernameByUserID(_connectionString, model.Userid).ToString();
                 userID = model.Userid;
             }
 
-            var customerId = GeneralService.GetCustomerIDByUsername(_connectionString, username);
+            var customerId = GeneralReponsitory.GetCustomerIDByUsername(_connectionString, username);
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 _reponsitory.InsertAppCodeAccount(cnn, Int32.Parse(userID), lstAppCode);
@@ -426,16 +548,16 @@ namespace JeeAccount.Services.AccountManagementService
                 if (!string.IsNullOrEmpty(model.Username))
                 {
                     username = model.Username;
-                    userID = GeneralService.GetUserIDByUsername(_connectionString, model.Username).ToString();
+                    userID = GeneralReponsitory.GetUserIDByUsername(_connectionString, model.Username).ToString();
                 }
 
                 if (!string.IsNullOrEmpty(model.Userid))
                 {
-                    username = GeneralService.GetUsernameByUserID(_connectionString, model.Userid).ToString();
+                    username = GeneralReponsitory.GetUsernameByUserID(_connectionString, model.Userid).ToString();
                     userID = model.Userid;
                 }
-                var customerId = GeneralService.GetCustomerIDByUsername(_connectionString, username);
-                var staffid = GeneralService.GetStaffIDByUserID(_connectionString, userID);
+                var customerId = GeneralReponsitory.GetCustomerIDByUsername(_connectionString, username);
+                var staffid = GeneralReponsitory.GetStaffIDByUserID(_connectionString, userID);
 
                 var custom = new JeeAccountCustomData();
                 custom.customerID = long.Parse(customerId.ToString());
@@ -474,5 +596,7 @@ namespace JeeAccount.Services.AccountManagementService
             }
             return linkAvatar;
         }
+
+        #endregion api new
     }
 }

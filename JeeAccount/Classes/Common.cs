@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace JeeAccount.Classes
 {
-    public class Common
+    public static class Common
     {
         public static string Format_DateHD_ExportExcel(string str = "", bool filename = false)
         {
@@ -94,17 +94,10 @@ namespace JeeAccount.Classes
 
         public static string Remove_Last_Phay(string p_Input = "")
         {
-            try
-            {
-                p_Input = p_Input.Trim();
-                var pattern1 = @",$";
-                p_Input = Regex.Replace(p_Input, pattern1, "");
-                return p_Input;
-            }
-            catch (Exception ex)
-            {
-                return p_Input;
-            }
+            p_Input = p_Input.Trim();
+            var pattern1 = @",$";
+            p_Input = Regex.Replace(p_Input, pattern1, "");
+            return p_Input;
         }
 
         public static string ConvertDateTimeToString(object obj, bool cothoigian = false, bool hiennamtruoc = false)
@@ -113,7 +106,6 @@ namespace JeeAccount.Classes
                 return "";
             try
             {
-
                 if (hiennamtruoc)
                 {
                     if (cothoigian)
@@ -128,13 +120,13 @@ namespace JeeAccount.Classes
                     else
                         return ((DateTime)obj).ToString("dd/MM/yyyy");
                 }
-
             }
             catch (Exception)
             {
                 return "";
             }
         }
+
         public static string GetFormatDate(DateTime tungay, DateTime denngay, string tugio, string dengio)
         {
             if (denngay.Date.Equals(DateTime.MinValue))
@@ -143,10 +135,12 @@ namespace JeeAccount.Classes
                 return $"{GetDayOfWeek(tungay)} {(tungay.Year.Equals(DateTime.Now.Year) ? string.Format("{0:dd/MM}", tungay) : string.Format("{0:dd/MM/yyyy}", tungay))} {tugio} - {dengio}";
             return $"{GetDayOfWeek(tungay)} {(tungay.Year.Equals(DateTime.Now.Year) ? string.Format("{0:dd/MM}", tungay) : string.Format("{0:dd/MM/yyyy}", tungay))} {tugio} - {GetDayOfWeek(denngay)} {(denngay.Year.Equals(DateTime.Now.Year) ? string.Format("{0:dd/MM}", denngay) : string.Format("{0:dd/MM/yyyy}", denngay))} { dengio}";
         }
+
         public static string GetFormatDate(DateTime ngay, string format)
         {
             return string.Format("{0:" + format + "}", ngay).Replace("77622", GetDayOfWeek(ngay));
         }
+
         public static string GetDayOfWeek(DateTime date)
         {
             switch (date.DayOfWeek)
@@ -161,7 +155,5 @@ namespace JeeAccount.Classes
             }
             return "";
         }
-
-
     }
 }

@@ -92,7 +92,7 @@ namespace JeeAccount.Services.CustomerManagementService
                     {
                         cnn.RollbackTransaction();
                         cnn.EndTransaction();
-                        identityServerReturn = GeneralService.TranformIdentityServerReturnSqlModel(create);
+                        identityServerReturn = TranferDataHelper.TranformIdentityServerReturnSqlModel(create);
                         return identityServerReturn;
                     }
 
@@ -101,7 +101,7 @@ namespace JeeAccount.Services.CustomerManagementService
                     {
                         cnn.RollbackTransaction();
                         cnn.EndTransaction();
-                        identityServerReturn = GeneralService.TranformIdentityServerReturnSqlModel(createAppcodes);
+                        identityServerReturn = TranferDataHelper.TranformIdentityServerReturnSqlModel(createAppcodes);
                         return identityServerReturn;
                     }
 
@@ -121,7 +121,7 @@ namespace JeeAccount.Services.CustomerManagementService
                     {
                         cnn.RollbackTransaction();
                         cnn.EndTransaction();
-                        identityServerReturn = GeneralService.TranformIdentityServerReturnSqlModel(createAccount);
+                        identityServerReturn = TranferDataHelper.TranformIdentityServerReturnSqlModel(createAccount);
                         return identityServerReturn;
                     }
                     long userId = _accountManagementReponsitory.GetLastUserID(cnn);
@@ -130,7 +130,7 @@ namespace JeeAccount.Services.CustomerManagementService
                     {
                         cnn.RollbackTransaction();
                         cnn.EndTransaction();
-                        identityServerReturn = GeneralService.TranformIdentityServerReturnSqlModel(createAccount);
+                        identityServerReturn = TranferDataHelper.TranformIdentityServerReturnSqlModel(createAccount);
                         return identityServerReturn;
                     }
                     IdentityServeAddAdminNewUser identity = new IdentityServeAddAdminNewUser
@@ -149,7 +149,7 @@ namespace JeeAccount.Services.CustomerManagementService
                             {
                                 Email = customerModel.Email,
                                 Fullname = customerModel.RegisterName,
-                                Name = GeneralService.getFirstname(customerModel.RegisterName),
+                                Name = GeneralService.GetFirstname(customerModel.RegisterName),
                                 Avatar = "",
                                 Birthday = "",
                                 Departmemt = "",
@@ -225,7 +225,7 @@ namespace JeeAccount.Services.CustomerManagementService
                 {
                     cnn.RollbackTransaction();
                     cnn.EndTransaction();
-                    identityServerReturn = GeneralService.TranformIdentityServerException(ex);
+                    identityServerReturn = TranferDataHelper.TranformIdentityServerException(ex);
                     return identityServerReturn;
                 }
             }

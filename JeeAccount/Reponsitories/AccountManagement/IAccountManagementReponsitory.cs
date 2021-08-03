@@ -101,8 +101,6 @@ namespace JeeAccount.Reponsitories
 
         ReturnSqlModel UpdatePersonalInfoCustomData(DpsConnection cnn, PersonalInfoCustomData personalInfoCustom, long userId, long customerId);
 
-        PersonalInfoCustomData GetPersonalInfoCustomData(long UserID, long CustomerID);
-
         ReturnSqlModel UpdateDirectManager(string Username, string DirectManager, long customerID);
 
         ReturnSqlModel InsertAppCodeAccount(DpsConnection cnn, long UserID, List<int> AppID);

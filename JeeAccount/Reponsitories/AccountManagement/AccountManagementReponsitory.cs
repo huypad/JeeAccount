@@ -63,7 +63,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
 
                 var result = dt.AsEnumerable().Select(row => new AccountManagementDTO
                 {
@@ -121,7 +121,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
 
                 var result = dt.AsEnumerable().Select(row => new AccountManagementDTO
                 {
@@ -170,7 +170,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
 
                 return dt.AsEnumerable().Select(row => new AccUsernameModel
                 {
@@ -187,8 +187,8 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID";
                     ChucVuID = row["ChucVuID"].ToString(),
                     NgaySinh = GeneralService.ConvertDateToString(row["Birthday"]),
                     BgColor = GeneralService.GetColorNameUser(row["Name"].ToString().Substring(0, 1)),
-                    FirstName = GeneralService.getFirstname(row["FullName"].ToString()),
-                    LastName = GeneralService.getlastname(row["FullName"].ToString())
+                    FirstName = GeneralService.GetFirstname(row["FullName"].ToString()),
+                    LastName = GeneralService.Getlastname(row["FullName"].ToString())
                 });
             }
         }
@@ -203,7 +203,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
 
                 return dt.AsEnumerable().Select(row => new AccUsernameModel
                 {
@@ -220,8 +220,8 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID";
                     ChucVuID = row["ChucVuID"].ToString(),
                     NgaySinh = GeneralService.ConvertDateToString(row["Birthday"]),
                     BgColor = GeneralService.GetColorNameUser(row["Name"].ToString().Substring(0, 1)),
-                    FirstName = GeneralService.getFirstname(row["FullName"].ToString()),
-                    LastName = GeneralService.getlastname(row["FullName"].ToString())
+                    FirstName = GeneralService.GetFirstname(row["FullName"].ToString()),
+                    LastName = GeneralService.Getlastname(row["FullName"].ToString())
                 });
             }
         }
@@ -268,7 +268,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
                 if (dt.Rows.Count == 0)
                     return 0;
                 var result = dt.AsEnumerable().Select(row => long.Parse(row["CustomerID"].ToString())).SingleOrDefault();
@@ -288,7 +288,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
 
                 var result = dt.AsEnumerable().Select(row => new InfoAdminDTO
                 {
@@ -316,7 +316,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
 
                 var result = dt.AsEnumerable().Select(row => new InfoAdminDTO
                 {
@@ -345,7 +345,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
                 if (dt.Rows.Count == 0)
                     return new InfoCustomerDTO();
                 var result = new InfoCustomerDTO
@@ -372,7 +372,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
                 if (dt.Rows.Count == 0)
                     return new InfoUserDTO();
                 var result = new InfoUserDTO
@@ -405,7 +405,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
                 if (dt.Rows.Count == 0)
                     return new InfoUserDTO();
                 var result = new InfoUserDTO
@@ -441,7 +441,7 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null) and IsAdmin
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
                 var result = dt.AsEnumerable().Select(row => new AdminModel
                 {
                     UserId = Int32.Parse(row["UserID"].ToString()),
@@ -464,7 +464,7 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null) and IsAdmin
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
                 var result = dt.AsEnumerable().Select(row => new AppListDTO
                 {
                     AppID = Int32.Parse(row["AppID"].ToString()),
@@ -506,7 +506,7 @@ join AppList on AppList.AppID = Account_App.AppID";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
                 if (CustomerID > 0)
                 {
                     var result = dt.AsEnumerable().Select(row => new AppListDTO
@@ -599,7 +599,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
                 if (dt.Rows.Count == 0)
                     return null;
                 var result = dt.AsEnumerable().Select(row => row["DirectManager"].ToString()).SingleOrDefault();
@@ -686,7 +686,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
                 var result = dt.AsEnumerable().Select(row => new AccUsernameModel
                 {
                     UserId = Int32.Parse(row["UserID"].ToString()),
@@ -721,7 +721,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
                 var result = dt.AsEnumerable().Select(row => new AccUsernameModel
                 {
                     UserId = Int32.Parse(row["UserID"].ToString()),
@@ -761,7 +761,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
 
                 var result = dt.AsEnumerable().Select(row => new JeeHRPersonalInfo
                 {
@@ -839,8 +839,8 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
 
                 if (account.Fullname is not null)
                 {
-                    string FirstName = GeneralService.getFirstname(account.Fullname);
-                    string Lastname = GeneralService.getlastname(account.Fullname);
+                    string FirstName = GeneralService.GetFirstname(account.Fullname);
+                    string Lastname = GeneralService.Getlastname(account.Fullname);
                     val.Add("FirstName", FirstName);
                     val.Add("LastName", Lastname);
                 }
@@ -972,9 +972,9 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
             }
 
             string firstname = "";
-            if (personalInfoCustom.Fullname is not null) firstname = GeneralService.getFirstname(personalInfoCustom.Fullname);
+            if (personalInfoCustom.Fullname is not null) firstname = GeneralService.GetFirstname(personalInfoCustom.Fullname);
             string lastname = "";
-            if (personalInfoCustom.Fullname is not null) lastname = GeneralService.getlastname(personalInfoCustom.Fullname);
+            if (personalInfoCustom.Fullname is not null) lastname = GeneralService.Getlastname(personalInfoCustom.Fullname);
             if (personalInfoCustom.Avatar is not null) val.Add("AvartarImgURL", personalInfoCustom.Avatar);
             if (personalInfoCustom.Birthday is not null)
             {
@@ -1003,41 +1003,6 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                 var UserId = cnn.ExecuteScalar(sql);
                 if (UserId == null) return 0;
                 return long.Parse(UserId.ToString());
-            }
-        }
-
-        public PersonalInfoCustomData GetPersonalInfoCustomData(long UserID, long CustomerID)
-        {
-            DataTable dt = new DataTable();
-            SqlConditions Conds = new SqlConditions();
-            using (DpsConnection cnn = new DpsConnection(_connectionString))
-            {
-                Conds.Add("CustomerID", CustomerID);
-                Conds.Add("UserID", UserID);
-
-                string sql = @"select UserID, Username, Email, LastName +' ' + FirstName as FullName
-                           , FirstName as Name, AvartarImgURL as Avatar, JobtitleList.JobtitleName, JobtitleID , DepartmentID,
-                           DepartmentList.DepartmentName, PhoneNumber, AccountList.CustomerID, cocauid, ChucVuID, Birthday, DirectManager
-                           from AccountList
-left join DepartmentList on DepartmentList.RowID = AccountList.DepartmentID
-left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID
-                                where CustomerID = @CustomerID and UserID = @UserID";
-
-                dt = cnn.CreateDataTable(sql, Conds);
-                if (dt.Rows.Count == 0)
-                    return new PersonalInfoCustomData();
-                return new PersonalInfoCustomData
-                {
-                    Avatar = dt.Rows[0]["Avatar"].ToString(),
-                    Birthday = (dt.Rows[0]["Birthday"] != DBNull.Value) ? ((DateTime)dt.Rows[0]["Birthday"]).ToString("dd/MM/yyyy") : "",
-                    Departmemt = dt.Rows[0]["Department"].ToString(),
-                    Fullname = dt.Rows[0]["Fullname"].ToString(),
-                    Jobtitle = dt.Rows[0]["Jobtitle"].ToString(),
-                    Name = dt.Rows[0]["Name"].ToString(),
-                    Phonenumber = dt.Rows[0]["PhoneNumber"].ToString(),
-                    StructureID = dt.Rows[0]["cocauid"].ToString(),
-                    BgColor = GeneralService.GetColorNameUser(dt.Rows[0]["Name"].ToString().Substring(0, 1)),
-                };
             }
         }
 
@@ -1150,7 +1115,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
                 var result = dt.AsEnumerable().Select(row => new AppListDTO
                 {
                     AppID = Int32.Parse(row["AppID"].ToString()),
@@ -1185,7 +1150,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
                 var result = dt.AsEnumerable().Select(row => new CustomerAppDTO
                 {
                     AppID = Int32.Parse(row["AppID"].ToString()),
@@ -1211,7 +1176,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds);
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
                 if (dt.Rows.Count == 0)
                     return 0;
                 var result = dt.AsEnumerable().Select(row => long.Parse(row["CustomerID"].ToString())).SingleOrDefault();

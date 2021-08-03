@@ -67,7 +67,7 @@ namespace JeeAccount.Models.Common
         /// </summary>
         public string devmessage { get; set; }
 
-        public int status { get; set; } = 0;///bao loi
+        public int status { get; set; } = 0;
         public T data { get; set; }
     }
 

@@ -27,7 +27,7 @@ namespace JeeAccount.Classes
             {
                 return Regex.Replace(p_keyword.Trim(), @"\s+", "", RegexOptions.Multiline);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return p_keyword;
             }
@@ -73,7 +73,7 @@ namespace JeeAccount.Classes
                     k = k.Substring(0, pLength) + "...";
                 return k;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return k;
             }
@@ -96,7 +96,7 @@ namespace JeeAccount.Classes
                     k = k.Substring(0, pLength > 3 ? pLength - 3 : pLength) + "...";
                 return k;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return k;
             }
@@ -143,7 +143,7 @@ namespace JeeAccount.Classes
             {
                 return Regex.Replace(input, @"[^0-9a-zA-Z]+", char_replTo);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return input;
             }
@@ -173,7 +173,7 @@ namespace JeeAccount.Classes
                 var customData = JsonConvert.DeserializeObject<CustomData>(_user);
                 return customData;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -187,7 +187,7 @@ namespace JeeAccount.Classes
                 if (!pHeader.ContainsKey(HeaderNames.Authorization)) return false;
 
                 IHeaderDictionary _d = pHeader;
-                string _bearer_token, _user;
+                string _bearer_token;
                 _bearer_token = _d[HeaderNames.Authorization].ToString().Replace("Bearer ", "");
                 SecurityToken validatedToken;
                 JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
@@ -203,7 +203,7 @@ namespace JeeAccount.Classes
                 var tokenS = handler.ValidateToken(_bearer_token, validationParameters, out validatedToken);
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -229,7 +229,7 @@ namespace JeeAccount.Classes
                 var User = _user;
                 return User;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -269,7 +269,7 @@ namespace JeeAccount.Classes
 
                 return _projectname;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -299,12 +299,12 @@ namespace JeeAccount.Classes
                 if (!pHeader.ContainsKey(HeaderNames.Authorization)) return null;
 
                 IHeaderDictionary _d = pHeader;
-                string _bearer_token, _user;
+                string _bearer_token;
                 _bearer_token = _d[HeaderNames.Authorization].ToString().Replace("Bearer ", "");
 
                 return _bearer_token;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
