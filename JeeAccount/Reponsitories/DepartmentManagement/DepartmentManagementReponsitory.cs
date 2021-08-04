@@ -17,19 +17,39 @@ namespace JeeAccount.Reponsitories
     {
         private readonly string _connectionString;
 
+        private const string SQL_DSDEPARMENT_DEFAULT = @"select DepartmentList.*, UserID as DepartmentManagerUserID,
+                                                    Username as DepartmentManagerUsername, AccountList.LastName +' '+ AccountList.FirstName
+                                                    as DepartmentManagerName from DepartmentList
+                                                    left join AccountList on AccountList.Username = DepartmentList.DepartmentManager";
+
+        private const string SQL_DSDEPARTMENT_JEEHR = @"select DISTINCT DepartmentID, Department from AccountList";
+
         public DepartmentManagementReponsitory(IConfiguration configuration)
         {
             _connectionString = configuration.GetValue<string>("AppConfig:Connection");
         }
 
-        public async Task<IEnumerable<DepartmentDTO>> GetListDepartmentDefaultAsync(long custormerID)
+        public async Task<IEnumerable<DepartmentDTO>> GetListDepartmentDefaultAsync(long custormerID, string where = "", string orderBy = "")
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", custormerID);
 
-            string sql = "select RowID, IsActive, DepartmentManager, DepartmentName, Note from DepartmentList " +
-                " where CustomerID=@CustomerID and (Disable != 1 or Disable is null)";
+            string where_order = "";
+            if (!string.IsNullOrEmpty(where))
+            {
+                where += " and DepartmentList.CustomerID = @CustomerID and (DepartmentList.Disable != 1 or DepartmentList.Disable is null)";
+            }
+            else
+            {
+                where += " DepartmentList.CustomerID = @CustomerID and (DepartmentList.Disable != 1 or DepartmentList.Disable is null)";
+            }
+            where_order += $"where {where} ";
+
+            if (!string.IsNullOrEmpty(orderBy)) where_order += $"order by {orderBy}";
+
+            string sql = @$"{SQL_DSDEPARMENT_DEFAULT} { where_order}";
+
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
@@ -37,22 +57,38 @@ namespace JeeAccount.Reponsitories
                 {
                     RowID = long.Parse(row["RowID"].ToString()),
                     IsActive = Convert.ToBoolean((bool)row["IsActive"]),
-                    DepartmentManager = row["DepartmentManager"].ToString(),
-                    DepartmentName = row["DepartmentName"].ToString(),
-                    Note = row["Note"].ToString(),
+                    DepartmentManager = row["DepartmentManager"] != DBNull.Value ? row["DepartmentManager"].ToString() : "",
+                    DepartmentManagerUserID = row["DepartmentManagerUserID"] != DBNull.Value ? long.Parse(row["DepartmentManagerUserID"].ToString()) : 0,
+                    DepartmentManagerUsername = row["DepartmentManagerUsername"] != DBNull.Value ? row["DepartmentManagerUsername"].ToString() : "",
+                    DepartmentName = row["DepartmentName"] != DBNull.Value ? row["DepartmentName"].ToString() : "",
+                    Note = row["Note"] != DBNull.Value ? row["Note"].ToString() : "",
                 });
                 return result;
             }
         }
 
-        public async Task<IEnumerable<JeeHRCoCauToChucModelFromDB>> GetListDepartmentIsJeeHRtAsync(long custormerID)
+        public async Task<IEnumerable<JeeHRCoCauToChucModelFromDB>> GetListDepartmentIsJeeHRtAsync(long custormerID, string where = "", string orderBy = "")
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", custormerID);
 
-            string sql = "select DISTINCT DepartmentID, Department, Disable from AccountList" +
-                " where CustomerID=@CustomerID and DepartmentID is not null and (Disable != 1 or Disable is null)";
+            string where_order = "";
+            if (!string.IsNullOrEmpty(where))
+            {
+                where += " and AccountList.CustomerID = @CustomerID and AccountList.Disable != 1";
+            }
+            else
+            {
+                where += " AccountList.CustomerID = @CustomerID and AccountList.Disable != 1";
+            }
+
+            where_order += $"where {where} ";
+
+            if (!string.IsNullOrEmpty(orderBy)) where_order += $"order by {orderBy}";
+
+            string sql = @$"{SQL_DSDEPARTMENT_JEEHR} { where_order}";
+
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);

@@ -57,6 +57,8 @@ namespace JeeAccount.Controllers
         {
             try
             {
+                query = query == null ? new QueryParams() : query;
+
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
@@ -808,6 +810,53 @@ namespace JeeAccount.Controllers
             try
             {
                 return Ok(GeneralService.GetInternalToken(_config));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpGet("SaveAgianPersonalInfoJeehr")]
+        public async Task<IActionResult> SaveAgianPersonalInfoJeehr()
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+                var access_token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                var jeehr = new JeeHRController(HOST_JEEHR_API);
+                var dataJeehr = await jeehr.GetDSNhanVien(access_token);
+                var customerID = 25;
+                var lstok = "";
+                var lstfail = "";
+                if (dataJeehr.status == 1)
+                {
+                    using (DpsConnection cnn = new DpsConnection(_connectionString))
+                    {
+                        foreach (var nv in dataJeehr.data)
+                        {
+                            Hashtable val = new Hashtable();
+                            SqlConditions Conds = new SqlConditions();
+                            Conds.Add("staffid", nv.IDNV);
+                            val.Add("Department", nv.Structure);
+
+                            int x = cnn.Update(val, Conds, "AccountList");
+                            if (x <= 0)
+                            {
+                                lstfail += " ," + nv.username;
+                            }
+                            else
+                            {
+                                lstok += " ," + nv.username;
+                            }
+                        }
+                    }
+                }
+                return Ok(new { lstfail = lstfail, lstok = lstok });
             }
             catch (Exception ex)
             {

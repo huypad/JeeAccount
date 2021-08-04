@@ -1,6 +1,7 @@
 ﻿using JeeAccount.Classes;
 using JeeAccount.Models.Common;
 using JeeAccount.Models.DepartmentManagement;
+using JeeAccount.Models.JeeHR;
 using JeeAccount.Reponsitories;
 using JeeAccount.Services;
 using JeeAccount.Services.DepartmentManagement;
@@ -9,6 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JeeAccount.Controllers
@@ -32,7 +36,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("GetListDepartment")]
-        public async Task<object> GetListDepartment([FromQuery] QueryParams query)
+        public async Task<object> GetListDepartment()
         {
             try
             {
@@ -66,7 +70,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("GetDSPhongban")]
-        public async Task<IActionResult> GetDSPhongban(bool notcalljeehr)
+        public async Task<IActionResult> GetDSPhongban(bool donotcallapijeehr = false)
         {
             try
             {
@@ -80,53 +84,57 @@ namespace JeeAccount.Controllers
                 {
                     return Ok(MessageReturnHelper.DangNhap());
                 }
-
-                var checkUsedJeeHr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
-                if (!checkUsedJeeHr)
+                var query = new QueryParams();
+                if (donotcallapijeehr)
                 {
-                    var depart = await _service.GetListDepartmentDefaultAsync(customData.JeeAccount.CustomerID);
-                    var obj = new
-                    {
-                        tree = DBNull.Value,
-                        flat = depart,
-                        isTree = false
-                    };
-                    return Ok(obj);
+                    query.donotcallapijeehr = donotcallapijeehr;
                 }
-                else
-                {
-                    if (!notcalljeehr)
-                    {
-                        var jeehrController = new JeeHRController(HOST_JEEHR_API);
-                        var list = await jeehrController.GetDSCoCauToChuc(token);
-                        if (list.status == 1)
-                        {
-                            var obj = new
-                            {
-                                tree = list.data,
-                                flat = TranferDataHelper.FlatListJeeHRCoCauToChuc(list.data),
-                                isTree = true
-                            };
+                var lst = await _service.GetDSPhongBan(query, customData.JeeAccount.CustomerID, token).ConfigureAwait(false);
+                return Ok(lst);
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieu(ex.Message));
+            }
+            catch (JeeHRException error)
+            {
+                return BadRequest(MessageReturnHelper.ExceptionJeeHR(error));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
 
-                            return Ok(obj);
-                        }
-                        else
-                        {
-                            return BadRequest(MessageReturnHelper.ErrorJeeHR(list.error));
-                        }
-                    }
-                    else
-                    {
-                        var depart = await _service.GetListDepartmentIsJeeHRtAsync(customData.JeeAccount.CustomerID);
-                        var obj = new
-                        {
-                            tree = DBNull.Value,
-                            flat = depart,
-                            isTree = false
-                        };
-                        return Ok(obj);
-                    }
+        [HttpGet("GetListDepartmentManagement")]
+        public async Task<IActionResult> GetListDepartmentManagement([FromQuery] QueryParams query)
+        {
+            try
+            {
+                query = query == null ? new QueryParams() : query;
+
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Ok(MessageReturnHelper.CustomDataKhongTonTai());
                 }
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return Ok(MessageReturnHelper.DangNhap());
+                }
+
+                var obj = await _service.GetDSPhongBan(query, customData.JeeAccount.CustomerID, token, true).ConfigureAwait(false);
+
+                return Ok(obj);
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieu(ex.Message));
+            }
+            catch (JeeHRException error)
+            {
+                return BadRequest(MessageReturnHelper.ExceptionJeeHR(error));
             }
             catch (Exception ex)
             {

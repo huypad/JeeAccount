@@ -48,7 +48,6 @@ namespace JeeAccount.Models.Common
         public int AllPage { get; set; } = 0;
         public int Size { get; set; } = 10;
         public int TotalCount { get; set; } = 0;
-        public int total { get; set; } = 0;
     }
 
     public class ErrorModelBTSC : ErrorModel
@@ -73,6 +72,7 @@ namespace JeeAccount.Models.Common
 
     public class QueryParams
     {
+        public bool donotcallapijeehr { get; set; } = false;
         public bool more { get; set; } = false;
         public int page { get; set; } = 1;
         public int record { get; set; } = 10;
@@ -118,10 +118,13 @@ namespace JeeAccount.Models.Common
         private void initDictionary()
         {
             string[] arrKeys = keys.Split('|');
-            string[] arrVals = vals.Split('|');
-            for (int i = 0; i < arrKeys.Length && i < arrVals.Length; i++)
+            if (vals is not null)
             {
-                _dic.Add(arrKeys[i], arrVals[i]);
+                string[] arrVals = vals.Split('|');
+                for (int i = 0; i < arrKeys.Length && i < arrVals.Length; i++)
+                {
+                    _dic.Add(arrKeys[i], arrVals[i]);
+                }
             }
         }
 

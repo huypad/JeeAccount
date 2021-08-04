@@ -29,7 +29,7 @@ namespace JeeAccount.Controllers
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(access_token);
                 var reponse = await client.GetAsync(url);
-                string returnValue = reponse.Content.ReadAsStringAsync().Result;
+                string returnValue = await reponse.Content.ReadAsStringAsync();
                 var res = JsonConvert.DeserializeObject<ReturnJeeHR<NhanVienJeeHR>>(returnValue);
                 return res;
             }
@@ -43,7 +43,7 @@ namespace JeeAccount.Controllers
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(access_token);
                 var reponse = await client.GetAsync(url);
-                string returnValue = reponse.Content.ReadAsStringAsync().Result;
+                string returnValue = await reponse.Content.ReadAsStringAsync();
                 var res = JsonConvert.DeserializeObject<ReturnJeeHR<NhanVienDuocQuanLyTrucTiep>>(returnValue);
                 return res;
             }
@@ -57,7 +57,7 @@ namespace JeeAccount.Controllers
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(access_token);
                 var reponse = await client.GetAsync(url);
-                string returnValue = reponse.Content.ReadAsStringAsync().Result;
+                string returnValue = await reponse.Content.ReadAsStringAsync();
                 var res = JsonConvert.DeserializeObject<ReturnJeeHR<JeeHRCoCauToChuc>>(returnValue);
                 return res;
             }

@@ -56,21 +56,21 @@ namespace JeeAccount.Classes
             };
         }
 
-        public static object KhongTonTai(string message)
+        public static object KhongTonTai(string message = "")
         {
             return new
             {
-                statusCode = ERRORCODE,
-                message = message.ToLower() + " không tồn tại",
+                statusCode = ERRORDATA,
+                message = string.IsNullOrEmpty(message) ? "Không tồn tại" : message + " ;hông tồn tại",
             };
         }
 
-        public static object KhongCoDuLieu(string message)
+        public static object KhongCoDuLieu(string message = "")
         {
             return new
             {
-                statusCode = ERRORCODE,
-                message = message.ToLower() + " không có dữ liệu",
+                statusCode = ERRORDATA,
+                message = string.IsNullOrEmpty(message) ? "không có dữ liệu" : message + " không có dữ liệu",
             };
         }
 
@@ -123,9 +123,9 @@ namespace JeeAccount.Classes
         {
             return new
             {
+                message = "Lỗi truy xuất dữ liệu",
                 statusCode = ERRORCODE_EXCEPTION,
-                message = "Lỗi " + last_error.Message,
-                error = last_error
+                error = last_error != null ? last_error.Message : "",
             };
         }
 
@@ -137,6 +137,17 @@ namespace JeeAccount.Classes
                 message = errorJeehr.message,
                 error = errorJeehr.LastError,
                 allowForce = errorJeehr.allowForce
+            };
+        }
+
+        public static object ExceptionJeeHR(JeeHRException jeeHRException)
+        {
+            return new
+            {
+                statusCode = jeeHRException.JeeHRError.code,
+                message = jeeHRException.JeeHRError.message,
+                error = jeeHRException.JeeHRError.LastError,
+                allowForce = jeeHRException.JeeHRError.allowForce
             };
         }
 

@@ -10,8 +10,9 @@ namespace JeeAccount.Models.DepartmentManagement
         public long RowID { get; set; }
         public string DepartmentName { get; set; }
         public string DepartmentManager { get; set; }
+        public string DepartmentManagerUsername { get; set; }
+        public long DepartmentManagerUserID { get; set; }
         public bool IsActive { get; set; }
         public string Note { get; set; }
-        public string Fullname { get; set; }
     }
 }

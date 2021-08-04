@@ -52,7 +52,10 @@ namespace JeeAccount.Services.AccountManagementService
                             { "chucvu", "AccountList.JobtitleID"},
                             { "phongban", "AccountList.DepartmentID" }
                         };
-
+            if (query.more)
+            {
+                var x = 11;
+            }
             var checkusedjeehr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customerid);
 
             if (!string.IsNullOrEmpty(query.sortField) && sortableFields.ContainsKey(query.sortField))

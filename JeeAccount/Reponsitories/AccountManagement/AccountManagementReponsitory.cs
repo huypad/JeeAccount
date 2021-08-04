@@ -49,11 +49,11 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID";
             string where_order = "";
             if (!string.IsNullOrEmpty(where))
             {
-                where += " and AccountList.CustomerID = @CustomerID";
+                where += " and AccountList.CustomerID = @CustomerID and (AccountList.Disable != 1 or AccountList.Disable is null)";
             }
             else
             {
-                where += " AccountList.CustomerID = @CustomerID";
+                where += " AccountList.CustomerID = @CustomerID and (AccountList.Disable != 1 or AccountList.Disable is null)";
             }
             where_order += $"where {where} ";
 
