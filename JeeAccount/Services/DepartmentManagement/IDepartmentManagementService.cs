@@ -14,7 +14,7 @@ namespace JeeAccount.Services.DepartmentManagement
 
         Task<IEnumerable<JeeHRCoCauToChucModelFromDB>> GetListDepartmentIsJeeHRAsync(long custormerID);
 
-        Task<object> GetDSPhongBan(QueryParams query, long customerid, string token, bool isShowPage = false);
+        Task<object> GetDSPhongBan(QueryParams query, long customerid, string token);
 
         void CreateDepartment(DepartmentModel departmentModel, long CustomerID, string Username);
 

@@ -11,11 +11,7 @@ namespace JeeAccount.Services.JobtitleManagementService
     public interface IJobtitleManagementService
 
     {
-        Task<IEnumerable<JobtitleDTO>> GetListJobtitleDefaultAsync(long custormerID);
-
-        Task<IEnumerable<JeeHRChucVuFromDB>> GetListJobtitleIsJeeHRtAsync(long custormerID);
-
-        Task<object> GetDSChucvu(QueryParams query, long customerid, string token, bool isShowPage = false);
+        Task<object> GetDSChucvu(QueryParams query, long customerid, string token);
 
         void CreateJobtitle(JobtitleModel JobtitleModel, long CustomerID, string Username);
 

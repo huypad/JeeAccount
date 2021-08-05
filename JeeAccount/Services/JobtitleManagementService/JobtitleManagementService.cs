@@ -29,7 +29,7 @@ namespace JeeAccount.Services.JobtitleManagementService
             HOST_JEEHR_API = configuration.GetValue<string>("Host:JeeHR_API");
         }
 
-        public async Task<object> GetDSChucvu(QueryParams query, long customerid, string token, bool isShowPage = false)
+        public async Task<object> GetDSChucvu(QueryParams query, long customerid, string token)
         {
             query = query == null ? new QueryParams() : query;
             PageModel pageModel = new PageModel();
@@ -71,61 +71,29 @@ namespace JeeAccount.Services.JobtitleManagementService
 
                 whereStrJeeHR = CreateWhereStrJeeHR(query);
             }
-            var donotcallapijeehr = query.donotcallapijeehr;
             if (checkusedjeehr)
             {
-                if (!donotcallapijeehr)
+                var cocauid = "0";
+                var chucdanhid = "0";
+                if (!string.IsNullOrEmpty(query.filter["cocauid"]))
                 {
-                    var cocauid = "0";
-                    var chucdanhid = "0";
-                    if (!string.IsNullOrEmpty(query.filter["cocauid"]))
-                    {
-                        cocauid = query.filter["cocauid"];
-                    }
-                    if (!string.IsNullOrEmpty(query.filter["chucdanhid"]))
-                    {
-                        chucdanhid = query.filter["chucdanhid"];
-                    }
-                    var jeehrController = new JeeHRController(HOST_JEEHR_API);
-                    var list = await jeehrController.GetDSChucVu(token, cocauid, chucdanhid).ConfigureAwait(false);
-                    if (list.status == 1)
-                    {
-                        var ds_jeehr = FilterLstJeeHRChucVu(list.data, query);
-
-                        pageModel.TotalCount = ds_jeehr.Count;
-                        if (ds_jeehr.Count() == 0) throw new KhongCoDuLieuException();
-                        pageModel.AllPage = (int)Math.Ceiling(ds_jeehr.Count / (decimal)query.record);
-                        pageModel.Size = query.record;
-                        pageModel.Page = query.page;
-                        if (query.more)
-                        {
-                            query.page = 1;
-                            pageModel.AllPage = 1;
-                            pageModel.Size = 1;
-                            query.record = pageModel.TotalCount;
-                        }
-                        ds_jeehr = ds_jeehr.Skip((query.page - 1) * query.record).Take(query.record).ToList();
-                        if (!isShowPage)
-                        {
-                            return ds_jeehr;
-                        }
-                        else
-                        {
-                            return new { data = ds_jeehr, panigator = pageModel };
-                        }
-                    }
-                    else
-                    {
-                        throw new JeeHRException(list.error);
-                    }
+                    cocauid = query.filter["cocauid"];
                 }
-                else
+                if (!string.IsNullOrEmpty(query.filter["chucdanhid"]))
                 {
-                    var lst_jeehr = await _reponsitory.GetListJobtitleIsJeeHRAsync(customerid, whereStrJeeHR, orderByStrJeeHR);
-
-                    pageModel.TotalCount = lst_jeehr.Count();
-                    if (lst_jeehr.Count() == 0) throw new KhongCoDuLieuException();
-                    pageModel.AllPage = (int)Math.Ceiling(lst_jeehr.Count() / (decimal)query.record);
+                    chucdanhid = query.filter["chucdanhid"];
+                }
+                var jeehrController = new JeeHRController(HOST_JEEHR_API);
+                var list = await jeehrController.GetDSChucVu(token, cocauid, chucdanhid).ConfigureAwait(false);
+                if (list.status == 1)
+                {
+                    var ds_jeehr = FilterLstJeeHRChucVu(list.data, query);
+                    pageModel.TotalCount = ds_jeehr.Count;
+                    if (ds_jeehr.Count() == 0)
+                    {
+                        return await ReturnObjectGetListJobtitleIsJeeHRAsync(query, pageModel, customerid, whereStrJeeHR, orderByStrJeeHR, checkusedjeehr);
+                    }
+                    pageModel.AllPage = (int)Math.Ceiling(ds_jeehr.Count / (decimal)query.record);
                     pageModel.Size = query.record;
                     pageModel.Page = query.page;
                     if (query.more)
@@ -135,68 +103,61 @@ namespace JeeAccount.Services.JobtitleManagementService
                         pageModel.Size = 1;
                         query.record = pageModel.TotalCount;
                     }
-                    lst_jeehr = lst_jeehr.Skip((query.page - 1) * query.record).Take(query.record).ToList();
-                    if (!isShowPage)
-                    {
-                        return lst_jeehr;
-                    }
-                    else
-                    {
-                        return new { data = lst_jeehr, panigator = pageModel };
-                    }
+                    ds_jeehr = ds_jeehr.Skip((query.page - 1) * query.record).Take(query.record).ToList();
+
+                    return new { data = ds_jeehr, panigator = pageModel, isJeeHR = checkusedjeehr };
+                }
+                else
+                {
+                    return await ReturnObjectGetListJobtitleIsJeeHRAsync(query, pageModel, customerid, whereStrJeeHR, orderByStrJeeHR, checkusedjeehr);
                 }
             }
             else
             {
-                var lst_default = await _reponsitory.GetListJobtitleDefaultAsync(customerid, whereStrDefault, orderByStrDefault);
-
-                pageModel.TotalCount = lst_default.Count();
-                if (lst_default.Count() == 0) throw new KhongCoDuLieuException();
-                pageModel.AllPage = (int)Math.Ceiling(lst_default.Count() / (decimal)query.record);
-                pageModel.Size = query.record;
-                pageModel.Page = query.page;
-                if (query.more)
-                {
-                    query.page = 1;
-                    pageModel.AllPage = 1;
-                    pageModel.Size = 1;
-                    query.record = pageModel.TotalCount;
-                }
-                lst_default = lst_default.Skip((query.page - 1) * query.record).Take(query.record).ToList();
-                if (!isShowPage)
-                {
-                    return lst_default;
-                }
-                else
-                {
-                    return new { data = lst_default, panigator = pageModel };
-                }
+                return await ReturnObjectGetListJobtitleDefaultAsync(query, pageModel, customerid, whereStrDefault, orderByStrDefault, checkusedjeehr);
             }
         }
 
-        public async Task<IEnumerable<JobtitleDTO>> GetListJobtitleDefaultAsync(long custormerID)
+        private async Task<object> ReturnObjectGetListJobtitleDefaultAsync(QueryParams query, PageModel pageModel, long customerid, string whereStrDefault, string orderByStrDefault, bool checkIsJeeHR)
         {
-            return await _reponsitory.GetListJobtitleDefaultAsync(custormerID).ConfigureAwait(false);
+            var lst_default = await _reponsitory.GetListJobtitleDefaultAsync(customerid, whereStrDefault, orderByStrDefault);
+
+            pageModel.TotalCount = lst_default.Count();
+            if (lst_default.Count() == 0) throw new KhongCoDuLieuException();
+            pageModel.AllPage = (int)Math.Ceiling(lst_default.Count() / (decimal)query.record);
+            pageModel.Size = query.record;
+            pageModel.Page = query.page;
+            if (query.more)
+            {
+                query.page = 1;
+                pageModel.AllPage = 1;
+                pageModel.Size = 1;
+                query.record = pageModel.TotalCount;
+            }
+            lst_default = lst_default.Skip((query.page - 1) * query.record).Take(query.record).ToList();
+
+            return new { data = lst_default, panigator = pageModel, isJeeHR = checkIsJeeHR };
         }
 
-        public async Task<IEnumerable<JeeHRChucVuFromDB>> GetListJobtitleIsJeeHRtAsync(long custormerID)
+        private async Task<object> ReturnObjectGetListJobtitleIsJeeHRAsync(QueryParams query, PageModel pageModel, long customerid, string whereStrJeeHR, string orderByStrJeeHR, bool checkIsJeeHR)
         {
-            return await _reponsitory.GetListJobtitleIsJeeHRAsync(custormerID).ConfigureAwait(false);
-        }
+            var lst_jeehr = await _reponsitory.GetListJobtitleIsJeeHRAsync(customerid, whereStrJeeHR, orderByStrJeeHR);
 
-        public ReturnSqlModel ChangeTinhTrang(long customerID, long RowID, string Note, long UserIdLogin)
-        {
-            return _reponsitory.ChangeTinhTrang(customerID, RowID, Note, UserIdLogin);
-        }
+            pageModel.TotalCount = lst_jeehr.Count();
+            if (lst_jeehr.Count() == 0) throw new KhongCoDuLieuException();
+            pageModel.AllPage = (int)Math.Ceiling(lst_jeehr.Count() / (decimal)query.record);
+            pageModel.Size = query.record;
+            pageModel.Page = query.page;
+            if (query.more)
+            {
+                query.page = 1;
+                pageModel.AllPage = 1;
+                pageModel.Size = 1;
+                query.record = pageModel.TotalCount;
+            }
+            lst_jeehr = lst_jeehr.Skip((query.page - 1) * query.record).Take(query.record).ToList();
 
-        public bool CheckJobtitleExist(long CustomerID, string connectionString)
-        {
-            return _reponsitory.CheckJobtitleExist(CustomerID, connectionString);
-        }
-
-        public void CreateJobtitle(JobtitleModel JobtitleModel, long CustomerID, string Username)
-        {
-            _reponsitory.CreateJobtitle(JobtitleModel, CustomerID, Username);
+            return new { data = lst_jeehr, panigator = pageModel, isJeeHR = checkIsJeeHR };
         }
 
         private string CreateWhereStrDefault(QueryParams query)
@@ -265,6 +226,31 @@ namespace JeeAccount.Services.JobtitleManagementService
             }
             var list = TranferDataHelper.LstJeeHRChucVuToJeeHRFromDBFromLstJeeHRChucvu(lst);
             return list;
+        }
+
+        public async Task<IEnumerable<JobtitleDTO>> GetListJobtitleDefaultAsync(long custormerID)
+        {
+            return await _reponsitory.GetListJobtitleDefaultAsync(custormerID).ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<JeeHRChucVuFromDB>> GetListJobtitleIsJeeHRtAsync(long custormerID)
+        {
+            return await _reponsitory.GetListJobtitleIsJeeHRAsync(custormerID).ConfigureAwait(false);
+        }
+
+        public ReturnSqlModel ChangeTinhTrang(long customerID, long RowID, string Note, long UserIdLogin)
+        {
+            return _reponsitory.ChangeTinhTrang(customerID, RowID, Note, UserIdLogin);
+        }
+
+        public bool CheckJobtitleExist(long CustomerID, string connectionString)
+        {
+            return _reponsitory.CheckJobtitleExist(CustomerID, connectionString);
+        }
+
+        public void CreateJobtitle(JobtitleModel JobtitleModel, long CustomerID, string Username)
+        {
+            _reponsitory.CreateJobtitle(JobtitleModel, CustomerID, Username);
         }
     }
 }

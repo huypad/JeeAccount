@@ -72,7 +72,6 @@ namespace JeeAccount.Models.Common
 
     public class QueryParams
     {
-        public bool donotcallapijeehr { get; set; } = false;
         public bool more { get; set; } = false;
         public int page { get; set; } = 1;
         public int record { get; set; } = 10;

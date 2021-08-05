@@ -66,112 +66,6 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpGet("GetDSPhongban")]
-        public async Task<IActionResult> GetDSPhongban(bool donotcallapijeehr = false)
-        {
-            try
-            {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
-                if (customData is null)
-                {
-                    return Ok(MessageReturnHelper.CustomDataKhongTonTai());
-                }
-                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
-                if (token is null)
-                {
-                    return Ok(MessageReturnHelper.DangNhap());
-                }
-                var query = new QueryParams();
-                if (donotcallapijeehr)
-                {
-                    query.donotcallapijeehr = donotcallapijeehr;
-                }
-                query.more = true;
-                var lst = await _service.GetDSPhongBan(query, customData.JeeAccount.CustomerID, token).ConfigureAwait(false);
-                return Ok(lst);
-            }
-            catch (KhongCoDuLieuException ex)
-            {
-                return BadRequest(MessageReturnHelper.KhongCoDuLieu(ex.Message));
-            }
-            catch (JeeHRException error)
-            {
-                return BadRequest(MessageReturnHelper.ExceptionJeeHR(error));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(MessageReturnHelper.Exception(ex));
-            }
-        }
-
-        [HttpGet("Get_DSPhongban")]
-        public async Task<IActionResult> Get_DSPhongban(bool donotcallapijeehr = false, bool isTree = false)
-        {
-            try
-            {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
-                if (customData is null)
-                {
-                    return Ok(MessageReturnHelper.CustomDataKhongTonTai());
-                }
-                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
-                if (token is null)
-                {
-                    return Ok(MessageReturnHelper.DangNhap());
-                }
-                var checkUsedJeeHr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
-                if (!checkUsedJeeHr)
-                {
-                    var depart = await _service.GetListDepartmentDefaultAsync(customData.JeeAccount.CustomerID).ConfigureAwait(false);
-                    var lst = TranferDataHelper.LstJeeHRCoCauToChucModelFromDBFromLstDepartmentDTO(depart.ToList());
-                    return Ok(lst);
-                }
-                else
-                {
-                    if (!donotcallapijeehr)
-                    {
-                        var jeehrController = new JeeHRController(HOST_JEEHR_API);
-                        var list = await jeehrController.GetDSCoCauToChuc(token);
-                        if (list.status == 1)
-                        {
-                            if (isTree)
-                            {
-                                return Ok(list.data);
-                            }
-                            else
-                            {
-                                var flat = TranferDataHelper.FlatListJeeHRCoCauToChuc(list.data);
-                                var lst = TranferDataHelper.LstJeeHRCoCauToChucModelFromDBFromLstFlatJeeHRCoCauToChucModel(flat);
-                                return Ok(lst);
-                            }
-                        }
-                        else
-                        {
-                            var listjeehr = await _service.GetListDepartmentIsJeeHRAsync(customData.JeeAccount.CustomerID).ConfigureAwait(false);
-                            return Ok(listjeehr);
-                        }
-                    }
-                    else
-                    {
-                        var listjeehr = await _service.GetListDepartmentIsJeeHRAsync(customData.JeeAccount.CustomerID).ConfigureAwait(false);
-                        return Ok(listjeehr);
-                    }
-                }
-            }
-            catch (KhongCoDuLieuException ex)
-            {
-                return BadRequest(MessageReturnHelper.KhongCoDuLieu(ex.Message));
-            }
-            catch (JeeHRException error)
-            {
-                return BadRequest(MessageReturnHelper.ExceptionJeeHR(error));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(MessageReturnHelper.Exception(ex));
-            }
-        }
-
         [HttpGet("GetListDepartmentManagement")]
         public async Task<IActionResult> GetListDepartmentManagement([FromQuery] QueryParams query)
         {
@@ -189,8 +83,7 @@ namespace JeeAccount.Controllers
                 {
                     return Ok(MessageReturnHelper.DangNhap());
                 }
-
-                var obj = await _service.GetDSPhongBan(query, customData.JeeAccount.CustomerID, token, true).ConfigureAwait(false);
+                var obj = await _service.GetDSPhongBan(query, customData.JeeAccount.CustomerID, token).ConfigureAwait(false);
 
                 return Ok(obj);
             }

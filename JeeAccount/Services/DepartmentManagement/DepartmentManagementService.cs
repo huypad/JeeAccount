@@ -53,7 +53,9 @@ namespace JeeAccount.Services.DepartmentManagement
             return await _reponsitory.GetListDepartmentIsJeeHRAsync(custormerID).ConfigureAwait(false);
         }
 
-        public async Task<object> GetDSPhongBan(QueryParams query, long customerid, string token, bool isShowPage = false)
+        #region GetDS Phong Ban
+
+        public async Task<object> GetDSPhongBan(QueryParams query, long customerid, string token)
         {
             query = query == null ? new QueryParams() : query;
             PageModel pageModel = new PageModel();
@@ -98,60 +100,20 @@ namespace JeeAccount.Services.DepartmentManagement
                 whereStrJeeHR = CreateWhereStrJeeHR(query);
             }
 
-            var donotcallapijeehr = query.donotcallapijeehr;
             if (checkusedjeehr)
             {
-                if (!donotcallapijeehr)
+                var jeehrController = new JeeHRController(HOST_JEEHR_API);
+                var list = await jeehrController.GetDSCoCauToChuc(token);
+                if (list.status == 1)
                 {
-                    var jeehrController = new JeeHRController(HOST_JEEHR_API);
-                    var list = await jeehrController.GetDSCoCauToChuc(token);
-                    if (list.status == 1)
+                    var flat = TranferDataHelper.FlatListJeeHRCoCauToChuc(list.data);
+                    flat = FilterLstFlatJeeHRCoCauToChuc(flat, query);
+                    pageModel.TotalCount = flat.Count;
+                    if (flat.Count() == 0)
                     {
-                        var flat = TranferDataHelper.FlatListJeeHRCoCauToChuc(list.data);
-                        flat = FilterLstFlatJeeHRCoCauToChuc(flat, query);
-
-                        pageModel.TotalCount = flat.Count;
-                        if (flat.Count() == 0) throw new KhongCoDuLieuException();
-                        pageModel.AllPage = (int)Math.Ceiling(flat.Count / (decimal)query.record);
-                        pageModel.Size = query.record;
-                        pageModel.Page = query.page;
-                        if (query.more)
-                        {
-                            query.page = 1;
-                            pageModel.AllPage = 1;
-                            pageModel.Size = 1;
-                            query.record = pageModel.TotalCount;
-                        }
-                        flat = flat.Skip((query.page - 1) * query.record).Take(query.record).ToList();
-
-                        var obj = new
-                        {
-                            tree = list.data,
-                            flat = flat,
-                            isTree = true,
-                            isJeeHR = checkusedjeehr,
-                        };
-                        if (!isShowPage)
-                        {
-                            return obj;
-                        }
-                        else
-                        {
-                            return new { data = obj, panigator = pageModel };
-                        }
+                        return await ReturnObjectGetListDepartmentIsJeeHRAsync(query, pageModel, customerid, whereStrJeeHR, orderByStrJeeHR, checkusedjeehr);
                     }
-                    else
-                    {
-                        throw new JeeHRException(list.error);
-                    }
-                }
-                else
-                {
-                    var depart = await _reponsitory.GetListDepartmentIsJeeHRAsync(customerid, whereStrJeeHR, orderByStrJeeHR);
-
-                    pageModel.TotalCount = depart.Count();
-                    if (depart.Count() == 0) throw new KhongCoDuLieuException();
-                    pageModel.AllPage = (int)Math.Ceiling(depart.Count() / (decimal)query.record);
+                    pageModel.AllPage = (int)Math.Ceiling(flat.Count / (decimal)query.record);
                     pageModel.Size = query.record;
                     pageModel.Page = query.page;
                     if (query.more)
@@ -161,59 +123,82 @@ namespace JeeAccount.Services.DepartmentManagement
                         pageModel.Size = 1;
                         query.record = pageModel.TotalCount;
                     }
-                    depart = depart.Skip((query.page - 1) * query.record).Take(query.record).ToList();
+                    flat = flat.Skip((query.page - 1) * query.record).Take(query.record).ToList();
 
                     var obj = new
                     {
-                        tree = DBNull.Value,
-                        flat = depart,
-                        isTree = false,
+                        tree = list.data,
+                        flat = flat,
+                        isTree = true,
                         isJeeHR = checkusedjeehr,
                     };
-                    if (!isShowPage)
-                    {
-                        return obj;
-                    }
-                    else
-                    {
-                        return new { data = obj, panigator = pageModel };
-                    }
+
+                    return new { data = obj, panigator = pageModel };
+                }
+                else
+                {
+                    return await ReturnObjectGetListDepartmentIsJeeHRAsync(query, pageModel, customerid, whereStrJeeHR, orderByStrJeeHR, checkusedjeehr);
                 }
             }
             else
             {
-                var depart = await _reponsitory.GetListDepartmentDefaultAsync(customerid, whereStrDefault, orderByStrDefault);
-
-                pageModel.TotalCount = depart.Count();
-                if (depart.Count() == 0) throw new KhongCoDuLieuException();
-                pageModel.AllPage = (int)Math.Ceiling(depart.Count() / (decimal)query.record);
-                pageModel.Size = query.record;
-                pageModel.Page = query.page;
-                if (query.more)
-                {
-                    query.page = 1;
-                    pageModel.AllPage = 1;
-                    pageModel.Size = 1;
-                    query.record = pageModel.TotalCount;
-                }
-                depart = depart.Skip((query.page - 1) * query.record).Take(query.record).ToList();
-
-                var obj = new
-                {
-                    tree = DBNull.Value,
-                    flat = depart,
-                    isTree = false,
-                    isJeeHR = checkusedjeehr,
-                };
-                if (!isShowPage)
-                {
-                    return obj;
-                }
-                else
-                {
-                    return new { data = obj, panigator = pageModel };
-                }
+                return await ReturnObjectDepartmentDefaultAsync(query, pageModel, customerid, whereStrDefault, orderByStrDefault, checkusedjeehr);
             }
+        }
+
+        private async Task<object> ReturnObjectDepartmentDefaultAsync(QueryParams query, PageModel pageModel, long customerid, string whereStrDefault, string orderByStrDefault, bool checkusedjeehr)
+        {
+            var depart = await _reponsitory.GetListDepartmentDefaultAsync(customerid, whereStrDefault, orderByStrDefault);
+            pageModel.TotalCount = depart.Count();
+            if (depart.Count() == 0) throw new KhongCoDuLieuException();
+            pageModel.AllPage = (int)Math.Ceiling(depart.Count() / (decimal)query.record);
+            pageModel.Size = query.record;
+            pageModel.Page = query.page;
+            if (query.more)
+            {
+                query.page = 1;
+                pageModel.AllPage = 1;
+                pageModel.Size = 1;
+                query.record = pageModel.TotalCount;
+            }
+            depart = depart.Skip((query.page - 1) * query.record).Take(query.record).ToList();
+
+            var obj = new
+            {
+                tree = DBNull.Value,
+                flat = depart,
+                isTree = false,
+                isJeeHR = checkusedjeehr,
+            };
+            return new { data = obj, panigator = pageModel };
+        }
+
+        private async Task<object> ReturnObjectGetListDepartmentIsJeeHRAsync(QueryParams query, PageModel pageModel, long customerid, string whereStrJeeHR, string orderByStrJeeHR, bool checkusedjeehr)
+        {
+            var depart = await _reponsitory.GetListDepartmentIsJeeHRAsync(customerid, whereStrJeeHR, orderByStrJeeHR).ConfigureAwait(false);
+            pageModel.TotalCount = depart.Count();
+            if (depart.Count() == 0) throw new KhongCoDuLieuException();
+            pageModel.AllPage = (int)Math.Ceiling(depart.Count() / (decimal)query.record);
+            pageModel.Size = query.record;
+            pageModel.Page = query.page;
+            if (query.more)
+            {
+                query.page = 1;
+                pageModel.AllPage = 1;
+                pageModel.Size = 1;
+                query.record = pageModel.TotalCount;
+            }
+            depart = depart.Skip((query.page - 1) * query.record).Take(query.record).ToList();
+
+            var objJeeHR = new
+            {
+                tree = DBNull.Value,
+                flat = depart,
+                isTree = false,
+                isJeeHR = checkusedjeehr,
+            };
+
+            return new { data = objJeeHR, panigator = pageModel };
         }
 
         private string CreateWhereStrDefault(QueryParams query)
@@ -283,5 +268,7 @@ namespace JeeAccount.Services.DepartmentManagement
             }
             return lst;
         }
+
+        #endregion GetDS Phong Ban
     }
 }
