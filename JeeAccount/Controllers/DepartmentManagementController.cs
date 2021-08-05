@@ -57,7 +57,7 @@ namespace JeeAccount.Controllers
                 {
                     var jeehrController = new JeeHRController(HOST_JEEHR_API);
                     var list = await jeehrController.GetDSCoCauToChuc(token);
-                    return JsonResultCommon.ThanhCong(list);
+                    return list;
                 }
             }
             catch (Exception ex)
