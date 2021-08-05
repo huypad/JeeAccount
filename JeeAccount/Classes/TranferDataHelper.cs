@@ -2,6 +2,7 @@
 using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.Common;
+using JeeAccount.Models.DepartmentManagement;
 using JeeAccount.Models.JeeHR;
 using JeeAccount.Services;
 using System;
@@ -61,6 +62,60 @@ namespace JeeAccount.Classes
             IdentityServerReturn identity = new IdentityServerReturn();
             identity.statusCode = Int32.Parse(Constant.ERRORCODE_EXCEPTION);
             return identity;
+        }
+
+        public static List<JeeHRCoCauToChucModelFromDB> LstJeeHRCoCauToChucModelFromDBFromLstDepartmentDTO(List<DepartmentDTO> lst)
+        {
+            var list = new List<JeeHRCoCauToChucModelFromDB>();
+            foreach (var item in lst)
+            {
+                list.Add(JeeHRCoCauToChucModelFromDBFromDepartmentDTO(item));
+            }
+            return list;
+        }
+
+        public static JeeHRCoCauToChucModelFromDB JeeHRCoCauToChucModelFromDBFromDepartmentDTO(DepartmentDTO dto)
+        {
+            var jeehr = new JeeHRCoCauToChucModelFromDB();
+            jeehr.RowID = int.Parse(dto.RowID.ToString());
+            jeehr.Title = dto.DepartmentName;
+            return jeehr;
+        }
+
+        public static List<JeeHRCoCauToChucModelFromDB> LstJeeHRCoCauToChucModelFromDBFromLstJeeHRCoCauToChuc(List<JeeHRCoCauToChuc> lst)
+        {
+            var list = new List<JeeHRCoCauToChucModelFromDB>();
+            foreach (var item in lst)
+            {
+                list.Add(JeeHRCoCauToChucModelFromDBFromJeeHRCoCauToChuc(item));
+            }
+            return list;
+        }
+
+        public static JeeHRCoCauToChucModelFromDB JeeHRCoCauToChucModelFromDBFromJeeHRCoCauToChuc(JeeHRCoCauToChuc dto)
+        {
+            var jeehr = new JeeHRCoCauToChucModelFromDB();
+            jeehr.RowID = int.Parse(dto.RowID.ToString());
+            jeehr.Title = dto.Title;
+            return jeehr;
+        }
+
+        public static List<JeeHRChucVuToJeeHRFromDB> LstJeeHRChucVuToJeeHRFromDBFromLstJeeHRChucvu(List<JeeHRChucVu> LstJeeHRChucVu)
+        {
+            var list = new List<JeeHRChucVuToJeeHRFromDB>();
+            foreach (var item in LstJeeHRChucVu)
+            {
+                list.Add(JeeHRChucVuToJeeHRFromDBFromJeeHRChucvu(item));
+            }
+            return list;
+        }
+
+        public static JeeHRChucVuToJeeHRFromDB JeeHRChucVuToJeeHRFromDBFromJeeHRChucvu(JeeHRChucVu jeeHRChucVu)
+        {
+            var data = new JeeHRChucVuToJeeHRFromDB();
+            data.RowID = jeeHRChucVu.ID;
+            data.Title = jeeHRChucVu.Title;
+            return data;
         }
     }
 }

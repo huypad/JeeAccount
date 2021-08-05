@@ -11,6 +11,7 @@ using JeeAccount.Services.CommentService;
 using JeeAccount.Services.CustomerManagementService;
 using JeeAccount.Services.DatabaseManagementService;
 using JeeAccount.Services.DepartmentManagement;
+using JeeAccount.Services.JobtitleManagementService;
 using JeeAccount.Services.MailService;
 using JeeAccount.Services.StructureManagementService;
 using JeeCustomer.ConsumerKafka;
@@ -132,36 +133,37 @@ namespace JeeAccount
                 builder.addAsyncLogger<AsyncLoggerProvider>(p => new AsyncLoggerProvider(p.GetService<IProducer>()));
             });
 
-            #region add Repository
-
-            services.AddTransient<IAccountManagementReponsitory, AccountManagementReponsitory>();
-            services.AddTransient<ICustomerManagementReponsitory, CustomerManagementReponsitory>();
-            services.AddTransient<IDatabaseManagementRepositoty, DatabaseManagementRepositoty>();
-            services.AddTransient<IDepartmentManagementReponsitory, DepartmentManagementReponsitory>();
-            services.AddTransient<IMailReponsitory, MailReponsitory>();
-            services.AddTransient<IStructureManagementReponsitory, StructureManagementReponsitory>();
-            services.AddTransient<IWidgetDashBoardRepository, WidgetDashBoardRepository>();
-            services.AddTransient<IJobtitleManagementReponsitory, JobtitleManagementReponsitory>();
-
-            #endregion add Repository
-
-            #region add Services
-
-            services.AddTransient<IAccountManagementService, AccountManagementService>();
-            services.AddTransient<IDepartmentManagementService, DepartmentManagementService>();
-            services.AddTransient<ICustomerManagementService, CustomerManagementService>();
-            services.AddTransient<IDatabaseManagementService, DatabaseManagementService>();
-            services.AddTransient<IMailService, MailService>();
-            services.AddTransient<IStructureManagementService, StructureManagementService>();
-            services.AddTransient<ICommentService, CommentService>();
-
-            #endregion add Services
-
             #region add kafka consumer
 
             services.AddSingleton<IHostedService, AccountConsumerController>();
 
             #endregion add kafka consumer
+
+            #region add Repository
+
+            services.AddScoped<IAccountManagementReponsitory, AccountManagementReponsitory>();
+            services.AddScoped<ICustomerManagementReponsitory, CustomerManagementReponsitory>();
+            services.AddScoped<IDatabaseManagementRepositoty, DatabaseManagementRepositoty>();
+            services.AddScoped<IDepartmentManagementReponsitory, DepartmentManagementReponsitory>();
+            services.AddScoped<IMailReponsitory, MailReponsitory>();
+            services.AddScoped<IStructureManagementReponsitory, StructureManagementReponsitory>();
+            services.AddScoped<IWidgetDashBoardRepository, WidgetDashBoardRepository>();
+            services.AddScoped<IJobtitleManagementReponsitory, JobtitleManagementReponsitory>();
+
+            #endregion add Repository
+
+            #region add Services
+
+            services.AddScoped<IAccountManagementService, AccountManagementService>();
+            services.AddScoped<IDepartmentManagementService, DepartmentManagementService>();
+            services.AddScoped<ICustomerManagementService, CustomerManagementService>();
+            services.AddScoped<IDatabaseManagementService, DatabaseManagementService>();
+            services.AddScoped<IMailService, MailService>();
+            services.AddScoped<IStructureManagementService, StructureManagementService>();
+            services.AddScoped<ICommentService, CommentService>();
+            services.AddScoped<IJobtitleManagementService, JobtitleManagementService>();
+
+            #endregion add Services
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -102,13 +102,15 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
   }
 
   showEnterComment() {
-    this.ClickShowReply$.next(true);
-    if (this.replyCommentID === '') {
-      this.showEnterComment$.next(true);
+    if (this.inputLstObjectID.length <= 1) {
+      this.ClickShowReply$.next(true);
+      if (this.replyCommentID === '') {
+        this.showEnterComment$.next(true);
+      }
+      this.isFocus.emit(true);
+      this.clickButtonShowReply();
     }
-    this.isFocus.emit(true);
-    this.clickButtonShowReply();
-  }
+  } 
 
   clickButtonShowReply() {
     if (this.isFirstTime) {

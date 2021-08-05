@@ -1,4 +1,5 @@
 ﻿using JeeAccount.Models.Common;
+using JeeAccount.Models.JeeHR;
 using JeeAccount.Models.JobtitleManagement;
 using System;
 using System.Collections.Generic;
@@ -9,9 +10,9 @@ namespace JeeAccount.Reponsitories.JobtitleManagement
 {
     public interface IJobtitleManagementReponsitory
     {
-        Task<IEnumerable<JobtitleDTO>> GetListJobtitleAsync(long custormerID);
+        Task<IEnumerable<JobtitleDTO>> GetListJobtitleDefaultAsync(long custormerID, string where = "", string orderBy = "");
 
-        Task ApiGoi1lanSaveJobtitleID(long customerid, List<string> usernames);
+        Task<IEnumerable<JeeHRChucVuFromDB>> GetListJobtitleIsJeeHRAsync(long custormerID, string where = "", string orderBy = "");
 
         ReturnSqlModel ChangeTinhTrang(long customerID, long RowID, string Note, long UserIdLogin);
 

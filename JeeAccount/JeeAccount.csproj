@@ -19,8 +19,7 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.10.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DBscript\" /> 
+  <ItemGroup> 
     <Folder Include="DPS\" />
     <Content Include="images\nhanvien\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -29,9 +28,13 @@
 
   <ItemGroup>
     <Compile Remove="ConsumerServices\**" />
+    <Compile Remove="DBscript\**" />
     <Content Remove="ConsumerServices\**" />
+    <Content Remove="DBscript\**" />
     <EmbeddedResource Remove="ConsumerServices\**" />
+    <EmbeddedResource Remove="DBscript\**" />
     <None Remove="ConsumerServices\**" />
+    <None Remove="DBscript\**" />
   </ItemGroup>
 
   <ItemGroup>

@@ -20,6 +20,7 @@ namespace JeeAccount.Controllers
         private const string GET_DSNHANVIEN = "api/interaction/Get_DSNhanVien?more=true";
         private const string GET_DSNHANVIEN_THEOQUANLYTRUCTIEP = "api/interaction/getDSNhanVienTheoQLTT";
         private const string GET_COCAUTOCHUC = "api/interaction/getCoCauToChuc";
+        private const string GET_CHUCVUCHUCDANH = "api/interaction/getDSChucVuTheoChucDanh";
 
         public async Task<ReturnJeeHR<NhanVienJeeHR>> GetDSNhanVien(string access_token)
         {
@@ -59,6 +60,20 @@ namespace JeeAccount.Controllers
                 var reponse = await client.GetAsync(url);
                 string returnValue = await reponse.Content.ReadAsStringAsync();
                 var res = JsonConvert.DeserializeObject<ReturnJeeHR<JeeHRCoCauToChuc>>(returnValue);
+                return res;
+            }
+        }
+
+        public async Task<ReturnJeeHR<JeeHRChucVu>> GetDSChucVu(string access_token, string cocauid, string chucdanh)
+        {
+            string url = $"{_HOST_API_JEEHR}/{GET_CHUCVUCHUCDANH}?cocauid={cocauid}&chucdanhid={chucdanh}";
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(access_token);
+                var reponse = await client.GetAsync(url);
+                string returnValue = await reponse.Content.ReadAsStringAsync();
+                var res = JsonConvert.DeserializeObject<ReturnJeeHR<JeeHRChucVu>>(returnValue);
                 return res;
             }
         }

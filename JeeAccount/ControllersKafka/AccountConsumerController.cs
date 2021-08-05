@@ -26,15 +26,13 @@ namespace JeeCustomer.ConsumerKafka
         private Consumer accountConsumer;
         private IProducer _producer;
         private readonly ILogger<AccountConsumerController> _logger;
-        private readonly IAccountManagementService _accountManagementService;
 
-        public AccountConsumerController(IConfiguration config, IProducer producer, ILogger<AccountConsumerController> logger, IAccountManagementService accountManagementService)
+        public AccountConsumerController(IConfiguration config, IProducer producer, ILogger<AccountConsumerController> logger)
         {
             _config = config;
             accountConsumer = new Consumer(_config, _config.GetValue<string>("KafkaConfig:Consumer:JeeAccountGroup"));
             _producer = producer;
             _logger = logger;
-            _accountManagementService = accountManagementService;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)

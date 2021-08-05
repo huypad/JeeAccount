@@ -1,6 +1,7 @@
 ﻿using DpsLibs.Data;
 using JeeAccount.Classes;
 using JeeAccount.Models.Common;
+using JeeAccount.Models.JeeHR;
 using JeeAccount.Models.JobtitleManagement;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -16,19 +17,36 @@ namespace JeeAccount.Reponsitories.JobtitleManagement
     {
         private readonly string _connectionString;
 
+        private const string SQL_DSJOBTITLE_DEFAULT = @"select * from JobtitleList";
+
+        private const string SQL_DSJOBTITLE_JEEHR = @"select DISTINCT JobtitleID, Jobtitle from AccountList";
+
         public JobtitleManagementReponsitory(IConfiguration configuration)
         {
             _connectionString = configuration.GetValue<string>("AppConfig:Connection");
         }
 
-        public async Task<IEnumerable<JobtitleDTO>> GetListJobtitleAsync(long custormerID)
+        public async Task<IEnumerable<JobtitleDTO>> GetListJobtitleDefaultAsync(long custormerID, string where = "", string orderBy = "")
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", custormerID);
 
-            string sql = "select RowID, IsActive, JobtitleName, Note from JobtitleList " +
-                "where CustomerID=@CustomerID and (Disable != 1 or Disable is null)";
+            string where_order = "";
+            if (!string.IsNullOrEmpty(where))
+            {
+                where += " and JobtitleList.CustomerID = @CustomerID and (JobtitleList.Disable != 1 or JobtitleList.Disable is null)";
+            }
+            else
+            {
+                where += " JobtitleList.CustomerID = @CustomerID and (JobtitleList.Disable != 1 or JobtitleList.Disable is null)";
+            }
+            where_order += $"where {where} ";
+
+            if (!string.IsNullOrEmpty(orderBy)) where_order += $"order by {orderBy}";
+
+            string sql = @$"{SQL_DSJOBTITLE_DEFAULT} { where_order}";
+
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 dt = cnn.CreateDataTable(sql, Conds);
@@ -36,10 +54,44 @@ namespace JeeAccount.Reponsitories.JobtitleManagement
                 {
                     RowID = long.Parse(row["RowID"].ToString()),
                     IsActive = Convert.ToBoolean((bool)row["IsActive"]),
-                    JobtitleName = row["JobtitleName"].ToString(),
-                    Note = row["Note"].ToString(),
+                    Title = row["JobtitleName"] != DBNull.Value ? row["JobtitleName"].ToString() : "",
+                    Note = row["Note"] != DBNull.Value ? row["Note"].ToString() : "",
                 });
                 return await Task.FromResult(result).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<IEnumerable<JeeHRChucVuFromDB>> GetListJobtitleIsJeeHRAsync(long custormerID, string where = "", string orderBy = "")
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("CustomerID", custormerID);
+
+            string where_order = "";
+            if (!string.IsNullOrEmpty(where))
+            {
+                where += " and AccountList.CustomerID = @CustomerID and AccountList.Disable != 1";
+            }
+            else
+            {
+                where += " AccountList.CustomerID = @CustomerID and AccountList.Disable != 1";
+            }
+
+            where_order += $"where {where} ";
+
+            if (!string.IsNullOrEmpty(orderBy)) where_order += $"order by {orderBy}";
+
+            string sql = @$"{SQL_DSJOBTITLE_JEEHR} { where_order}";
+
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                var result = dt.AsEnumerable().Select(row => new JeeHRChucVuFromDB
+                {
+                    RowID = int.Parse(row["JobtitleID"].ToString()),
+                    Title = row["Jobtitle"].ToString()
+                });
+                return result;
             }
         }
 
@@ -103,22 +155,6 @@ namespace JeeAccount.Reponsitories.JobtitleManagement
                 cnn.RollbackTransaction();
                 cnn.EndTransaction();
                 throw cnn.LastError;
-            }
-        }
-
-        public async Task ApiGoi1lanSaveJobtitleID(long customerid, List<string> usernames)
-        {
-            var lst = await GetListJobtitleAsync(customerid);
-            if (lst.Count() > 0)
-            {
-                var idJobtitle = (int)lst.First().RowID;
-                foreach (var username in usernames)
-                {
-                    using (DpsConnection cnn = new DpsConnection(_connectionString))
-                    {
-                        updateJobtitleForAccountList(cnn, idJobtitle, username);
-                    }
-                }
             }
         }
 

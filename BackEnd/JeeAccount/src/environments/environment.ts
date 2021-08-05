@@ -8,7 +8,7 @@ export const environment = {
   HOST_JEEACCOUNT_API: 'https://localhost:5001',
   HOST_IDENTITYSERVER_API: 'https://identityserver.jee.vn',
   HOST_PORTAL_API: 'https://portal.jee.vn',
-  HOST_JEECOMMENT_API: 'https://localhost:5005',
+  HOST_JEECOMMENT_API: 'https://jeecomment-api.jee.vn', //https://localhost:5005
   HOST_JEELANDINGPAGE_API: 'https://jeeglobal-api.jee.vn',
   HOST_JEELANDINGPAGE: 'https://jeeglobal.jee.vn',
   HOST_JEECHAT_API: 'https://jeechat-api.jee.vn',

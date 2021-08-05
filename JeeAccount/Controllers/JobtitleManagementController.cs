@@ -2,13 +2,14 @@
 using JeeAccount.Models.Common;
 using JeeAccount.Models.JobtitleManagement;
 using JeeAccount.Reponsitories;
-using JeeAccount.Reponsitories.JobtitleManagement;
-using JeeAccount.Services;
+using JeeAccount.Services.JobtitleManagementService;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace JeeAccount.Controllers
 {
@@ -18,33 +19,206 @@ namespace JeeAccount.Controllers
     public class JobtitleManagementController : ControllerBase
     {
         private readonly IConfiguration _config;
-        private readonly IJobtitleManagementReponsitory _reponsitory;
+        private readonly IJobtitleManagementService _service;
         private readonly string _connectionString;
+        private readonly string HOST_JEEHR_API;
 
-        public JobtitleManagementController(IConfiguration configuration, IJobtitleManagementReponsitory reponsitory)
+        public JobtitleManagementController(IConfiguration configuration, IJobtitleManagementService service)
         {
             _config = configuration;
-            _reponsitory = reponsitory;
+            _service = service;
             _connectionString = configuration.GetValue<string>("AppConfig:Connection");
+            HOST_JEEHR_API = configuration.GetValue<string>("Host:JeeHR_API");
         }
 
         [HttpGet("GetListJobtitle")]
-        public async Task<object> GetListJobtitle([FromQuery] QueryParams query)
+        public async Task<IActionResult> GetListJobtitle()
         {
             try
             {
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                    return Ok(MessageReturnHelper.CustomDataKhongTonTai());
                 }
-
-                var depart = await _reponsitory.GetListJobtitleAsync(customData.JeeAccount.CustomerID);
-                return JsonResultCommon.ThanhCong(depart);
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return Ok(MessageReturnHelper.DangNhap());
+                }
+                var checkUsedJeeHr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
+                if (!checkUsedJeeHr)
+                {
+                    var list = await _service.GetListJobtitleDefaultAsync(customData.JeeAccount.CustomerID);
+                    return Ok(list);
+                }
+                else
+                {
+                    var jeehrController = new JeeHRController(HOST_JEEHR_API);
+                    var list = await jeehrController.GetDSChucVu(token, "0", "0");
+                    return Ok(list);
+                }
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieu(ex.Message));
+            }
+            catch (JeeHRException error)
+            {
+                return BadRequest(MessageReturnHelper.ExceptionJeeHR(error));
             }
             catch (Exception ex)
             {
-                return JsonResultCommon.Exception(ex);
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpGet("GetDSChucvu")]
+        public async Task<IActionResult> GetDSChucvu(bool donotcallapijeehr = false)
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Ok(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return Ok(MessageReturnHelper.DangNhap());
+                }
+                var query = new QueryParams();
+                if (donotcallapijeehr)
+                {
+                    query.donotcallapijeehr = donotcallapijeehr;
+                }
+                query.more = true;
+
+                var lst = await _service.GetDSChucvu(query, customData.JeeAccount.CustomerID, token).ConfigureAwait(false);
+                return Ok(lst);
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieu(ex.Message));
+            }
+            catch (JeeHRException error)
+            {
+                return BadRequest(MessageReturnHelper.ExceptionJeeHR(error));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpGet("Get_DSChucvu")]
+        public async Task<IActionResult> Get_DSPhongban(bool donotcallapijeehr = false)
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Ok(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return Ok(MessageReturnHelper.DangNhap());
+                }
+                var checkUsedJeeHr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
+                if (!checkUsedJeeHr)
+                {
+                    var lst = await _service.GetListJobtitleDefaultAsync(customData.JeeAccount.CustomerID).ConfigureAwait(false);
+                    var lstobject = new List<object>();
+                    foreach (var item in lst)
+                    {
+                        var obj = new { RowID = item.RowID, Title = item.Title };
+                        lstobject.Add(obj);
+                    }
+                    return Ok(lstobject);
+                }
+                else
+                {
+                    if (!donotcallapijeehr)
+                    {
+                        var jeehrController = new JeeHRController(HOST_JEEHR_API);
+                        var list = await jeehrController.GetDSChucVu(token, "0", "0");
+
+                        if (list.status == 1)
+                        {
+                            if (list.data.Count > 0)
+                            {
+                                var lst = TranferDataHelper.LstJeeHRChucVuToJeeHRFromDBFromLstJeeHRChucvu(list.data);
+                                return Ok(lst);
+                            }
+                            else
+                            {
+                                var listjeehr = await _service.GetListJobtitleIsJeeHRtAsync(customData.JeeAccount.CustomerID).ConfigureAwait(false);
+                                return Ok(listjeehr);
+                            }
+                        }
+                        else
+                        {
+                            var listjeehr = await _service.GetListJobtitleIsJeeHRtAsync(customData.JeeAccount.CustomerID).ConfigureAwait(false);
+                            return Ok(listjeehr);
+                        }
+                    }
+                    else
+                    {
+                        var listjeehr = await _service.GetListJobtitleIsJeeHRtAsync(customData.JeeAccount.CustomerID).ConfigureAwait(false);
+                        return Ok(listjeehr);
+                    }
+                }
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieu(ex.Message));
+            }
+            catch (JeeHRException error)
+            {
+                return BadRequest(MessageReturnHelper.ExceptionJeeHR(error));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpGet("GetListJobtitleManagement")]
+        public async Task<IActionResult> GetListDepartmentManagement([FromQuery] QueryParams query)
+        {
+            try
+            {
+                query = query == null ? new QueryParams() : query;
+
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Ok(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return Ok(MessageReturnHelper.DangNhap());
+                }
+
+                var obj = await _service.GetDSChucvu(query, customData.JeeAccount.CustomerID, token, true).ConfigureAwait(false);
+
+                return Ok(obj);
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieu(ex.Message));
+            }
+            catch (JeeHRException error)
+            {
+                return BadRequest(MessageReturnHelper.ExceptionJeeHR(error));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
             }
         }
 
@@ -60,7 +234,7 @@ namespace JeeAccount.Controllers
                 }
                 var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, customData.JeeAccount.UserID);
                 var username = commonInfo.Username;
-                _reponsitory.CreateJobtitle(depart, customData.JeeAccount.CustomerID, username);
+                _service.CreateJobtitle(depart, customData.JeeAccount.CustomerID, username);
 
                 return JsonResultCommon.ThanhCong(depart);
             }
@@ -81,7 +255,7 @@ namespace JeeAccount.Controllers
                     return await Task.FromResult(JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData"));
                 }
 
-                ReturnSqlModel update = _reponsitory.ChangeTinhTrang(customData.JeeAccount.CustomerID, acc.RowID, acc.Note, customData.JeeAccount.UserID);
+                ReturnSqlModel update = _service.ChangeTinhTrang(customData.JeeAccount.CustomerID, acc.RowID, acc.Note, customData.JeeAccount.UserID);
                 if (!update.Susscess)
                 {
                     if (update.ErrorCode.Equals(Constant.ERRORCODE_NOTEXIST))

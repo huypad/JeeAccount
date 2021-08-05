@@ -126,7 +126,7 @@ export class QuanLytrucTiepEditDialogComponent implements OnInit {
     } else {
       search = search.toLowerCase();
     }
-    // filter the banks
+    // filter
     this.filterQuanLys.next(this.quanLys.filter((item) => item.Display.toLowerCase().indexOf(search) > -1));
   }
 }

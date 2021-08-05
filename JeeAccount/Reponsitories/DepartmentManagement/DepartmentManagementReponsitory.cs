@@ -57,7 +57,7 @@ namespace JeeAccount.Reponsitories
                 {
                     RowID = long.Parse(row["RowID"].ToString()),
                     IsActive = Convert.ToBoolean((bool)row["IsActive"]),
-                    DepartmentManager = row["DepartmentManager"] != DBNull.Value ? row["DepartmentManager"].ToString() : "",
+                    DepartmentManager = row["DepartmentManagerName"] != DBNull.Value ? row["DepartmentManagerName"].ToString() : "",
                     DepartmentManagerUserID = row["DepartmentManagerUserID"] != DBNull.Value ? long.Parse(row["DepartmentManagerUserID"].ToString()) : 0,
                     DepartmentManagerUsername = row["DepartmentManagerUsername"] != DBNull.Value ? row["DepartmentManagerUsername"].ToString() : "",
                     DepartmentName = row["DepartmentName"] != DBNull.Value ? row["DepartmentName"].ToString() : "",
@@ -67,7 +67,7 @@ namespace JeeAccount.Reponsitories
             }
         }
 
-        public async Task<IEnumerable<JeeHRCoCauToChucModelFromDB>> GetListDepartmentIsJeeHRtAsync(long custormerID, string where = "", string orderBy = "")
+        public async Task<IEnumerable<JeeHRCoCauToChucModelFromDB>> GetListDepartmentIsJeeHRAsync(long custormerID, string where = "", string orderBy = "")
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();

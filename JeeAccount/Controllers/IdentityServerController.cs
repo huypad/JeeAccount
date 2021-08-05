@@ -127,7 +127,7 @@ namespace JeeAccount.Controllers
                 var reponse = await client.PostAsync(url, httpContent);
                 if (reponse.IsSuccessStatusCode)
                 {
-                    string returnValue = reponse.Content.ReadAsStringAsync().Result;
+                    string returnValue = await reponse.Content.ReadAsStringAsync();
 
                     var logindata = JsonConvert.DeserializeObject<LoginObject>(returnValue);
 
@@ -141,7 +141,7 @@ namespace JeeAccount.Controllers
                 }
                 else
                 {
-                    string returnValue = reponse.Content.ReadAsStringAsync().Result;
+                    string returnValue = await reponse.Content.ReadAsStringAsync();
                     var res = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
                     return res;
                 }
@@ -188,7 +188,7 @@ namespace JeeAccount.Controllers
                 var reponse = await client.PostAsync(url, httpContent);
                 if (reponse.IsSuccessStatusCode)
                 {
-                    string returnValue = reponse.Content.ReadAsStringAsync().Result;
+                    string returnValue = await reponse.Content.ReadAsStringAsync();
 
                     var logindata = JsonConvert.DeserializeObject<LoginObject>(returnValue);
 
@@ -251,7 +251,7 @@ namespace JeeAccount.Controllers
                 var reponse = await client.PostAsync(url, httpContent);
                 if (reponse.IsSuccessStatusCode)
                 {
-                    string returnValue = reponse.Content.ReadAsStringAsync().Result;
+                    string returnValue = await reponse.Content.ReadAsStringAsync();
 
                     var logindata = JsonConvert.DeserializeObject<LoginObject>(returnValue);
 
@@ -292,7 +292,7 @@ namespace JeeAccount.Controllers
                 var reponse = await client.PostAsync(url, httpContent);
                 if (reponse.IsSuccessStatusCode)
                 {
-                    string returnValue = reponse.Content.ReadAsStringAsync().Result;
+                    string returnValue = await reponse.Content.ReadAsStringAsync();
 
                     var logindata = JsonConvert.DeserializeObject<LoginObject>(returnValue);
 
@@ -306,7 +306,7 @@ namespace JeeAccount.Controllers
                 }
                 else
                 {
-                    string returnValue = reponse.Content.ReadAsStringAsync().Result;
+                    string returnValue = await reponse.Content.ReadAsStringAsync();
                     var res = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
                     return res;
                 }

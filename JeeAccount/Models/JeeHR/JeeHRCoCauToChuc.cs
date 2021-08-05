@@ -38,4 +38,22 @@ namespace JeeAccount.Models.JeeHR
         public int RowID { get; set; }
         public string Title { get; set; }
     }
+
+    public class JeeHRChucVuToJeeHRFromDB
+    {
+        public int RowID { get; set; }
+        public string Title { get; set; }
+    }
+
+    public class JeeHRChucVu
+    {
+        public int ID { get; set; }
+        public string Title { get; set; }
+    }
+
+    public class JeeHRChucVuFromDB
+    {
+        public int RowID { get; set; }
+        public string Title { get; set; }
+    }
 }

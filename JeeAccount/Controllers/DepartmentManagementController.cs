@@ -3,17 +3,14 @@ using JeeAccount.Models.Common;
 using JeeAccount.Models.DepartmentManagement;
 using JeeAccount.Models.JeeHR;
 using JeeAccount.Reponsitories;
-using JeeAccount.Services;
 using JeeAccount.Services.DepartmentManagement;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace JeeAccount.Controllers
 {
@@ -43,7 +40,7 @@ namespace JeeAccount.Controllers
                 var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Thông tin customData");
+                    return JsonResultCommon.BatBuoc("Thông tin tài khoản");
                 }
                 var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
                 if (token is null)
@@ -60,7 +57,7 @@ namespace JeeAccount.Controllers
                 {
                     var jeehrController = new JeeHRController(HOST_JEEHR_API);
                     var list = await jeehrController.GetDSCoCauToChuc(token);
-                    return list;
+                    return JsonResultCommon.ThanhCong(list);
                 }
             }
             catch (Exception ex)
@@ -89,8 +86,69 @@ namespace JeeAccount.Controllers
                 {
                     query.donotcallapijeehr = donotcallapijeehr;
                 }
+                query.more = true;
                 var lst = await _service.GetDSPhongBan(query, customData.JeeAccount.CustomerID, token).ConfigureAwait(false);
                 return Ok(lst);
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieu(ex.Message));
+            }
+            catch (JeeHRException error)
+            {
+                return BadRequest(MessageReturnHelper.ExceptionJeeHR(error));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpGet("Get_DSPhongban")]
+        public async Task<IActionResult> Get_DSPhongban(bool donotcallapijeehr = false)
+        {
+            try
+            {
+                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Ok(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return Ok(MessageReturnHelper.DangNhap());
+                }
+                var checkUsedJeeHr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
+                if (!checkUsedJeeHr)
+                {
+                    var depart = await _service.GetListDepartmentDefaultAsync(customData.JeeAccount.CustomerID).ConfigureAwait(false);
+                    var lst = TranferDataHelper.LstJeeHRCoCauToChucModelFromDBFromLstDepartmentDTO(depart.ToList());
+                    return Ok(lst);
+                }
+                else
+                {
+                    if (!donotcallapijeehr)
+                    {
+                        var jeehrController = new JeeHRController(HOST_JEEHR_API);
+                        var list = await jeehrController.GetDSCoCauToChuc(token);
+                        if (list.status == 1)
+                        {
+                            var lst = TranferDataHelper.LstJeeHRCoCauToChucModelFromDBFromLstJeeHRCoCauToChuc(list.data);
+                            return Ok(lst);
+                        }
+                        else
+                        {
+                            var listjeehr = await _service.GetListDepartmentIsJeeHRAsync(customData.JeeAccount.CustomerID).ConfigureAwait(false);
+                            return Ok(listjeehr);
+                        }
+                    }
+                    else
+                    {
+                        var listjeehr = await _service.GetListDepartmentIsJeeHRAsync(customData.JeeAccount.CustomerID).ConfigureAwait(false);
+                        return Ok(listjeehr);
+                    }
+                }
             }
             catch (KhongCoDuLieuException ex)
             {

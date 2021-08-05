@@ -12,7 +12,7 @@ namespace JeeAccount.Services.DepartmentManagement
     {
         Task<IEnumerable<DepartmentDTO>> GetListDepartmentDefaultAsync(long custormerID);
 
-        Task<IEnumerable<JeeHRCoCauToChucModelFromDB>> GetListDepartmentIsJeeHRtAsync(long custormerID);
+        Task<IEnumerable<JeeHRCoCauToChucModelFromDB>> GetListDepartmentIsJeeHRAsync(long custormerID);
 
         Task<object> GetDSPhongBan(QueryParams query, long customerid, string token, bool isShowPage = false);
 

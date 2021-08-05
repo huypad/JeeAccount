@@ -51,8 +51,8 @@ namespace JeeAccount.Classes
         {
             return new
             {
-                statusCode = ERRORCODE,
-                message = "CustomData không tồn tại",
+                statusCode = ERRORCODE_UNAUTHORIZED,
+                message = "Tài khoản không hợp lệ hoặc thiếu hiệu lực. Vui lòng đăng nhập lại!",
             };
         }
 
@@ -79,7 +79,7 @@ namespace JeeAccount.Classes
             return new
             {
                 statusCode = ERRORDATA,
-                message = message.ToLower() + "đã tồn tại",
+                message = message + "đã tồn tại",
             };
         }
 
@@ -88,7 +88,7 @@ namespace JeeAccount.Classes
             return new
             {
                 statusCode = ERRORDATA,
-                message = str_required.ToLower() + "là bắt buộc",
+                message = str_required + "là bắt buộc",
             };
         }
 
@@ -97,7 +97,7 @@ namespace JeeAccount.Classes
             return new
             {
                 statusCode = ERRORDATA,
-                message = str_custom.ToLower()
+                message = str_custom
             };
         }
 

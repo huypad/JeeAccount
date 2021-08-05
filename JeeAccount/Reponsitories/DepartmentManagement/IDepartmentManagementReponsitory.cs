@@ -12,7 +12,7 @@ namespace JeeAccount.Reponsitories
     {
         Task<IEnumerable<DepartmentDTO>> GetListDepartmentDefaultAsync(long custormerID, string where = "", string orderBy = "");
 
-        Task<IEnumerable<JeeHRCoCauToChucModelFromDB>> GetListDepartmentIsJeeHRtAsync(long custormerID, string where = "", string orderBy = "");
+        Task<IEnumerable<JeeHRCoCauToChucModelFromDB>> GetListDepartmentIsJeeHRAsync(long custormerID, string where = "", string orderBy = "");
 
         void CreateDepartment(DepartmentModel departmentModel, long CustomerID, string Username);
 
