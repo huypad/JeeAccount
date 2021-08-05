@@ -82,17 +82,17 @@ namespace JeeAccount.Classes
             return jeehr;
         }
 
-        public static List<JeeHRCoCauToChucModelFromDB> LstJeeHRCoCauToChucModelFromDBFromLstJeeHRCoCauToChuc(List<JeeHRCoCauToChuc> lst)
+        public static List<JeeHRCoCauToChucModelFromDB> LstJeeHRCoCauToChucModelFromDBFromLstFlatJeeHRCoCauToChucModel(List<FlatJeeHRCoCauToChucModel> lst)
         {
             var list = new List<JeeHRCoCauToChucModelFromDB>();
             foreach (var item in lst)
             {
-                list.Add(JeeHRCoCauToChucModelFromDBFromJeeHRCoCauToChuc(item));
+                list.Add(JeeHRCoCauToChucModelFromDBFromFlatJeeHRCoCauToChucModel(item));
             }
             return list;
         }
 
-        public static JeeHRCoCauToChucModelFromDB JeeHRCoCauToChucModelFromDBFromJeeHRCoCauToChuc(JeeHRCoCauToChuc dto)
+        public static JeeHRCoCauToChucModelFromDB JeeHRCoCauToChucModelFromDBFromFlatJeeHRCoCauToChucModel(FlatJeeHRCoCauToChucModel dto)
         {
             var jeehr = new JeeHRCoCauToChucModelFromDB();
             jeehr.RowID = int.Parse(dto.RowID.ToString());

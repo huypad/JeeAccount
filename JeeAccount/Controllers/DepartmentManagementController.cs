@@ -105,7 +105,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("Get_DSPhongban")]
-        public async Task<IActionResult> Get_DSPhongban(bool donotcallapijeehr = false)
+        public async Task<IActionResult> Get_DSPhongban(bool donotcallapijeehr = false, bool isTree = false)
         {
             try
             {
@@ -134,8 +134,16 @@ namespace JeeAccount.Controllers
                         var list = await jeehrController.GetDSCoCauToChuc(token);
                         if (list.status == 1)
                         {
-                            var lst = TranferDataHelper.LstJeeHRCoCauToChucModelFromDBFromLstJeeHRCoCauToChuc(list.data);
-                            return Ok(lst);
+                            if (isTree)
+                            {
+                                return Ok(list.data);
+                            }
+                            else
+                            {
+                                var flat = TranferDataHelper.FlatListJeeHRCoCauToChuc(list.data);
+                                var lst = TranferDataHelper.LstJeeHRCoCauToChucModelFromDBFromLstFlatJeeHRCoCauToChucModel(flat);
+                                return Ok(lst);
+                            }
                         }
                         else
                         {
