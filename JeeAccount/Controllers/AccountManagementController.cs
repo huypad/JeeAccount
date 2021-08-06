@@ -100,6 +100,49 @@ namespace JeeAccount.Controllers
             }
         }
 
+        [Route("GetListAccountManagement/internal/{customerid}")]
+        [HttpGet]
+        public async Task<ActionResult> GetListAccountManagementInternal([FromQuery] QueryParams query, long customerid)
+        {
+            try
+            {
+                query = query == null ? new QueryParams() : query;
+                var isToken = Ulities.IsInternaltoken(HttpContext.Request.Headers, _config.GetValue<string>("Jwt:internal_secret"));
+                if (isToken == false)
+                {
+                    return Unauthorized(MessageReturnHelper.Unauthorized());
+                }
+                PageModel pageModel = new PageModel();
+                var lst = await _service.GetListAccountManagement(query, customerid).ConfigureAwait(false);
+                int total = lst.Count();
+                if (total == 0) return BadRequest(MessageReturnHelper.KhongCoDuLieu("danh sách tài khoản"));
+                pageModel.TotalCount = lst.Count();
+                pageModel.AllPage = (int)Math.Ceiling(total / (decimal)query.record);
+                pageModel.Size = query.record;
+                pageModel.Page = query.page;
+                if (query.more)
+                {
+                    query.page = 1;
+                    query.record = pageModel.TotalCount;
+                }
+                var list = lst.Skip((query.page - 1) * query.record).Take(query.record);
+
+                return Ok(MessageReturnHelper.Ok(list, pageModel));
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieuException(ex));
+            }
+            catch (JeeHRException error)
+            {
+                return BadRequest(MessageReturnHelper.ExceptionJeeHR(error));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
         [HttpPost("UpdateAvatarWithChangeUrlAvatar")]
         public async Task<IActionResult> UpdateAvatarWithChangeUrlAvatar(PostImgModel img)
         {
