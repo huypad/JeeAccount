@@ -78,7 +78,6 @@ export abstract class ITableService<T> {
     return this.http.post<any>(this.API_URL_CTEATE, item).pipe(
       catchError((err) => {
         this._errorMessage.next(err);
-        console.error('CREATE ITEM', err);
         return of({ id: undefined });
       }),
       finalize(() => this._isLoading$.next(false))
@@ -99,7 +98,6 @@ export abstract class ITableService<T> {
       .pipe(
         catchError((err) => {
           this._errorMessage.next(err);
-          console.error('FIND ITEMS', err);
           return of({ items: [], total: 0 });
         })
       );
@@ -117,7 +115,6 @@ export abstract class ITableService<T> {
       .pipe(
         catchError((err) => {
           this._errorMessage.next(err);
-          console.error('GET ITEM BY IT', id, err);
           return of({ id: undefined });
         }),
         finalize(() => this._isLoading$.next(false))
@@ -137,7 +134,6 @@ export abstract class ITableService<T> {
       .pipe(
         catchError((err) => {
           this._errorMessage.next(err);
-          console.error('UPDATE ITEM', item, err);
           return of(item);
         }),
         finalize(() => this._isLoading$.next(false))
@@ -153,7 +149,6 @@ export abstract class ITableService<T> {
     return this.http.post(url, item).pipe(
       catchError((err) => {
         this._errorMessage.next(err);
-        console.error('DELETE ITEM', item, err);
         return of({});
       }),
       finalize(() => this._isLoading$.next(false))

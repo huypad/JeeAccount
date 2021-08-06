@@ -24,3 +24,34 @@ export class DepChangeTinhTrangModel {
     this.Note = '';
   }
 }
+
+export interface DepartmentManagementDTO {
+  DepartmentManager: string;
+  DepartmentManagerUserID: string;
+  DepartmentManagerUsername: string;
+  DepartmentName: string;
+  IsActive: boolean;
+  Note: string;
+  RowID: number;
+}
+
+export interface TreeJeeHRDepartmentDTO {
+  RowID: number;
+  Title: string;
+  Level: number;
+  ParentID: number;
+  Position: number;
+  Children: TreeJeeHRDepartmentDTO[];
+}
+
+export interface FlatJeeHRDepartmentDTO {
+  RowID: number;
+  Title: string;
+}
+
+export interface DepartmentManagement {
+  flat: any[];
+  isJeeHR: boolean;
+  isTree: boolean;
+  tree: TreeJeeHRDepartmentDTO;
+}

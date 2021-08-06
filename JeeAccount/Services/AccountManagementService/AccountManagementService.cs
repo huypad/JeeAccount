@@ -49,8 +49,9 @@ namespace JeeAccount.Services.AccountManagementService
                             { "nhanvien", "AccountList.LastName"},
                             { "tendangnhap", "AccountList.Username"},
                             { "tinhtrang", "AccountList.IsActive"},
-                            { "chucvu", "AccountList.JobtitleID"},
-                            { "phongban", "AccountList.DepartmentID" }
+                            { "chucvuid", "AccountList.JobtitleID"},
+                            { "phongbanid", "AccountList.DepartmentID" },
+                            {"quanlytructiep", "AccountList.DirectManager" }
                         };
 
             var checkusedjeehr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customerid);
@@ -102,7 +103,7 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
 
             if (!string.IsNullOrEmpty(query.filter["phongbanid"]))
             {
-                whereStr += $" and (AccountList.DepartmentID  = {query.filter["phongbanid"]}) ";
+                whereStr += $" and (AccountList.DepartmentID  in ({query.filter["phongbanid"]})) ";
             }
 
             if (!string.IsNullOrEmpty(query.filter["chucvu"]))
@@ -137,7 +138,10 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
                     whereStr += $" and (AccountList.IsActive = 0) ";
                 }
             }
-
+            if (!string.IsNullOrEmpty(query.filter["email"]))
+            {
+                whereStr += $" and (AccountList.Email like N'%{query.filter["email"]}%') ";
+            }
             var lst = Enumerable.Empty<AccountManagementDTO>();
             if (!checkusedjeehr)
             {

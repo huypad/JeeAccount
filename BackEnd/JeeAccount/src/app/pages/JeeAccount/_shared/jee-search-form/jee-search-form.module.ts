@@ -1,3 +1,4 @@
+import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { TranslateModule } from '@ngx-translate/core';
@@ -35,6 +36,7 @@ import { ClickOutside2Directive } from './click-outside2.directive';
     ReactiveFormsModule,
     MatExpansionModule,
     MatCheckboxModule,
+    MatSelectModule
   ],
   providers: [JeeSearchFormService],
   entryComponents: [JeeSearchFormComponent],

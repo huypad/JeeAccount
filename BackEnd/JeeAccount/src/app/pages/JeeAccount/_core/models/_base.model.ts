@@ -27,12 +27,26 @@ export interface ResultModel<T> {
 
 export interface ResultObjModel<T> {
   data: T;
-  error: ErrorModel;
-  status: number;
+  error?: ErrorModel;
+  status?: number;
+  panigator?: PageModel;
 }
+export interface ResultObjectModel<T> {
+  data: T;
+  error?: ErrorReturnModel;
+  status?: number;
+  panigator?: PageModel;
+}
+
 export interface ErrorModel {
   LastError: string;
   code: number;
+  message: string;
+}
+
+export interface ErrorReturnModel {
+  error: string;
+  statusCode: number;
   message: string;
 }
 
@@ -41,5 +55,4 @@ export interface PageModel {
   AllPage: number;
   Size: number;
   TotalCount: number;
-  total: number;
 }

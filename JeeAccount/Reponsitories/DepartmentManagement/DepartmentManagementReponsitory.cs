@@ -38,7 +38,7 @@ namespace JeeAccount.Reponsitories
             string where_order = "";
             if (!string.IsNullOrEmpty(where))
             {
-                where += " and DepartmentList.CustomerID = @CustomerID and (DepartmentList.Disable != 1 or DepartmentList.Disable is null)";
+                where += " and DepartmentList.CustomerID = @CustomerID ";
             }
             else
             {
@@ -76,7 +76,7 @@ namespace JeeAccount.Reponsitories
             string where_order = "";
             if (!string.IsNullOrEmpty(where))
             {
-                where += " and AccountList.CustomerID = @CustomerID and AccountList.Disable != 1";
+                where += " and AccountList.CustomerID = @CustomerID ";
             }
             else
             {

@@ -8,7 +8,7 @@ namespace JeeAccount.Classes
     [Serializable]
     public class KhongCoDuLieuException : Exception
     {
-        public KhongCoDuLieuException() : base()
+        public KhongCoDuLieuException() : base("")
         {
         }
 

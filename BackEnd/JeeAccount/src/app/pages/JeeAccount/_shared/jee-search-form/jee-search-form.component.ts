@@ -1,8 +1,15 @@
-import { BehaviorSubject, Subject, Subscription } from 'rxjs';
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, Output, EventEmitter } from '@angular/core';
+import {
+  TreeJeeHRDepartmentDTO,
+  FlatJeeHRDepartmentDTO,
+  DepartmentManagementDTO,
+} from './../../Management/DepartmentManagement/Model/department-management.model';
+import { showSearchFormModel } from './jee-search-form.model';
+import { BehaviorSubject, of, Subject, Subscription } from 'rxjs';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, Output, EventEmitter, Input } from '@angular/core';
 import { JeeSearchFormService } from './jee-search-form.service';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { DepartmentManagement } from '../../Management/DepartmentManagement/Model/department-management.model';
 
 @Component({
   selector: 'app-jee-search-form',
@@ -16,11 +23,18 @@ export class JeeSearchFormComponent implements OnInit {
   private subscriptions: Subscription[] = [];
   searchGroup: FormGroup;
   filterGroup: FormGroup;
+  @Input() showSearch?: showSearchFormModel = new showSearchFormModel();
   @Output() keywordEvent: EventEmitter<string> = new EventEmitter<string>();
   @Output() filterEvent: EventEmitter<any> = new EventEmitter<any>();
   public isAdmin: boolean = false;
   public daKhoa: boolean = false;
   public showFilter: boolean = false;
+  public isJeeHR: boolean;
+  public isTree: boolean;
+  public treeJeeHR: TreeJeeHRDepartmentDTO;
+  public flatJeeHRs: FlatJeeHRDepartmentDTO[];
+  public flatDepartmentDtos: DepartmentManagementDTO[];
+  public clickSelection: boolean = true;
   get isLoading$() {
     return this._isLoading$.asObservable();
   }
@@ -36,10 +50,38 @@ export class JeeSearchFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.searchForm();
-    this.filterForm();
+    this._isLoading$.next(true);
+    const sb = this.service
+      .getDSPhongBan()
+      .pipe(
+        tap((res) => {
+          console.log(res);
+          this.initDataPhongBanId(res.data);
+          this.searchForm();
+          this.filterForm();
+          this._isLoading$.next(false);
+        }),
+        catchError((err) => {
+          console.log(err);
+          this._errorMessage$.next(err);
+          return of();
+        })
+      )
+      .subscribe();
+    this.subscriptions.push(sb);
   }
 
+  initDataPhongBanId(data: DepartmentManagement) {
+    this.isJeeHR = data.isJeeHR;
+    this.isTree = data.isTree;
+    if (this.isJeeHR) {
+      this.treeJeeHR = data.tree;
+      this.flatJeeHRs = data.flat;
+    } else {
+      this.flatDepartmentDtos = data.flat;
+      console.log(this.flatDepartmentDtos);
+    }
+  }
   ngOnDestroy(): void {}
   // search
   searchForm() {
@@ -71,7 +113,9 @@ export class JeeSearchFormComponent implements OnInit {
       username: [''],
       tennhanvien: [''],
       phongban: [''],
+      phongbanid: [''],
       chucvu: [''],
+      chucvuid: [''],
     });
   }
 
@@ -84,14 +128,30 @@ export class JeeSearchFormComponent implements OnInit {
     filter['chucvu'] = this.filterGroup.controls['chucvu'].value;
     filter['isadmin'] = this.isAdmin;
     filter['dakhoa'] = this.daKhoa;
+    filter['phongbanid'] = this.filterGroup.controls['phongbanid'].value;
+    console.log(filter);
     this.filterEvent.emit(filter);
   }
 
   clickShowFilter(val: boolean) {
     this.showFilter = !val;
   }
+  clearFilter() {
+    this.searchGroup.reset();
+    this.filterGroup.reset();
+    this.clickSearch();
+    this.showFilter = false;
+  }
 
   clickOutSideFilter() {
-    this.showFilter = false;
+    console.log('why');
+    if (!this.clickSelection) this.showFilter = false;
+    setTimeout(() => {
+      this.clickSelection = false;
+    }, 3000);
+  }
+  clickSelect() {
+    console.log('click');
+    this.clickSelection = true;
   }
 }

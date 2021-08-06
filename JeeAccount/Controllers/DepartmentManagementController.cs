@@ -89,7 +89,7 @@ namespace JeeAccount.Controllers
             }
             catch (KhongCoDuLieuException ex)
             {
-                return BadRequest(MessageReturnHelper.KhongCoDuLieu(ex.Message));
+                return BadRequest(MessageReturnHelper.KhongCoDuLieuException(ex));
             }
             catch (JeeHRException error)
             {

@@ -86,6 +86,14 @@ namespace JeeAccount.Controllers
 
                 return Ok(MessageReturnHelper.Ok(list, pageModel));
             }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieuException(ex));
+            }
+            catch (JeeHRException error)
+            {
+                return BadRequest(MessageReturnHelper.ExceptionJeeHR(error));
+            }
             catch (Exception ex)
             {
                 return BadRequest(MessageReturnHelper.Exception(ex));

@@ -74,6 +74,15 @@ namespace JeeAccount.Classes
             };
         }
 
+        public static object KhongCoDuLieuException(KhongCoDuLieuException ex)
+        {
+            return new
+            {
+                statusCode = ERRORDATA,
+                message = string.IsNullOrEmpty(ex.Message) ? "không có dữ liệu" : ex.Message + " không có dữ liệu",
+            };
+        }
+
         public static object Trung(string message)
         {
             return new

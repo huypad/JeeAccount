@@ -67,16 +67,16 @@ namespace JeeAccount.Services.DepartmentManagement
 
             Dictionary<string, string> sortableFieldsDefault = new Dictionary<string, string>
                         {
-                            { "departmentid", "DepartmentList.RowID"},
-                            { "departmentname", "DepartmentList.DepartmentName"},
+                            { "phongbanid", "DepartmentList.RowID"},
+                            { "phongban", "DepartmentList.DepartmentName"},
                             { "tinhtrang", "DepartmentList.IsActive"},
-                            { "departmentmanager", "DepartmentList.DepartmentManager"},
+                            { "phongbanmanager", "DepartmentList.DepartmentManager"},
                         };
 
             Dictionary<string, string> sortableFieldsJeeHR = new Dictionary<string, string>
                         {
-                            { "departmentid", "AccountList.DepartmentID"},
-                            { "departmentname", "AccountList.DepartmentName"},
+                            { "phongbanid", "AccountList.DepartmentID"},
+                            { "phongban", "AccountList.DepartmentName"},
                         };
 
             var checkusedjeehr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customerid);
@@ -88,7 +88,7 @@ namespace JeeAccount.Services.DepartmentManagement
                     orderByStrDefault = sortableFieldsDefault[query.sortField] + ("desc".Equals(query.sortOrder) ? " desc" : " asc");
                 }
 
-                whereStrDefault = CreateWhereStrDefault(query);
+                whereStrDefault = CreateWhereStrDefault(query, whereStrDefault);
             }
             else
             {
@@ -97,7 +97,7 @@ namespace JeeAccount.Services.DepartmentManagement
                     orderByStrJeeHR = sortableFieldsJeeHR[query.sortField] + ("desc".Equals(query.sortOrder) ? " desc" : " asc");
                 }
 
-                whereStrJeeHR = CreateWhereStrJeeHR(query);
+                whereStrJeeHR = CreateWhereStrJeeHR(query, whereStrJeeHR);
             }
 
             if (checkusedjeehr)
@@ -107,7 +107,7 @@ namespace JeeAccount.Services.DepartmentManagement
                 if (list.status == 1)
                 {
                     var flat = TranferDataHelper.FlatListJeeHRCoCauToChuc(list.data);
-                    flat = FilterLstFlatJeeHRCoCauToChuc(flat, query);
+                    flat = FilterLstFlatJeeHRCoCauToChuc(flat, query, sortableFieldsJeeHR);
                     pageModel.TotalCount = flat.Count;
                     if (flat.Count() == 0)
                     {
@@ -201,9 +201,8 @@ namespace JeeAccount.Services.DepartmentManagement
             return new { data = objJeeHR, panigator = pageModel };
         }
 
-        private string CreateWhereStrDefault(QueryParams query)
+        private string CreateWhereStrDefault(QueryParams query, string whereStrDefault)
         {
-            string whereStrDefault = "";
             if (!string.IsNullOrEmpty(query.filter["keyword"]))
             {
                 whereStrDefault += $" and (AccountList.LastName + ' ' + AccountList.FirstName like N'%{query.filter["keyword"]}%' " +
@@ -217,7 +216,7 @@ namespace JeeAccount.Services.DepartmentManagement
 
             if (!string.IsNullOrEmpty(query.filter["phongbanid"]))
             {
-                whereStrDefault += $" and (DepartmentList.RowID  = {query.filter["phongbanid"]}) ";
+                whereStrDefault += $" and (DepartmentList.RowID  in ({query.filter["phongbanid"]})) ";
             }
 
             if (!string.IsNullOrEmpty(query.filter["dakhoa"]))
@@ -230,9 +229,8 @@ namespace JeeAccount.Services.DepartmentManagement
             return whereStrDefault;
         }
 
-        private string CreateWhereStrJeeHR(QueryParams query)
+        private string CreateWhereStrJeeHR(QueryParams query, string whereStrJeeHR)
         {
-            string whereStrJeeHR = "";
             if (!string.IsNullOrEmpty(query.filter["keyword"]))
             {
                 whereStrJeeHR += $" and AccountList.DepartmentName like N'%{query.filter["keyword"]}%') ";
@@ -245,12 +243,12 @@ namespace JeeAccount.Services.DepartmentManagement
 
             if (!string.IsNullOrEmpty(query.filter["phongbanid"]))
             {
-                whereStrJeeHR += $" and (AccountList.DepartmentID  = {query.filter["phongbanid"]}) ";
+                whereStrJeeHR += $" and (AccountList.DepartmentID  in ({query.filter["phongbanid"]})) ";
             }
             return whereStrJeeHR;
         }
 
-        private List<FlatJeeHRCoCauToChucModel> FilterLstFlatJeeHRCoCauToChuc(List<FlatJeeHRCoCauToChucModel> lst, QueryParams query)
+        private List<FlatJeeHRCoCauToChucModel> FilterLstFlatJeeHRCoCauToChuc(List<FlatJeeHRCoCauToChucModel> lst, QueryParams query, Dictionary<string, string> sortableFieldsJeeHR)
         {
             if (!string.IsNullOrEmpty(query.filter["keyword"]))
             {
@@ -265,6 +263,27 @@ namespace JeeAccount.Services.DepartmentManagement
             if (!string.IsNullOrEmpty(query.filter["phongbanid"]))
             {
                 lst = lst.AsEnumerable().Where(item => item.RowID.ToString() == query.filter["phongbanid"]).ToList();
+            }
+            if (!string.IsNullOrEmpty(query.sortField) && sortableFieldsJeeHR.ContainsKey(query.sortField))
+            {
+                if (query.sortField.Equals("phongbanid"))
+                {
+                    if ("desc".Equals(query.sortOrder))
+                    {
+                        lst = lst.AsEnumerable().OrderByDescending(item => item.RowID).ToList();
+                    }
+                }
+                if (query.sortField.Equals("phongban"))
+                {
+                    if ("desc".Equals(query.sortOrder))
+                    {
+                        lst = lst.AsEnumerable().OrderByDescending(item => item.Title).ToList();
+                    }
+                    else
+                    {
+                        lst = lst.AsEnumerable().OrderBy(item => item.Title).ToList();
+                    }
+                }
             }
             return lst;
         }

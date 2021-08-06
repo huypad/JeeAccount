@@ -41,15 +41,15 @@ namespace JeeAccount.Services.JobtitleManagementService
 
             Dictionary<string, string> sortableFieldsDefault = new Dictionary<string, string>
                         {
-                            { "jobtitileid", "JobtitleList.RowID"},
-                            { "JobtitleName", "JobtitleList.JobtitleName"},
+                            { "chucvuid", "JobtitleList.RowID"},
+                            { "chucvu", "JobtitleList.JobtitleName"},
                             { "tinhtrang", "JobtitleList.IsActive"},
                         };
 
             Dictionary<string, string> sortableFieldsJeeHR = new Dictionary<string, string>
                         {
-                            { "jobtitileid", "AccountList.JobtitleID"},
-                            { "Jobtitlename", "AccountList.JobtitleName"},
+                            { "chucvuid", "AccountList.JobtitleID"},
+                            { "chucvu", "AccountList.JobtitleName"},
                         };
 
             var checkusedjeehr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customerid);
@@ -60,7 +60,7 @@ namespace JeeAccount.Services.JobtitleManagementService
                     orderByStrDefault = sortableFieldsDefault[query.sortField] + ("desc".Equals(query.sortOrder) ? " desc" : " asc");
                 }
 
-                whereStrDefault = CreateWhereStrDefault(query);
+                whereStrDefault = CreateWhereStrDefault(query, whereStrDefault);
             }
             else
             {
@@ -69,7 +69,7 @@ namespace JeeAccount.Services.JobtitleManagementService
                     orderByStrJeeHR = sortableFieldsJeeHR[query.sortField] + ("desc".Equals(query.sortOrder) ? " desc" : " asc");
                 }
 
-                whereStrJeeHR = CreateWhereStrJeeHR(query);
+                whereStrJeeHR = CreateWhereStrJeeHR(query, whereStrJeeHR);
             }
             if (checkusedjeehr)
             {
@@ -87,7 +87,7 @@ namespace JeeAccount.Services.JobtitleManagementService
                 var list = await jeehrController.GetDSChucVu(token, cocauid, chucdanhid).ConfigureAwait(false);
                 if (list.status == 1)
                 {
-                    var ds_jeehr = FilterLstJeeHRChucVu(list.data, query);
+                    var ds_jeehr = FilterLstJeeHRChucVu(list.data, query, sortableFieldsJeeHR);
                     pageModel.TotalCount = ds_jeehr.Count;
                     if (ds_jeehr.Count() == 0)
                     {
@@ -160,9 +160,8 @@ namespace JeeAccount.Services.JobtitleManagementService
             return new { data = lst_jeehr, panigator = pageModel, isJeeHR = checkIsJeeHR };
         }
 
-        private string CreateWhereStrDefault(QueryParams query)
+        private string CreateWhereStrDefault(QueryParams query, string whereStrDefault)
         {
-            string whereStrDefault = "";
             if (!string.IsNullOrEmpty(query.filter["keyword"]))
             {
                 whereStrDefault += $" and JobtitleList.JobtitleName like N'%{query.filter["keyword"]}%')";
@@ -188,9 +187,8 @@ namespace JeeAccount.Services.JobtitleManagementService
             return whereStrDefault;
         }
 
-        private string CreateWhereStrJeeHR(QueryParams query)
+        private string CreateWhereStrJeeHR(QueryParams query, string whereStrJeeHR)
         {
-            string whereStrJeeHR = "";
             if (!string.IsNullOrEmpty(query.filter["keyword"]))
             {
                 whereStrJeeHR += $" and AccountList.Jobtitle like N'%{query.filter["keyword"]}%') ";
@@ -208,7 +206,7 @@ namespace JeeAccount.Services.JobtitleManagementService
             return whereStrJeeHR;
         }
 
-        private List<JeeHRChucVuToJeeHRFromDB> FilterLstJeeHRChucVu(List<JeeHRChucVu> lst, QueryParams query)
+        private List<JeeHRChucVuToJeeHRFromDB> FilterLstJeeHRChucVu(List<JeeHRChucVu> lst, QueryParams query, Dictionary<string, string> sortableFieldsJeeHR)
         {
             if (!string.IsNullOrEmpty(query.filter["keyword"]))
             {
@@ -224,6 +222,28 @@ namespace JeeAccount.Services.JobtitleManagementService
             {
                 lst = lst.AsEnumerable().Where(item => item.ID.ToString() == query.filter["chucvuid"]).ToList();
             }
+            if (!string.IsNullOrEmpty(query.sortField) && sortableFieldsJeeHR.ContainsKey(query.sortField))
+            {
+                if (query.sortField.Equals("chucvuid"))
+                {
+                    if ("desc".Equals(query.sortOrder))
+                    {
+                        lst = lst.AsEnumerable().OrderByDescending(item => item.ID).ToList();
+                    }
+                }
+                if (query.sortField.Equals("chucvu"))
+                {
+                    if ("desc".Equals(query.sortOrder))
+                    {
+                        lst = lst.AsEnumerable().OrderByDescending(item => item.Title).ToList();
+                    }
+                    else
+                    {
+                        lst = lst.AsEnumerable().OrderBy(item => item.Title).ToList();
+                    }
+                }
+            }
+
             var list = TranferDataHelper.LstJeeHRChucVuToJeeHRFromDBFromLstJeeHRChucvu(lst);
             return list;
         }
