@@ -9,9 +9,9 @@ namespace JeeAccount.Models.JeeHR
     {
         public int RowID { get; set; }
         public string Title { get; set; }
-        public int Level { get; set; }
-        public int ParentID { get; set; }
-        public int Position { get; set; }
+        public string Level { get; set; }
+        public string ParentID { get; set; }
+        public string Position { get; set; }
         public JeeHRCoCauToChuc[] Children { get; set; }
     }
 
@@ -19,9 +19,9 @@ namespace JeeAccount.Models.JeeHR
     {
         public int RowID { get; set; }
         public string Title { get; set; }
-        public int Level { get; set; }
-        public int ParentID { get; set; }
-        public int Position { get; set; }
+        public string Level { get; set; }
+        public string ParentID { get; set; }
+        public string Position { get; set; }
 
         public FlatJeeHRCoCauToChucModel(JeeHRCoCauToChuc item)
         {
