@@ -1,4 +1,4 @@
-import { SelectModel } from './../../../_shared/jee-search-form/jee-search-form.model';
+import { SelectModel } from '../../../_shared/jee-search-form/jee-search-form.model';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -15,11 +15,11 @@ import { catchError, finalize, tap } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-account-management-edit-dialog',
-  templateUrl: './account-management-edit-dialog.component.html',
+  selector: 'app-account-management-chinhsua-jeehr-dialog',
+  templateUrl: './account-management-chinhsua-jeehr-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AccountManagementEditDialogComponent implements OnInit, OnDestroy {
+export class AccountManagementChinhSuaJeeHRDialogComponent implements OnInit, OnDestroy {
   item: AccountManagementModel;
   itemForm = this.fb.group({
     AnhDaiDien: [''],
@@ -63,7 +63,7 @@ export class AccountManagementEditDialogComponent implements OnInit, OnDestroy {
   // End
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
-    public dialogRef: MatDialogRef<AccountManagementEditDialogComponent>,
+    public dialogRef: MatDialogRef<AccountManagementChinhSuaJeeHRDialogComponent>,
     private fb: FormBuilder,
     public accountManagementService: AccountManagementService,
     private changeDetect: ChangeDetectorRef,

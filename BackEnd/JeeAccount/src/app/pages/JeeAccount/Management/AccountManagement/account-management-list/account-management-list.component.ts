@@ -1,10 +1,11 @@
+import { AccountManagementEditJeeHRDialogComponent } from './../account-management-edit-jeehr-dialog/account-management-edit-jeehr-dialog.component';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, of, Subscription } from 'rxjs';
 import { SubheaderService } from 'src/app/_metronic/partials/layout';
 import { AccountManagementEditDialogComponent } from '../account-management-edit-dialog/account-management-edit-dialog.component';
-import { AccountManagementDTO, PostImgModel } from '../Model/account-management.model';
+import { AccountManagementDTO, AppListDTO, PostImgModel } from '../Model/account-management.model';
 import { AccountManagementService } from '../Services/account-management.service';
 import { QuanLytrucTiepEditDialogComponent } from '../quan-ly-truc-tiep-edit-dialog/quan-ly-truc-tiep-edit-dialog.component';
 import { ChangeTinhTrangEditDialogComponent } from '../change-tinh-trang-edit-dialog/change-tinh-trang-edit-dialog.component';
@@ -15,6 +16,7 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { GroupingState, PaginatorState } from 'src/app/_metronic/shared/crud-table';
 import { SortState } from './../../../../../_metronic/shared/crud-table/models/sort.model';
 import { catchError, debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
+import { ResultModel } from '../../../_core/models/_base.model';
 
 @Component({
   selector: 'app-account-management-list',
@@ -24,15 +26,15 @@ import { catchError, debounceTime, distinctUntilChanged, tap } from 'rxjs/operat
 export class AccountManagementListComponent implements OnInit {
   // Table fields
   loadingSubject = new BehaviorSubject<boolean>(false);
-  displayedColumns = ['NhanVien', 'TenDangNhap', 'ChucVu', 'QuanLyTrucTiep', 'TinhTrang', 'GhiChu', 'ThaoTac'];
   filterGroup: FormGroup;
   searchGroup: FormGroup;
   paginator: PaginatorState;
   sorting: SortState;
   grouping: GroupingState;
-  dataResult: AccountManagementDTO[] = [];
   imgFile: string = '';
   isLoading: boolean = false;
+  listApp: AppListDTO[] = [];
+  isJeeHR: boolean;
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -41,8 +43,7 @@ export class AccountManagementListComponent implements OnInit {
     public subheaderService: SubheaderService,
     private layoutUtilsService: LayoutUtilsService,
     public dialog: MatDialog,
-    public danhmuc: DanhMucChungService,
-    private fb: FormBuilder
+    public danhmuc: DanhMucChungService
   ) {}
 
   //=================PageSize Table=====================
@@ -54,6 +55,22 @@ export class AccountManagementListComponent implements OnInit {
     this.paginator = this.accountManagementService.paginator;
     this.sorting = this.accountManagementService.sorting;
     const sb = this.accountManagementService.isLoading$.subscribe((res) => (this.isLoading = res));
+    this.subscriptions.push(sb);
+    this.loadListApp();
+  }
+
+  loadListApp() {
+    const sb = this.accountManagementService
+      .GetListAppByCustomerID()
+      .pipe(
+        tap((res: ResultModel<AppListDTO>) => {
+          if (res) {
+            this.listApp = res.data;
+            this.isJeeHR = this.listApp.map((item) => item.AppCode).includes('JeeHR');
+          }
+        })
+      )
+      .subscribe();
     this.subscriptions.push(sb);
   }
 
@@ -74,18 +91,34 @@ export class AccountManagementListComponent implements OnInit {
     saveMessageTranslateParam += 'Thêm thành công';
     const saveMessage = this.translate.instant(saveMessageTranslateParam);
     const messageType = MessageType.Create;
-    const dialogRef = this.dialog.open(AccountManagementEditDialogComponent, {
-      data: {},
-    });
-    const sb = dialogRef.afterClosed().subscribe((res) => {
-      if (!res) {
-        this.accountManagementService.fetch();
-      } else {
-        this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
-        this.accountManagementService.fetch();
-      }
-    });
-    this.subscriptions.push(sb);
+    if (!this.isJeeHR) {
+      const dialogRef = this.dialog.open(AccountManagementEditDialogComponent, {
+        data: {},
+      });
+      const sb = dialogRef.afterClosed().subscribe((res) => {
+        if (!res) {
+          this.accountManagementService.fetch();
+        } else {
+          this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+          this.accountManagementService.fetch();
+        }
+      });
+      this.subscriptions.push(sb);
+    }
+    if (this.isJeeHR) {
+      const dialogRef = this.dialog.open(AccountManagementEditJeeHRDialogComponent, {
+        data: {},
+      });
+      const sb = dialogRef.afterClosed().subscribe((res) => {
+        if (!res) {
+          this.accountManagementService.fetch();
+        } else {
+          this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+          this.accountManagementService.fetch();
+        }
+      });
+      this.subscriptions.push(sb);
+    }
   }
 
   getHeight(): any {

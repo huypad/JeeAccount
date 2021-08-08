@@ -12,6 +12,9 @@ import { QuanLytrucTiepEditDialogComponent } from './quan-ly-truc-tiep-edit-dial
 import { ChangeTinhTrangEditDialogComponent } from './change-tinh-trang-edit-dialog/change-tinh-trang-edit-dialog.component';
 
 import { JeeAccountModule } from 'src/app/pages/jee-account.module';
+import { AccountManagementChinhSuaNoJeeHRDialogComponent } from './account-management-chinhsua-nojeehr-dialog/account-management-chinhsua-nojeehr-dialog.component';
+import { AccountManagementChinhSuaJeeHRDialogComponent } from './account-management-chinhsua-jeehr-dialog/account-management-chinhsua-jeehr-dialog.component';
+import { AccountManagementEditJeeHRDialogComponent } from './account-management-edit-jeehr-dialog/account-management-edit-jeehr-dialog.component';
 const routes: Routes = [
   {
     path: '',
@@ -32,6 +35,9 @@ const routes: Routes = [
     AccountManagementEditDialogComponent,
     QuanLytrucTiepEditDialogComponent,
     ChangeTinhTrangEditDialogComponent,
+    AccountManagementChinhSuaNoJeeHRDialogComponent,
+    AccountManagementChinhSuaJeeHRDialogComponent,
+    AccountManagementEditJeeHRDialogComponent,
   ],
   imports: [CommonModule, RouterModule.forChild(routes), JeeAccountModule, NgxMatSelectSearchModule, InlineSVGModule],
   providers: [
@@ -41,6 +47,13 @@ const routes: Routes = [
       useValue: { hasBackdrop: true, height: 'auto', width: '900px', panelClass: 'mat-dialog-container-wrapper', disableClose: true },
     },
   ],
-  entryComponents: [AccountManagementEditDialogComponent, QuanLytrucTiepEditDialogComponent, ChangeTinhTrangEditDialogComponent],
+  entryComponents: [
+    AccountManagementEditDialogComponent,
+    QuanLytrucTiepEditDialogComponent,
+    ChangeTinhTrangEditDialogComponent,
+    AccountManagementChinhSuaNoJeeHRDialogComponent,
+    AccountManagementChinhSuaJeeHRDialogComponent,
+    AccountManagementEditJeeHRDialogComponent,
+  ],
 })
 export class AccountManagementModule {}

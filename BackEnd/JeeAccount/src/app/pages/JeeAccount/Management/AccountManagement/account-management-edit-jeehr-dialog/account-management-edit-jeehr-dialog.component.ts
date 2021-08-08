@@ -1,4 +1,4 @@
-import { SelectModel } from './../../../_shared/jee-search-form/jee-search-form.model';
+import { SelectModel } from '../../../_shared/jee-search-form/jee-search-form.model';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -15,27 +15,19 @@ import { catchError, finalize, tap } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-account-management-edit-dialog',
-  templateUrl: './account-management-edit-dialog.component.html',
+  selector: 'app-account-management-edit-jeehr-dialog',
+  templateUrl: './account-management-edit-jeehr-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AccountManagementEditDialogComponent implements OnInit, OnDestroy {
+export class AccountManagementEditJeeHRDialogComponent implements OnInit, OnDestroy {
   item: AccountManagementModel;
   itemForm = this.fb.group({
-    AnhDaiDien: [''],
-    HoTen: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
-    Email: ['', Validators.compose([Validators.email])],
-    PhongBan: ['', [Validators.required]],
+    NhanVien: ['', [Validators.required]],
+    NhanVienFilterCtrl: [],
     TenDangNhap: ['', [Validators.required]],
     MatKhau: ['', [Validators.required]],
     NhapLaiMatKhau: ['', [Validators.required]],
-    SoDienThoai: ['', Validators.compose([Validators.pattern(/^-?(0|[0-9]\d*)?$/)])],
     AppsCheckbox: new FormArray([]),
-    file: [],
-    PhongBanFilterCtrl: [],
-    Chucvu: ['', [Validators.required]],
-    ChucVuFilterCtrl: [],
-    BirthDay: [''],
   });
   listApp: AppListDTO[] = [];
   CompanyCode: string;
@@ -63,13 +55,12 @@ export class AccountManagementEditDialogComponent implements OnInit, OnDestroy {
   // End
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
-    public dialogRef: MatDialogRef<AccountManagementEditDialogComponent>,
+    public dialogRef: MatDialogRef<AccountManagementEditJeeHRDialogComponent>,
     private fb: FormBuilder,
     public accountManagementService: AccountManagementService,
     private changeDetect: ChangeDetectorRef,
     private layoutUtilsService: LayoutUtilsService,
     public danhmuc: DanhMucChungService,
-    private authService: AuthService,
     public datepipe: DatePipe,
     private translateService: TranslateService
   ) {}
@@ -81,20 +72,12 @@ export class AccountManagementEditDialogComponent implements OnInit, OnDestroy {
 
   createForm() {
     this.itemForm = this.fb.group({
-      AnhDaiDien: [''],
-      HoTen: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
-      Email: ['', Validators.compose([Validators.email])],
-      PhongBan: ['', [Validators.required]],
+      NhanVien: ['', [Validators.required]],
+      NhanVienFilterCtrl: [],
       TenDangNhap: ['', [Validators.required]],
       MatKhau: ['', [Validators.required]],
       NhapLaiMatKhau: ['', [Validators.required]],
-      SoDienThoai: ['', Validators.compose([Validators.pattern(/^-?(0|[0-9]\d*)?$/)])],
       AppsCheckbox: new FormArray([]),
-      file: [],
-      PhongBanFilterCtrl: [],
-      Chucvu: ['', [Validators.required]],
-      ChucVuFilterCtrl: [],
-      BirthDay: [''],
     });
   }
 
@@ -115,7 +98,6 @@ export class AccountManagementEditDialogComponent implements OnInit, OnDestroy {
           }
         }),
         finalize(() => {
-          this.loadPhongBan();
           this.loadChucVu();
         }),
         catchError((err) => {
@@ -181,44 +163,6 @@ export class AccountManagementEditDialogComponent implements OnInit, OnDestroy {
       )
       .subscribe();
     this.subscriptions.push(sb3);
-  }
-  loadPhongBan() {
-    const sb2 = this.danhmuc
-      .getDSPhongBan()
-      .pipe(
-        tap((res) => {
-          this.phongBans = [...res.data.flat];
-          this.filterPhongBans.next([...res.data.flat]);
-          this.itemForm.controls.PhongBanFilterCtrl.valueChanges.subscribe(() => {
-            this.profilterPhongBans();
-          });
-        }),
-        finalize(() => {
-          this._isFirstLoading$.next(false);
-          this._isLoading$.next(false);
-        }),
-        catchError((err) => {
-          console.log(err);
-          this._errorMessage$.next(err);
-          return of();
-        })
-      )
-      .subscribe();
-    this.subscriptions.push(sb2);
-  }
-  protected profilterPhongBans() {
-    if (!this.itemForm.controls.PhongBan) {
-      return;
-    }
-
-    let search = this.itemForm.controls.PhongBanFilterCtrl.value;
-    if (!search) {
-      this.filterPhongBans.next([...this.phongBans]);
-      return;
-    } else {
-      search = search.toLowerCase();
-    }
-    this.filterPhongBans.next(this.phongBans.filter((item) => item.DepartmentName.toLowerCase().indexOf(search) > -1));
   }
 
   protected profilterChucVus() {
