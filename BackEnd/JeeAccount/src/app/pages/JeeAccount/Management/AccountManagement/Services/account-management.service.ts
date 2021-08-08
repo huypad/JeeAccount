@@ -8,6 +8,7 @@ import {
   AccountManagementModel,
   AppListDTO,
   InfoUserDTO,
+  JeeHRNhanVien,
   PostImgModel,
 } from '../Model/account-management.model';
 import { environment } from 'src/environments/environment';
@@ -36,6 +37,14 @@ export class AccountManagementService extends ITableService<AccountManagementDTO
   GetListAppByCustomerID(): Observable<ResultModel<AppListDTO>> {
     const httpHeaders = this.httpUtils.getHTTPHeaders();
     const url = API_PRODUCTS_URL + `/GetListAppByCustomerID`;
+    return this.http.get<any>(url, {
+      headers: httpHeaders,
+    });
+  }
+
+  GetListJeeHR(): Observable<JeeHRNhanVien[]> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const url = API_PRODUCTS_URL + `/GetDSJeeHR`;
     return this.http.get<any>(url, {
       headers: httpHeaders,
     });
@@ -75,6 +84,4 @@ export class AccountManagementService extends ITableService<AccountManagementDTO
       headers: httpHeaders,
     });
   }
-
-  
 }

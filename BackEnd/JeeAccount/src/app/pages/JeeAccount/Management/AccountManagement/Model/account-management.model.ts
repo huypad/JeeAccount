@@ -117,3 +117,25 @@ export class InfoUserDTO {
     this.Username = '';
   }
 }
+
+export interface JeeHRNhanVien {
+  HoTen: string;
+  NgaySinh: string;
+  Structure: string;
+  Phai: string;
+  TenChucVu: string;
+  MaNV: string;
+  ID_NV: number;
+  Email: string;
+  TuNgay: string;
+  NgayBatDauLamViec: Date;
+  IDNV: number;
+  Title: string;
+  cmnd: string;
+  avatar: string;
+  username: string;
+  structureid: number;
+  jobtitleid: number;
+  managerid: number;
+  manager: string;
+}

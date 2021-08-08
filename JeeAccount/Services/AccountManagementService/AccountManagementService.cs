@@ -1,4 +1,5 @@
-﻿using DPSinfra.UploadFile;
+﻿using DPSinfra.Kafka;
+using DPSinfra.UploadFile;
 using DPSinfra.Utils;
 using DpsLibs.Data;
 using JeeAccount.Classes;
@@ -28,14 +29,18 @@ namespace JeeAccount.Services.AccountManagementService
         private readonly string _connectionString;
         private IConfiguration _configuration;
         private readonly string HOST_MINIOSERVER;
+        private readonly string TopicAddNewCustomerUser;
+        private readonly IProducer _producer;
 
-        public AccountManagementService(IAccountManagementReponsitory reponsitory, IConfiguration configuration)
+        public AccountManagementService(IAccountManagementReponsitory reponsitory, IConfiguration configuration, IProducer producer)
         {
             _reponsitory = reponsitory;
             identityServerController = new IdentityServerController();
             HOST_MINIOSERVER = configuration.GetValue<string>("MinioConfig:MinioServer");
             _connectionString = configuration.GetValue<string>("AppConfig:Connection");
             _configuration = configuration;
+            TopicAddNewCustomerUser = _configuration.GetValue<string>("KafkaConfig:TopicProduce:JeeplatformInitialization");
+            _producer = producer;
         }
 
         #region api giao diện
@@ -336,7 +341,7 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 if (IsExistUsernameCnn(cnn, account.Username, customerID)) throw new TrungDuLieuExceoption("Username");
-                if (!string.IsNullOrEmpty(account.ImageAvatar)) account.ImageAvatar = UpdateAvatar(account.Username, account.ImageAvatar);
+                if (!string.IsNullOrEmpty(account.ImageAvatar) && !isJeeHR) account.ImageAvatar = UpdateAvatar(account.Username, account.ImageAvatar);
                 try
                 {
                     cnn.BeginTransaction();
@@ -355,6 +360,16 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
                         throw new Exception(res.message);
                     }
                     cnn.EndTransaction();
+                    var obj = new
+                    {
+                        CustomerID = customerID,
+                        AppCode = account.AppCode,
+                        UserID = account.Userid,
+                        Username = account.Username,
+                        IsInitial = false,
+                        IsAdmin = false
+                    };
+                    await _producer.PublishAsync(TopicAddNewCustomerUser, JsonConvert.SerializeObject(obj));
                 }
                 catch (Exception)
                 {

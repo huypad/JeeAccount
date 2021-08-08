@@ -1,3 +1,4 @@
+import { JeeHRNhanVien } from './../Model/account-management.model';
 import { SelectModel } from '../../../_shared/jee-search-form/jee-search-form.model';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -33,10 +34,8 @@ export class AccountManagementEditJeeHRDialogComponent implements OnInit, OnDest
   CompanyCode: string;
   imgFile = '../assets/media/Img/NoImage.jpg';
   // ngx-mat-search area
-  phongBans: DepartmentManagementDTO[] = [];
-  filterPhongBans: ReplaySubject<DepartmentManagementDTO[]> = new ReplaySubject<DepartmentManagementDTO[]>();
-  chucvus: SelectModel[] = [];
-  filterChucVus: ReplaySubject<SelectModel[]> = new ReplaySubject<SelectModel[]>();
+  NhanViens: JeeHRNhanVien[] = [];
+  filterNhanViens: ReplaySubject<JeeHRNhanVien[]> = new ReplaySubject<JeeHRNhanVien[]>();
   private _isLoading$ = new BehaviorSubject<boolean>(false);
   private _isFirstLoading$ = new BehaviorSubject<boolean>(true);
   private _errorMessage$ = new BehaviorSubject<string>('');
@@ -98,7 +97,8 @@ export class AccountManagementEditJeeHRDialogComponent implements OnInit, OnDest
           }
         }),
         finalize(() => {
-          this.loadChucVu();
+          this._isFirstLoading$.next(true);
+          this.loadNhanVienJeeHR();
         }),
         catchError((err) => {
           console.log(err);
@@ -140,15 +140,16 @@ export class AccountManagementEditJeeHRDialogComponent implements OnInit, OnDest
     this.AppsFromArray.setValue(lst);
   }
 
-  loadChucVu() {
-    const sb3 = this.danhmuc
-      .getDSChucvu()
+  loadNhanVienJeeHR() {
+    const sb3 = this.accountManagementService
+      .GetListJeeHR()
       .pipe(
         tap((res) => {
-          this.chucvus = [...res.data];
-          this.filterChucVus.next([...res.data]);
-          this.itemForm.controls.ChucVuFilterCtrl.valueChanges.subscribe(() => {
-            this.profilterChucVus();
+          console.log(res);
+          this.NhanViens = [...res];
+          this.filterNhanViens.next([...res]);
+          this.itemForm.controls.NhanVienFilterCtrl.valueChanges.subscribe(() => {
+            this.profilterNhanViens();
           });
         }),
         finalize(() => {
@@ -165,18 +166,18 @@ export class AccountManagementEditJeeHRDialogComponent implements OnInit, OnDest
     this.subscriptions.push(sb3);
   }
 
-  protected profilterChucVus() {
-    if (!this.itemForm.controls.Chucvu) {
+  protected profilterNhanViens() {
+    if (!this.itemForm.controls.NhanVien) {
       return;
     }
-    let search = this.itemForm.controls.ChucVuFilterCtrl.value;
+    let search = this.itemForm.controls.NhanVienFilterCtrl.value;
     if (!search) {
-      this.filterChucVus.next([...this.chucvus]);
+      this.filterNhanViens.next([...this.NhanViens]);
       return;
     } else {
       search = search.toLowerCase();
     }
-    this.filterChucVus.next(this.chucvus.filter((item) => item.Title.toLowerCase().indexOf(search) > -1));
+    this.filterNhanViens.next(this.NhanViens.filter((item) => item.HoTen.toLowerCase().indexOf(search) > -1));
   }
 
   onSubmit(withBack: boolean) {
@@ -213,17 +214,21 @@ export class AccountManagementEditJeeHRDialogComponent implements OnInit, OnDest
     }
     acc.AppCode = AppCode;
     acc.AppID = AppID;
-    acc.Fullname = this.itemForm.controls.HoTen.value;
-    acc.Email = this.itemForm.controls.Email.value;
-    acc.Phonemumber = this.itemForm.controls.SoDienThoai.value;
-    acc.DepartmemtID = +this.itemForm.controls.PhongBan.value;
-    if (acc.DepartmemtID != 0) acc.Departmemt = this.phongBans.find((item) => item.RowID == acc.DepartmemtID).DepartmentName;
-    acc.JobtitleID = +this.itemForm.controls.Chucvu.value;
-    if (acc.JobtitleID != 0) acc.Jobtitle = this.chucvus.find((item) => item.RowID == acc.JobtitleID).Title;
-    acc.Username = `${this.CompanyCode}.${this.itemForm.controls.TenDangNhap.value}`;
-    acc.Password = this.itemForm.controls.MatKhau.value;
-    acc.ImageAvatar = this.imgFile ? this.imgFile.split(',')[1] : '';
-    acc.Birthday = !this.itemForm.controls.BirthDay.value ? this.format_date(this.itemForm.controls.BirthDay.value) : '';
+    if (this.itemForm.controls.NhanVien.value) {
+      const indexNhanvien = +this.itemForm.controls.NhanVien.value;
+      const nhanvien = this.NhanViens.find((item) => item.IDNV == indexNhanvien);
+      acc.Fullname = nhanvien.HoTen;
+      acc.Email = nhanvien.Email;
+      acc.Phonemumber = '';
+      acc.DepartmemtID = nhanvien.structureid;
+      if (nhanvien.structureid != 0) acc.Departmemt = nhanvien.Structure;
+      acc.JobtitleID = nhanvien.jobtitleid;
+      if (nhanvien.jobtitleid != 0) acc.Jobtitle = nhanvien.TenChucVu;
+      acc.Username = `${this.CompanyCode}.${this.itemForm.controls.TenDangNhap.value}`;
+      acc.Password = this.itemForm.controls.MatKhau.value;
+      acc.ImageAvatar = nhanvien.avatar;
+      acc.Birthday = nhanvien.NgaySinh;
+    }
     return acc;
   }
   validateAllFormFields(formGroup: FormGroup) {
@@ -302,7 +307,6 @@ export class AccountManagementEditJeeHRDialogComponent implements OnInit, OnDest
     const model = this.prepareDataFromFB();
     if (this.item.Username === '') {
       const empty = new AccountManagementModel();
-      empty.Username = `${this.CompanyCode}.`;
       empty.AppCode = this.listApp.filter((item) => item.IsDefaultApp).map((item) => item.AppCode);
       empty.AppID = this.listApp.filter((item) => item.IsDefaultApp).map((item) => item.AppID);
       return this.danhmuc.isEqual(empty, model);

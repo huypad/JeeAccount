@@ -153,6 +153,7 @@ export const locale = {
       SELECTCHUCVUALL: 'Toàn bộ chức vụ',
       TIMKIEMTHEOTENCHUCVU: 'Tìm kiếm theo tên chức vụ',
       TIMKIEMTHEOTENPHONGBAN: 'Tìm kiếm theo tên phòng ban',
+      TIMTHEOTENNHANVIEN: 'Tìm theo tên nhân viên',
     },
     profile: {
       thongtincanhan: 'Thông tin cá nhân',
@@ -174,6 +175,7 @@ export const locale = {
       TENCHUCVU: 'Tên chức vụ',
       TENDANGNHAP: 'Tên đăng nhập',
       NHAPLAIMATKHAU: 'Nhập lại mật khẩu',
+      TENNHANVIEN: 'Tên nhân viên',
     },
     jeechat: {
       send: 'Gửi',

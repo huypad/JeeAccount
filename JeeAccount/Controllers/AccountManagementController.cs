@@ -873,6 +873,32 @@ namespace JeeAccount.Controllers
             }
         }
 
-
+        [HttpGet("GetDSJeeHR")]
+        public async Task<IActionResult> GetDSJeeHR()
+        {
+            try
+            {
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+                var jeeHRController = new JeeHRController(HOST_JEEHR_API);
+                var lst = await jeeHRController.GetDSNhanVien(token);
+                var listStaffId = GeneralReponsitory.GetLstStaffIDByCustomerid(_connectionString, customData.JeeAccount.CustomerID);
+                if (lst.status == 0) return BadRequest(MessageReturnHelper.ErrorJeeHR(lst.error));
+                var lstData = lst.data.Where(item => !listStaffId.Contains(item.IDNV));
+                return Ok(lstData);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
     }
 }

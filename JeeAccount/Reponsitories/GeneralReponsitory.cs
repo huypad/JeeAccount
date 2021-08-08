@@ -287,6 +287,37 @@ namespace JeeAccount.Reponsitories
             }
         }
 
+        public static List<long> GetLstStaffIDByCustomerid(string connectionString, long customerid)
+        {
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                var lst = new List<long>();
+                string sql = $"select StaffID from AccountList where CustomerID = {customerid}";
+                DataTable dt = new DataTable();
+                dt = cnn.CreateDataTable(sql);
+                if (dt.Rows.Count == 0) return null;
+                foreach (DataRow dr in dt.Rows)
+                {
+                    lst.Add(long.Parse(dr["StaffID"].ToString()));
+                }
+                return lst;
+            }
+        }
+
+        public static List<long> GetLstStaffIDByCustomeridCnn(DpsConnection cnn, long customerid)
+        {
+            var lst = new List<long>();
+            string sql = $"select StaffID from AccountList where CustomerID = {customerid}";
+            DataTable dt = new DataTable();
+            dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count == 0) return null;
+            foreach (DataRow dr in dt.Rows)
+            {
+                lst.Add(long.Parse(dr["StaffID"].ToString()));
+            }
+            return lst;
+        }
+
         public static List<string> GetLstUsernameByCustomeridCnn(DpsConnection cnn, long customerid)
         {
             var lst = new List<string>();
