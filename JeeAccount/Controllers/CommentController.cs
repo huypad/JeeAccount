@@ -26,7 +26,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 var access_token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
@@ -59,7 +59,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return Unauthorized(NotFound(MessageReturnHelper.CustomDataKhongTonTai()));
@@ -84,7 +84,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return Unauthorized(NotFound(MessageReturnHelper.CustomDataKhongTonTai()));

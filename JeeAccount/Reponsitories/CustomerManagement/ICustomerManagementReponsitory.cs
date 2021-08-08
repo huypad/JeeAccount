@@ -28,5 +28,7 @@ namespace JeeAccount.Reponsitories.CustomerManagement
         Task<ReturnSqlModel> UpdateCustomerAppGiaHanModelCnn(CustomerAppGiaHanModel model, DpsConnection cnn);
 
         Task<ReturnSqlModel> UpdateCustomerAppAddNumberStaff(CustomerAppAddNumberStaffModel model);
+
+        string CompanyCode(long customerid);
     }
 }

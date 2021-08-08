@@ -154,7 +154,7 @@ namespace JeeAccount.Classes
         /// </summary>
         /// <param name="pHeader"></param>
         /// <returns></returns>
-        public static CustomData GetUserByHeader(IHeaderDictionary pHeader)
+        public static CustomData GetCustomDataByHeader(IHeaderDictionary pHeader)
         {
             try
             {

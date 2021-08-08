@@ -60,7 +60,7 @@ namespace JeeAccount.Services.AccountManagementService
 
         ReturnSqlModel UpdateDirectManager(string Username, string DirectManager, long customerID);
 
-        Task<IdentityServerReturn> CreateAccount(string Admin_accessToken, long customerID, long AdminUserID, AccountManagementModel account, string apiUrl);
+        Task CreateAccount(bool isJeeHR, string Admin_accessToken, long customerID, string usernameCreatedBy, AccountManagementModel account);
 
         Task<IdentityServerReturn> UpdatePersonalInfoCustomData(string Admin_access_token, PersonalInfoCustomData personalInfoCustom, long userId, long customerId);
 
@@ -68,12 +68,6 @@ namespace JeeAccount.Services.AccountManagementService
 
         Task<HttpResponseMessage> ResetPasswordRootCustomer(CustomerResetPasswordModel model);
 
-        Task<HttpResponseMessage> UpdateOneBgColorCustomData(InputApiModel model);
-
-        void UpdateAllAppCodesCustomData(InputApiModel model, List<int> lstAppCode);
-
-        void SaveNewAccountInAccount_AppAndAccountList(long customerID, long AdminUserID, AccountManagementModel account, List<int> ListAppID);
-
-        string UpdateAvatarCdn(string username, string base64);
+        string UpdateAvatar(string username, string base64);
     }
 }

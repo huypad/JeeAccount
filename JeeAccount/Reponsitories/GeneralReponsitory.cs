@@ -339,7 +339,7 @@ namespace JeeAccount.Reponsitories
                            from AccountList
 left join DepartmentList on DepartmentList.RowID = AccountList.DepartmentID
 left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID
-                                where CustomerID = @CustomerID and UserID = @UserID";
+                                where AccountList.CustomerID = @CustomerID and UserID = @UserID";
 
                     dt = cnn.CreateDataTable(sql, Conds);
                     if (dt.Rows.Count == 0)
@@ -376,7 +376,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID
                 var objCustom = new ObjCustomData();
                 objCustom.userId = commonInfo.UserID;
                 objCustom.updateField = "jee-account";
-                objCustom.fieldValue = new JeeAccountModel
+                objCustom.fieldValue = new JeeAccountCustomDataModel
                 {
                     AppCode = appCodesName,
                     CustomerID = commonInfo.CustomerID,

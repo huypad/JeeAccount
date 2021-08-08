@@ -17,6 +17,7 @@ import { JeeSearchFormService } from './jee-search-form.service';
 import { JeeSearchFormComponent } from './jee-search-form.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ClickOutside2Directive } from './click-outside2.directive';
+import { DropdownTreeModule } from 'dps-lib';
 
 @NgModule({
   declarations: [JeeSearchFormComponent, ClickOutside2Directive],
@@ -36,7 +37,8 @@ import { ClickOutside2Directive } from './click-outside2.directive';
     ReactiveFormsModule,
     MatExpansionModule,
     MatCheckboxModule,
-    MatSelectModule
+    MatSelectModule,
+    DropdownTreeModule,
   ],
   providers: [JeeSearchFormService],
   entryComponents: [JeeSearchFormComponent],

@@ -113,7 +113,6 @@ export class JeeCommentComponent implements OnInit {
               this.pushItemCommentInTopicComemnt(this.item, result.LstCreate);
             }
             if (result.LstEdit.length > 0) {
-              console.log(result.LstEdit);
               this.editItemCommentInTopicComemnt(this.item, result.LstEdit);
             }
             if (result.LstDelete.length > 0) {
@@ -140,7 +139,6 @@ export class JeeCommentComponent implements OnInit {
   }
 
   updateLengCreate(currentLength: number, lengthLstCreate: number) {
-    console.log(currentLength, lengthLstCreate);
     currentLength = currentLength + lengthLstCreate;
   }
 

@@ -13,7 +13,7 @@
     flex-wrap: wrap;
   }
 </style>
-<div [ngClass]="getClass()" id="{{ user.user.IdGroup }}" class="card chat-box">
+<div [ngClass]="getClass()" id="{{ user.user.IdGroup }}" class="card chat-box" style="z-index: 100">
   <div style="padding: 5px" *ngIf="!user.user.isGroup" class="card-header">
     <div class="d-flex" *ngFor="let item of user.user.InfoGroupUser">
       <div class="mr">
@@ -47,7 +47,7 @@
   <div style="padding: 5px" *ngIf="user.user.isGroup" class="card-header">
     <div class="d-flex">
       <div class="avatar-group">
-        <div *ngFor="let mb of user.user.ListMember.slice(0,4); let i = index">
+        <div *ngFor="let mb of user.user.ListMember.slice(0, 4); let i = index">
           <div *ngFor="let it of mb.InfoMemberUser">
             <div *ngIf="i >= 0 && i < 3">
               <ngx-avatar [size]="25" [name]="it.Fullname.slice(0, 1)" bgColor="{{ it.BgColor }}" *ngIf="!it.Avatar"></ngx-avatar>

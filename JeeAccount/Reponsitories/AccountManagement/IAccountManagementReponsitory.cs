@@ -77,18 +77,14 @@ namespace JeeAccount.Reponsitories
 
         ReturnSqlModel ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin);
 
-        ReturnSqlModel CreateAccount(DpsConnection cnn, AccountManagementModel account, long AdminUserID, long CustomerID, bool isAdmin = false);
-
-        ReturnSqlModel UpdateAvatar(DpsConnection cnn, string AvatarUrl, long userID, long CustomerID);
+        void CreateAccount(bool isJeeHR, DpsConnection cnn, AccountManagementModel account, string usernameCreatedBy, long CustomerID, bool isAdmin = false);
 
         void UpdateAvatar(string AvatarUrl, long userID, long CustomerID);
-
-        ReturnSqlModel UpdateAvatarFirstTime(DpsConnection cnn, string AvatarUrl, long userID, long CustomerID);
 
         ReturnSqlModel UpdatePersonalInfoCustomData(DpsConnection cnn, PersonalInfoCustomData personalInfoCustom, long userId, long customerId);
 
         ReturnSqlModel UpdateDirectManager(string Username, string DirectManager, long customerID);
 
-        ReturnSqlModel InsertAppCodeAccount(DpsConnection cnn, long UserID, List<int> AppID);
+        void InsertAppCodeAccount(DpsConnection cnn, long UserID, List<int> AppID, string createdBy);
     }
 }

@@ -253,22 +253,38 @@ body .mat-select-required .mat-select-value {
 .card.card-custom {
   > .card-header {
     min-height: 65px;
+
+    > .card-search {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: auto;
+      margin-left: 0;
+    }
   }
   > .card-body {
     padding: 0;
 
     th {
+      box-sizing: border-box;
       height: 48px;
-      padding: 0;
+      padding: 0 6px;
       font-weight: 600;
       color: #808080 !important;
-      background-color: #f0f0f0 !important;
+      background-color: #f3f6f9 !important;
       letter-spacing: 0 !important;
     }
     td {
+      box-sizing: border-box;
       height: 48px;
-      padding: 0;
+      padding: 0 6px;
     }
+  }
+}
+
+.modal-content {
+  .mat-form-field-underline {
+    background-color: #e6e4e4 !important;
   }
 }
 
@@ -278,4 +294,8 @@ body .mat-select-required .mat-select-value {
 
 pl-10 {
   padding-left: 10px !important;
+}
+
+.mat-dialog-container {
+  padding: 0 !important;
 }

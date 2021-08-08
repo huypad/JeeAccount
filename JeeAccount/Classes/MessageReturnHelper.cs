@@ -28,6 +28,15 @@ namespace JeeAccount.Classes
             };
         }
 
+        public static object ThanhCong(string message = "")
+        {
+            return new
+            {
+                statusCode = 1,
+                message = string.IsNullOrEmpty(message) ? "Thành công" : message + " thành công",
+            };
+        }
+
         public static object Ok(object data, PageModel pageModel, bool Visible)
         {
             return new
@@ -35,15 +44,6 @@ namespace JeeAccount.Classes
                 data = data,
                 Visible = Visible,
                 panigator = pageModel
-            };
-        }
-
-        public static object Unauthorized()
-        {
-            return new
-            {
-                statusCode = ERRORCODE_UNAUTHORIZED,
-                message = "Unauthorized",
             };
         }
 
@@ -61,7 +61,7 @@ namespace JeeAccount.Classes
             return new
             {
                 statusCode = ERRORDATA,
-                message = string.IsNullOrEmpty(message) ? "Không tồn tại" : message + " ;hông tồn tại",
+                message = string.IsNullOrEmpty(message) ? "Không tồn tại" : message + " không tồn tại",
             };
         }
 
@@ -89,6 +89,15 @@ namespace JeeAccount.Classes
             {
                 statusCode = ERRORDATA,
                 message = message + "đã tồn tại",
+            };
+        }
+
+        public static object Trung(TrungDuLieuExceoption ex)
+        {
+            return new
+            {
+                statusCode = ERRORDATA,
+                message = string.IsNullOrEmpty(ex.Message) ? "Dữ liệu đã tồn tại" : ex.Message + " đã tồn tại",
             };
         }
 

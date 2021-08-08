@@ -46,7 +46,7 @@ namespace JeeAccount.Controllers
             string id_menu = "0";
             try
             {
-                var loginData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var loginData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 //LoginData loginData = lc._GetInfoUser(Token);
                 //if (loginData == null)
                 //    return JsonResultCommon.DangNhap();
@@ -77,7 +77,7 @@ namespace JeeAccount.Controllers
                                Icon = r["Icon"].ToString(),
                                ALink = r["ALink"].ToString(),
                                Child = from c in ds.Tables[1].AsEnumerable()
-                                       where c["groupname"].ToString().Trim().ToLower().Equals(r["Code"].ToString().Trim().ToLower())
+                                       where c["groupname"].ToString().Trim().Equals(r["Code"].ToString().Trim(), StringComparison.OrdinalIgnoreCase)
                                        select new
                                        {
                                            Title = c["title"].ToString(),

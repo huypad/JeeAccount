@@ -749,7 +749,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
             return new ReturnSqlModel();
         }
 
-        public ReturnSqlModel CreateAccount(DpsConnection cnn, AccountManagementModel account, long userID, long CustomerID, bool isAdmin = false)
+        public void CreateAccount(bool isJeeHR, DpsConnection cnn, AccountManagementModel account, string username_createdby, long CustomerID, bool isAdmin = false)
         {
             Hashtable val = new Hashtable();
             try
@@ -764,23 +764,27 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                     val.Add("LastName", Lastname);
                 }
                 if (account.Username is not null) val.Add("Username", account.Username);
-                if (account.Jobtitle is not null) val.Add("Jobtitle", account.Jobtitle);
-                if (account.Departmemt is not null) val.Add("Department", account.Departmemt);
-                if (account.Phonemumber is not null) val.Add("PhoneNumber", account.Phonemumber);
-                if (account.Email is not null) val.Add("Email", account.Email);
-                if (account.ImageAvatar is not null) val.Add("AvartarImgURL", account.ImageAvatar);
+                if (account.DepartmemtID != 0) val.Add("DepartmentID", account.DepartmemtID);
+                if (!string.IsNullOrEmpty(account.Departmemt) && isJeeHR)
+                    val.Add("Department", account.Departmemt);
+
+                if (account.JobtitleID != 0) val.Add("JobtitleID", account.JobtitleID);
+                if (account.cocauid != 0) val.Add("CoCauID", account.chucvuid);
+                if (account.chucvuid != 0) val.Add("ChucvuID", account.chucvuid);
+                if (!string.IsNullOrEmpty(account.Jobtitle) && isJeeHR) val.Add("Jobtitle", account.Jobtitle);
+                if (!string.IsNullOrEmpty(account.Phonemumber)) val.Add("PhoneNumber", account.Phonemumber);
+                if (!string.IsNullOrEmpty(account.Email)) val.Add("Email", account.Email);
+                if (!string.IsNullOrEmpty(account.ImageAvatar)) val.Add("AvartarImgURL", account.ImageAvatar);
                 if (account.StaffID != 0) val.Add("StaffID", account.StaffID);
-                if (account.Birthday is not null)
+                if (!string.IsNullOrEmpty(account.Birthday))
                 {
                     var date = DateTime.ParseExact(account.Birthday, "dd/MM/yyyy", CultureInfo.InvariantCulture);
                     val.Add("Birthday", date);
                 }
                 val.Add("IsActive", 1);
                 val.Add("Disable", 0);
-                val.Add("ActiveDate", DateTime.Now);
-                val.Add("ActiveBy", userID);
                 val.Add("CreatedDate", DateTime.Now);
-                val.Add("CreatedBy", userID);
+                val.Add("CreatedBy", username_createdby);
                 val.Add("CustomerID", CustomerID);
                 if (isAdmin)
                 {
@@ -796,53 +800,13 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                 int x = cnn.Insert(val, "AccountList");
                 if (x <= 0)
                 {
-                    return new ReturnSqlModel(cnn.LastError.ToString(), Constant.ERRORCODE_EXCEPTION);
+                    throw cnn.LastError;
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                return new ReturnSqlModel(ex.Message, Constant.ERRORCODE_EXCEPTION);
+                throw;
             }
-            return new ReturnSqlModel();
-        }
-
-        public ReturnSqlModel UpdateAvatar(DpsConnection cnn, string AvatarUrl, long userID, long CustomerID)
-        {
-            Hashtable val = new Hashtable();
-            val.Add("AvartarImgURL", AvatarUrl);
-            SqlConditions cond = new SqlConditions();
-            cond.Add("UserID", userID);
-            cond.Add("CustomerID", CustomerID);
-            try
-            {
-                int x = cnn.Update(val, cond, "AccountList");
-                if (x <= 0)
-                {
-                    return new ReturnSqlModel(cnn.LastError.ToString(), Constant.ERRORCODE_EXCEPTION);
-                }
-            }
-            catch (Exception ex)
-            {
-                return new ReturnSqlModel(ex.Message, Constant.ERRORCODE_EXCEPTION);
-            }
-            return new ReturnSqlModel();
-        }
-
-        public ReturnSqlModel UpdateAvatarFirstTime(DpsConnection cnn, string AvatarUrl, long userID, long CustomerID)
-        {
-            Hashtable val = new Hashtable();
-            val.Add("AvartarImgURL", AvatarUrl);
-            SqlConditions cond = new SqlConditions();
-            cond.Add("UserID", userID);
-            cond.Add("CustomerID", CustomerID);
-
-            int x = cnn.Update(val, cond, "AccountList");
-            if (x <= 0)
-            {
-                return new ReturnSqlModel(cnn.LastError.ToString(), Constant.ERRORCODE_EXCEPTION);
-            }
-
-            return new ReturnSqlModel();
         }
 
         public void UpdateAvatar(string AvatarUrl, long userID, long CustomerID)
@@ -939,7 +903,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
             return userid;
         }
 
-        public ReturnSqlModel InsertAppCodeAccount(DpsConnection cnn, long UserID, List<int> AppID)
+        public void InsertAppCodeAccount(DpsConnection cnn, long UserID, List<int> AppID, string createdBy)
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
@@ -954,17 +918,15 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                 val.Add("UserID", UserID);
                 val.Add("AppID", id);
                 val.Add("CreatedDate", DateTime.Now);
-                val.Add("CreatedBy", 0);
+                val.Add("CreatedBy", createdBy);
                 val.Add("Disable", 0);
                 val.Add("IsActive", 1);
                 int x = cnn.Insert(val, "Account_App");
                 if (x <= 0)
                 {
-                    return new ReturnSqlModel(cnn.LastError.ToString(), Constant.ERRORCODE_EXCEPTION);
+                    throw cnn.LastError;
                 }
             }
-
-            return new ReturnSqlModel();
         }
 
         public List<int> GetAppIdByAppCode(DpsConnection cnn, List<string> AppCode)

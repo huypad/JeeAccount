@@ -35,7 +35,7 @@ import { MenuConfigService } from './_metronic/core/services/menu-config.service
 import { LayoutUtilsService } from './pages/JeeAccount/_core/utils/layout-utils.service';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { JeeAccountModule } from './pages/jee-account.module';
-
+import { DatePipe } from '@angular/common';
 // jee-comment
 
 function appInitializer(authService: AuthService) {
@@ -88,6 +88,7 @@ function appInitializer(authService: AuthService) {
     DynamicAsideMenuService,
     TokenStorage,
     MenuServices,
+    DatePipe,
     {
       provide: APP_INITIALIZER,
       useFactory: appInitializer,

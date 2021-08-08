@@ -37,7 +37,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return JsonResultCommon.BatBuoc("Thông tin tài khoản");
@@ -73,7 +73,7 @@ namespace JeeAccount.Controllers
             {
                 query = query == null ? new QueryParams() : query;
 
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return Ok(MessageReturnHelper.CustomDataKhongTonTai());
@@ -106,7 +106,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return JsonResultCommon.BatBuoc("Đăng nhập");
@@ -128,7 +128,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return await Task.FromResult(JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData"));

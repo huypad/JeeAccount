@@ -72,7 +72,7 @@ namespace JeeAccount.Services.CustomerManagementService
             return token;
         }
 
-        public async Task<IdentityServerReturn> CreateCustomer(CustomerModel customerModel)
+        public async Task<IdentityServerReturn> CreateCustomer(CustomerModel customerModel, string usernameAdmin)
         {
             using (DpsConnection cnn = new DpsConnection(ConnectionString))
             {
@@ -115,31 +115,19 @@ namespace JeeAccount.Services.CustomerManagementService
                         Username = customerModel.Username,
                         Password = customerModel.Password,
                     };
+                    var isJeeHR = appcodes.Contains("JeeHR");
+                    _accountManagementReponsitory.CreateAccount(isJeeHR, cnn, accountManagementModel, usernameAdmin, customerModel.RowID, true);
 
-                    var createAccount = _accountManagementReponsitory.CreateAccount(cnn, accountManagementModel, 0, customerModel.RowID, true);
-                    if (!createAccount.Susscess)
-                    {
-                        cnn.RollbackTransaction();
-                        cnn.EndTransaction();
-                        identityServerReturn = TranferDataHelper.TranformIdentityServerReturnSqlModel(createAccount);
-                        return identityServerReturn;
-                    }
                     long userId = _accountManagementReponsitory.GetLastUserID(cnn);
-                    var updateAppCode = _accountManagementReponsitory.InsertAppCodeAccount(cnn, userId, customerModel.AppID);
-                    if (!updateAppCode.Susscess)
-                    {
-                        cnn.RollbackTransaction();
-                        cnn.EndTransaction();
-                        identityServerReturn = TranferDataHelper.TranformIdentityServerReturnSqlModel(createAccount);
-                        return identityServerReturn;
-                    }
+                    _accountManagementReponsitory.InsertAppCodeAccount(cnn, userId, customerModel.AppID, usernameAdmin);
+
                     IdentityServeAddAdminNewUser identity = new IdentityServeAddAdminNewUser
                     {
                         username = customerModel.Username,
                         password = customerModel.Password,
                         customData = new CustomAdminData
                         {
-                            JeeAccount = new JeeAccountModel
+                            JeeAccount = new JeeAccountCustomDataModel
                             {
                                 AppCode = appcodes,
                                 CustomerID = customerModel.RowID,
@@ -311,6 +299,11 @@ namespace JeeAccount.Services.CustomerManagementService
             var projectName = configuration.GetValue<string>("KafkaConfig:ProjectName");
             var token = JsonWebToken.issueToken(new TokenClaims { projectName = projectName }, secret);
             return token;
+        }
+
+        public string CompanyCode(long customerid)
+        {
+            return _customerManagementReponsitory.CompanyCode(customerid);
         }
     }
 }

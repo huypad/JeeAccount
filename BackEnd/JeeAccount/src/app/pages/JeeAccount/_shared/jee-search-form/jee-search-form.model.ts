@@ -19,3 +19,8 @@ export class showSearchFormModel {
     this.dakhoa = true;
   }
 }
+
+export interface SelectModel {
+  RowID: number;
+  Title: string;
+}

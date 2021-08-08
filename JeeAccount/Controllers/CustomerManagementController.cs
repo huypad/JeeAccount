@@ -90,6 +90,35 @@ namespace JeeAccount.Controllers
             }
         }
 
+        [HttpGet("GetCompanyCode")]
+        public IActionResult GetCompanyCode()
+        {
+            try
+            {
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+
+                var code = _service.CompanyCode(customData.JeeAccount.CustomerID);
+                if (code is null) throw new KhongCoDuLieuException();
+                return Ok(new { CompanyCode = code });
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieuException(ex));
+            }
+            catch (JeeHRException error)
+            {
+                return BadRequest(MessageReturnHelper.ExceptionJeeHR(error));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
         #region api for customer
 
         [HttpPost("CreateCustomer")]
@@ -101,7 +130,7 @@ namespace JeeAccount.Controllers
                 if (token is null) return NotFound("Secrectkey");
                 if (!token.Equals(_JeeCustomerSecrectkey)) return NotFound("Secrectkey Không hợp lệ");
 
-                var create = await _service.CreateCustomer(model);
+                var create = await _service.CreateCustomer(model, "jeecustomer");
                 if (create.statusCode == 0)
                 {
                     return Ok(create);

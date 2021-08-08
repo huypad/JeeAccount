@@ -8,12 +8,15 @@ using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.Common;
 using JeeAccount.Reponsitories;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JeeAccount.Services.AccountManagementService
@@ -325,77 +328,31 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
             }
         }
 
-        public async Task<IdentityServerReturn> CreateAccount(string Admin_accessToken, long customerID, long AdminUserID, AccountManagementModel account, string apiUrl)
+        public async Task CreateAccount(bool isJeeHR, string Admin_accessToken, long customerID, string usernameCreatedBy, AccountManagementModel account)
         {
+            CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+            TextInfo textInfo = cultureInfo.TextInfo;
+            account.Fullname = textInfo.ToTitleCase(account.Fullname.Trim());
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                IdentityServerReturn identityServerReturn = new IdentityServerReturn();
+                if (IsExistUsernameCnn(cnn, account.Username, customerID)) throw new TrungDuLieuExceoption("Username");
+                if (!string.IsNullOrEmpty(account.ImageAvatar)) account.ImageAvatar = UpdateAvatar(account.Username, account.ImageAvatar);
                 try
                 {
                     cnn.BeginTransaction();
-                    var create = _reponsitory.CreateAccount(cnn, account, AdminUserID, customerID);
-                    if (create.Susscess)
+                    _reponsitory.CreateAccount(isJeeHR, cnn, account, usernameCreatedBy, customerID, isJeeHR);
+                    account.Userid = GeneralReponsitory.GetCommonInfoCnn(cnn, 0, account.Username).UserID;
+                    _reponsitory.InsertAppCodeAccount(cnn, account.Userid, account.AppID, usernameCreatedBy);
+                    var identity = InitIdentityServerUserModel(customerID, account);
+                    string userId = identity.customData.JeeAccount.UserID.ToString();
+                    var createUser = await identityServerController.addNewUser(identity, Admin_accessToken);
+                    if (!createUser.IsSuccessStatusCode)
                     {
-                        var identity = InitIdentityServerUserModel(cnn, customerID, account);
-                        string userId = identity.customData.JeeAccount.UserID.ToString();
-                        //GeneralService.saveImgNhanVien(account.ImageAvatar, userId, customerID);
-                        string urlAvatar = apiUrl + $"images/nhanvien/{customerID}/{userId}.jpg";
-                        identity.customData.PersonalInfo.Avatar = urlAvatar;
-                        var createUser = await this.identityServerController.addNewUser(identity, Admin_accessToken);
-                        var updateAvatar = _reponsitory.UpdateAvatarFirstTime(cnn, urlAvatar, long.Parse(userId), customerID);
-                        if (createUser.statusCode != 0)
-                        {
-                            cnn.RollbackTransaction();
-                            cnn.EndTransaction();
-                            return createUser;
-                        }
-
-                        cnn.EndTransaction();
-                        return createUser;
-                    }
-                    else
-                    {
+                        string returnValue = await createUser.Content.ReadAsStringAsync();
+                        var res = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
                         cnn.RollbackTransaction();
                         cnn.EndTransaction();
-                        identityServerReturn = TranferDataHelper.TranformIdentityServerReturnSqlModel(create);
-                        return identityServerReturn;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    cnn.RollbackTransaction();
-                    cnn.EndTransaction();
-                    identityServerReturn = TranferDataHelper.TranformIdentityServerException(ex);
-                    return identityServerReturn;
-                }
-            }
-        }
-
-        public void SaveNewAccountInAccount_AppAndAccountList(long customerID, long AdminUserID, AccountManagementModel account, List<int> ListAppID)
-        {
-            using (DpsConnection cnn = new DpsConnection(_connectionString))
-            {
-                try
-                {
-                    cnn.BeginTransaction();
-                    var create = _reponsitory.CreateAccount(cnn, account, AdminUserID, customerID);
-                    if (create.Susscess)
-                    {
-                        var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, 0, account.Username);
-                        var userid = commonInfo.UserID;
-                        var saveAppList = _reponsitory.InsertAppCodeAccount(cnn, userid, ListAppID);
-                        if (!saveAppList.Susscess)
-                        {
-                            cnn.RollbackTransaction();
-                            cnn.EndTransaction();
-                            throw new Exception(saveAppList.ErrorMessgage);
-                        }
-                    }
-                    else
-                    {
-                        cnn.RollbackTransaction();
-                        cnn.EndTransaction();
-                        throw new Exception(create.ErrorMessgage);
+                        throw new Exception(res.message);
                     }
                     cnn.EndTransaction();
                 }
@@ -408,12 +365,11 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
             }
         }
 
-        private IdentityServerAddNewUser InitIdentityServerUserModel(DpsConnection cnn, long customerID, AccountManagementModel account)
+        private IdentityServerAddNewUser InitIdentityServerUserModel(long customerID, AccountManagementModel account)
         {
             IdentityServerAddNewUser identity = new IdentityServerAddNewUser();
             identity.username = account.Username;
             identity.password = account.Password;
-
             CustomData customData = new CustomData();
             PersonalInfoCustomData personalInfo = new PersonalInfoCustomData();
             personalInfo.Name = GeneralService.GetFirstname(account.Fullname);
@@ -421,16 +377,23 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
             personalInfo.Departmemt = account.Departmemt;
             personalInfo.Fullname = account.Fullname;
             personalInfo.Jobtitle = account.Jobtitle;
-            personalInfo.Birthday = "";
+            personalInfo.Birthday = account.Birthday;
             personalInfo.Phonenumber = account.Phonemumber;
-            long idUser = _reponsitory.GetCurrentIdentity(cnn);
-            JeeAccountModel jee = new JeeAccountModel();
+            personalInfo.DepartmemtID = account.DepartmemtID;
+            personalInfo.Email = account.Email;
+            personalInfo.Departmemt = account.Departmemt;
+            personalInfo.Jobtitle = account.Jobtitle;
+            personalInfo.JobtitleID = account.JobtitleID;
+            personalInfo.Structure = "";
+            personalInfo.StructureID = account.cocauid.ToString();
+            personalInfo.BgColor = GeneralService.GetColorNameUser(personalInfo.Name);
+            JeeAccountCustomDataModel jee = new JeeAccountCustomDataModel();
             jee.AppCode = account.AppCode;
             jee.CustomerID = customerID;
-            jee.UserID = idUser;
+            jee.UserID = account.Userid;
+            jee.StaffID = account.StaffID;
             customData.JeeAccount = jee;
             customData.PersonalInfo = personalInfo;
-
             identity.customData = customData;
             return identity;
         }
@@ -516,14 +479,14 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
             var identity = new IdentityServerController();
             try
             {
-                string avatar = UpdateAvatarCdn(Username, base64);
+                string avatar = UpdateAvatar(Username, base64);
 
                 _reponsitory.UpdateAvatar(avatar, UserId, CustomerID);
                 var personal = GeneralReponsitory.GetPersonalInfoCustomData(UserId, CustomerID, _connectionString);
                 var res = await identity.updateCustomDataPersonalInfoInternal(getSecretToken(), personal, Username);
                 if (!res.IsSuccessStatusCode)
                 {
-                    string returnValue = res.Content.ReadAsStringAsync().Result;
+                    string returnValue = await res.Content.ReadAsStringAsync();
                     throw new Exception(returnValue);
                 }
             }
@@ -556,46 +519,6 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
             return token;
         }
 
-        private void SaveStaffID(DpsConnection cnn, string StaffID, string UserID)
-        {
-            Hashtable val = new Hashtable();
-            if (!string.IsNullOrEmpty(StaffID))
-            {
-                val.Add("StaffID", long.Parse(StaffID));
-            }
-            SqlConditions Conds = new SqlConditions();
-            Conds.Add("UserID", long.Parse(UserID));
-            int x = cnn.Update(val, Conds, "AccountList");
-            if (x <= 0)
-            {
-                throw cnn.LastError;
-            }
-        }
-
-        public async Task<HttpResponseMessage> UpdateOneBgColorCustomData(InputApiModel model)
-        {
-            var commonInfo = GeneralReponsitory.GetCommonInfoByInputApiModel(_connectionString, model);
-
-            var personal = GeneralReponsitory.GetPersonalInfoCustomData(commonInfo.UserID, commonInfo.CustomerID, _connectionString);
-            personal.BgColor = GeneralService.GetColorNameUser(personal.Name[0].ToString());
-            var jwt_internal = getSecretToken();
-
-            var objCustom = new ObjCustomData();
-            objCustom.userId = commonInfo.UserID;
-            objCustom.updateField = "personalInfo";
-            objCustom.fieldValue = personal;
-            return await identityServerController.UpdateCustomDataInternal(jwt_internal, commonInfo.Username, objCustom);
-        }
-
-        public void UpdateAllAppCodesCustomData(InputApiModel model, List<int> lstAppCode)
-        {
-            var commonInfo = GeneralReponsitory.GetCommonInfoByInputApiModel(_connectionString, model);
-            using (DpsConnection cnn = new DpsConnection(_connectionString))
-            {
-                _reponsitory.InsertAppCodeAccount(cnn, commonInfo.UserID, lstAppCode);
-            }
-        }
-
         public async Task<JeeAccountCustomData> GetJeeAccountCustomDataAsync(InputApiModel model)
         {
             try
@@ -616,25 +539,46 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
             }
         }
 
-        public string UpdateAvatarCdn(string username, string base64)
+        public string UpdateAvatar(string username, string base64)
         {
-            var linkAvatar = "";
-            upLoadFileModel up = new upLoadFileModel()
+            try
             {
-                bs = Convert.FromBase64String(base64),
-                FileName = $"{username}.png",
-                Linkfile = $"images/avatars"
-            };
-            var upload = UploadFile.UploadFileImageMinio(up, _configuration);
-            if (upload.status)
+                var linkAvatar = "";
+                upLoadFileModel up = new upLoadFileModel()
+                {
+                    bs = Convert.FromBase64String(base64),
+                    FileName = $"{username}.png",
+                    Linkfile = $"images/avatars"
+                };
+                var upload = UploadFile.UploadFileImageMinio(up, _configuration);
+                if (upload.status)
+                {
+                    linkAvatar = $"https://{HOST_MINIOSERVER}{upload.link}";
+                }
+                else
+                {
+                    throw new Exception("Cập nhật avatar thất bại");
+                }
+                return linkAvatar;
+            }
+            catch (Exception)
             {
-                linkAvatar = $"https://{HOST_MINIOSERVER}{upload.link}";
+                throw;
+            }
+        }
+
+        private bool IsExistUsernameCnn(DpsConnection cnn, string username, long customerid = 0)
+        {
+            string sql = "";
+            if (customerid != 0)
+            {
+                sql = $"select Username from AccountList where Username = '{username}' and CustomerID = {customerid}";
             }
             else
             {
-                throw new Exception("CDN Error");
+                sql = $"select Username from AccountList where Username = '{username}'";
             }
-            return linkAvatar;
+            return GeneralReponsitory.IsExistCnn(sql, cnn);
         }
 
         #endregion api new

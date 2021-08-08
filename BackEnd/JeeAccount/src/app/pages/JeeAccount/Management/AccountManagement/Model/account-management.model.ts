@@ -47,7 +47,26 @@ export class AccountManagementModel {
   Departmemt: string;
   Phonemumber: string;
   Password: string;
+  Birthday: string;
   AppCode: string[];
+  AppID: number[];
+  DepartmemtID: number;
+  JobtitleID: number;
+  constructor() {
+    this.Fullname = '';
+    this.ImageAvatar = '';
+    this.Email = '';
+    this.Username = '';
+    this.Jobtitle = '';
+    this.JobtitleID = 0;
+    this.DepartmemtID = 0;
+    this.Departmemt = '';
+    this.Phonemumber = '';
+    this.Password = '';
+    this.AppCode = [];
+    this.AppID = [];
+    this.Birthday = '';
+  }
 }
 
 export class PostImgModel {

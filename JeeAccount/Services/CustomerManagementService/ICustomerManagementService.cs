@@ -21,12 +21,14 @@ namespace JeeAccount.Services.CustomerManagementService
 
         bool checkTrungCode(string Code);
 
-        Task<IdentityServerReturn> CreateCustomer(CustomerModel customerModel);
+        Task<IdentityServerReturn> CreateCustomer(CustomerModel customerModel, string usernameAdmin);
 
         Task<ReturnSqlModel> UpdateCustomerAppGiaHanModel(CustomerAppGiaHanModel model);
 
         Task<ReturnSqlModel> UpdateCustomerAppAddNumberStaff(CustomerAppAddNumberStaffModel model);
 
         Task<string> LockUnLockCustomer(long customerid, bool state);
+
+        string CompanyCode(long customerid);
     }
 }

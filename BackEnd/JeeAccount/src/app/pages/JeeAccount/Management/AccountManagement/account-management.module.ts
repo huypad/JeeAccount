@@ -10,7 +10,7 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { InlineSVGModule } from 'ng-inline-svg';
 import { QuanLytrucTiepEditDialogComponent } from './quan-ly-truc-tiep-edit-dialog/quan-ly-truc-tiep-edit-dialog.component';
 import { ChangeTinhTrangEditDialogComponent } from './change-tinh-trang-edit-dialog/change-tinh-trang-edit-dialog.component';
-import { AccountManagementEditNoJeeHRDialogComponent } from './account-management-edit-no-jeehr-dialog/account-management-edit-no-jeehr-dialog.component';
+
 import { JeeAccountModule } from 'src/app/pages/jee-account.module';
 const routes: Routes = [
   {
@@ -32,7 +32,6 @@ const routes: Routes = [
     AccountManagementEditDialogComponent,
     QuanLytrucTiepEditDialogComponent,
     ChangeTinhTrangEditDialogComponent,
-    AccountManagementEditNoJeeHRDialogComponent,
   ],
   imports: [CommonModule, RouterModule.forChild(routes), JeeAccountModule, NgxMatSelectSearchModule, InlineSVGModule],
   providers: [
@@ -42,11 +41,6 @@ const routes: Routes = [
       useValue: { hasBackdrop: true, height: 'auto', width: '900px', panelClass: 'mat-dialog-container-wrapper', disableClose: true },
     },
   ],
-  entryComponents: [
-    AccountManagementEditDialogComponent,
-    QuanLytrucTiepEditDialogComponent,
-    ChangeTinhTrangEditDialogComponent,
-    AccountManagementEditNoJeeHRDialogComponent,
-  ],
+  entryComponents: [AccountManagementEditDialogComponent, QuanLytrucTiepEditDialogComponent, ChangeTinhTrangEditDialogComponent],
 })
 export class AccountManagementModule {}

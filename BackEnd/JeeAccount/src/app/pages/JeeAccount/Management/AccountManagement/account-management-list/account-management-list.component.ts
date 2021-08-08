@@ -8,7 +8,6 @@ import { AccountManagementDTO, PostImgModel } from '../Model/account-management.
 import { AccountManagementService } from '../Services/account-management.service';
 import { QuanLytrucTiepEditDialogComponent } from '../quan-ly-truc-tiep-edit-dialog/quan-ly-truc-tiep-edit-dialog.component';
 import { ChangeTinhTrangEditDialogComponent } from '../change-tinh-trang-edit-dialog/change-tinh-trang-edit-dialog.component';
-import { AccountManagementEditNoJeeHRDialogComponent } from '../account-management-edit-no-jeehr-dialog/account-management-edit-no-jeehr-dialog.component';
 import { LayoutUtilsService, MessageType } from '../../../_core/utils/layout-utils.service';
 import { DanhMucChungService } from '../../../_core/services/danhmuc.service';
 import { DeleteEntityDialogComponent } from '../../../_shared/delete-entity-dialog/delete-entity-dialog.component';
@@ -166,14 +165,13 @@ export class AccountManagementListComponent implements OnInit {
           .UpdateAvatarWithChangeUrlAvatar(postimg)
           .pipe(
             tap((res) => {
-              console.log(res);
               this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
               this.imgFile = '';
               this.accountManagementService.fetch();
             }),
             catchError((err) => {
               console.log(err);
-              this.layoutUtilsService.showActionNotification(err.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
+              this.layoutUtilsService.showActionNotification(err.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
               this.imgFile = '';
               return of();
             })
@@ -190,18 +188,18 @@ export class AccountManagementListComponent implements OnInit {
     saveMessageTranslateParam += 'Cập nhật thành công';
     const saveMessage = this.translate.instant(saveMessageTranslateParam);
     const messageType = MessageType.Create;
-    const dialogRef = this.dialog.open(AccountManagementEditNoJeeHRDialogComponent, {
-      data: { item: item },
-    });
-    const sb = dialogRef.afterClosed().subscribe((res) => {
-      if (!res) {
-        this.accountManagementService.fetch();
-      } else {
-        this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
-        this.accountManagementService.fetch();
-      }
-    });
-    this.subscriptions.push(sb);
+    // const dialogRef = this.dialog.open(AccountManagementEditNoJeeHRDialogComponent, {
+    //   data: { item: item },
+    // });
+    // const sb = dialogRef.afterClosed().subscribe((res) => {
+    //   if (!res) {
+    //     this.accountManagementService.fetch();
+    //   } else {
+    //     this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+    //     this.accountManagementService.fetch();
+    //   }
+    // });
+    // this.subscriptions.push(sb);
   }
 
   delete(item) {

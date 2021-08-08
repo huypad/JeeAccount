@@ -38,9 +38,9 @@ export interface DepartmentManagementDTO {
 export interface TreeJeeHRDepartmentDTO {
   RowID: number;
   Title: string;
-  Level: number;
-  ParentID: number;
-  Position: number;
+  Level: string;
+  ParentID: string;
+  Position: string;
   Children: TreeJeeHRDepartmentDTO[];
 }
 
@@ -53,5 +53,5 @@ export interface DepartmentManagement {
   flat: any[];
   isJeeHR: boolean;
   isTree: boolean;
-  tree: TreeJeeHRDepartmentDTO;
+  tree: TreeJeeHRDepartmentDTO[];
 }

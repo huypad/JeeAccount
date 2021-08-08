@@ -1,7 +1,10 @@
-<div class="card card-custom gutter-b">
+<style></style>
+<div class="card card-custom card-sticky gutter-b">
   <div class="card-header">
     <div class="card-title">
       <span class="card-label">{{ 'ACCOUNTMANAGEMENT.DANHSACHNGUOIDUNG' | translate }}</span>
+    </div>
+    <div class="card-search">
       <app-jee-search-form (keywordEvent)="changeKeyword($event)" (filterEvent)="changeFilter($event)"></app-jee-search-form>
     </div>
     <div class="card-toolbar">

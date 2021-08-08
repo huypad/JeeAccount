@@ -47,36 +47,19 @@
           <span class="text">{{ 'SEARCH.PHONGBAN' | translate }}</span>
         </div>
         <div class="col-lg-8">
-          <mat-form-field class="example-full-width">
-            <input class="input-thuong" formControlName="phongban" matInput />
-          </mat-form-field>
-        </div>
-      </div>
-      <div class="row" *ngIf="showSearch.phongban">
-        <div class="col-lg-4">
-          <span class="text">{{ 'SEARCH.PHONGBAN' | translate }}</span>
-        </div>
-        <div class="col-lg-8">
-          <mat-form-field class="example-full-width" style="font-size: 13px">
+          <mat-form-field class="example-full-width" style="font-size: 13px" *ngIf="isJeeHR && !isTree">
             <mat-select (selectionChange)="clickSelect()" formControlName="phongbanid">
-              <ng-container *ngIf="isJeeHR">
+              <ng-container>
                 <mat-option *ngFor="let item of flatJeeHRs" [value]="item.RowID">{{ item.Title }}</mat-option>
-              </ng-container>
-              <ng-container *ngIf="isJeeHR === false">
-                <mat-option *ngFor="let item of flatDepartmentDtos" [value]="item.RowID">{{ item.DepartmentName }}</mat-option>
               </ng-container>
             </mat-select>
           </mat-form-field>
-        </div>
-      </div>
-      <div class="row" *ngIf="showSearch.chucvu">
-        <div class="col-lg-4">
-          <span class="text">{{ 'SEARCH.CHUCVU' | translate }}</span>
-        </div>
-        <div class="col-lg-8">
-          <mat-form-field class="example-full-width">
-            <input class="input-thuong" formControlName="chucvu" matInput />
+          <mat-form-field class="example-full-width" style="font-size: 13px" *ngIf="!isJeeHR">
+            <mat-select (selectionChange)="clickSelect()" formControlName="phongbanid">
+              <mat-option *ngFor="let item of flatDepartmentDtos" [value]="item.RowID">{{ item.DepartmentName }}</mat-option>
+            </mat-select>
           </mat-form-field>
+          <m-dropdown-tree *ngIf="isTree && isJeeHR" [data]="datatree$" (SelectedItemTree)="getValueNode($event)"> </m-dropdown-tree>
         </div>
       </div>
       <div class="row" *ngIf="showSearch.chucvu">
@@ -84,8 +67,12 @@
           <span class="text">{{ 'SEARCH.CHUCVU' | translate }}</span>
         </div>
         <div class="col-lg-8">
-          <mat-form-field class="example-full-width">
-            <input class="input-thuong" formControlName="chucvuid" matInput />
+          <mat-form-field class="example-full-width" style="font-size: 13px">
+            <mat-select (selectionChange)="clickSelect()" formControlName="chucvuid">
+              <ng-container>
+                <mat-option *ngFor="let item of lstChucvu" [value]="item.RowID">{{ item.Title }}</mat-option>
+              </ng-container>
+            </mat-select>
           </mat-form-field>
         </div>
       </div>

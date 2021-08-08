@@ -286,7 +286,6 @@ export class MessengerComponent implements OnInit, OnDestroy, OnChanges {
           this.chatBoxUsers.push(u);
 
           this.ListBBChat.push(u);
-          console.log(' this.ListBBChat', this.ListBBChat);
         } else {
           this.chatBoxUsers.push(new UserChatBox(user, 300 + 325));
         }

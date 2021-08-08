@@ -1,13 +1,24 @@
+import { DanhMucChungService } from './../../_core/services/danhmuc.service';
 import {
   TreeJeeHRDepartmentDTO,
   FlatJeeHRDepartmentDTO,
   DepartmentManagementDTO,
 } from './../../Management/DepartmentManagement/Model/department-management.model';
-import { showSearchFormModel } from './jee-search-form.model';
+import { showSearchFormModel, SelectModel } from './jee-search-form.model';
 import { BehaviorSubject, of, Subject, Subscription } from 'rxjs';
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, Output, EventEmitter, Input } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  ElementRef,
+  Output,
+  EventEmitter,
+  Input,
+  OnDestroy,
+} from '@angular/core';
 import { JeeSearchFormService } from './jee-search-form.service';
-import { catchError, debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, tap, finalize } from 'rxjs/operators';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { DepartmentManagement } from '../../Management/DepartmentManagement/Model/department-management.model';
 
@@ -17,7 +28,7 @@ import { DepartmentManagement } from '../../Management/DepartmentManagement/Mode
   styleUrls: ['jee-search-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class JeeSearchFormComponent implements OnInit {
+export class JeeSearchFormComponent implements OnInit, OnDestroy {
   private _isLoading$ = new BehaviorSubject<boolean>(false);
   private _errorMessage$ = new BehaviorSubject<string>('');
   private subscriptions: Subscription[] = [];
@@ -26,15 +37,17 @@ export class JeeSearchFormComponent implements OnInit {
   @Input() showSearch?: showSearchFormModel = new showSearchFormModel();
   @Output() keywordEvent: EventEmitter<string> = new EventEmitter<string>();
   @Output() filterEvent: EventEmitter<any> = new EventEmitter<any>();
-  public isAdmin: boolean = false;
-  public daKhoa: boolean = false;
-  public showFilter: boolean = false;
-  public isJeeHR: boolean;
-  public isTree: boolean;
-  public treeJeeHR: TreeJeeHRDepartmentDTO;
-  public flatJeeHRs: FlatJeeHRDepartmentDTO[];
-  public flatDepartmentDtos: DepartmentManagementDTO[];
-  public clickSelection: boolean = true;
+  isAdmin: boolean = false;
+  daKhoa: boolean = false;
+  showFilter: boolean = false;
+  isJeeHR: boolean;
+  isTree: boolean;
+  flatJeeHRs: FlatJeeHRDepartmentDTO[];
+  flatDepartmentDtos: DepartmentManagementDTO[];
+  clickSelection: boolean = false;
+  datatree$: BehaviorSubject<any[]> = new BehaviorSubject<any>([]);
+  lstPhongBanid: number[] = [];
+  lstChucvu: SelectModel[];
   get isLoading$() {
     return this._isLoading$.asObservable();
   }
@@ -45,21 +58,38 @@ export class JeeSearchFormComponent implements OnInit {
   constructor(
     public service: JeeSearchFormService,
     public cd: ChangeDetectorRef,
-    private elementRef: ElementRef,
+    public generalService: DanhMucChungService,
     private fb: FormBuilder
   ) {}
 
   ngOnInit() {
     this._isLoading$.next(true);
-    const sb = this.service
+    const sb = this.generalService
       .getDSPhongBan()
       .pipe(
         tap((res) => {
-          console.log(res);
-          this.initDataPhongBanId(res.data);
-          this.searchForm();
-          this.filterForm();
-          this._isLoading$.next(false);
+          this.initDataPhongBan(res.data);
+        }),
+        finalize(() => {
+          const sb2 = this.generalService
+            .getDSChucvu()
+            .pipe(
+              tap((res) => {
+                this.lstChucvu = res.data;
+              }),
+              finalize(() => {
+                this.searchForm();
+                this.filterForm();
+                this._isLoading$.next(false);
+              }),
+              catchError((err) => {
+                console.log(err);
+                this._errorMessage$.next(err);
+                return of();
+              })
+            )
+            .subscribe();
+          this.subscriptions.push(sb2);
         }),
         catchError((err) => {
           console.log(err);
@@ -71,18 +101,36 @@ export class JeeSearchFormComponent implements OnInit {
     this.subscriptions.push(sb);
   }
 
-  initDataPhongBanId(data: DepartmentManagement) {
+  initDataPhongBan(data: DepartmentManagement) {
     this.isJeeHR = data.isJeeHR;
     this.isTree = data.isTree;
     if (this.isJeeHR) {
-      this.treeJeeHR = data.tree;
+      if (this.isTree) {
+        this.datatree$.next(data.tree);
+      }
       this.flatJeeHRs = data.flat;
     } else {
       this.flatDepartmentDtos = data.flat;
-      console.log(this.flatDepartmentDtos);
     }
   }
-  ngOnDestroy(): void {}
+
+  getValueNode($event: TreeJeeHRDepartmentDTO) {
+    this.lstPhongBanid = [];
+    this.lstPhongBanid = this.joinRowID($event, this.lstPhongBanid);
+    let join = this.lstPhongBanid.join(',');
+  }
+
+  joinRowID(tree: TreeJeeHRDepartmentDTO, list: number[]) {
+    list.push(tree.RowID);
+    tree.Children.forEach((element) => {
+      list = this.joinRowID(element, list);
+    });
+    return list;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((sb) => sb.unsubscribe());
+  }
   // search
   searchForm() {
     this.searchGroup = this.fb.group({
@@ -112,9 +160,7 @@ export class JeeSearchFormComponent implements OnInit {
       keyword: [''],
       username: [''],
       tennhanvien: [''],
-      phongban: [''],
       phongbanid: [''],
-      chucvu: [''],
       chucvuid: [''],
     });
   }
@@ -124,12 +170,16 @@ export class JeeSearchFormComponent implements OnInit {
     filter['keyword'] = this.filterGroup.controls['keyword'].value;
     filter['username'] = this.filterGroup.controls['username'].value;
     filter['tennhanvien'] = this.filterGroup.controls['tennhanvien'].value;
-    filter['phongban'] = this.filterGroup.controls['phongban'].value;
-    filter['chucvu'] = this.filterGroup.controls['chucvu'].value;
+    filter['chucvuid'] = this.filterGroup.controls['chucvuid'].value;
     filter['isadmin'] = this.isAdmin;
     filter['dakhoa'] = this.daKhoa;
-    filter['phongbanid'] = this.filterGroup.controls['phongbanid'].value;
-    console.log(filter);
+    if (!this.filterGroup.controls['phongbanid'].value) {
+      if (this.lstPhongBanid.length > 0) {
+        filter['phongbanid'] = this.lstPhongBanid.join(',');
+      }
+    } else {
+      filter['phongbanid'] = this.filterGroup.controls['phongbanid'].value;
+    }
     this.filterEvent.emit(filter);
   }
 
@@ -141,17 +191,16 @@ export class JeeSearchFormComponent implements OnInit {
     this.filterGroup.reset();
     this.clickSearch();
     this.showFilter = false;
+    this.lstPhongBanid = [];
   }
 
   clickOutSideFilter() {
-    console.log('why');
     if (!this.clickSelection) this.showFilter = false;
     setTimeout(() => {
       this.clickSelection = false;
     }, 3000);
   }
   clickSelect() {
-    console.log('click');
     this.clickSelection = true;
   }
 }

@@ -181,6 +181,5 @@ export class CheckboxComponent implements OnInit {
   }
 
   changeValueEvent() {
-    console.log('myValue:', this.myValue);
   }
 }

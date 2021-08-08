@@ -59,7 +59,7 @@ namespace JeeAccount.Controllers
             {
                 query = query == null ? new QueryParams() : query;
 
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
@@ -110,7 +110,7 @@ namespace JeeAccount.Controllers
                 var isToken = Ulities.IsInternaltoken(HttpContext.Request.Headers, _config.GetValue<string>("Jwt:internal_secret"));
                 if (isToken == false)
                 {
-                    return Unauthorized(MessageReturnHelper.Unauthorized());
+                    return Unauthorized(MessageReturnHelper.DangNhap());
                 }
                 PageModel pageModel = new PageModel();
                 var lst = await _service.GetListAccountManagement(query, customerid).ConfigureAwait(false);
@@ -148,15 +148,15 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
                 }
                 var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, 0, img.Username);
                 var userid = commonInfo.UserID;
-                await _service.UpdateAvatarWithChangeUrlAvatar(Convert.ToInt64(userid), img.Username, customData.JeeAccount.CustomerID, img.imgFile);
-                return Ok();
+                await _service.UpdateAvatarWithChangeUrlAvatar(Convert.ToInt64(userid), img.Username, customData.JeeAccount.CustomerID, img.imgFile).ConfigureAwait(false);
+                return Ok("Cập nhật thành công");
             }
             catch (Exception ex)
             {
@@ -173,7 +173,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
@@ -197,7 +197,7 @@ namespace JeeAccount.Controllers
                 var isToken = Ulities.IsInternaltoken(HttpContext.Request.Headers, _config.GetValue<string>("Jwt:internal_secret"));
                 if (isToken == false)
                 {
-                    return Unauthorized(MessageReturnHelper.Unauthorized());
+                    return Unauthorized(MessageReturnHelper.DangNhap());
                 }
                 var usernames = await _service.GetListAccUsernameModel(customerID);
                 if (usernames is null)
@@ -218,7 +218,7 @@ namespace JeeAccount.Controllers
                 var isToken = Ulities.IsInternaltoken(HttpContext.Request.Headers, _config.GetValue<string>("Jwt:internal_secret"));
                 if (isToken == false)
                 {
-                    return Unauthorized(MessageReturnHelper.Unauthorized());
+                    return Unauthorized(MessageReturnHelper.DangNhap());
                 }
                 var list = await _service.GetListJustCustormerID();
                 if (list.Count() == 0)
@@ -241,7 +241,7 @@ namespace JeeAccount.Controllers
                 var isInternalToken = Ulities.IsInternaltoken(HttpContext.Request.Headers, _internal_secret);
                 if (!isInternalToken)
                 {
-                    return Unauthorized(MessageReturnHelper.Unauthorized());
+                    return Unauthorized(MessageReturnHelper.DangNhap());
                 }
                 var list = await _service.GetListJustCustormerIDAppCode(appCode);
                 if (list.Count() == 0)
@@ -261,7 +261,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
@@ -282,7 +282,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
@@ -304,7 +304,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
@@ -326,7 +326,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
@@ -345,7 +345,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
@@ -367,7 +367,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
@@ -389,7 +389,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
@@ -409,7 +409,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
@@ -429,7 +429,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
@@ -448,7 +448,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
@@ -467,7 +467,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
@@ -498,7 +498,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
@@ -523,7 +523,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
@@ -547,7 +547,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
@@ -571,7 +571,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
@@ -596,7 +596,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
@@ -621,7 +621,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
@@ -652,7 +652,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
@@ -677,7 +677,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
@@ -730,7 +730,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
@@ -759,27 +759,32 @@ namespace JeeAccount.Controllers
         }
 
         [HttpPost("createAccount")]
-        public async Task<object> CreateAccount(AccountManagementModel account)
+        public async Task<IActionResult> CreateAccount(AccountManagementModel account)
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
+                    return Unauthorized(MessageReturnHelper.DangNhap());
                 }
+                var username = Ulities.GetUsernameByHeader(HttpContext.Request.Headers);
+                if (string.IsNullOrEmpty(username)) return Unauthorized(MessageReturnHelper.DangNhap());
+                // for JeeOffice
+                account.cocauid = 1;
+                account.chucvuid = 33;
                 var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
-                string apiUrl = _config.GetValue<string>("JeeAccount:API");
-                var create = await _service.CreateAccount(token, customData.JeeAccount.CustomerID, customData.JeeAccount.UserID, account, apiUrl);
-                if (create.data is null)
-                {
-                    return JsonResultCommon.ThatBai(create.message);
-                }
-                return JsonResultCommon.ThanhCong(create.data);
+                await _service.CreateAccount(false, token, customData.JeeAccount.CustomerID, username, account);
+
+                return Ok(MessageReturnHelper.ThanhCong("Tạo tài khoản"));
+            }
+            catch (TrungDuLieuExceoption ex)
+            {
+                return BadRequest(MessageReturnHelper.Trung(ex));
             }
             catch (Exception ex)
             {
-                return JsonResultCommon.Exception(ex);
+                return BadRequest(MessageReturnHelper.Exception(ex));
             }
         }
 
@@ -788,7 +793,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");

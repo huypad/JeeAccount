@@ -300,5 +300,17 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
                 return new ReturnSqlModel(ex.Message, Constant.ERRORCODE_EXCEPTION);
             }
         }
+
+        public string CompanyCode(long customerid)
+        {
+            DataTable dt = new DataTable();
+            string sql = $"select Code from CustomerList where RowID = {customerid}";
+
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                dt = cnn.CreateDataTable(sql);
+                return dt.Rows[0][0].ToString();
+            }
+        }
     }
 }

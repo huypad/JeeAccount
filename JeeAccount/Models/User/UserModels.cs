@@ -56,7 +56,7 @@ namespace JeeAccount.Models
         public PersonalInfoCustomData PersonalInfo { get; set; }
 
         [JsonProperty("jee-account")]
-        public JeeAccountModel JeeAccount { get; set; }
+        public JeeAccountCustomDataModel JeeAccount { get; set; }
     }
 
     public class CustomAdminData
@@ -65,7 +65,7 @@ namespace JeeAccount.Models
         public PersonalInfoCustomData PersonalInfo { get; set; }
 
         [JsonProperty("jee-account")]
-        public JeeAccountModel JeeAccount { get; set; }
+        public JeeAccountCustomDataModel JeeAccount { get; set; }
 
         [JsonProperty("identityServer")]
         public IdentityServer identityServer { get; set; }
@@ -77,7 +77,7 @@ namespace JeeAccount.Models
         public List<string> actions { get; set; }
     }
 
-    public class JeeAccountModel
+    public class JeeAccountCustomDataModel
     {
         [JsonProperty("customerID")]
         public long CustomerID { get; set; }

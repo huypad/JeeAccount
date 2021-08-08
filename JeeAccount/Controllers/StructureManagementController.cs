@@ -28,7 +28,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return JsonResultCommon.BatBuoc("Đăng nhập");
@@ -48,7 +48,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                var customData = Ulities.GetUserByHeader(HttpContext.Request.Headers);
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
                     return JsonResultCommon.BatBuoc("Đăng nhập");

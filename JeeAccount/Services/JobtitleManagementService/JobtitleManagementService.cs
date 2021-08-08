@@ -34,8 +34,8 @@ namespace JeeAccount.Services.JobtitleManagementService
             query = query == null ? new QueryParams() : query;
             PageModel pageModel = new PageModel();
 
-            string orderByStrDefault = "JobtitleList.RowID asc";
-            string orderByStrJeeHR = "AccountList.jobtitleid asc";
+            string orderByStrDefault = "JobtitleList.JobtitleName asc";
+            string orderByStrJeeHR = "AccountList.Jobtitle asc";
             string whereStrDefault = " (JobtitleList.Disable != 1 or JobtitleList.Disable is null)";
             string whereStrJeeHR = " (AccountList.Disable != 1 or AccountList.Disable is null)";
 
@@ -49,7 +49,7 @@ namespace JeeAccount.Services.JobtitleManagementService
             Dictionary<string, string> sortableFieldsJeeHR = new Dictionary<string, string>
                         {
                             { "chucvuid", "AccountList.JobtitleID"},
-                            { "chucvu", "AccountList.JobtitleName"},
+                            { "chucvu", "AccountList.Jobtitle"},
                         };
 
             var checkusedjeehr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customerid);
