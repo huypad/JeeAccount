@@ -809,6 +809,56 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
             }
         }
 
+        public void UpdateAccount(bool isJeeHR, DpsConnection cnn, AccountManagementModel account, long CustomerID)
+        {
+            Hashtable val = new Hashtable();
+            SqlConditions conds = new SqlConditions();
+            conds.Add("UserID", account.Userid);
+            conds.Add("CustomerID", CustomerID);
+            try
+            {
+                #region val data
+
+                if (account.Fullname is not null)
+                {
+                    string FirstName = GeneralService.GetFirstname(account.Fullname);
+                    string Lastname = GeneralService.Getlastname(account.Fullname);
+                    val.Add("FirstName", FirstName);
+                    val.Add("LastName", Lastname);
+                }
+                if (account.Username is not null) val.Add("Username", account.Username);
+                if (account.DepartmemtID != 0) val.Add("DepartmentID", account.DepartmemtID);
+                if (!string.IsNullOrEmpty(account.Departmemt) && isJeeHR)
+                    val.Add("Department", account.Departmemt);
+
+                if (account.JobtitleID != 0) val.Add("JobtitleID", account.JobtitleID);
+                if (account.cocauid != 0) val.Add("CoCauID", account.chucvuid);
+                if (account.chucvuid != 0) val.Add("ChucvuID", account.chucvuid);
+                if (!string.IsNullOrEmpty(account.Jobtitle) && isJeeHR) val.Add("Jobtitle", account.Jobtitle);
+                if (!string.IsNullOrEmpty(account.Phonemumber)) val.Add("PhoneNumber", account.Phonemumber);
+                if (!string.IsNullOrEmpty(account.Email)) val.Add("Email", account.Email);
+                if (!string.IsNullOrEmpty(account.ImageAvatar)) val.Add("AvartarImgURL", account.ImageAvatar);
+                if (account.StaffID != 0) val.Add("StaffID", account.StaffID);
+                if (!string.IsNullOrEmpty(account.Birthday))
+                {
+                    var date = DateTime.ParseExact(account.Birthday, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                    val.Add("Birthday", date);
+                }
+
+                #endregion val data
+
+                int x = cnn.Update(val, conds, "AccountList");
+                if (x <= 0)
+                {
+                    throw cnn.LastError;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public void UpdateAvatar(string AvatarUrl, long userID, long CustomerID)
         {
             using (DpsConnection cnn = new DpsConnection(_connectionString))
@@ -911,6 +961,10 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
 
             foreach (var id in AppID)
             {
+                if (id == 14)
+                {
+                    if (!GeneralReponsitory.IsAdminHeThongCnn(cnn, UserID)) continue;
+                }
                 string sql2 = @$"select AppID from Account_App where UserID = @UserID and AppID = {id} and (Disable = 0 or Disable is null)";
                 var dtnew = cnn.CreateDataTable(sql2, Conds);
                 if (dtnew.Rows.Count > 0) continue;

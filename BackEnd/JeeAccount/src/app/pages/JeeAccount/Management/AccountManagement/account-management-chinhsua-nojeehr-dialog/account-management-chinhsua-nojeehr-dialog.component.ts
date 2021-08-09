@@ -96,7 +96,6 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
       this.item = new AccountManagementModel();
     }
 
-    console.log(this.item);
     this.createForm();
     const sb = this.accountManagementService
       .GetEditListAppByUserIDByListCustomerId(this.userid)
@@ -276,7 +275,6 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
   }
 
   prepareDataFromFB(): AccountManagementModel {
-    console.log('BirthDay', this.itemForm.controls.BirthDay.value);
     const acc = new AccountManagementModel();
     const AppCode: string[] = [];
     const AppID: number[] = [];
@@ -368,8 +366,6 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
       empty.AppID = this.listApp.filter((item) => item.IsUsed).map((item) => item.AppID);
       return this.danhmuc.isEqual(empty, model);
     }
-    console.log('model', model);
-    console.log('this.item', this.item);
     return this.danhmuc.isEqual(model, this.item);
   }
 

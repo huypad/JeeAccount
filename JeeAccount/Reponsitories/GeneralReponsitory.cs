@@ -47,15 +47,6 @@ namespace JeeAccount.Reponsitories
             return true;
         }
 
-        public static bool CheckIsAdminByUserIDCnn(DpsConnection cnn, string UserId)
-        {
-            string sql = $"select * from AccountList where UserId = {UserId} and IsAdmin = 1";
-            DataTable dt = new DataTable();
-            dt = cnn.CreateDataTable(sql);
-            if (dt.Rows.Count == 0) return false;
-            return true;
-        }
-
         public static bool CheckIsActiveByUserIDCnn(DpsConnection cnn, string UserId)
         {
             string sql = $"select * from AccountList where UserId = {UserId} and IsActive = 1";
@@ -318,6 +309,26 @@ namespace JeeAccount.Reponsitories
             return lst;
         }
 
+        public static bool IsAdminHeThongCnn(DpsConnection cnn, long UserID)
+        {
+            string sql1 = $"select * from AccountList where IsAdmin = 1 and UserID = {UserID}";
+            DataTable dtCheck = cnn.CreateDataTable(sql1);
+            if (dtCheck.Rows.Count == 0) return false;
+            return true;
+        }
+
+        public static bool IsAdminHeThong(string connectionString, long UserID)
+        {
+            string sql1 = $"select * from AccountList where IsAdmin = 1 and UserID = {UserID}";
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                DataTable dt = new DataTable();
+                dt = cnn.CreateDataTable(sql1);
+                if (dt.Rows.Count == 0) return false;
+            }
+            return true;
+        }
+
         public static List<string> GetLstUsernameByCustomeridCnn(DpsConnection cnn, long customerid)
         {
             var lst = new List<string>();
@@ -489,7 +500,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
             Conds.Add("UserID", UserID);
-            string selection = " AppList.*, Account_App.IsActive ";
+            string selection = " AppList.*, Account_App.IsActive, Account_App.IsAdmin as AdminApp";
             string join = @"join Account_App on Account_App.UserID = AccountList.UserID
 join AppList on AppList.AppID = Account_App.AppID";
             string where = "where AccountList.UserID = @UserID and (AccountList.Disable = 0 or AccountList.Disable is null)";
@@ -529,6 +540,7 @@ join AppList on AppList.AppID = Account_App.AppID";
                         SoLuongNhanSu = (row["SoLuongNhanSu"] != DBNull.Value) ? Int32.Parse(row["SoLuongNhanSu"].ToString()) : 0,
                         IsShowApp = Convert.ToBoolean(row["IsShowApp"]),
                         IsActive = Convert.ToBoolean(row["IsActive"]),
+                        IsAdmin = Convert.ToBoolean(row["AdminApp"]),
                     });
                     return result;
                 }
@@ -550,6 +562,7 @@ join AppList on AppList.AppID = Account_App.AppID";
                         Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
                         IsShowApp = Convert.ToBoolean(row["IsShowApp"]),
                         IsActive = Convert.ToBoolean(row["IsActive"]),
+                        IsAdmin = Convert.ToBoolean(row["AdminApp"]),
                     });
                     return result;
                 }
@@ -561,7 +574,7 @@ join AppList on AppList.AppID = Account_App.AppID";
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
             Conds.Add("UserID", UserID);
-            string selection = " AppList.*, Account_App.IsActive ";
+            string selection = " AppList.*, Account_App.IsActive, Account_App.IsAdmin as AdminApp";
             string join = @"join Account_App on Account_App.UserID = AccountList.UserID
 join AppList on AppList.AppID = Account_App.AppID";
             string where = "where AccountList.UserID = @UserID and (AccountList.Disable = 0 or AccountList.Disable is null)";
@@ -601,6 +614,7 @@ join AppList on AppList.AppID = Account_App.AppID";
                         SoLuongNhanSu = (row["SoLuongNhanSu"] != DBNull.Value) ? Int32.Parse(row["SoLuongNhanSu"].ToString()) : 0,
                         IsShowApp = Convert.ToBoolean(row["IsShowApp"]),
                         IsActive = Convert.ToBoolean(row["IsActive"]),
+                        IsAdmin = Convert.ToBoolean(row["AdminApp"]),
                     });
                     return result;
                 }
@@ -622,6 +636,7 @@ join AppList on AppList.AppID = Account_App.AppID";
                         Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
                         IsShowApp = Convert.ToBoolean(row["IsShowApp"]),
                         IsActive = Convert.ToBoolean(row["IsActive"]),
+                        IsAdmin = Convert.ToBoolean(row["AdminApp"]),
                     });
                     return result;
                 }

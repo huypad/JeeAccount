@@ -79,6 +79,8 @@ namespace JeeAccount.Reponsitories
 
         void CreateAccount(bool isJeeHR, DpsConnection cnn, AccountManagementModel account, string usernameCreatedBy, long CustomerID, bool isAdmin = false);
 
+        void UpdateAccount(bool isJeeHR, DpsConnection cnn, AccountManagementModel account, long CustomerID);
+
         void UpdateAvatar(string AvatarUrl, long userID, long CustomerID);
 
         ReturnSqlModel UpdatePersonalInfoCustomData(DpsConnection cnn, PersonalInfoCustomData personalInfoCustom, long userId, long customerId);

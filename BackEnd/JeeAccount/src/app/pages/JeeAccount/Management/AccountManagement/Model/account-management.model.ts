@@ -43,6 +43,7 @@ export interface CheckEditAppListByDTO {
   AppCode: string;
   AppName: string;
   IsUsed: boolean;
+  Disable: boolean;
 }
 export class AccountManagementModel {
   Fullname: string;

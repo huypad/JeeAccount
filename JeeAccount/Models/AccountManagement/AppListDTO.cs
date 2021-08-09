@@ -23,5 +23,6 @@ namespace JeeAccount.Models.AccountManagement
         public int SoLuongNhanSu { get; set; }
         public bool IsShowApp { get; set; }
         public bool IsActive { get; set; }
+        public bool IsAdmin { get; set; }
     }
 }

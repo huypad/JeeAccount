@@ -387,6 +387,65 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
             }
         }
 
+        public async Task UpdateAccount(bool isJeeHR, string Admin_accessToken, long customerID, string usernameCreatedBy, AccountManagementModel account)
+        {
+            CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+            TextInfo textInfo = cultureInfo.TextInfo;
+            account.Fullname = textInfo.ToTitleCase(account.Fullname.Trim());
+            var isAdminHeThong = GeneralReponsitory.IsAdminHeThong(_connectionString, account.Userid);
+            var listAppCode = account.AppCode.ToList();
+
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                if (IsExistUsernameCnn(cnn, account.Username, customerID)) throw new TrungDuLieuExceoption("Username");
+                if (!string.IsNullOrEmpty(account.ImageAvatar) && !isJeeHR) account.ImageAvatar = UpdateAvatar(account.Username, account.ImageAvatar);
+                try
+                {
+                    cnn.BeginTransaction();
+                    _reponsitory.UpdateAccount(isJeeHR, cnn, account, customerID);
+                    account.Userid = GeneralReponsitory.GetCommonInfoCnn(cnn, 0, account.Username).UserID;
+                    //remove jeehr
+                    if (isJeeHR)
+                    {
+                        var index = account.AppCode.FindIndex(item => item.Equals("JeeHR"));
+                        account.AppID.RemoveAt(index);
+                    }
+                    _reponsitory.InsertAppCodeAccount(cnn, account.Userid, account.AppID, usernameCreatedBy);
+                    var identity = InitIdentityServerUserModel(customerID, account);
+                    string userId = identity.customData.JeeAccount.UserID.ToString();
+                    var createUser = await identityServerController.addNewUser(identity, Admin_accessToken);
+                    if (!createUser.IsSuccessStatusCode)
+                    {
+                        string returnValue = await createUser.Content.ReadAsStringAsync();
+                        var res = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
+                        cnn.RollbackTransaction();
+                        cnn.EndTransaction();
+                        throw new Exception(res.message);
+                    }
+                    cnn.EndTransaction();
+                    if (!isAdminHeThong)
+                    {
+                        var obj = new
+                        {
+                            CustomerID = customerID,
+                            AppCode = listAppCode,
+                            UserID = account.Userid,
+                            Username = account.Username,
+                            IsInitial = false,
+                            IsAdmin = false
+                        };
+                        await _producer.PublishAsync(TopicAddNewCustomerUser, JsonConvert.SerializeObject(obj));
+                    }
+                }
+                catch (Exception)
+                {
+                    cnn.RollbackTransaction();
+                    cnn.EndTransaction();
+                    throw;
+                }
+            }
+        }
+
         private IdentityServerAddNewUser InitIdentityServerUserModel(long customerID, AccountManagementModel account)
         {
             IdentityServerAddNewUser identity = new IdentityServerAddNewUser();
@@ -608,6 +667,7 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
             var appListCustomer = await GetListAppByCustomerIDAsync(customerid);
             var appIdCustomer = appListCustomer.Select(item => item.AppID).ToList();
             var appListUserid = await GeneralReponsitory.GetListAppByUserIDAsync(_connectionString, userid, customerid, false);
+            var isAdminHeThong = GeneralReponsitory.IsAdminHeThong(_connectionString, userid);
             appListUserid = appListUserid.ToList();
             var lst = new List<CheckEditAppListByDTO>();
             foreach (var item in appListUserid)
@@ -624,6 +684,7 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
                 {
                     editApp.IsUsed = false;
                 }
+                if (isAdminHeThong || item.IsAdmin) editApp.Disable = true;
                 lst.Add(editApp);
             }
             return lst;

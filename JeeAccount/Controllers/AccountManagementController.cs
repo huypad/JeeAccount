@@ -792,12 +792,45 @@ namespace JeeAccount.Controllers
                     return Unauthorized(MessageReturnHelper.DangNhap());
                 }
                 var username = Ulities.GetUsernameByHeader(HttpContext.Request.Headers);
+                var isjeeHR = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
                 if (string.IsNullOrEmpty(username)) return Unauthorized(MessageReturnHelper.DangNhap());
                 // for JeeOffice
                 account.cocauid = 1;
                 account.chucvuid = 33;
                 var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
-                await _service.CreateAccount(false, token, customData.JeeAccount.CustomerID, username, account);
+                await _service.CreateAccount(isjeeHR, token, customData.JeeAccount.CustomerID, username, account);
+
+                return Ok(MessageReturnHelper.ThanhCong("Tạo tài khoản"));
+            }
+            catch (TrungDuLieuExceoption ex)
+            {
+                return BadRequest(MessageReturnHelper.Trung(ex));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpPost("UpdatecreateAccount")]
+        public async Task<IActionResult> UpdateAccount(AccountManagementModel account)
+        {
+            try
+            {
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+                var username = Ulities.GetUsernameByHeader(HttpContext.Request.Headers);
+                if (string.IsNullOrEmpty(username)) return Unauthorized(MessageReturnHelper.DangNhap());
+                var isjeeHR = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
+
+                // for JeeOffice
+                account.cocauid = 1;
+                account.chucvuid = 33;
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                // await _service.UpdateAccount(isjeeHR, token, customData.JeeAccount.CustomerID, username, account);
 
                 return Ok(MessageReturnHelper.ThanhCong("Tạo tài khoản"));
             }
@@ -923,5 +956,7 @@ namespace JeeAccount.Controllers
                 return BadRequest(MessageReturnHelper.Exception(ex));
             }
         }
+
+
     }
 }

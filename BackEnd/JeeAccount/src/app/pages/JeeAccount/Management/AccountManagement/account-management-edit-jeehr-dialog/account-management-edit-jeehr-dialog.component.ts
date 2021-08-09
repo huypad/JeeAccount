@@ -145,7 +145,6 @@ export class AccountManagementEditJeeHRDialogComponent implements OnInit, OnDest
       .GetListJeeHR()
       .pipe(
         tap((res) => {
-          console.log(res);
           this.NhanViens = [...res];
           this.filterNhanViens.next([...res]);
           this.itemForm.controls.NhanVienFilterCtrl.valueChanges.subscribe(() => {

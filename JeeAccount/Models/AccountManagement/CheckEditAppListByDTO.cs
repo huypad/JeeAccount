@@ -11,5 +11,6 @@ namespace JeeAccount.Models.AccountManagement
         public string AppCode { get; set; }
         public string AppName { get; set; }
         public bool IsUsed { get; set; }
+        public bool Disable { get; set; }
     }
 }

@@ -123,7 +123,12 @@
           <div class="col-lg-12">
             <section formArrayName="AppsCheckbox" *ngIf="!(isFirstLoading$ | async)">
               <div class="app-checbox">
-                <mat-checkbox class="example-margin" *ngFor="let app of AppsFromArray.controls; index as i" [formControlName]="i">
+                <mat-checkbox
+                  [disabled]="listApp[i].Disable"
+                  class="example-margin"
+                  *ngFor="let app of AppsFromArray.controls; index as i"
+                  [formControlName]="i"
+                >
                   {{ listApp[i].AppName }}
                 </mat-checkbox>
               </div>
