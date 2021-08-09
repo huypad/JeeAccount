@@ -402,7 +402,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID
             {
                 var indentityController = new IdentityServerController();
                 var commonInfo = GetCommonInfoByInputApiModel(connectionString, model);
-                var appCodes = await GetListAppByUserIDAsync(connectionString, commonInfo.UserID);
+                var appCodes = GetListAppByUserID(connectionString, commonInfo.UserID);
                 var appCodesName = appCodes.Select(x => x.AppCode).ToList();
                 var objCustom = new ObjCustomData();
                 objCustom.userId = commonInfo.UserID;
@@ -414,7 +414,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID
                     StaffID = commonInfo.StaffID,
                     UserID = commonInfo.UserID
                 };
-                var reponse = await indentityController.UpdateCustomDataInternal(jwt_internal, commonInfo.Username, objCustom).ConfigureAwait(false);
+                var reponse = await indentityController.UpdateCustomDataInternal(jwt_internal, commonInfo.Username, objCustom);
                 return reponse;
             }
             catch (Exception)
@@ -442,6 +442,34 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID
             }
         }
 
+        public static void InsertAppCodeJeeHRKafka(string connectionString, long UserID)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("UserID", UserID);
+
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                string sql2 = @$"select AppID from Account_App where UserID = @UserID and AppID = 1 and (Disable = 0 or Disable is null)";
+                var dtnew = cnn.CreateDataTable(sql2, Conds);
+                if (dtnew.Rows.Count == 0)
+                {
+                    Hashtable val = new Hashtable();
+                    val.Add("UserID", UserID);
+                    val.Add("AppID", 1);
+                    val.Add("CreatedDate", DateTime.Now);
+                    val.Add("CreatedBy", "kafka");
+                    val.Add("Disable", 0);
+                    val.Add("IsActive", 1);
+                    int x = cnn.Insert(val, "Account_App");
+                    if (x <= 0)
+                    {
+                        throw cnn.LastError;
+                    }
+                }
+            }
+        }
+
         public static void SaveStaffIDCnn(long UserID, long staffID, DpsConnection cnn)
         {
             Hashtable val = new Hashtable();
@@ -456,12 +484,12 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID
             }
         }
 
-        public static async Task<IEnumerable<AppListDTO>> GetListAppByUserIDAsync(string connectionString, long UserID, long CustomerID = 0)
+        public static async Task<IEnumerable<AppListDTO>> GetListAppByUserIDAsync(string connectionString, long UserID, long CustomerID = 0, bool IsActive = true)
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
             Conds.Add("UserID", UserID);
-            string selection = " AppList.* ";
+            string selection = " AppList.*, Account_App.IsActive ";
             string join = @"join Account_App on Account_App.UserID = AccountList.UserID
 join AppList on AppList.AppID = Account_App.AppID";
             string where = "where AccountList.UserID = @UserID and (AccountList.Disable = 0 or AccountList.Disable is null)";
@@ -472,6 +500,11 @@ join AppList on AppList.AppID = Account_App.AppID";
                 where += " and Customer_App.CustomerID = @CustomerID";
                 Conds.Add("CustomerID", CustomerID);
             }
+            if (IsActive)
+            {
+                where += " and  Account_App.IsActive = 1";
+            }
+
             string sql = @$"select {selection} from AccountList {join} {where} order by Position";
 
             using (DpsConnection cnn = new DpsConnection(connectionString))
@@ -494,7 +527,8 @@ join AppList on AppList.AppID = Account_App.AppID";
                         Icon = row["Icon"].ToString(),
                         Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
                         SoLuongNhanSu = (row["SoLuongNhanSu"] != DBNull.Value) ? Int32.Parse(row["SoLuongNhanSu"].ToString()) : 0,
-                        IsShowApp = Convert.ToBoolean(row["IsShowApp"])
+                        IsShowApp = Convert.ToBoolean(row["IsShowApp"]),
+                        IsActive = Convert.ToBoolean(row["IsActive"]),
                     });
                     return result;
                 }
@@ -514,7 +548,80 @@ join AppList on AppList.AppID = Account_App.AppID";
                         ReleaseDate = row["ReleaseDate"].ToString(),
                         Icon = row["Icon"].ToString(),
                         Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
-                        IsShowApp = Convert.ToBoolean(row["IsShowApp"])
+                        IsShowApp = Convert.ToBoolean(row["IsShowApp"]),
+                        IsActive = Convert.ToBoolean(row["IsActive"]),
+                    });
+                    return result;
+                }
+            }
+        }
+
+        public static IEnumerable<AppListDTO> GetListAppByUserID(string connectionString, long UserID, long CustomerID = 0, bool IsActive = true)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("UserID", UserID);
+            string selection = " AppList.*, Account_App.IsActive ";
+            string join = @"join Account_App on Account_App.UserID = AccountList.UserID
+join AppList on AppList.AppID = Account_App.AppID";
+            string where = "where AccountList.UserID = @UserID and (AccountList.Disable = 0 or AccountList.Disable is null)";
+            if (CustomerID > 0)
+            {
+                selection += " , Customer_App.SoLuongNhanSu";
+                join += " join Customer_App on Customer_App.AppID = AppList.AppID ";
+                where += " and Customer_App.CustomerID = @CustomerID";
+                Conds.Add("CustomerID", CustomerID);
+            }
+            if (IsActive)
+            {
+                where += " and Account_App.IsActive = 1";
+            }
+
+            string sql = @$"select {selection} from AccountList {join} {where} order by Position";
+
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                dt = cnn.CreateDataTable(sql, Conds);
+                if (CustomerID > 0)
+                {
+                    var result = dt.AsEnumerable().Select(row => new AppListDTO
+                    {
+                        AppID = Int32.Parse(row["AppID"].ToString()),
+                        APIUrl = row["APIUrl"].ToString(),
+                        AppCode = row["AppCode"].ToString(),
+                        AppName = row["AppName"].ToString(),
+                        BackendURL = row["BackendURL"].ToString(),
+                        CurrentVersion = row["CurrentVersion"].ToString(),
+                        Description = row["Description"].ToString(),
+                        LastUpdate = row["LastUpdate"].ToString(),
+                        Note = row["Note"].ToString(),
+                        ReleaseDate = row["ReleaseDate"].ToString(),
+                        Icon = row["Icon"].ToString(),
+                        Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
+                        SoLuongNhanSu = (row["SoLuongNhanSu"] != DBNull.Value) ? Int32.Parse(row["SoLuongNhanSu"].ToString()) : 0,
+                        IsShowApp = Convert.ToBoolean(row["IsShowApp"]),
+                        IsActive = Convert.ToBoolean(row["IsActive"]),
+                    });
+                    return result;
+                }
+                else
+                {
+                    var result = dt.AsEnumerable().Select(row => new AppListDTO
+                    {
+                        AppID = Int32.Parse(row["AppID"].ToString()),
+                        APIUrl = row["APIUrl"].ToString(),
+                        AppCode = row["AppCode"].ToString(),
+                        AppName = row["AppName"].ToString(),
+                        BackendURL = row["BackendURL"].ToString(),
+                        CurrentVersion = row["CurrentVersion"].ToString(),
+                        Description = row["Description"].ToString(),
+                        LastUpdate = row["LastUpdate"].ToString(),
+                        Note = row["Note"].ToString(),
+                        ReleaseDate = row["ReleaseDate"].ToString(),
+                        Icon = row["Icon"].ToString(),
+                        Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
+                        IsShowApp = Convert.ToBoolean(row["IsShowApp"]),
+                        IsActive = Convert.ToBoolean(row["IsActive"]),
                     });
                     return result;
                 }

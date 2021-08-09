@@ -1,8 +1,9 @@
+import { CheckEditAppListByDTO } from './../Model/account-management.model';
 import { SelectModel } from '../../../_shared/jee-search-form/jee-search-form.model';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { AccountManagementModel, AppListDTO } from '../Model/account-management.model';
+import { AccountManagementDTO, AccountManagementModel, AppListDTO } from '../Model/account-management.model';
 import { AccountManagementService } from '../Services/account-management.service';
 import { ReplaySubject, of, BehaviorSubject, Subscription } from 'rxjs';
 import { AuthService } from 'src/app/modules/auth/_services/auth.service';
@@ -21,25 +22,11 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, OnDestroy {
   item: AccountManagementModel;
-  itemForm = this.fb.group({
-    AnhDaiDien: [''],
-    HoTen: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
-    Email: ['', Validators.compose([Validators.email])],
-    PhongBan: ['', [Validators.required]],
-    TenDangNhap: ['', [Validators.required]],
-    MatKhau: ['', [Validators.required]],
-    NhapLaiMatKhau: ['', [Validators.required]],
-    SoDienThoai: ['', Validators.compose([Validators.pattern(/^-?(0|[0-9]\d*)?$/)])],
-    AppsCheckbox: new FormArray([]),
-    file: [],
-    PhongBanFilterCtrl: [],
-    Chucvu: ['', [Validators.required]],
-    ChucVuFilterCtrl: [],
-    BirthDay: [''],
-  });
-  listApp: AppListDTO[] = [];
+  itemData: AccountManagementDTO;
+  itemForm: FormGroup;
+  listApp: CheckEditAppListByDTO[] = [];
   CompanyCode: string;
-  imgFile = '../assets/media/Img/NoImage.jpg';
+  userid: number = 0;
   // ngx-mat-search area
   phongBans: DepartmentManagementDTO[] = [];
   filterPhongBans: ReplaySubject<DepartmentManagementDTO[]> = new ReplaySubject<DepartmentManagementDTO[]>();
@@ -64,9 +51,8 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<AccountManagementChinhSuaNoJeeHRDialogComponent>,
-    private fb: FormBuilder,
+    public fb: FormBuilder,
     public accountManagementService: AccountManagementService,
-    private changeDetect: ChangeDetectorRef,
     private layoutUtilsService: LayoutUtilsService,
     public danhmuc: DanhMucChungService,
     private authService: AuthService,
@@ -79,39 +65,47 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
     this.subscriptions.forEach((sb) => sb.unsubscribe());
   }
 
+  initDataToForm() {
+    this.itemForm.controls.HoTen.patchValue(this.item.Fullname);
+    this.itemForm.controls.Email.patchValue(this.item.Email);
+    this.itemForm.controls.SoDienThoai.patchValue(this.item.Phonemumber);
+    if (this.item.Birthday) this.itemForm.controls['BirthDay'].patchValue(this.danhmuc.f_string_date(this.item.Birthday));
+  }
   createForm() {
     this.itemForm = this.fb.group({
-      AnhDaiDien: [''],
-      HoTen: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
+      HoTen: ['' + this.item.Fullname, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
       Email: ['', Validators.compose([Validators.email])],
       PhongBan: ['', [Validators.required]],
-      TenDangNhap: ['', [Validators.required]],
-      MatKhau: ['', [Validators.required]],
-      NhapLaiMatKhau: ['', [Validators.required]],
       SoDienThoai: ['', Validators.compose([Validators.pattern(/^-?(0|[0-9]\d*)?$/)])],
       AppsCheckbox: new FormArray([]),
-      file: [],
       PhongBanFilterCtrl: [],
       Chucvu: ['', [Validators.required]],
       ChucVuFilterCtrl: [],
       BirthDay: [''],
     });
+    this.initDataToForm();
   }
-
   ngOnInit(): void {
     this._isFirstLoading$.next(true);
     if (this.data.item) {
-      this.item = this.data.item;
+      this.item = new AccountManagementModel();
+      this.itemData = this.data.item;
+      this.userid = this.itemData.UserId;
+      this.initItemData();
     } else {
       this.item = new AccountManagementModel();
     }
+
+    console.log(this.item);
+    this.createForm();
     const sb = this.accountManagementService
-      .GetListAppByCustomerID()
+      .GetEditListAppByUserIDByListCustomerId(this.userid)
       .pipe(
-        tap((res: ResultModel<AppListDTO>) => {
+        tap((res: ResultModel<CheckEditAppListByDTO>) => {
           if (res) {
             this.listApp = res.data;
             this.addCheckboxes();
+            this.initItemListApp();
           }
         }),
         finalize(() => {
@@ -145,16 +139,37 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
     this.subscriptions.push(sb4);
   }
 
+  initItemData() {
+    this.item.Birthday = this.itemData.NgaySinh;
+    this.item.Departmemt = this.itemData.Department;
+    this.item.DepartmemtID = this.itemData.DepartmentID;
+    this.item.Email = this.itemData.Email;
+    this.item.Fullname = this.itemData.FullName;
+    this.item.ImageAvatar = this.itemData.AvartarImgURL;
+    this.item.Jobtitle = this.itemData.Jobtitle;
+    this.item.JobtitleID = this.itemData.JobtitleID;
+    this.item.Phonemumber = this.itemData.PhoneNumber;
+    this.item.Username = this.itemData.Username;
+  }
+
+  initItemListApp() {
+    let lstUserd = this.listApp.filter((item) => item.IsUsed);
+    let appId = lstUserd.map((item) => item.AppID);
+    let appCode = lstUserd.map((item) => item.AppCode);
+    this.item.AppID = appId;
+    this.item.AppCode = appCode;
+  }
+
   get AppsFromArray() {
     return this.itemForm.get('AppsCheckbox') as FormArray;
   }
 
   private addCheckboxes() {
-    this.listApp.forEach((item) => this.AppsFromArray.push(new FormControl(item.IsDefaultApp)));
+    this.listApp.forEach((item) => this.AppsFromArray.push(new FormControl(item.IsUsed)));
   }
 
   private setValueCheckboxes() {
-    const lst = this.listApp.map((item) => item.IsDefaultApp);
+    const lst = this.listApp.map((item) => item.IsUsed);
     this.AppsFromArray.setValue(lst);
   }
 
@@ -165,6 +180,7 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
         tap((res) => {
           this.chucvus = [...res.data];
           this.filterChucVus.next([...res.data]);
+          this.itemForm.controls.Chucvu.patchValue(this.itemData.JobtitleID);
           this.itemForm.controls.ChucVuFilterCtrl.valueChanges.subscribe(() => {
             this.profilterChucVus();
           });
@@ -189,6 +205,7 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
         tap((res) => {
           this.phongBans = [...res.data.flat];
           this.filterPhongBans.next([...res.data.flat]);
+          this.itemForm.controls.PhongBan.patchValue(this.itemData.DepartmentID);
           this.itemForm.controls.PhongBanFilterCtrl.valueChanges.subscribe(() => {
             this.profilterPhongBans();
           });
@@ -206,6 +223,7 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
       .subscribe();
     this.subscriptions.push(sb2);
   }
+
   protected profilterPhongBans() {
     if (!this.itemForm.controls.PhongBan) {
       return;
@@ -258,6 +276,7 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
   }
 
   prepareDataFromFB(): AccountManagementModel {
+    console.log('BirthDay', this.itemForm.controls.BirthDay.value);
     const acc = new AccountManagementModel();
     const AppCode: string[] = [];
     const AppID: number[] = [];
@@ -276,10 +295,9 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
     if (acc.DepartmemtID != 0) acc.Departmemt = this.phongBans.find((item) => item.RowID == acc.DepartmemtID).DepartmentName;
     acc.JobtitleID = +this.itemForm.controls.Chucvu.value;
     if (acc.JobtitleID != 0) acc.Jobtitle = this.chucvus.find((item) => item.RowID == acc.JobtitleID).Title;
-    acc.Username = `${this.CompanyCode}.${this.itemForm.controls.TenDangNhap.value}`;
-    acc.Password = this.itemForm.controls.MatKhau.value;
-    acc.ImageAvatar = this.imgFile ? this.imgFile.split(',')[1] : '';
-    acc.Birthday = !this.itemForm.controls.BirthDay.value ? this.format_date(this.itemForm.controls.BirthDay.value) : '';
+    acc.ImageAvatar = this.itemData.AvartarImgURL;
+    acc.Birthday = this.itemForm.controls.BirthDay.value != undefined ? this.format_date(this.itemForm.controls.BirthDay.value) : '';
+    acc.Username = this.itemData.Username;
     return acc;
   }
   validateAllFormFields(formGroup: FormGroup) {
@@ -293,18 +311,6 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
     });
   }
 
-  onFileChange(event) {
-    if (event.target.files && event.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.imgFile = e.target.result;
-        const filename = event.target.files[0].name;
-        this.itemForm.controls.AnhDaiDien.setValue(filename);
-        this.changeDetect.detectChanges();
-      };
-      reader.readAsDataURL(event.target.files[0]);
-    }
-  }
   create(acc: AccountManagementModel, withBack: boolean = false) {
     this.isLoadingSubmit$.next(true);
     this.accountManagementService
@@ -315,9 +321,8 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
           if (withBack) {
             this.dialogRef.close(res);
           } else {
-            let saveMessageTranslateParam = '';
-            saveMessageTranslateParam += 'COMMOM.THEMTHANHCONG';
-            const saveMessage = 'Thêm thành công';
+            let saveMessageTranslateParam = 'COMMOM.THEMTHANHCONG';
+            const saveMessage = this.translate.instant(saveMessageTranslateParam);
             const messageType = MessageType.Create;
             this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
             this.itemForm.reset();
@@ -359,10 +364,12 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
     if (this.item.Username === '') {
       const empty = new AccountManagementModel();
       empty.Username = `${this.CompanyCode}.`;
-      empty.AppCode = this.listApp.filter((item) => item.IsDefaultApp).map((item) => item.AppCode);
-      empty.AppID = this.listApp.filter((item) => item.IsDefaultApp).map((item) => item.AppID);
+      empty.AppCode = this.listApp.filter((item) => item.IsUsed).map((item) => item.AppCode);
+      empty.AppID = this.listApp.filter((item) => item.IsUsed).map((item) => item.AppID);
       return this.danhmuc.isEqual(empty, model);
     }
+    console.log('model', model);
+    console.log('this.item', this.item);
     return this.danhmuc.isEqual(model, this.item);
   }
 

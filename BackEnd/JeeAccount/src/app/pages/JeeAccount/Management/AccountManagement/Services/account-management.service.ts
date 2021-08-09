@@ -7,6 +7,7 @@ import {
   AccountManagementDTO,
   AccountManagementModel,
   AppListDTO,
+  CheckEditAppListByDTO,
   InfoUserDTO,
   JeeHRNhanVien,
   PostImgModel,
@@ -37,6 +38,22 @@ export class AccountManagementService extends ITableService<AccountManagementDTO
   GetListAppByCustomerID(): Observable<ResultModel<AppListDTO>> {
     const httpHeaders = this.httpUtils.getHTTPHeaders();
     const url = API_PRODUCTS_URL + `/GetListAppByCustomerID`;
+    return this.http.get<any>(url, {
+      headers: httpHeaders,
+    });
+  }
+
+  GetListAppByUserId(userid: number): Observable<ResultModel<AppListDTO>> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const url = API_PRODUCTS_URL + `/GetListAppByUserID?userid=${userid}`;
+    return this.http.get<any>(url, {
+      headers: httpHeaders,
+    });
+  }
+
+  GetEditListAppByUserIDByListCustomerId(userid: number): Observable<ResultModel<CheckEditAppListByDTO>> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const url = API_PRODUCTS_URL + `/GetEditListAppByUserIDByListCustomerId?userid=${userid}`;
     return this.http.get<any>(url, {
       headers: httpHeaders,
     });

@@ -16,7 +16,7 @@
     <div class="table-responsive angular-bootstrap-table" [ngStyle]="{ height: getHeight() }">
       <table class="table table-head-custom table-vertical-center overflow-hidden">
         <thead>
-          <th class="pl-8">
+          <th class="pl-8" style="min-width: 250px">
             <span>{{ 'ACCOUNTMANAGEMENT.NHANVIEN' | translate }}</span>
             <app-sort-icon
               column="nhanvien"
@@ -34,7 +34,7 @@
               (sort)="sort($event)"
             ></app-sort-icon>
           </th>
-          <th>
+          <th style="min-width: 150px">
             <span>{{ 'ACCOUNTMANAGEMENT.PHONGBAN' | translate }}</span>
             <app-sort-icon
               column="phongban"
@@ -43,7 +43,7 @@
               (sort)="sort($event)"
             ></app-sort-icon>
           </th>
-          <th>
+          <th style="min-width: 150px">
             <span>{{ 'COMMOM.CHUCVU' | translate }}</span>
             <app-sort-icon
               column="chucvu"
@@ -52,10 +52,10 @@
               (sort)="sort($event)"
             ></app-sort-icon>
           </th>
-          <th>
+          <th style="min-width: 150px">
             <span>{{ 'ACCOUNTMANAGEMENT.QUANLYTRUCTIEP' | translate }}</span>
           </th>
-          <th>
+          <th style="min-width: 100px">
             <span>{{ 'COMMOM.TINHTRANG' | translate }}</span>
             <app-sort-icon
               column="tinhtrang"
@@ -64,10 +64,10 @@
               (sort)="sort($event)"
             ></app-sort-icon>
           </th>
-          <th>
+          <th style="min-width: 150px">
             <span>{{ 'COMMOM.GHICHU' | translate }}</span>
           </th>
-          <th>
+          <th style="min-width: 100px">
             <span>{{ 'COMMOM.THAOTAC' | translate }}</span>
           </th>
         </thead>

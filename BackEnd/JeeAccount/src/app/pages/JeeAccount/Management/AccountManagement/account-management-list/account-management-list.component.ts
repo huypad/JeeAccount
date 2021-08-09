@@ -1,3 +1,4 @@
+import { AccountManagementChinhSuaNoJeeHRDialogComponent } from './../account-management-chinhsua-nojeehr-dialog/account-management-chinhsua-nojeehr-dialog.component';
 import { AccountManagementEditJeeHRDialogComponent } from './../account-management-edit-jeehr-dialog/account-management-edit-jeehr-dialog.component';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -221,18 +222,34 @@ export class AccountManagementListComponent implements OnInit {
     saveMessageTranslateParam += 'Cập nhật thành công';
     const saveMessage = this.translate.instant(saveMessageTranslateParam);
     const messageType = MessageType.Create;
-    // const dialogRef = this.dialog.open(AccountManagementEditNoJeeHRDialogComponent, {
-    //   data: { item: item },
-    // });
-    // const sb = dialogRef.afterClosed().subscribe((res) => {
-    //   if (!res) {
-    //     this.accountManagementService.fetch();
-    //   } else {
-    //     this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
-    //     this.accountManagementService.fetch();
-    //   }
-    // });
-    // this.subscriptions.push(sb);
+    if (!this.isJeeHR) {
+      const dialogRef = this.dialog.open(AccountManagementChinhSuaNoJeeHRDialogComponent, {
+        data: { item: item },
+      });
+      const sb = dialogRef.afterClosed().subscribe((res) => {
+        if (!res) {
+          this.accountManagementService.fetch();
+        } else {
+          this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+          this.accountManagementService.fetch();
+        }
+      });
+      this.subscriptions.push(sb);
+    }
+    // if (this.isJeeHR) {
+    //   const dialogRef = this.dialog.open(AccountManagementEditJeeHRDialogComponent, {
+    //     data: { item: item },
+    //   });
+    //   const sb = dialogRef.afterClosed().subscribe((res) => {
+    //     if (!res) {
+    //       this.accountManagementService.fetch();
+    //     } else {
+    //       this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+    //       this.accountManagementService.fetch();
+    //     }
+    //   });
+    //   this.subscriptions.push(sb);
+    // }
   }
 
   delete(item) {

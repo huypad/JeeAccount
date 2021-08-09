@@ -38,6 +38,12 @@ export interface AppListDTO {
   IsDefaultApp: boolean;
 }
 
+export interface CheckEditAppListByDTO {
+  AppID: number;
+  AppCode: string;
+  AppName: string;
+  IsUsed: boolean;
+}
 export class AccountManagementModel {
   Fullname: string;
   ImageAvatar: string;

@@ -425,7 +425,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("GetListAppByUserID")]
-        public async Task<object> GetListAppByUserID()
+        public async Task<object> GetListAppByUserID(long userid = 0)
         {
             try
             {
@@ -434,7 +434,30 @@ namespace JeeAccount.Controllers
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
-                var appList = await GeneralReponsitory.GetListAppByUserIDAsync(_connectionString, customData.JeeAccount.UserID, customData.JeeAccount.CustomerID);
+                if (userid == 0) userid = customData.JeeAccount.UserID;
+
+                var appList = await GeneralReponsitory.GetListAppByUserIDAsync(_connectionString, userid, customData.JeeAccount.CustomerID);
+                return JsonResultCommon.ThanhCong(appList);
+            }
+            catch (Exception ex)
+            {
+                return JsonResultCommon.Exception(ex);
+            }
+        }
+
+        [HttpGet("GetEditListAppByUserIDByListCustomerId")]
+        public async Task<object> GetEditListAppByUserIDByListCustomerId(long userid = 0)
+        {
+            try
+            {
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
+                }
+                if (userid == 0) userid = customData.JeeAccount.UserID;
+
+                var appList = await _service.GetEditListAppByUserIDByListCustomerId(userid, customData.JeeAccount.CustomerID);
                 return JsonResultCommon.ThanhCong(appList);
             }
             catch (Exception ex)

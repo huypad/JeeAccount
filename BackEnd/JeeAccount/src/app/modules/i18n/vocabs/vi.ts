@@ -164,6 +164,7 @@ export const locale = {
     ACCOUNTMANAGEMENT: {
       TITLE: 'Danh sách phòng ban, nhóm',
       THEMMOITAIKHOAN: 'Thêm mới tài khoản sử dụng',
+      CHINHSUATAIKHOAN: 'Chỉnh sửa tài khoản',
       UNGDUNGDUOCSUDUNG: 'Ứng dụng được sử dụng',
       DANHSACHNGUOIDUNG: 'Danh sách người dùng',
       NHANVIEN: 'Nhân viên',

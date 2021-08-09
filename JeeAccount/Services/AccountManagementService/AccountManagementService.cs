@@ -338,6 +338,7 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
             CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
             TextInfo textInfo = cultureInfo.TextInfo;
             account.Fullname = textInfo.ToTitleCase(account.Fullname.Trim());
+            var listAppCode = account.AppCode.ToList();
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 if (IsExistUsernameCnn(cnn, account.Username, customerID)) throw new TrungDuLieuExceoption("Username");
@@ -345,8 +346,14 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
                 try
                 {
                     cnn.BeginTransaction();
-                    _reponsitory.CreateAccount(isJeeHR, cnn, account, usernameCreatedBy, customerID, isJeeHR);
+                    _reponsitory.CreateAccount(isJeeHR, cnn, account, usernameCreatedBy, customerID, false);
                     account.Userid = GeneralReponsitory.GetCommonInfoCnn(cnn, 0, account.Username).UserID;
+                    //remove jeehr
+                    if (isJeeHR)
+                    {
+                        var index = account.AppCode.FindIndex(item => item.Equals("JeeHR"));
+                        account.AppID.RemoveAt(index);
+                    }
                     _reponsitory.InsertAppCodeAccount(cnn, account.Userid, account.AppID, usernameCreatedBy);
                     var identity = InitIdentityServerUserModel(customerID, account);
                     string userId = identity.customData.JeeAccount.UserID.ToString();
@@ -363,7 +370,7 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
                     var obj = new
                     {
                         CustomerID = customerID,
-                        AppCode = account.AppCode,
+                        AppCode = listAppCode,
                         UserID = account.Userid,
                         Username = account.Username,
                         IsInitial = false,
@@ -594,6 +601,32 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
                 sql = $"select Username from AccountList where Username = '{username}'";
             }
             return GeneralReponsitory.IsExistCnn(sql, cnn);
+        }
+
+        public async Task<IEnumerable<CheckEditAppListByDTO>> GetEditListAppByUserIDByListCustomerId(long userid, long customerid)
+        {
+            var appListCustomer = await GetListAppByCustomerIDAsync(customerid);
+            var appIdCustomer = appListCustomer.Select(item => item.AppID).ToList();
+            var appListUserid = await GeneralReponsitory.GetListAppByUserIDAsync(_connectionString, userid, customerid, false);
+            appListUserid = appListUserid.ToList();
+            var lst = new List<CheckEditAppListByDTO>();
+            foreach (var item in appListUserid)
+            {
+                var editApp = new CheckEditAppListByDTO();
+                editApp.AppID = item.AppID;
+                editApp.AppCode = item.AppCode;
+                editApp.AppName = item.AppName;
+                if (appIdCustomer.Contains(item.AppID) && item.IsActive)
+                {
+                    editApp.IsUsed = true;
+                }
+                else
+                {
+                    editApp.IsUsed = false;
+                }
+                lst.Add(editApp);
+            }
+            return lst;
         }
 
         #endregion api new

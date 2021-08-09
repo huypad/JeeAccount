@@ -79,25 +79,6 @@ export class AccountManagementEditDialogComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach((sb) => sb.unsubscribe());
   }
 
-  createForm() {
-    this.itemForm = this.fb.group({
-      AnhDaiDien: [''],
-      HoTen: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
-      Email: ['', Validators.compose([Validators.email])],
-      PhongBan: ['', [Validators.required]],
-      TenDangNhap: ['', [Validators.required]],
-      MatKhau: ['', [Validators.required]],
-      NhapLaiMatKhau: ['', [Validators.required]],
-      SoDienThoai: ['', Validators.compose([Validators.pattern(/^-?(0|[0-9]\d*)?$/)])],
-      AppsCheckbox: new FormArray([]),
-      file: [],
-      PhongBanFilterCtrl: [],
-      Chucvu: ['', [Validators.required]],
-      ChucVuFilterCtrl: [],
-      BirthDay: [''],
-    });
-  }
-
   ngOnInit(): void {
     this._isFirstLoading$.next(true);
     if (this.data.item) {
@@ -279,7 +260,7 @@ export class AccountManagementEditDialogComponent implements OnInit, OnDestroy {
     acc.Username = `${this.CompanyCode}.${this.itemForm.controls.TenDangNhap.value}`;
     acc.Password = this.itemForm.controls.MatKhau.value;
     acc.ImageAvatar = this.imgFile ? this.imgFile.split(',')[1] : '';
-    acc.Birthday = !this.itemForm.controls.BirthDay.value ? this.format_date(this.itemForm.controls.BirthDay.value) : '';
+    acc.Birthday = this.itemForm.controls.BirthDay.value != undefined ? this.format_date(this.itemForm.controls.BirthDay.value) : '';
     return acc;
   }
   validateAllFormFields(formGroup: FormGroup) {
