@@ -449,32 +449,36 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
                         throw new Exception(res.message);
                     }
                     cnn.EndTransaction();
-                    if (!isAdminHeThong)
+                    if (listInsertAppCode.Count > 0)
                     {
-                        var obj = new
+                        if (!isAdminHeThong)
                         {
-                            CustomerID = customerID,
-                            AppCode = listInsertAppCode,
-                            UserID = account.Userid,
-                            Username = account.Username,
-                            IsInitial = false,
-                            IsAdmin = false
-                        };
-                        await _producer.PublishAsync(TopicAddNewCustomerUser, JsonConvert.SerializeObject(obj));
-                    }
-                    else
-                    {
-                        var obj = new
+                            var obj = new
+                            {
+                                CustomerID = customerID,
+                                AppCode = listInsertAppCode,
+                                UserID = account.Userid,
+                                Username = account.Username,
+                                IsInitial = false,
+                                IsAdmin = false
+                            };
+                            await _producer.PublishAsync(TopicAddNewCustomerUser, JsonConvert.SerializeObject(obj));
+                        }
+                        else
                         {
-                            CustomerID = customerID,
-                            AppCode = listInsertAppCode,
-                            UserID = account.Userid,
-                            Username = account.Username,
-                            IsInitial = true,
-                            IsAdmin = false
-                        };
-                        await _producer.PublishAsync(TopicAddNewCustomerUser, JsonConvert.SerializeObject(obj));
+                            var obj = new
+                            {
+                                CustomerID = customerID,
+                                AppCode = listInsertAppCode,
+                                UserID = account.Userid,
+                                Username = account.Username,
+                                IsInitial = true,
+                                IsAdmin = false
+                            };
+                            await _producer.PublishAsync(TopicAddNewCustomerUser, JsonConvert.SerializeObject(obj));
+                        }
                     }
+
                 }
                 catch (Exception)
                 {
