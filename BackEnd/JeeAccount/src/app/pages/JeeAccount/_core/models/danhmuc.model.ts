@@ -5,7 +5,14 @@ export interface NhanVienMatchip {
   UserId: number;
 }
 
-export interface  DepartmentSelection {
+export interface DepartmentSelection {
   RowID: string;
   DeparmentName: string;
+}
+
+export interface CommonInfo {
+  UserID: number;
+  Username: string;
+  StaffID: number;
+  CustomerID: number;
 }

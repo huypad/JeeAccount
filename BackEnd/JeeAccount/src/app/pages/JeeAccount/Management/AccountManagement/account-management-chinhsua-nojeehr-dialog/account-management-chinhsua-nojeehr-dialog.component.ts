@@ -167,11 +167,6 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
     this.listApp.forEach((item) => this.AppsFromArray.push(new FormControl(item.IsUsed)));
   }
 
-  private setValueCheckboxes() {
-    const lst = this.listApp.map((item) => item.IsUsed);
-    this.AppsFromArray.setValue(lst);
-  }
-
   loadChucVu() {
     const sb3 = this.danhmuc
       .getDSChucvu()
@@ -254,21 +249,8 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
 
   onSubmit(withBack: boolean) {
     if (this.itemForm.valid) {
-      if (this.itemForm.controls.MatKhau.value !== this.itemForm.controls.NhapLaiMatKhau.value) {
-        this.layoutUtilsService.showActionNotification(
-          'Mật khẩu không trùng khớp',
-          MessageType.Read,
-          999999999,
-          true,
-          false,
-          3000,
-          'top',
-          0
-        );
-        return;
-      }
       const acc = this.prepareDataFromFB();
-      this.create(acc, withBack);
+      this.update(acc, withBack);
     } else {
       this.validateAllFormFields(this.itemForm);
     }
@@ -309,22 +291,15 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
     });
   }
 
-  create(acc: AccountManagementModel, withBack: boolean = false) {
+  update(acc: AccountManagementModel, withBack: boolean = false) {
     this.isLoadingSubmit$.next(true);
     this.accountManagementService
-      .createAccount(acc)
+      .UpdateAccount(acc)
       .pipe(
         tap((res) => {
           this.isLoadingSubmit$.next(false);
           if (withBack) {
             this.dialogRef.close(res);
-          } else {
-            let saveMessageTranslateParam = 'COMMOM.THEMTHANHCONG';
-            const saveMessage = this.translate.instant(saveMessageTranslateParam);
-            const messageType = MessageType.Create;
-            this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
-            this.itemForm.reset();
-            this.setValueCheckboxes();
           }
         })
       )

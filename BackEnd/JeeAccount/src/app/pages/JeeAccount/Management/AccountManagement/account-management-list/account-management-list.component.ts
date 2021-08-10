@@ -18,6 +18,7 @@ import { GroupingState, PaginatorState } from 'src/app/_metronic/shared/crud-tab
 import { SortState } from './../../../../../_metronic/shared/crud-table/models/sort.model';
 import { catchError, debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { ResultModel } from '../../../_core/models/_base.model';
+import { AccountManagementChinhSuaJeeHRDialogComponent } from '../account-management-chinhsua-jeehr-dialog/account-management-chinhsua-jeehr-dialog.component';
 
 @Component({
   selector: 'app-account-management-list',
@@ -218,8 +219,7 @@ export class AccountManagementListComponent implements OnInit {
   }
 
   update(item) {
-    let saveMessageTranslateParam = '';
-    saveMessageTranslateParam += 'Cập nhật thành công';
+    let saveMessageTranslateParam = 'COMMOM.CAPNHATTHANHCONG';
     const saveMessage = this.translate.instant(saveMessageTranslateParam);
     const messageType = MessageType.Create;
     if (!this.isJeeHR) {
@@ -236,20 +236,20 @@ export class AccountManagementListComponent implements OnInit {
       });
       this.subscriptions.push(sb);
     }
-    // if (this.isJeeHR) {
-    //   const dialogRef = this.dialog.open(AccountManagementEditJeeHRDialogComponent, {
-    //     data: { item: item },
-    //   });
-    //   const sb = dialogRef.afterClosed().subscribe((res) => {
-    //     if (!res) {
-    //       this.accountManagementService.fetch();
-    //     } else {
-    //       this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
-    //       this.accountManagementService.fetch();
-    //     }
-    //   });
-    //   this.subscriptions.push(sb);
-    // }
+    if (this.isJeeHR) {
+      const dialogRef = this.dialog.open(AccountManagementChinhSuaJeeHRDialogComponent, {
+        data: { item: item },
+      });
+      const sb = dialogRef.afterClosed().subscribe((res) => {
+        if (!res) {
+          this.accountManagementService.fetch();
+        } else {
+          this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+          this.accountManagementService.fetch();
+        }
+      });
+      this.subscriptions.push(sb);
+    }
   }
 
   delete(item) {

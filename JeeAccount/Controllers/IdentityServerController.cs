@@ -3,6 +3,7 @@ using JeeAccount.Models.AccountManagement;
 using JeeAccount.Services.AccountManagementService;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -223,6 +224,28 @@ namespace JeeAccount.Controllers
             }
         }
 
+        public async Task<HttpResponseMessage> UppdateCustomDataHttpResponse(string Admin_access_token, string Username, ObjCustomData objCustomData)
+        {
+            string url = LINK_UPDATE_CUSTOMDATA;
+            var content = new UpdateCustomDataModel
+            {
+                username = Username,
+                updateField = objCustomData.updateField,
+                fieldValue = objCustomData.fieldValue,
+            };
+
+            var stringContent = await Task.Run(() => JsonConvert.SerializeObject(content));
+            var httpContent = new StringContent(stringContent, Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(Admin_access_token);
+
+                var reponse = await client.PostAsync(url, httpContent);
+                return reponse;
+            }
+        }
+
         public async Task<IdentityServerReturn> UppdateCustomData(string Admin_access_token, string Username, ObjCustomData objCustomData)
         {
             string url = LINK_UPDATE_CUSTOMDATA;
@@ -347,6 +370,21 @@ namespace JeeAccount.Controllers
                 var reponse = await client.PostAsync(url, httpContent);
                 return reponse;
             }
+        }
+
+        public ObjCustomData JeeAccountCustomData(List<string> appCodes, long UserID, long CustomerID, long StaffID)
+        {
+            ObjCustomData obj = new ObjCustomData();
+            obj.fieldValue = new
+            {
+                customerID = CustomerID,
+                appCode = appCodes,
+                userID = UserID,
+                staffID = StaffID
+            };
+            obj.updateField = "jee-account";
+            obj.userId = UserID;
+            return obj;
         }
     }
 }

@@ -71,5 +71,7 @@ namespace JeeAccount.Services.AccountManagementService
         string UpdateAvatar(string username, string base64);
 
         Task<IEnumerable<CheckEditAppListByDTO>> GetEditListAppByUserIDByListCustomerId(long userid, long customerid);
+
+        Task UpdateAccount(bool isJeeHR, string Admin_accessToken, long customerID, string usernameCreatedBy, AccountManagementModel account);
     }
 }

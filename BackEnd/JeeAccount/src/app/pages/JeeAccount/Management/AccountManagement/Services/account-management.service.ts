@@ -66,9 +66,25 @@ export class AccountManagementService extends ITableService<AccountManagementDTO
       headers: httpHeaders,
     });
   }
+
+  GetDSJeeHRToUpdate(): Observable<JeeHRNhanVien[]> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const url = API_PRODUCTS_URL + `/GetDSJeeHRToUpdate`;
+    return this.http.get<any>(url, {
+      headers: httpHeaders,
+    });
+  }
+
+
   createAccount(item: AccountManagementModel): Observable<any> {
     const httpHeaders = this.httpUtils.getHTTPHeaders();
     const url = API_PRODUCTS_URL + `/createAccount`;
+    return this.http.post<any>(url, item, { headers: httpHeaders });
+  }
+
+  UpdateAccount(item: AccountManagementModel): Observable<any> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const url = API_PRODUCTS_URL + `/UpdateAccount`;
     return this.http.post<any>(url, item, { headers: httpHeaders });
   }
 

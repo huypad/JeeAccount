@@ -963,11 +963,32 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
             {
                 if (id == 14)
                 {
-                    if (!GeneralReponsitory.IsAdminHeThongCnn(cnn, UserID)) continue;
+                    if (!GeneralReponsitory.IsAdminHeThongCnn(cnn, UserID) || GeneralReponsitory.IsAdminAppCnn(cnn, UserID, 14)) continue;
                 }
                 string sql2 = @$"select AppID from Account_App where UserID = @UserID and AppID = {id} and (Disable = 0 or Disable is null)";
                 var dtnew = cnn.CreateDataTable(sql2, Conds);
-                if (dtnew.Rows.Count > 0) continue;
+                if (dtnew.Rows.Count > 0)
+                {
+                    string sql3 = @$"select AppID from Account_App where UserID = @UserID and AppID = {id} and (Disable = 0 or Disable is null) and IsActive = 0";
+                    var dt3 = cnn.CreateDataTable(sql3);
+                    if (dt3.Rows.Count == 0) continue;
+                    var userid_createdBy = GeneralReponsitory.GetCommonInfoCnn(cnn, 0, createdBy).UserID;
+                    Hashtable val2 = new Hashtable();
+                    val2.Add("ActivatedBy", userid_createdBy);
+                    val2.Add("ActivatedDate", DateTime.Now);
+                    val2.Add("IsActive", 1);
+
+                    SqlConditions conds = new SqlConditions();
+                    conds.Add("UserID", UserID);
+                    val2.Add("AppID", id);
+
+                    int z = cnn.Update(val2, conds, "Account_App");
+                    if (z <= 0)
+                    {
+                        throw cnn.LastError;
+                    }
+                    continue;
+                };
                 Hashtable val = new Hashtable();
                 val.Add("UserID", UserID);
                 val.Add("AppID", id);
@@ -976,6 +997,40 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                 val.Add("Disable", 0);
                 val.Add("IsActive", 1);
                 int x = cnn.Insert(val, "Account_App");
+                if (x <= 0)
+                {
+                    throw cnn.LastError;
+                }
+            }
+        }
+
+        public void RemoveAppCodeAccount(DpsConnection cnn, long UserID, List<int> AppID, string editBy)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("UserID", UserID);
+
+            foreach (var id in AppID)
+            {
+                if (id == 14)
+                {
+                    if (!GeneralReponsitory.IsAdminHeThongCnn(cnn, UserID)) continue;
+                }
+                if (GeneralReponsitory.IsAdminAppCnn(cnn, UserID, id)) continue;
+                string sql2 = @$"select AppID from Account_App where UserID = @UserID and AppID = {id} and (Disable = 0 or Disable is null)";
+                var dtnew = cnn.CreateDataTable(sql2, Conds);
+                if (dtnew.Rows.Count == 0) continue;
+                var userid_Editby = GeneralReponsitory.GetCommonInfoCnn(cnn, 0, editBy).UserID;
+                Hashtable val = new Hashtable();
+                val.Add("InActiveDate", DateTime.Now);
+                val.Add("InActiveBy", userid_Editby);
+                val.Add("IsActive", 0);
+
+                SqlConditions conds = new SqlConditions();
+                conds.Add("UserID", UserID);
+                val.Add("AppID", id);
+
+                int x = cnn.Update(val, conds, "Account_App");
                 if (x <= 0)
                 {
                     throw cnn.LastError;

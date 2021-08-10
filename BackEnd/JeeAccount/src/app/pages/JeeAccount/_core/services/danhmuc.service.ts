@@ -10,6 +10,7 @@ import { QueryResultsModel } from '../models/query-models/query-results.model';
 import { environment } from '../../../../../environments/environment';
 import { ResultObjectModel } from '../models/_base.model';
 import { DatePipe } from '@angular/common';
+import { CommonInfo } from '../models/danhmuc.model';
 
 const API_URL = environment.HOST_JEEACCOUNT_API + '/api';
 const API_PRODUCTS_URL = API_URL + '/dashboard';
@@ -98,5 +99,13 @@ export class DanhMucChungService {
 
   f_string_date(value: string): Date {
     return new Date(value.split('/')[2] + '-' + value.split('/')[1] + '-' + value.split('/')[0]);
+  }
+
+  GetCommonAccount(userid: number): Observable<CommonInfo> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const url = API_URL + `/accountmanagement/GetCommonAccount/${userid}`;
+    return this.http.get<any>(url, {
+      headers: httpHeaders,
+    });
   }
 }

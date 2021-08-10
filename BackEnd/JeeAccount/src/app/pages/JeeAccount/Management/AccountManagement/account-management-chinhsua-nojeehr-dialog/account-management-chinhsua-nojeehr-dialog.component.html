@@ -144,17 +144,6 @@
         [disabled]="isLoadingSubmit$ | async"
         [class.spinner]="isLoadingSubmit$ | async"
         mat-raised-button
-        style="float: right; margin: 0"
-        class="ja_btn-addcontinue"
-        (click)="onSubmit(false)"
-      >
-        <mat-icon class="icon-repeat">repeat</mat-icon>
-        {{ 'COMMOM.LUUTIEPTUC' | translate }}
-      </button>
-      <button
-        [disabled]="isLoadingSubmit$ | async"
-        [class.spinner]="isLoadingSubmit$ | async"
-        mat-raised-button
         style="float: right; margin-right: 12px"
         class="ja_btn-addnew"
         (click)="onSubmit(true)"

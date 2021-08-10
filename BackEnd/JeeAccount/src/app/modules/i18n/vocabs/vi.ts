@@ -114,6 +114,7 @@ export const locale = {
       THEMMOI: 'Thêm mới',
       THEMTHANHCONG: 'Thêm thành công',
       THEMKHACHHANG: 'Thêm khách hàng',
+      CAPNHATTHANHCONG: 'Cập nhật thành công',
       LUU: 'Lưu',
       TROLAI: 'Trở lại',
       DONG: 'Đóng',

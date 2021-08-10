@@ -362,8 +362,6 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
                     {
                         string returnValue = await createUser.Content.ReadAsStringAsync();
                         var res = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
-                        cnn.RollbackTransaction();
-                        cnn.EndTransaction();
                         throw new Exception(res.message);
                     }
                     cnn.EndTransaction();
@@ -389,37 +387,57 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
 
         public async Task UpdateAccount(bool isJeeHR, string Admin_accessToken, long customerID, string usernameCreatedBy, AccountManagementModel account)
         {
+            var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, 0, account.Username);
+            account.Userid = commonInfo.UserID;
             CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
             TextInfo textInfo = cultureInfo.TextInfo;
             account.Fullname = textInfo.ToTitleCase(account.Fullname.Trim());
             var isAdminHeThong = GeneralReponsitory.IsAdminHeThong(_connectionString, account.Userid);
             var listAppCode = account.AppCode.ToList();
+            var lstAppCurrentCustomer = await GetListAppByCustomerIDAsync(customerID);
+            lstAppCurrentCustomer = lstAppCurrentCustomer.ToList();
+            var lstAppIDCurrentCustomer = lstAppCurrentCustomer.Select(item => item.AppID).ToList();
+            var lstAppCurrentUserid = GeneralReponsitory.GetListAppByUserID(_connectionString, account.Userid, customerID, false).ToList();
+            var lstAppIDCurrentUserid = lstAppCurrentUserid.Select(item => item.AppID).ToList();
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                if (IsExistUsernameCnn(cnn, account.Username, customerID)) throw new TrungDuLieuExceoption("Username");
-                if (!string.IsNullOrEmpty(account.ImageAvatar) && !isJeeHR) account.ImageAvatar = UpdateAvatar(account.Username, account.ImageAvatar);
                 try
                 {
                     cnn.BeginTransaction();
                     _reponsitory.UpdateAccount(isJeeHR, cnn, account, customerID);
-                    account.Userid = GeneralReponsitory.GetCommonInfoCnn(cnn, 0, account.Username).UserID;
+                    if (isAdminHeThong) {
+                        cnn.EndTransaction();
+                        return;
+                    };
+
+                    account.Userid = commonInfo.UserID;
+                    var listInsertAppid = new List<int>();
+                    var listInsertAppCode = new List<string>();
+                    for (var index = 0; index < account.AppID.Count; index++)
+                    {
+                        if (!lstAppIDCurrentUserid.Contains(account.AppID[index])) listInsertAppid.Add(account.AppID[index]);
+                        if (!lstAppIDCurrentUserid.Contains(account.AppID[index])) listInsertAppCode.Add(account.AppCode[index]);
+                    }
                     //remove jeehr
                     if (isJeeHR)
                     {
                         var index = account.AppCode.FindIndex(item => item.Equals("JeeHR"));
-                        account.AppID.RemoveAt(index);
+                        listInsertAppid.RemoveAt(index);
                     }
-                    _reponsitory.InsertAppCodeAccount(cnn, account.Userid, account.AppID, usernameCreatedBy);
-                    var identity = InitIdentityServerUserModel(customerID, account);
-                    string userId = identity.customData.JeeAccount.UserID.ToString();
-                    var createUser = await identityServerController.addNewUser(identity, Admin_accessToken);
-                    if (!createUser.IsSuccessStatusCode)
+
+                    _reponsitory.InsertAppCodeAccount(cnn, account.Userid, listInsertAppid, usernameCreatedBy);
+                    var listRemove = checkNotExisAppID(lstAppIDCurrentUserid, lstAppIDCurrentCustomer);
+                    _reponsitory.RemoveAppCodeAccount(cnn, account.Userid, listRemove, usernameCreatedBy);
+
+                    var objCustomDataJeeAccount = identityServerController.JeeAccountCustomData(account.AppCode, commonInfo.UserID, customerID, commonInfo.StaffID);
+
+                    var updateIndentity = await identityServerController.UppdateCustomDataHttpResponse(Admin_accessToken, commonInfo.Username, objCustomDataJeeAccount);
+
+                    if (!updateIndentity.IsSuccessStatusCode)
                     {
-                        string returnValue = await createUser.Content.ReadAsStringAsync();
+                        string returnValue = await updateIndentity.Content.ReadAsStringAsync();
                         var res = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
-                        cnn.RollbackTransaction();
-                        cnn.EndTransaction();
                         throw new Exception(res.message);
                     }
                     cnn.EndTransaction();
@@ -428,10 +446,23 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
                         var obj = new
                         {
                             CustomerID = customerID,
-                            AppCode = listAppCode,
+                            AppCode = listInsertAppCode,
                             UserID = account.Userid,
                             Username = account.Username,
                             IsInitial = false,
+                            IsAdmin = false
+                        };
+                        await _producer.PublishAsync(TopicAddNewCustomerUser, JsonConvert.SerializeObject(obj));
+                    }
+                    else
+                    {
+                        var obj = new
+                        {
+                            CustomerID = customerID,
+                            AppCode = listInsertAppCode,
+                            UserID = account.Userid,
+                            Username = account.Username,
+                            IsInitial = true,
                             IsAdmin = false
                         };
                         await _producer.PublishAsync(TopicAddNewCustomerUser, JsonConvert.SerializeObject(obj));
@@ -444,6 +475,16 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
                     throw;
                 }
             }
+        }
+
+        private List<int> checkNotExisAppID(List<int> appIDUser, List<int> appIdCustomer)
+        {
+            var lst = new List<int>();
+            foreach (var id in appIdCustomer)
+            {
+                if (!appIDUser.Contains(id)) lst.Add(id);
+            }
+            return lst;
         }
 
         private IdentityServerAddNewUser InitIdentityServerUserModel(long customerID, AccountManagementModel account)

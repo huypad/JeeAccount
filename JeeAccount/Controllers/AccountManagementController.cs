@@ -812,7 +812,7 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpPost("UpdatecreateAccount")]
+        [HttpPost("UpdateAccount")]
         public async Task<IActionResult> UpdateAccount(AccountManagementModel account)
         {
             try
@@ -825,14 +825,23 @@ namespace JeeAccount.Controllers
                 var username = Ulities.GetUsernameByHeader(HttpContext.Request.Headers);
                 if (string.IsNullOrEmpty(username)) return Unauthorized(MessageReturnHelper.DangNhap());
                 var isjeeHR = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
+                if (isjeeHR)
+                {
+                    if (account.StaffID > 0)
+                    {
+                        var common = GeneralReponsitory.GetCommonInfo(_connectionString, 0, account.Username);
+                        var common2 = GeneralReponsitory.GetCommonInfo(_connectionString, 0, "", account.StaffID);
 
-                // for JeeOffice
-                account.cocauid = 1;
-                account.chucvuid = 33;
+                        if (common.UserID != common2.UserID && common2.UserID != 0)
+                        {
+                            return BadRequest(MessageReturnHelper.Trung("ID Nhân viên này đã được tài khoản khác, vui lòng chọn đúng tài khoản"));
+                        }
+                    }
+                }
                 var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
-                // await _service.UpdateAccount(isjeeHR, token, customData.JeeAccount.CustomerID, username, account);
+                await _service.UpdateAccount(isjeeHR, token, customData.JeeAccount.CustomerID, username, account);
 
-                return Ok(MessageReturnHelper.ThanhCong("Tạo tài khoản"));
+                return Ok(MessageReturnHelper.ThanhCong("Cập tài khoản"));
             }
             catch (TrungDuLieuExceoption ex)
             {
@@ -957,6 +966,56 @@ namespace JeeAccount.Controllers
             }
         }
 
+        [HttpGet("GetDSJeeHRToUpdate")]
+        public async Task<IActionResult> GetDSJeeHRToUpdate()
+        {
+            try
+            {
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+                var jeeHRController = new JeeHRController(HOST_JEEHR_API);
+                var lst = await jeeHRController.GetDSNhanVien(token);
+                var listStaffId = GeneralReponsitory.GetLstStaffIDByCustomerid(_connectionString, customData.JeeAccount.CustomerID);
+                if (lst.status == 0) return BadRequest(MessageReturnHelper.ErrorJeeHR(lst.error));
+                var lstData = lst.data.Where(item => listStaffId.Contains(item.IDNV));
+                return Ok(lstData);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
 
+        [HttpGet("GetCommonAccount/{userid}")]
+        public IActionResult GetCommonAccount(long userid)
+        {
+            try
+            {
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+                var common = GeneralReponsitory.GetCommonInfo(_connectionString, userid);
+                return Ok(common);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
     }
 }
