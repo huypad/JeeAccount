@@ -703,7 +703,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
 
         #endregion public api
 
-        public ReturnSqlModel ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin)
+        public bool ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin)
         {
             Hashtable val = new Hashtable();
             if (!string.IsNullOrEmpty(Note))
@@ -719,7 +719,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                 DataTable dt = cnn.CreateDataTable(sql, Conds);
                 if (dt.Rows.Count == 0)
                 {
-                    return new ReturnSqlModel("userId không tồn tại", Constant.ERRORCODE_NOTEXIST);
+                    throw new KhongCoDuLieuException("UserID");
                 }
                 string sqlGetUsernameLogin = $"select Username from AccountList where CustomerID=@CustomerID and UserID=@UserID";
                 SqlConditions CondsLogin = new SqlConditions();
@@ -743,10 +743,11 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                 int x = cnn.Update(val, Conds, "AccountList");
                 if (x <= 0)
                 {
-                    return new ReturnSqlModel(cnn.LastError.ToString(), Constant.ERRORCODE_EXCEPTION);
+                    throw cnn.LastError;
                 }
+                DataTable dt2 = cnn.CreateDataTable(sql, Conds);
+                return Convert.ToBoolean((bool)dt2.Rows[0][0]);
             }
-            return new ReturnSqlModel();
         }
 
         public void CreateAccount(bool isJeeHR, DpsConnection cnn, AccountManagementModel account, string username_createdby, long CustomerID, bool isAdmin = false)

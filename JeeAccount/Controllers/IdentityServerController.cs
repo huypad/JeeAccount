@@ -141,6 +141,27 @@ namespace JeeAccount.Controllers
             }
         }
 
+        public async Task<HttpResponseMessage> changeUserStateAsync(string Admin_access_token, string username, bool disable)
+        {
+            string url = LINK_CHANGE_USERSTATE;
+            var content = new
+            {
+                username = username,
+                disabled = disable,
+            };
+
+            var stringContent = await Task.Run(() => JsonConvert.SerializeObject(content));
+            var httpContent = new StringContent(stringContent, Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(Admin_access_token);
+
+                var reponse = await client.PostAsync(url, httpContent);
+                return reponse;
+            }
+        }
+
         public async Task<HttpResponseMessage> changeUserStateInternalAsync(IdentityServerChangeUserStateModel identityServerChangeUserStateModel)
         {
             string url = LINK_CHANGE_USERSTATE + "/internal";

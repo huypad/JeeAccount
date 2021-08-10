@@ -178,6 +178,7 @@ export const locale = {
       TENDANGNHAP: 'Tên đăng nhập',
       NHAPLAIMATKHAU: 'Nhập lại mật khẩu',
       TENNHANVIEN: 'Tên nhân viên',
+      THAYDOITINHTRANGTAIKHOAN: 'Thay đổi tình trạng tài khoản',
     },
     jeechat: {
       send: 'Gửi',

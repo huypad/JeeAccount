@@ -306,9 +306,16 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
 
         #endregion api giao diện
 
-        public ReturnSqlModel ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin)
+        public async Task ChangeTinhTrang(string Admin_accessToken, long customerID, string Username, string Note, long UserIdLogin)
         {
-            return _reponsitory.ChangeTinhTrang(customerID, Username, Note, UserIdLogin);
+            var isActive = _reponsitory.ChangeTinhTrang(customerID, Username, Note, UserIdLogin);
+            var identity = new IdentityServerController();
+            var response = await identity.changeUserStateAsync(Admin_accessToken, Username, !isActive);
+            if (!response.IsSuccessStatusCode)
+            {
+                var res = JsonConvert.DeserializeObject<IdentityServerReturn>(await response.Content.ReadAsStringAsync());
+                throw new Exception(res.message);
+            }
         }
 
         public ReturnSqlModel UpdateDirectManager(string Username, string DirectManager, long customerID)
@@ -406,7 +413,8 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
                 {
                     cnn.BeginTransaction();
                     _reponsitory.UpdateAccount(isJeeHR, cnn, account, customerID);
-                    if (isAdminHeThong) {
+                    if (isAdminHeThong)
+                    {
                         cnn.EndTransaction();
                         return;
                     };

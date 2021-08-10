@@ -56,7 +56,7 @@ namespace JeeAccount.Services.AccountManagementService
 
         Task<JeeAccountCustomData> GetJeeAccountCustomDataAsync(InputApiModel model);
 
-        ReturnSqlModel ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin);
+        Task ChangeTinhTrang(string Admin_accessToken, long customerID, string Username, string Note, long UserIdLogin);
 
         ReturnSqlModel UpdateDirectManager(string Username, string DirectManager, long customerID);
 

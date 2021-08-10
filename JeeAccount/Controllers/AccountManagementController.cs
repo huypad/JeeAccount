@@ -749,35 +749,34 @@ namespace JeeAccount.Controllers
         }
 
         [HttpPost("ChangeTinhTrang")]
-        public object ChangeTinhTrang(AccChangeTinhTrangModel acc)
+        public async Task<IActionResult> ChangeTinhTrang(AccChangeTinhTrangModel acc)
         {
             try
             {
                 var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
+                    return Unauthorized(MessageReturnHelper.DangNhap());
                 }
-
-                ReturnSqlModel update = _service.ChangeTinhTrang(customData.JeeAccount.CustomerID, acc.Username, acc.Note, customData.JeeAccount.UserID);
-                if (!update.Susscess)
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
                 {
-                    if (update.ErrorCode.Equals(Constant.ERRORCODE_NOTEXIST))
-                    {
-                        return JsonResultCommon.KhongTonTai("tài khoản");
-                    }
-                    if (update.ErrorCode.Equals(Constant.ERRORCODE_EXCEPTION))
-                    {
-                        string logMessage = update.ErrorMessgage;
-
-                        return JsonResultCommon.ThatBai(update.ErrorMessgage);
-                    }
+                    return Unauthorized(MessageReturnHelper.DangNhap());
                 }
-                return JsonResultCommon.ThanhCong(update);
+                await _service.ChangeTinhTrang(token, customData.JeeAccount.CustomerID, acc.Username, acc.Note, customData.JeeAccount.UserID);
+                return Ok(MessageReturnHelper.ThanhCong());
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieuException(ex));
+            }
+            catch (JeeHRException error)
+            {
+                return BadRequest(MessageReturnHelper.ExceptionJeeHR(error));
             }
             catch (Exception ex)
             {
-                return JsonResultCommon.Exception(ex);
+                return BadRequest(MessageReturnHelper.Exception(ex));
             }
         }
 

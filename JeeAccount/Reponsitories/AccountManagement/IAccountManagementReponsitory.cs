@@ -75,7 +75,7 @@ namespace JeeAccount.Reponsitories
 
         #endregion api
 
-        ReturnSqlModel ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin);
+        bool ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin);
 
         void CreateAccount(bool isJeeHR, DpsConnection cnn, AccountManagementModel account, string usernameCreatedBy, long CustomerID, bool isAdmin = false);
 

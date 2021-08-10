@@ -1,33 +1,37 @@
-<div class="m-portlet">
-  <div class="m-portlet__head">
-    <div class="m-portlet__head-title">
-      <div class="row" style="display: inline">
-        <h5 class="m-portlet__head-text">
-          <span class="dialog-title">Thay đổi tình trạng tài khoản</span>
-          <button mat-button style="float: right; margin: 0" class="ja_button mat-button ja_btn-addnew"
-            (click)="onSubmit()">Lưu</button>
-          <button mat-button style="float: right; margin: 0; margin-right: 12px;"
-            class="ja_button mat-button ja_btn-goback" (click)="goBack()">Đóng</button>
-        </h5>
-      </div>
+<div class="modal-content">
+  <div class="modal-header">
+    <div class="modal-title h4" id="example-modal-sizes-title-lg">
+      <span class="dialog-title">{{ 'ACCOUNTMANAGEMENT.THAYDOITINHTRANGTAIKHOAN' | translate }}</span>
+    </div>
+    <div class="modal-title" style="display: inline">
+      <button
+        [disabled]="isLoadingSubmit$ | async"
+        [class.spinner]="isLoadingSubmit$ | async"
+        mat-raised-button
+        style="float: right; margin: 0"
+        class="ja_btn-addnew"
+        (click)="onSubmit()"
+      >
+        {{ 'COMMOM.LUU' | translate }}
+      </button>
+      <button mat-raised-button style="float: right; margin: 0; margin-right: 12px" class="ja_btn-goback" (click)="goBack()">
+        {{ 'COMMOM.TROLAI' | translate }}
+      </button>
     </div>
   </div>
-  <div class="m-form m-form--fit m-form--label-align-right m-form--group-seperator-dashed">
-    <div class="m-portlet__body">
+  <div class="overlay overlay-block cursor-default modal-body overflow-auto">
+    <ng-container>
       <form [formGroup]="itemForm" class="m-form m-form--group-seperator-dashed">
         <div class="m-form__section m-form__section--first">
           <div class="row m-form__group">
             <div class="col-md-12 m--margin-bottom-10-mobile">
               <mat-form-field class="mat-form-field-fluid">
-                <textarea cols="12" rows="4" formControlName="GhiChu" placeholder="Ghi chú" matInput
-                  required> </textarea>
+                <textarea cols="12" rows="4" formControlName="GhiChu" placeholder="Ghi chú" matInput required> </textarea>
               </mat-form-field>
             </div>
           </div>
         </div>
       </form>
-    </div>
-    <div class="m-portlet__foot m-portlet__no-border m-portlet__foot--fit text-right">
-    </div>
+    </ng-container>
   </div>
 </div>
