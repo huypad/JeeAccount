@@ -20,7 +20,7 @@ import { ITableService } from '../../../_core/services/itable.service';
 const API_PRODUCTS_URL = environment.HOST_JEEACCOUNT_API + '/api/accountmanagement';
 
 @Injectable()
-export class AccountManagementService extends ITableService<AccountManagementDTO> implements OnDestroy {
+export class AccountManagementService extends ITableService<AccountManagementDTO[]> implements OnDestroy {
   API_URL_FIND: string = API_PRODUCTS_URL + '/GetListAccountManagement';
   API_URL_CTEATE: string = API_PRODUCTS_URL + '/createAccount';
   API_URL_EDIT: string = API_PRODUCTS_URL + '/createAccount';

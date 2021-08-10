@@ -1,138 +1,84 @@
+import { GroupingState } from './../../../../../_metronic/shared/crud-table/models/grouping.model';
+import { FormGroup } from '@angular/forms';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, merge } from 'rxjs';
+import { BehaviorSubject, merge, Subscription } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { TokenStorage } from 'src/app/modules/auth/_services/token-storage.service';
 import { SubheaderService } from 'src/app/_metronic/partials/layout';
 import { DepartmentManagementService } from '../Sevices/department-management.service';
-import { DepartmentManagementDatasource } from '../Model/data-sources/department-management.datasource';
 import { DepartmentManagementEditDialogComponent } from '../department-management-edit-dialog/department-management-edit-dialog.component';
 import { DepartmentModel } from '../Model/department-management.model';
 import { DepartmentChangeTinhTrangEditDialogComponent } from '../department-change-tinh-trang-edit-dialog/department-change-tinh-trang-edit-dialog.component';
 import { LayoutUtilsService, MessageType } from '../../../_core/utils/layout-utils.service';
 import { QueryParamsModelNew } from '../../../_core/models/query-models/query-params.model';
+import { PaginatorState, SortState } from 'src/app/_metronic/shared/crud-table';
 
 @Component({
   selector: 'app-department-management-list',
   templateUrl: './department-management-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DepartmentManagementLístComponent implements OnInit {
-  // Table fields
-  loadingSubject = new BehaviorSubject<boolean>(false);
-  dataSource: DepartmentManagementDatasource;
-  displayedColumns = [];
-  availableColumns = [
-    {
-      stt: 1,
-      name: 'PhongBan',
-      alwaysChecked: false,
-    },
-    {
-      stt: 2,
-      name: 'QuanLy',
-      alwaysChecked: false,
-    },
-    {
-      stt: 3,
-      name: 'TinhTrang',
-      alwaysChecked: false,
-    },
-    {
-      stt: 4,
-      name: 'GhiChu',
-      alwaysChecked: false,
-    },
-    {
-      stt: 99,
-      name: 'ThaoTac',
-      alwaysChecked: false,
-    },
-  ];
-  selectedColumns = new SelectionModel<any>(true, this.availableColumns);
-  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort: MatSort;
-  dataResult: any[] = [];
-
+export class DepartmentManagementListComponent implements OnInit {
   constructor(
-    private changeDetect: ChangeDetectorRef,
-    private departmentManagementService: DepartmentManagementService,
+    public departmentManagementService: DepartmentManagementService,
     private translate: TranslateService,
     public subheaderService: SubheaderService,
     private layoutUtilsService: LayoutUtilsService,
-    private tokenStorage: TokenStorage,
     public dialog: MatDialog
   ) {}
-
   //=================PageSize Table=====================
-  pageSize = 50;
-  dataAccounts: any[] = [];
-  //==========Dropdown Search==============
-  filter: any = {};
+  pageSize: number = 50;
+  loadingSubject = new BehaviorSubject<boolean>(false);
+  filterGroup: FormGroup;
+  searchGroup: FormGroup;
+  paginator: PaginatorState;
+  sorting: SortState;
+  grouping: GroupingState;
+  imgFile: string = '';
+  isLoading: boolean = false;
+  isJeeHR: boolean;
+  private subscriptions: Subscription[] = [];
 
   ngOnInit() {
-    this.tokenStorage.getPageSize().subscribe((res) => {
-      this.pageSize = +res;
-    });
-    this.beginMatTable();
+    this.departmentManagementService.fetch();
+    this.grouping = this.departmentManagementService.grouping;
+    this.paginator = this.departmentManagementService.paginator;
+    this.sorting = this.departmentManagementService.sorting;
+    const sb = this.departmentManagementService.isLoading$.subscribe((res) => (this.isLoading = res));
+    this.subscriptions.push(sb);
   }
 
-  beginMatTable() {
-    // set show table data
-    this.applySelectedColumns();
-
-    this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-    // load data khi sort Changed
-    merge(this.sort.sortChange, this.paginator.page)
-      .pipe(
-        tap(() => {
-          this.loadDataList(true);
-        })
-      )
-      .subscribe();
-
-    // Init DataSource
-    this.dataSource = new DepartmentManagementDatasource(this.departmentManagementService);
-    // Read from URL itemId, for restore previous state
-    this.dataSource.entitySubject.subscribe((res) => (this.dataResult = res));
-    // First load list
-    this.loadDataList();
+  sort(column: string): void {
+    const sorting = this.sorting;
+    const isActiveColumn = sorting.column === column;
+    if (!isActiveColumn) {
+      sorting.column = column;
+      sorting.direction = 'asc';
+    } else {
+      sorting.direction = sorting.direction === 'asc' ? 'desc' : 'asc';
+    }
+    this.departmentManagementService.patchState({ sorting });
   }
 
-  /*=========== Check columns of data grid ==========*/
-  applySelectedColumns() {
-    const selectedColumns: string[] = [];
-    this.selectedColumns.selected
-      .sort((a, b) => {
-        return a.stt - b.stt;
-      })
-      .forEach((col) => {
-        selectedColumns.push(col.name);
-      });
-    this.displayedColumns = selectedColumns;
+  paginate(paginator: PaginatorState) {
+    this.departmentManagementService.patchState({ paginator });
   }
 
-  /*=================================================*/
-
-  /** FILTRATION */
-  filterConfiguration(): any {
-    return this.filter;
+  changeKeyword(val) {
+    this.search(val);
   }
 
-  loadDataList(page: boolean = false) {
-    const queryParams = new QueryParamsModelNew(
-      this.filterConfiguration(),
-      this.sort.direction,
-      this.sort.active,
-      page ? this.paginator.pageIndex : (this.paginator.pageIndex = 0),
-      this.paginator.pageSize
-    );
-    this.dataSource.LoadList(queryParams);
+  changeFilter(filter) {
+    this.departmentManagementService.patchState({ filter });
+  }
+
+  search(searchTerm: string) {
+    this.departmentManagementService.patchState({ searchTerm });
   }
 
   create() {
@@ -149,10 +95,10 @@ export class DepartmentManagementLístComponent implements OnInit {
     const dialogRef = this.dialog.open(DepartmentManagementEditDialogComponent, { data: { item } });
     dialogRef.afterClosed().subscribe((res) => {
       if (!res) {
-        this.loadDataList();
+        this.departmentManagementService.fetch();
       } else {
         this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
-        this.loadDataList();
+        this.departmentManagementService.fetch();
       }
     });
   }
@@ -173,13 +119,15 @@ export class DepartmentManagementLístComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((res) => {
       if (!res) {
-        this.loadDataList();
+        this.departmentManagementService.fetch();
       } else {
         this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
-        this.loadDataList();
+        this.departmentManagementService.fetch();
       }
     });
   }
 
   delete(item) {}
+
+  openQuanLyTrucTiepEdit(username, DirectManager) {}
 }

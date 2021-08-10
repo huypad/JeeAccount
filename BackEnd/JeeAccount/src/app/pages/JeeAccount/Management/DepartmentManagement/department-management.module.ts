@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 import { DepartmentManagementComponent } from './department-management.component';
-import { DepartmentManagementLístComponent } from './department-management-list/department-management-list.component';
+import { DepartmentManagementListComponent } from './department-management-list/department-management-list.component';
 import { DepartmentManagementService } from './Sevices/department-management.service';
 import { DepartmentManagementEditDialogComponent } from './department-management-edit-dialog/department-management-edit-dialog.component';
 import { MatChipsModule } from '@angular/material/chips';
@@ -19,7 +19,7 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        component: DepartmentManagementLístComponent,
+        component: DepartmentManagementListComponent,
       },
     ],
   },
@@ -28,15 +28,13 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     DepartmentManagementComponent,
-    DepartmentManagementLístComponent,
+    DepartmentManagementListComponent,
     DepartmentManagementEditDialogComponent,
     DepartmentChangeTinhTrangEditDialogComponent,
   ],
   imports: [CommonModule, RouterModule.forChild(routes), JeeAccountModule, MatChipsModule, NgxMatSelectSearchModule, InlineSVGModule],
-  providers: [
-    DepartmentManagementService,
-  ],
+  providers: [DepartmentManagementService],
   entryComponents: [DepartmentManagementEditDialogComponent, DepartmentChangeTinhTrangEditDialogComponent],
-  exports: [DepartmentManagementLístComponent],
+  exports: [DepartmentManagementListComponent],
 })
 export class DepartmentManagementModule {}

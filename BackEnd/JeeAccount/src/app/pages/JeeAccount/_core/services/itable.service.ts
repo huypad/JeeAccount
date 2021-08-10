@@ -1,3 +1,4 @@
+import { ResultObjectModel } from './../models/_base.model';
 // tslint:disable:variable-name
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, Subscription } from 'rxjs';
@@ -18,7 +19,7 @@ const DEFAULT_STATE: ITableState = {
 
 export abstract class ITableService<T> {
   // Private fields
-  private _items$ = new BehaviorSubject<T[]>([]);
+  private _items$ = new BehaviorSubject<T>(undefined);
   private _isLoading$ = new BehaviorSubject<boolean>(false);
   private _isFirstLoading$ = new BehaviorSubject<boolean>(true);
   private _tableState$ = new BehaviorSubject<ITableState>(DEFAULT_STATE);
@@ -85,7 +86,7 @@ export abstract class ITableService<T> {
   }
 
   // READ (Returning filtered list of entities)
-  find(tableState: ITableState): Observable<ResultModel<T>> {
+  find(tableState: ITableState): Observable<ResultObjectModel<T>> {
     const url = this.API_URL_FIND;
     const httpHeaders = this.httpUtils.getHTTPHeaders();
     const httpParams = this.httpUtils.getFindHTTPParamsITableState(tableState);
@@ -160,7 +161,7 @@ export abstract class ITableService<T> {
     this._errorMessage.next('');
     const request = this.find(this._tableState$.value)
       .pipe(
-        tap((res: ResultModel<T>) => {
+        tap((res: ResultObjectModel<T>) => {
           this._items$.next(res.data);
           this.patchStateWithoutFetch({
             paginator: this._tableState$.value.paginator.recalculatePaginator(res.panigator.TotalCount),

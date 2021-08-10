@@ -361,7 +361,7 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
                         var index = account.AppCode.FindIndex(item => item.Equals("JeeHR"));
                         account.AppID.RemoveAt(index);
                     }
-                    _reponsitory.InsertAppCodeAccount(cnn, account.Userid, account.AppID, usernameCreatedBy);
+                    _reponsitory.InsertAppCodeAccount(cnn, account.Userid, account.AppID, usernameCreatedBy, false);
                     var identity = InitIdentityServerUserModel(customerID, account);
                     string userId = identity.customData.JeeAccount.UserID.ToString();
                     var createUser = await identityServerController.addNewUser(identity, Admin_accessToken);
@@ -434,7 +434,7 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
                         listInsertAppid.RemoveAt(index);
                     }
 
-                    _reponsitory.InsertAppCodeAccount(cnn, account.Userid, listInsertAppid, usernameCreatedBy);
+                    _reponsitory.InsertAppCodeAccount(cnn, account.Userid, listInsertAppid, usernameCreatedBy, false);
                     var listRemove = checkNotExisAppID(lstAppIDCurrentUserid, lstAppIDCurrentCustomer);
                     _reponsitory.RemoveAppCodeAccount(cnn, account.Userid, listRemove, usernameCreatedBy);
 

@@ -954,7 +954,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
             return userid;
         }
 
-        public void InsertAppCodeAccount(DpsConnection cnn, long UserID, List<int> AppID, string createdBy)
+        public void InsertAppCodeAccount(DpsConnection cnn, long UserID, List<int> AppID, string createdBy, bool IsAdmin = false)
         {
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
@@ -995,6 +995,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                 val.Add("AppID", id);
                 val.Add("CreatedDate", DateTime.Now);
                 val.Add("CreatedBy", createdBy);
+                val.Add("IsAdmin", IsAdmin);
                 val.Add("Disable", 0);
                 val.Add("IsActive", 1);
                 int x = cnn.Insert(val, "Account_App");

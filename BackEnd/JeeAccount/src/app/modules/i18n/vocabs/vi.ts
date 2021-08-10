@@ -180,6 +180,11 @@ export const locale = {
       TENNHANVIEN: 'Tên nhân viên',
       THAYDOITINHTRANGTAIKHOAN: 'Thay đổi tình trạng tài khoản',
     },
+    DEPARTMANAGEMENT: {
+      DANHSACHPHONGBAN: 'Danh sách phòng ban, nhóm',
+      TENPHONGBANNHOM:'Tên phòng ban nhóm',
+      QUANLYNHOM: 'Quản lý nhóm'
+    },
     jeechat: {
       send: 'Gửi',
       sendmess: 'Gửi tin nhắn riêng',

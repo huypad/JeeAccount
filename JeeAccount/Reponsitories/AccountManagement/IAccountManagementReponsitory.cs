@@ -87,7 +87,7 @@ namespace JeeAccount.Reponsitories
 
         ReturnSqlModel UpdateDirectManager(string Username, string DirectManager, long customerID);
 
-        void InsertAppCodeAccount(DpsConnection cnn, long UserID, List<int> AppID, string createdBy);
+        void InsertAppCodeAccount(DpsConnection cnn, long UserID, List<int> AppID, string createdBy, bool IsAdmin = false);
 
         void RemoveAppCodeAccount(DpsConnection cnn, long UserID, List<int> AppID, string editBy);
     }

@@ -107,11 +107,11 @@ namespace JeeAccount.Reponsitories
                     where += $" or StaffID = {StaffID}";
                 }
             }
-            if (string.IsNullOrEmpty(where)) throw new ArgumentNullException("UserID or Username or Staffid");
+            if (string.IsNullOrEmpty(where)) throw new Exception("UserID or Username or Staffid");
             string sql = $"select UserID, Username, StaffID, CustomerID from AccountList where {where}";
             DataTable dt = new DataTable();
             dt = cnn.CreateDataTable(sql);
-            if (dt.Rows.Count == 0) throw new ArgumentNullException("UserID or Username or Staffid");
+            if (dt.Rows.Count == 0) throw new Exception("UserID or Username or Staffid");
             return dt.AsEnumerable().Select(row => new CommonInfo
             {
                 CustomerID = Convert.ToInt32(row["CustomerID"]),
@@ -634,7 +634,7 @@ join AppList on AppList.AppID = Account_App.AppID";
                         SoLuongNhanSu = (row["SoLuongNhanSu"] != DBNull.Value) ? Int32.Parse(row["SoLuongNhanSu"].ToString()) : 0,
                         IsShowApp = Convert.ToBoolean(row["IsShowApp"]),
                         IsActive = Convert.ToBoolean(row["IsActive"]),
-                        IsAdmin = Convert.ToBoolean(row["AdminApp"]),
+                        IsAdmin = row["AdminApp"] != DBNull.Value ? Convert.ToBoolean(row["AdminApp"]) : false,
                     });
                     return result;
                 }
@@ -656,7 +656,7 @@ join AppList on AppList.AppID = Account_App.AppID";
                         Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
                         IsShowApp = Convert.ToBoolean(row["IsShowApp"]),
                         IsActive = Convert.ToBoolean(row["IsActive"]),
-                        IsAdmin = Convert.ToBoolean(row["AdminApp"]),
+                        IsAdmin = row["AdminApp"] != DBNull.Value ? Convert.ToBoolean(row["AdminApp"]) : false,
                     });
                     return result;
                 }
@@ -706,7 +706,7 @@ join AppList on AppList.AppID = Account_App.AppID";
                     SoLuongNhanSu = (row["SoLuongNhanSu"] != DBNull.Value) ? Int32.Parse(row["SoLuongNhanSu"].ToString()) : 0,
                     IsShowApp = Convert.ToBoolean(row["IsShowApp"]),
                     IsActive = Convert.ToBoolean(row["IsActive"]),
-                    IsAdmin = Convert.ToBoolean(row["AdminApp"]),
+                    IsAdmin = row["AdminApp"] != DBNull.Value ? Convert.ToBoolean(row["AdminApp"]) : false,
                 });
                 return result;
             }
@@ -728,7 +728,7 @@ join AppList on AppList.AppID = Account_App.AppID";
                     Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
                     IsShowApp = Convert.ToBoolean(row["IsShowApp"]),
                     IsActive = Convert.ToBoolean(row["IsActive"]),
-                    IsAdmin = Convert.ToBoolean(row["AdminApp"]),
+                    IsAdmin = row["AdminApp"] != DBNull.Value ? Convert.ToBoolean(row["AdminApp"]) : false,
                 });
                 return result;
             }
