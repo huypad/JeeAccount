@@ -1113,5 +1113,41 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                 return result;
             }
         }
+
+        public void DeleteAccountManagement(string DeletedBy, long customerID, long userid)
+        {
+            Hashtable val = new Hashtable();
+            val.Add("DeletedBy", DeletedBy);
+            val.Add("DeletedDate", DateTime.Now);
+            val.Add("Disable", 1);
+            val.Add("IsActive", 0);
+
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("CustomerID", customerID);
+            Conds.Add("UserID", userid);
+
+            string sql = $"select IsAdmin from AccountList where CustomerID=@CustomerID and UserID=@UserID";
+            string sql2 = $"select * from Account_App where UserID=@UserID and IsAdmin = 1";
+
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                DataTable dt = cnn.CreateDataTable(sql, Conds);
+                if (dt.Rows.Count == 0)
+                {
+                    throw new KhongCoDuLieuException("Tài khoản");
+                }
+                if (Convert.ToBoolean(dt.Rows[0][0].ToString())) throw new KhongDuocXoaException("Tài khoản là admin hệ thống. Không thể xoá!");
+                DataTable dt2 = cnn.CreateDataTable(sql2, Conds);
+                if (dt2.Rows.Count > 0)
+                {
+                    throw new KhongDuocXoaException("Tài khoản là admin hệ thống. Không thể xoá!");
+                }
+                int x = cnn.Update(val, Conds, "AccountList");
+                if (x <= 0)
+                {
+                    throw cnn.LastError;
+                }
+            }
+        }
     }
 }

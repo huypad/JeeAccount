@@ -111,6 +111,7 @@ namespace JeeAccount.Reponsitories.JobtitleManagement
                     val.Add("CreatedDate", DateTime.Now);
                     val.Add("CreatedBy", Username);
                     val.Add("CustomerID", CustomerID);
+                    if (!string.IsNullOrEmpty(JobtitleModel.Description)) val.Add("Description", JobtitleModel.Description);
 
                     #endregion val data
 
@@ -138,6 +139,51 @@ namespace JeeAccount.Reponsitories.JobtitleManagement
                 }
             }
             catch
+            {
+                throw;
+            }
+        }
+
+        public JobtitleModel GetJobtitle(int rowid, long CustomerID)
+        {
+            try
+            {
+                using (DpsConnection cnn = new DpsConnection(_connectionString))
+                {
+                    SqlConditions conds = new SqlConditions();
+                    conds.Add("RowID", rowid);
+                    conds.Add("CustomerID", CustomerID);
+
+                    string sql = "select * from JobtitleList where RowID = @RowID and CustomerID = @CustomerID";
+                    var dt = cnn.CreateDataTable(sql, conds);
+                    var result = dt.AsEnumerable().Select(row => new JobtitleModel
+                    {
+                        RowID = long.Parse(row["RowID"].ToString()),
+                        JobtitleName = row["JobtitleName"] != DBNull.Value ? row["JobtitleName"].ToString() : "",
+                        Description = row["Description"] != DBNull.Value ? row["Description"].ToString() : "",
+                        Note = row["Note"] != DBNull.Value ? row["Note"].ToString() : "",
+                    }).SingleOrDefault();
+
+                    if (result == null) throw new KhongCoDuLieuException();
+                    var job = new JobtitleModel();
+                    job.RowID = result.RowID;
+                    job.Description = result.Description;
+                    job.JobtitleName = result.JobtitleName;
+                    job.Note = result.Note;
+
+                    string sql2 = "select Username, UserID from AccountList where JobtitleID = @RowID and CustomerID = @CustomerID";
+                    var dt2 = cnn.CreateDataTable(sql2, conds);
+                    var lst = dt2.AsEnumerable().Select(row => new CommonInfo
+                    {
+                        Username = row["Username"].ToString(),
+                        UserID = long.Parse(row["UserID"].ToString()),
+                    }).ToList();
+                    if (lst.Count > 0)
+                        job.ThanhVien = lst.Select(item => item.Username).ToList();
+                    return job;
+                }
+            }
+            catch (Exception)
             {
                 throw;
             }
@@ -216,6 +262,131 @@ namespace JeeAccount.Reponsitories.JobtitleManagement
                 }
             }
             return true;
+        }
+
+        public void UpdateJobtitle(JobtitleModel job, long CustomerID, string Username, bool isJeeHR)
+        {
+            Hashtable val = new Hashtable();
+            try
+            {
+                using (DpsConnection cnn = new DpsConnection(_connectionString))
+                {
+                    #region val data
+
+                    val.Add("JobtitleName", job.JobtitleName);
+                    if (!string.IsNullOrEmpty(job.Note)) val.Add("Note", job.Note);
+                    val.Add("LastModified", DateTime.Now);
+                    val.Add("ModifiedBy", Username);
+                    if (!string.IsNullOrEmpty(job.Description)) val.Add("Description", job.Description);
+
+                    #endregion val data
+
+                    SqlConditions conds = new SqlConditions();
+                    conds.Add("RowID", job.RowID);
+
+                    cnn.BeginTransaction();
+                    int x = cnn.Update(val, conds, "JobtitleList");
+                    if (x <= 0)
+                    {
+                        cnn.RollbackTransaction();
+                        cnn.EndTransaction();
+                        throw cnn.LastError;
+                    }
+                    if (job.ThanhVienDelete is not null)
+                    {
+                        if (job.ThanhVienDelete.Count() > 0)
+                        {
+                            foreach (string username in job.ThanhVienDelete)
+                            {
+                                DeleteJobtitleForAccountList(cnn, job, username);
+                            }
+                        }
+                    }
+                    if (job.ThanhVien is not null)
+                    {
+                        if (job.ThanhVien.Count() > 0)
+                        {
+                            foreach (string username in job.ThanhVien)
+                            {
+                                UpdateJobtileForAccountList(cnn, job, username);
+                            }
+                        }
+                    }
+
+                    cnn.EndTransaction();
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private void UpdateJobtileForAccountList(DpsConnection cnn, JobtitleModel job, string Username, bool isJeeHR = false)
+        {
+            Hashtable val = new Hashtable();
+            SqlConditions conds = new SqlConditions();
+            conds.Add("Username", Username);
+            val.Add("JobtitleID", job.RowID);
+            if (isJeeHR) val.Add("Jobtitle", job.JobtitleName);
+
+            int x = cnn.Update(val, conds, "AccountList");
+            if (x <= 0)
+            {
+                cnn.RollbackTransaction();
+                cnn.EndTransaction();
+                throw cnn.LastError;
+            }
+        }
+
+        private void DeleteJobtitleForAccountList(DpsConnection cnn, JobtitleModel job, string Username)
+        {
+            Hashtable val = new Hashtable();
+            SqlConditions conds = new SqlConditions();
+            conds.Add("Username", Username);
+            val.Add("JobtitleID", DBNull.Value);
+            val.Add("Jobtitle", DBNull.Value);
+            int x = cnn.Update(val, conds, "AccountList");
+            if (x <= 0)
+            {
+                cnn.RollbackTransaction();
+                cnn.EndTransaction();
+                throw cnn.LastError;
+            }
+        }
+
+        public void DeleteJobtile(string DeletedBy, long customerID, int JobtitleID)
+        {
+            string sqlUserInDepartment = $"select JobtitleID from AccountList where JobtitleID = {JobtitleID} and CustomerID = {customerID}";
+            Hashtable val = new Hashtable();
+            val.Add("DeletedBy", DeletedBy);
+            val.Add("DeletedDate", DateTime.Now);
+            val.Add("Disable", 1);
+            val.Add("IsActive", 0);
+
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("CustomerID", customerID);
+            Conds.Add("RowID", JobtitleID);
+
+            string sql = $"select RowID from JobtitleList where CustomerID=@CustomerID and RowID=@RowID";
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                var dtCheck = cnn.CreateDataTable(sqlUserInDepartment);
+                if (dtCheck.Rows.Count > 0) throw new KhongDuocXoaException();
+                {
+                    DataTable dt = cnn.CreateDataTable(sql, Conds);
+                    if (dt.Rows.Count == 0)
+                    {
+                        throw new KhongCoDuLieuException("Đối tượng");
+                    }
+
+                    int x = cnn.Update(val, Conds, "JobtitleList");
+                    if (x <= 0)
+                    {
+                        throw cnn.LastError;
+                    }
+                }
+            }
         }
     }
 }

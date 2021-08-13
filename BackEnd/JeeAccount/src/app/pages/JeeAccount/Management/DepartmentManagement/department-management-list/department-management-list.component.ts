@@ -1,29 +1,26 @@
+import { ChangeTinhTrangDepartmentEditDialogComponent } from './../change-tinh-trang-department-edit-dialog/change-tinh-trang-department-edit-dialog.component';
 import { GroupingState } from './../../../../../_metronic/shared/crud-table/models/grouping.model';
 import { FormGroup } from '@angular/forms';
-import { SelectionModel } from '@angular/cdk/collections';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { ChangeDetectionStrategy, Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, merge, Subscription } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { TokenStorage } from 'src/app/modules/auth/_services/token-storage.service';
 import { SubheaderService } from 'src/app/_metronic/partials/layout';
 import { DepartmentManagementService } from '../Sevices/department-management.service';
 import { DepartmentManagementEditDialogComponent } from '../department-management-edit-dialog/department-management-edit-dialog.component';
-import { DepartmentModel } from '../Model/department-management.model';
-import { DepartmentChangeTinhTrangEditDialogComponent } from '../department-change-tinh-trang-edit-dialog/department-change-tinh-trang-edit-dialog.component';
+import { DepartmentManagementDTO, DepartmentModel } from '../Model/department-management.model';
 import { LayoutUtilsService, MessageType } from '../../../_core/utils/layout-utils.service';
-import { QueryParamsModelNew } from '../../../_core/models/query-models/query-params.model';
 import { PaginatorState, SortState } from 'src/app/_metronic/shared/crud-table';
+import { DepartmentQuanLytrucTiepEditDialogComponent } from '../department-quan-ly-truc-tiep-edit-dialog/department-quan-ly-truc-tiep-edit-dialog.component';
+import { showSearchFormModel } from '../../../_shared/jee-search-form/jee-search-form.model';
+import { DeleteEntityDialogComponent } from '../../../_shared/delete-entity-dialog/delete-entity-dialog.component';
 
 @Component({
   selector: 'app-department-management-list',
   templateUrl: './department-management-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DepartmentManagementListComponent implements OnInit {
+export class DepartmentManagementListComponent implements OnInit, OnDestroy {
   constructor(
     public departmentManagementService: DepartmentManagementService,
     private translate: TranslateService,
@@ -31,6 +28,7 @@ export class DepartmentManagementListComponent implements OnInit {
     private layoutUtilsService: LayoutUtilsService,
     public dialog: MatDialog
   ) {}
+
   //=================PageSize Table=====================
   pageSize: number = 50;
   loadingSubject = new BehaviorSubject<boolean>(false);
@@ -42,6 +40,7 @@ export class DepartmentManagementListComponent implements OnInit {
   imgFile: string = '';
   isLoading: boolean = false;
   isJeeHR: boolean;
+  showSearch = new showSearchFormModel();
   private subscriptions: Subscription[] = [];
 
   ngOnInit() {
@@ -51,6 +50,17 @@ export class DepartmentManagementListComponent implements OnInit {
     this.sorting = this.departmentManagementService.sorting;
     const sb = this.departmentManagementService.isLoading$.subscribe((res) => (this.isLoading = res));
     this.subscriptions.push(sb);
+    this.configShowSearch();
+  }
+
+  configShowSearch() {
+    this.showSearch.chucvu = false;
+    this.showSearch.chucvuid = false;
+    this.showSearch.dakhoa = true;
+    this.showSearch.isAdmin = false;
+    this.showSearch.tennhanvien = false;
+    this.showSearch.username = false;
+    this.showSearch.titlekeyword = 'SEARCH.SEARCH2';
   }
 
   sort(column: string): void {
@@ -84,16 +94,12 @@ export class DepartmentManagementListComponent implements OnInit {
   create() {
     const item = new DepartmentModel();
     item.clear(); // Set all defaults fields
-    this.update(item);
-  }
-
-  update(item: DepartmentModel) {
     let saveMessageTranslateParam = '';
     saveMessageTranslateParam += item.RowID > 0 ? 'Cập nhật thành công' : 'Thêm thành công';
     const saveMessage = this.translate.instant(saveMessageTranslateParam);
     const messageType = item.RowID > 0 ? MessageType.Update : MessageType.Create;
     const dialogRef = this.dialog.open(DepartmentManagementEditDialogComponent, { data: { item } });
-    dialogRef.afterClosed().subscribe((res) => {
+    const sb = dialogRef.afterClosed().subscribe((res) => {
       if (!res) {
         this.departmentManagementService.fetch();
       } else {
@@ -101,6 +107,24 @@ export class DepartmentManagementListComponent implements OnInit {
         this.departmentManagementService.fetch();
       }
     });
+    this.subscriptions.push(sb);
+  }
+
+  update(item: DepartmentManagementDTO) {
+    let saveMessageTranslateParam = '';
+    saveMessageTranslateParam += item.RowID > 0 ? 'Cập nhật thành công' : 'Thêm thành công';
+    const saveMessage = this.translate.instant(saveMessageTranslateParam);
+    const messageType = item.RowID > 0 ? MessageType.Update : MessageType.Create;
+    const dialogRef = this.dialog.open(DepartmentManagementEditDialogComponent, { data: { item } });
+    const sb = dialogRef.afterClosed().subscribe((res) => {
+      if (!res) {
+        this.departmentManagementService.fetch();
+      } else {
+        this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+        this.departmentManagementService.fetch();
+      }
+    });
+    this.subscriptions.push(sb);
   }
 
   getHeight(): any {
@@ -114,10 +138,10 @@ export class DepartmentManagementListComponent implements OnInit {
     saveMessageTranslateParam += 'Thay đổi tình trạng thành công';
     const saveMessage = this.translate.instant(saveMessageTranslateParam);
     const messageType = MessageType.Create;
-    const dialogRef = this.dialog.open(DepartmentChangeTinhTrangEditDialogComponent, {
+    const dialogRef = this.dialog.open(ChangeTinhTrangDepartmentEditDialogComponent, {
       data: { RowID: RowID },
     });
-    dialogRef.afterClosed().subscribe((res) => {
+    const sb = dialogRef.afterClosed().subscribe((res) => {
       if (!res) {
         this.departmentManagementService.fetch();
       } else {
@@ -125,9 +149,58 @@ export class DepartmentManagementListComponent implements OnInit {
         this.departmentManagementService.fetch();
       }
     });
+    this.subscriptions.push(sb);
   }
 
-  delete(item) {}
+  delete(RowID: number) {
+    let saveMessageTranslateParam = 'COMMOM.XOATHANHCONG';
+    const saveMessage = this.translate.instant(saveMessageTranslateParam);
+    const messageType = MessageType.Create;
+    const dialogRef = this.dialog.open(DeleteEntityDialogComponent, {
+      data: {},
+      width: '450px',
+    });
+    const sb = dialogRef.afterClosed().subscribe((res) => {
+      if (!res) {
+        this.departmentManagementService.fetch();
+      } else {
+        this.departmentManagementService.Delete(RowID).subscribe(
+          (res) => {
+            this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+          },
+          (error) => {
+            this.layoutUtilsService.showActionNotification(error.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
+          },
+          () => {
+            this.departmentManagementService.fetch();
+          }
+        );
+      }
+    });
+    this.subscriptions.push(sb);
+  }
 
-  openQuanLyTrucTiepEdit(username, DirectManager) {}
+  openQuanLyTrucTiepEdit(RowID: number, DepartmentManager: string) {
+    let saveMessageTranslateParam = '';
+    DepartmentManager === '' ? (saveMessageTranslateParam += 'Thêm thành công') : (saveMessageTranslateParam += 'Cập nhật thành công');
+    const saveMessage = this.translate.instant(saveMessageTranslateParam);
+
+    const dialogRef = this.dialog.open(DepartmentQuanLytrucTiepEditDialogComponent, {
+      data: { RowID, DepartmentManager },
+    });
+    const sb = dialogRef.afterClosed().subscribe((res) => {
+      if (!res) {
+        this.departmentManagementService.fetch();
+      } else {
+        this.layoutUtilsService.showActionNotification(saveMessage, MessageType.Create, 4000, true, false);
+        this.departmentManagementService.fetch();
+      }
+    });
+    this.subscriptions.push(sb);
+  }
+
+  ngOnDestroy(): void {
+    this.departmentManagementService.ngOnDestroy();
+    this.subscriptions.forEach((sb) => sb.unsubscribe());
+  }
 }

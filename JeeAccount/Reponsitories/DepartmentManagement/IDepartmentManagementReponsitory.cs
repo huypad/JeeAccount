@@ -18,6 +18,14 @@ namespace JeeAccount.Reponsitories
 
         bool CheckDepartmentExist(long CustomerID, string connectionString);
 
-        ReturnSqlModel ChangeTinhTrang(long customerID, long RowID, string Note, long UserIdLogin);
+        void ChangeTinhTrang(long customerID, long RowID, string Note, long UserIdLogin);
+
+        void UpdateDepartment(DepartmentModel departmentModel, long CustomerID, string Username, bool isJeeHR = false);
+
+        DepartmentModel GetDepartment(int rowid, long CustomerID);
+
+        void UpdateDepartmentManager(string UsernameModifiedBy, long customerID, string DirectManagerUsername, int departmemntID);
+
+        void DeleteDepartmentManager(string DeletedBy, long customerID, int departmemntID);
     }
 }

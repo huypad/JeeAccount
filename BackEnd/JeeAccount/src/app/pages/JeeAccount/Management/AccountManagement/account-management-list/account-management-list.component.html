@@ -52,10 +52,10 @@
               (sort)="sort($event)"
             ></app-sort-icon>
           </th>
-          <th style="min-width: 150px">
+          <th style="min-width: 250px; text-align: center">
             <span>{{ 'ACCOUNTMANAGEMENT.QUANLYTRUCTIEP' | translate }}</span>
           </th>
-          <th style="min-width: 100px">
+          <th style="min-width: 150px; text-align: center">
             <span>{{ 'COMMOM.TINHTRANG' | translate }}</span>
             <app-sort-icon
               column="tinhtrang"
@@ -67,7 +67,7 @@
           <th style="min-width: 150px">
             <span>{{ 'COMMOM.GHICHU' | translate }}</span>
           </th>
-          <th style="min-width: 100px">
+          <th style="min-width: 100px; text-align: center">
             <span>{{ 'COMMOM.THAOTAC' | translate }}</span>
           </th>
         </thead>
@@ -113,26 +113,28 @@
             <td>
               <span>{{ r.Jobtitle }}</span>
             </td>
-            <td>
-              <div style="cursor: pointer" (click)="openQuanLyTrucTiepEdit(r.Username, r.DirectManager)">
+            <td style="text-align: center">
+              <div style="cursor: pointer" (click)="openQuanLyTrucTiepEdit(r.Username, r.DirectManagerUsername)">
                 <span *ngIf="r.DirectManager != ''">{{ r.DirectManager }}</span>
                 <span *ngIf="r.DirectManager == ''">
                   <mat-icon>person_add</mat-icon>
                 </span>
               </div>
             </td>
-            <td style="justify-content: center">
+            <td style="text-align: center">
               <mat-slide-toggle (click)="changeTinhTrang(r.Username)" [checked]="r.IsActive"> </mat-slide-toggle>
             </td>
             <td>
               <span>{{ r.Note }}</span>
             </td>
-            <td>
+            <td style="text-align: center">
               <mat-icon (click)="update(r)" style="cursor: pointer; color: #1bc5bd; font-size: 16px" aria-hidden="false">
                 mode_edit</mat-icon
               >
               &nbsp;
-              <mat-icon (click)="delete(r)" style="cursor: pointer; color: red; font-size: 16px" aria-hidden="false">delete </mat-icon>
+              <mat-icon (click)="delete(r.UserId)" style="cursor: pointer; color: red; font-size: 16px" aria-hidden="false"
+                >delete
+              </mat-icon>
             </td>
           </tr>
         </tbody>

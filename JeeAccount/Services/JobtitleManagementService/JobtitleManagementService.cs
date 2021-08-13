@@ -272,5 +272,20 @@ namespace JeeAccount.Services.JobtitleManagementService
         {
             _reponsitory.CreateJobtitle(JobtitleModel, CustomerID, Username);
         }
+
+        public JobtitleModel GetJobtitle(int rowid, long CustomerID)
+        {
+            return _reponsitory.GetJobtitle(rowid, CustomerID);
+        }
+
+        public void UpdateJobtitle(JobtitleModel job, long CustomerID, string Username, bool isJeeHR)
+        {
+            _reponsitory.UpdateJobtitle(job, CustomerID, Username, isJeeHR);
+        }
+
+        public void DeleteJobtile(string DeletedBy, long customerID, int departmemntID)
+        {
+            _reponsitory.DeleteJobtile(DeletedBy, customerID, departmemntID);
+        }
     }
 }

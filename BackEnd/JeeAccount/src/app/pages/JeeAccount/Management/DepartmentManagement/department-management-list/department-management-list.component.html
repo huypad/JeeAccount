@@ -5,7 +5,11 @@
       <span class="card-label">{{ 'DEPARTMANAGEMENT.DANHSACHPHONGBAN' | translate }}</span>
     </div>
     <div class="card-search">
-      <app-jee-search-form (keywordEvent)="changeKeyword($event)" (filterEvent)="changeFilter($event)"></app-jee-search-form>
+      <app-jee-search-form
+        [showSearch]="showSearch"
+        (keywordEvent)="changeKeyword($event)"
+        (filterEvent)="changeFilter($event)"
+      ></app-jee-search-form>
     </div>
     <div class="card-toolbar">
       <button mat-raised-button class="ja_button ja_btn-addnew" (click)="create()">{{ 'COMMOM.THEMMOI' | translate }}</button>
@@ -19,16 +23,16 @@
           <th style="min-width: 250px; padding-left: 32px">
             <span>{{ 'DEPARTMANAGEMENT.TENPHONGBANNHOM' | translate }}</span>
             <app-sort-icon
-              column="department"
+              column="phongbanid"
               [activeColumn]="sorting.column"
               [activeDirection]="sorting.direction"
               (sort)="sort($event)"
             ></app-sort-icon>
           </th>
-          <th style="min-width: 150px">
+          <th style="min-width: 150px; text-align: center">
             <span>{{ 'DEPARTMANAGEMENT.QUANLYNHOM' | translate }}</span>
           </th>
-          <th style="min-width: 100px">
+          <th style="min-width: 100px; text-align: center">
             <span>{{ 'COMMOM.TINHTRANG' | translate }}</span>
             <app-sort-icon
               column="tinhtrang"
@@ -40,7 +44,7 @@
           <th style="min-width: 300px">
             <span>{{ 'COMMOM.GHICHU' | translate }}</span>
           </th>
-          <th style="min-width: 100px">
+          <th style="min-width: 100px; text-align: center">
             <span>{{ 'COMMOM.THAOTAC' | translate }}</span>
           </th>
         </thead>
@@ -52,25 +56,25 @@
               </div>
             </td>
             <td>
-              <div style="cursor: pointer" (click)="openQuanLyTrucTiepEdit(r.Username, r.DirectManager)">
+              <div style="cursor: pointer; text-align: center" (click)="openQuanLyTrucTiepEdit(r.RowID, r.DepartmentManagerUsername)">
                 <span *ngIf="r.DepartmentManager != ''">{{ r.DepartmentManager }}</span>
                 <span *ngIf="r.DepartmentManager == ''">
                   <mat-icon>person_add</mat-icon>
                 </span>
               </div>
             </td>
-            <td style="justify-content: center">
-              <mat-slide-toggle (click)="changeTinhTrang(r.Username)" [checked]="r.IsActive"> </mat-slide-toggle>
+            <td style="text-align: center">
+              <mat-slide-toggle (click)="changeTinhTrang(r.RowID)" [checked]="r.IsActive"> </mat-slide-toggle>
             </td>
             <td>
               <span>{{ r.Note }}</span>
             </td>
-            <td>
+            <td style="text-align: center">
               <mat-icon (click)="update(r)" style="cursor: pointer; color: #1bc5bd; font-size: 16px" aria-hidden="false">
                 mode_edit</mat-icon
               >
               &nbsp;
-              <mat-icon (click)="delete(r)" style="cursor: pointer; color: red; font-size: 16px" aria-hidden="false">delete </mat-icon>
+              <mat-icon (click)="delete(r.RowID)" style="cursor: pointer; color: red; font-size: 16px" aria-hidden="false">delete </mat-icon>
             </td>
           </tr>
         </tbody>

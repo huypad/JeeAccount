@@ -73,5 +73,7 @@ namespace JeeAccount.Services.AccountManagementService
         Task<IEnumerable<CheckEditAppListByDTO>> GetEditListAppByUserIDByListCustomerId(long userid, long customerid);
 
         Task UpdateAccount(bool isJeeHR, string Admin_accessToken, long customerID, string usernameCreatedBy, AccountManagementModel account);
+
+        Task DeleteAccountManagement(string token, string DeletedBy, long DeletedByID, long customerID, long userid);
     }
 }

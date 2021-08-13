@@ -115,6 +115,7 @@ export const locale = {
       THEMTHANHCONG: 'Thêm thành công',
       THEMKHACHHANG: 'Thêm khách hàng',
       CAPNHATTHANHCONG: 'Cập nhật thành công',
+      XOATHANHCONG: 'Xoá thành công',
       LUU: 'Lưu',
       TROLAI: 'Trở lại',
       DONG: 'Đóng',
@@ -151,6 +152,8 @@ export const locale = {
       NOTACTIVE: 'Đã khoá',
       TIMKIEM: 'Tìm kiếm',
       SEARCH1: 'Tìm theo tên, username, phòng ban, chức vụ',
+      SEARCH2: 'Tìm kiếm theo tên phòng ban, nhóm',
+      SEARCH3: 'Tìm kiếm theo tên chức vụ',
       SELECTCHUCVUALL: 'Toàn bộ chức vụ',
       TIMKIEMTHEOTENCHUCVU: 'Tìm kiếm theo tên chức vụ',
       TIMKIEMTHEOTENPHONGBAN: 'Tìm kiếm theo tên phòng ban',
@@ -182,8 +185,18 @@ export const locale = {
     },
     DEPARTMANAGEMENT: {
       DANHSACHPHONGBAN: 'Danh sách phòng ban, nhóm',
-      TENPHONGBANNHOM:'Tên phòng ban nhóm',
-      QUANLYNHOM: 'Quản lý nhóm'
+      TENPHONGBANNHOM: 'Tên phòng ban nhóm',
+      QUANLYNHOM: 'Quản lý nhóm',
+      THEMMOI: 'Thêm mới phòng ban, nhóm',
+      THEMQUANLYNHOM: 'Thêm quản lý nhóm',
+      THEMTHANHVIEN: 'Thêm thành viên',
+      THANHVIEN: 'Thành viên',
+      THAYDOITINHTRANGPHONGBAN: 'Thay đổi tình trạng phòng ban',
+    },
+    JOBTITLEMANAGEMENT: {
+      DANHSACH: 'Danh sách chức vụ',
+      TENCHUCVU: 'Tên chức vụ',
+      THEMMOI: 'Thêm mới chức vụ',
     },
     jeechat: {
       send: 'Gửi',

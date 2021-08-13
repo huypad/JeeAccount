@@ -1,0 +1,36 @@
+<div class="modal-content">
+  <div class="modal-header">
+    <div class="modal-title h4" id="example-modal-sizes-title-lg">
+      <span class="dialog-title">{{ 'DEPARTMANAGEMENT.THAYDOITINHTRANGPHONGBAN' | translate }}</span>
+    </div>
+    <div class="modal-title" style="display: inline">
+      <button
+        [disabled]="isLoadingSubmit$ | async"
+        [class.spinner]="isLoadingSubmit$ | async"
+        mat-raised-button
+        style="float: right; margin: 0"
+        class="ja_btn-addnew"
+        (click)="onSubmit()"
+      >
+        {{ 'COMMOM.LUU' | translate }}
+      </button>
+      <button mat-raised-button style="float: right; margin: 0; margin-right: 12px" class="ja_btn-goback" (click)="goBack()">
+        {{ 'COMMOM.TROLAI' | translate }}
+      </button>
+    </div>
+  </div>
+  <div class="overlay overlay-block cursor-default modal-body overflow-auto">
+    <ng-container>
+      <form [formGroup]="itemForm">
+        <div class="row">
+          <div class="col-md-12">
+            <mat-form-field class="mat-form-field-fluid">
+              <textarea cols="12" rows="4" formControlName="GhiChu" placeholder="{{ 'COMMOM.GHICHU' | translate }}" matInput required>
+              </textarea>
+            </mat-form-field>
+          </div>
+        </div>
+      </form>
+    </ng-container>
+  </div>
+</div>

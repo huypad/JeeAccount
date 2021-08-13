@@ -10,6 +10,8 @@ namespace JeeAccount.Models.JobtitleManagement
         public long RowID { get; set; }
         public string JobtitleName { get; set; }
         public List<string> ThanhVien { get; set; }
+        public List<string> ThanhVienDelete { get; set; }
         public string Note { get; set; }
+        public string Description { get; set; }
     }
 }

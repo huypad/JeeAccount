@@ -3,15 +3,19 @@ export class DepartmentModel {
   public DepartmentName: string;
   public DepartmentManager: string;
   public ThanhVien: string[];
+  public ThanhVienDelete: string[];
   public Note: string;
+  public Description: string;
   public Fullname: string;
   clear() {
     this.RowID = 0;
     this.DepartmentManager = '';
     this.DepartmentName = '';
     this.ThanhVien = [];
+    this.ThanhVienDelete = [];
     this.Note = '';
     this.Fullname = '';
+    this.Description = '';
   }
 }
 
@@ -33,6 +37,7 @@ export interface DepartmentManagementDTO {
   IsActive: boolean;
   Note: string;
   RowID: number;
+  Description: string;
 }
 
 export interface TreeJeeHRDepartmentDTO {
@@ -54,4 +59,14 @@ export interface DepartmentManagement {
   isJeeHR: boolean;
   isTree: boolean;
   tree: TreeJeeHRDepartmentDTO[];
+}
+
+export class DepDirectManagerModel {
+  RowID: number;
+  DepartmentManager: string;
+
+  clear() {
+    this.RowID = 0;
+    this.DepartmentManager = '';
+  }
 }

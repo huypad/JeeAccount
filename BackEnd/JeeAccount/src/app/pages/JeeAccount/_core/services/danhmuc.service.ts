@@ -1,3 +1,4 @@
+import { JobtitleManagementDTO } from './../../Management/JobtitleManagement/Model/jobtitle-management.model';
 import { SelectModel } from './../../_shared/jee-search-form/jee-search-form.model';
 import { DepartmentManagement } from './../../Management/DepartmentManagement/Model/department-management.model';
 import { Injectable } from '@angular/core';
@@ -58,7 +59,7 @@ export class DanhMucChungService {
     return this.http.get<any>(url, { headers: httpHeaders });
   }
 
-  getDSChucvu(): Observable<ResultObjectModel<SelectModel[]>> {
+  getDSChucvu(): Observable<ResultObjectModel<JobtitleManagementDTO[]>> {
     const httpHeaders = this.httpUtils.getHTTPHeaders();
     const url = API_URL + `/jobtitlemanagement/GetListJobtitleManagement?query.more=true`;
     return this.http.get<any>(url, { headers: httpHeaders });

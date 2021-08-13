@@ -478,7 +478,6 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
                             await _producer.PublishAsync(TopicAddNewCustomerUser, JsonConvert.SerializeObject(obj));
                         }
                     }
-
                 }
                 catch (Exception)
                 {
@@ -520,7 +519,7 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
             personalInfo.JobtitleID = account.JobtitleID;
             personalInfo.Structure = "";
             personalInfo.StructureID = account.cocauid.ToString();
-            personalInfo.BgColor = GeneralService.GetColorNameUser(personalInfo.Name);
+            personalInfo.BgColor = GeneralService.GetColorNameUser(GeneralService.GetFirstname(account.Fullname));
             JeeAccountCustomDataModel jee = new JeeAccountCustomDataModel();
             jee.AppCode = account.AppCode;
             jee.CustomerID = customerID;
@@ -741,6 +740,26 @@ $"or AccountList.Department like N'%{query.filter["keyword"]}%')";
                 lst.Add(editApp);
             }
             return lst;
+        }
+
+        public async Task DeleteAccountManagement(string token, string DeletedBy, long DeletedByID, long customerID, long userid)
+        {
+            try
+            {
+                _reponsitory.DeleteAccountManagement(DeletedBy, customerID, userid);
+                var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, userid);
+                var identity = new IdentityServerController();
+                var response = await identity.changeUserStateAsync(token, commonInfo.Username, true);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var res = JsonConvert.DeserializeObject<IdentityServerReturn>(await response.Content.ReadAsStringAsync());
+                    throw new Exception(res.message);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         #endregion api new

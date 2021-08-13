@@ -76,12 +76,12 @@ namespace JeeAccount.Controllers
                 var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return Ok(MessageReturnHelper.CustomDataKhongTonTai());
+                    return BadRequest(MessageReturnHelper.CustomDataKhongTonTai());
                 }
                 var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
                 if (token is null)
                 {
-                    return Ok(MessageReturnHelper.DangNhap());
+                    return BadRequest(MessageReturnHelper.DangNhap());
                 }
                 var obj = await _service.GetDSPhongBan(query, customData.JeeAccount.CustomerID, token).ConfigureAwait(false);
 
@@ -109,7 +109,7 @@ namespace JeeAccount.Controllers
                 var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return JsonResultCommon.BatBuoc("Đăng nhập");
+                    return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
                 }
 
                 var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, customData.JeeAccount.UserID);
@@ -123,37 +123,136 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpPost("ChangeTinhTrang")]
-        public async Task<object> changeTinhTrang(DepChangeTinhTrangModel acc)
+        [HttpGet("GetDepartment/{rowid}")]
+        public IActionResult GetDepartment(int rowid)
         {
             try
             {
                 var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
                 if (customData is null)
                 {
-                    return await Task.FromResult(JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData"));
+                    return Unauthorized(MessageReturnHelper.DangNhap());
                 }
-
-                ReturnSqlModel update = _service.ChangeTinhTrang(customData.JeeAccount.CustomerID, acc.RowID, acc.Note, customData.JeeAccount.UserID);
-                if (!update.Susscess)
-                {
-                    if (update.ErrorCode.Equals(Constant.ERRORCODE_NOTEXIST))
-                    {
-                        return await Task.FromResult(JsonResultCommon.KhongTonTai("tài khoản"));
-                    }
-                    if (update.ErrorCode.Equals(Constant.ERRORCODE_EXCEPTION))
-                    {
-                        // TODO: bổ sung ghi log sau
-                        string logMessage = update.ErrorMessgage;
-
-                        return Task.FromResult(JsonResultCommon.ThatBai(update.ErrorMessgage));
-                    }
-                }
-                return await Task.FromResult(JsonResultCommon.ThanhCong(update));
+                if (GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID)) return BadRequest(MessageReturnHelper.Custom("Api này không dùng cho khách hàng có sử dụng JeeHR"));
+                return Ok(_service.GetDepartment(rowid, customData.JeeAccount.CustomerID));
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieuException(ex));
             }
             catch (Exception ex)
             {
-                return await Task.FromResult(JsonResultCommon.Exception(ex));
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpPost("UpdateDepartment")]
+        public IActionResult UpdateDepartment(DepartmentModel depart)
+        {
+            try
+            {
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+
+                var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, customData.JeeAccount.UserID);
+                var isJeeHR = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
+                _service.UpdateDepartment(depart, customData.JeeAccount.CustomerID, commonInfo.Username, isJeeHR);
+                return Ok(MessageReturnHelper.ThanhCong());
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieuException(ex));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpPost("UpdateDepartmentManager")]
+        public IActionResult UpdateDepartmentManager(UpdateDepartmentManagerModel depart)
+        {
+            try
+            {
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+                var Username = Ulities.GetUsernameByHeader(HttpContext.Request.Headers);
+                if (Username is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+                _service.UpdateDepartmentManager(Username, customData.JeeAccount.CustomerID, depart.DepartmentManager, depart.RowID);
+                return Ok(MessageReturnHelper.ThanhCong());
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieuException(ex));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpPost("ChangeTinhTrang")]
+        public IActionResult changeTinhTrang(DepChangeTinhTrangModel acc)
+        {
+            try
+            {
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+
+                _service.ChangeTinhTrang(customData.JeeAccount.CustomerID, acc.RowID, acc.Note, customData.JeeAccount.UserID);
+                return Ok(MessageReturnHelper.ThanhCong());
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieuException(ex));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpDelete("Delete/{rowid}")]
+        public IActionResult Delete(int rowid)
+        {
+            try
+            {
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+                var Username = Ulities.GetUsernameByHeader(HttpContext.Request.Headers);
+                if (Username is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+                _service.DeleteDepartmentManager(Username, customData.JeeAccount.CustomerID, rowid);
+                return Ok(MessageReturnHelper.ThanhCong());
+            }
+            catch (KhongDuocXoaException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongDuocXoaException(ex));
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieuException(ex));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
             }
         }
     }

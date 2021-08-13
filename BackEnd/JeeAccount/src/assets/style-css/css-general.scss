@@ -278,6 +278,12 @@ body .mat-select-required .mat-select-value {
       box-sizing: border-box;
       height: 48px;
       padding: 0 6px;
+      border-bottom: #f2f3f8 1px solid;
+    }
+
+    tr:hover {
+      background-color: #f2f3f8;
+      cursor: pointer;
     }
   }
 }

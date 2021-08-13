@@ -11,6 +11,14 @@ namespace JeeAccount.Models.DepartmentManagement
         public string DepartmentName { get; set; }
         public string DepartmentManager { get; set; }
         public List<string> ThanhVien { get; set; }
+        public List<string> ThanhVienDelete { get; set; }
         public string Note { get; set; }
+        public string Description { get; set; }
+    }
+
+    public class UpdateDepartmentManagerModel
+    {
+        public int RowID { get; set; }
+        public string DepartmentManager { get; set; }
     }
 }

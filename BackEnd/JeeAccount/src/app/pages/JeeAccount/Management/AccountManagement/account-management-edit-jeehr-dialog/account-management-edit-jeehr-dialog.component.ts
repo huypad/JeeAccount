@@ -255,7 +255,7 @@ export class AccountManagementEditJeeHRDialogComponent implements OnInit, OnDest
   }
   create(acc: AccountManagementModel, withBack: boolean = false) {
     this.isLoadingSubmit$.next(true);
-    this.accountManagementService
+    const sb = this.accountManagementService
       .createAccount(acc)
       .pipe(
         tap((res) => {
@@ -282,6 +282,7 @@ export class AccountManagementEditJeeHRDialogComponent implements OnInit, OnDest
           this._errorMessage$.next(error);
         }
       );
+    this.subscriptions.push(sb);
   }
   goBack() {
     if (this.checkDataBeforeClose()) {

@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { ReplaySubject, BehaviorSubject } from 'rxjs';
+import { ReplaySubject, BehaviorSubject, Subscription } from 'rxjs';
 import { AccountManagementService } from '../Services/account-management.service';
 import { AccDirectManagerModel } from '../Model/account-management.model';
 import { NhanVienMatchip } from '../../../_core/models/danhmuc.model';
@@ -14,7 +14,7 @@ import { ResultModel } from '../../../_core/models/_base.model';
   templateUrl: './quan-ly-truc-tiep-edit-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class QuanLytrucTiepEditDialogComponent implements OnInit {
+export class QuanLytrucTiepEditDialogComponent implements OnInit, OnDestroy {
   itemForm = this.fb.group({
     QuanLyNhom: [],
     FilterQuanLyNhom: [],
@@ -25,6 +25,7 @@ export class QuanLytrucTiepEditDialogComponent implements OnInit {
   isLoadingSubmit$: BehaviorSubject<boolean>;
   isLoading$: BehaviorSubject<boolean>;
   // End
+  private subscriptions: Subscription[] = [];
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -36,10 +37,14 @@ export class QuanLytrucTiepEditDialogComponent implements OnInit {
     private layoutUtilsService: LayoutUtilsService
   ) {}
 
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((sb) => sb.unsubscribe());
+    this.accountManagementService.ngOnDestroy();
+  }
   ngOnInit(): void {
     this.isLoadingSubmit$ = new BehaviorSubject(false);
     this.isLoading$ = new BehaviorSubject(true);
-    this.danhmucService.GetMatchipNhanVien().subscribe((res: ResultModel<NhanVienMatchip>) => {
+    const sb = this.danhmucService.GetMatchipNhanVien().subscribe((res: ResultModel<NhanVienMatchip>) => {
       if (res && res.status === 1) {
         // ngx
         this.quanLys = [...res.data];
@@ -50,12 +55,13 @@ export class QuanLytrucTiepEditDialogComponent implements OnInit {
         });
         //  init data
         if (this.data.DirectManager) {
-          const index = this.quanLys.findIndex((x) => x.Username === this.data.DirectManager);
-          this.itemForm.controls.QuanLyNhom.setValue(this.quanLys[index].Username);
+          console.log(this.data);
+          this.itemForm.controls.QuanLyNhom.setValue(this.data.DirectManager);
         }
         this.isLoading$.next(false);
       }
     });
+    this.subscriptions.push(sb);
   }
   onSubmit() {
     if (this.itemForm.valid) {
@@ -81,7 +87,7 @@ export class QuanLytrucTiepEditDialogComponent implements OnInit {
   }
   update(directManagement: AccDirectManagerModel) {
     this.isLoadingSubmit$.next(true);
-    this.accountManagementService.UpdateDirectManager(directManagement).subscribe((res) => {
+    const sb = this.accountManagementService.UpdateDirectManager(directManagement).subscribe((res) => {
       if (res && res.status === 1) {
         this.dialogRef.close(res);
       } else {
@@ -89,6 +95,7 @@ export class QuanLytrucTiepEditDialogComponent implements OnInit {
       }
       this.isLoadingSubmit$.next(false);
     });
+    this.subscriptions.push(sb);
   }
 
   initDataFromFB(): AccDirectManagerModel {

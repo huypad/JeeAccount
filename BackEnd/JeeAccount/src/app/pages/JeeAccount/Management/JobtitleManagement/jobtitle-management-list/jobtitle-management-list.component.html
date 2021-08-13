@@ -1,0 +1,75 @@
+<style></style>
+<div class="card card-custom card-sticky gutter-b">
+  <div class="card-header">
+    <div class="card-title">
+      <span class="card-label">{{ 'JOBTITLEMANAGEMENT.DANHSACH' | translate }}</span>
+    </div>
+    <div class="card-toolbar">
+      <button mat-raised-button class="ja_button ja_btn-addnew" (click)="create()">{{ 'COMMOM.THEMMOI' | translate }}</button>
+    </div>
+  </div>
+  <!-- body -->
+  <div class="card-body">
+    <div class="table-responsive angular-bootstrap-table" [ngStyle]="{ height: getHeight() }">
+      <table class="table table-head-custom table-vertical-center overflow-hidden">
+        <thead>
+          <th style="min-width: 250px; padding-left: 32px">
+            <span>{{ 'JOBTITLEMANAGEMENT.TENCHUCVU' | translate }}</span>
+            <app-sort-icon
+              column="chucvu"
+              [activeColumn]="sorting.column"
+              [activeDirection]="sorting.direction"
+              (sort)="sort($event)"
+            ></app-sort-icon>
+          </th>
+          <th style="min-width: 100px; text-align: center">
+            <span>{{ 'COMMOM.TINHTRANG' | translate }}</span>
+            <app-sort-icon
+              column="tinhtrang"
+              [activeColumn]="sorting.column"
+              [activeDirection]="sorting.direction"
+              (sort)="sort($event)"
+            ></app-sort-icon>
+          </th>
+          <th style="min-width: 300px">
+            <span>{{ 'COMMOM.GHICHU' | translate }}</span>
+          </th>
+          <th style="min-width: 100px; text-align: center">
+            <span>{{ 'COMMOM.THAOTAC' | translate }}</span>
+          </th>
+        </thead>
+        <tbody *ngIf="jobtitleManagementService.items$ | async">
+          <tr *ngFor="let r of jobtitleManagementService.items$ | async">
+            <td style="padding-left: 32px">
+              <div>
+                <span>{{ r.Title }}</span>
+              </div>
+            </td>
+            <td style="text-align: center">
+              <mat-slide-toggle (click)="changeTinhTrang(r.RowID)" [checked]="r.IsActive"> </mat-slide-toggle>
+            </td>
+            <td>
+              <span>{{ r.Note }}</span>
+            </td>
+            <td style="text-align: center">
+              <mat-icon (click)="update(r)" style="cursor: pointer; color: #1bc5bd; font-size: 16px" aria-hidden="false">
+                mode_edit</mat-icon
+              >
+              &nbsp;
+              <mat-icon (click)="delete(r.RowID)" style="cursor: pointer; color: red; font-size: 16px" aria-hidden="false"
+                >delete
+              </mat-icon>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- end: Table -->
+    <app-paginator
+      class="d-flex justify-content-between align-items-center flex-wrap"
+      [paginator]="paginator"
+      [isLoading]="isLoading"
+      (paginate)="paginate($event)"
+    ></app-paginator>
+  </div>
+</div>

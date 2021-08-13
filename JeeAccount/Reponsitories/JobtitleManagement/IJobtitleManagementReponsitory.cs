@@ -19,5 +19,11 @@ namespace JeeAccount.Reponsitories.JobtitleManagement
         void CreateJobtitle(JobtitleModel JobtitleModel, long CustomerID, string Username);
 
         bool CheckJobtitleExist(long CustomerID, string connectionString);
+
+        JobtitleModel GetJobtitle(int rowid, long CustomerID);
+
+        void UpdateJobtitle(JobtitleModel job, long CustomerID, string Username, bool isJeeHR);
+
+        void DeleteJobtile(string DeletedBy, long customerID, int departmemntID);
     }
 }

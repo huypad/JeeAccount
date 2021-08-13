@@ -1,22 +1,23 @@
 import { LayoutUtilsService, MessageType } from './../../../_core/utils/layout-utils.service';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AccChangeTinhTrangModel } from '../../AccountManagement/Model/account-management.model';
 import { AccountManagementService } from '../Services/account-management.service';
 import { DanhMucChungService } from '../../../_core/services/danhmuc.service';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-change-tinh-trang-edit-dialog',
   templateUrl: './change-tinh-trang-edit-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ChangeTinhTrangEditDialogComponent implements OnInit {
+export class ChangeTinhTrangEditDialogComponent implements OnInit, OnDestroy {
   itemForm = this.fb.group({
     GhiChu: ['', [Validators.required]],
   });
   isLoadingSubmit$: BehaviorSubject<boolean>;
+  private subscriptions: Subscription[] = [];
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -39,7 +40,7 @@ export class ChangeTinhTrangEditDialogComponent implements OnInit {
   }
   update(accChangTinhTrang: AccChangeTinhTrangModel) {
     this.isLoadingSubmit$.next(true);
-    this.accountManagementService.changeTinhTrang(accChangTinhTrang).subscribe(
+    const sb = this.accountManagementService.changeTinhTrang(accChangTinhTrang).subscribe(
       (res) => {
         if (res) {
           this.isLoadingSubmit$.next(false);
@@ -51,6 +52,7 @@ export class ChangeTinhTrangEditDialogComponent implements OnInit {
         this.layoutUtilsService.showActionNotification(error.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
       }
     );
+    this.subscriptions.push(sb);
   }
 
   initDataFromFB(): AccChangeTinhTrangModel {
@@ -74,5 +76,9 @@ export class ChangeTinhTrangEditDialogComponent implements OnInit {
 
   goBack() {
     this.dialogRef.close();
+  }
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((sb) => sb.unsubscribe());
+    this.accountManagementService.ngOnDestroy();
   }
 }

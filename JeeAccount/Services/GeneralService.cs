@@ -81,6 +81,7 @@ namespace JeeAccount.Services
 
         public static string GetColorNameUser(string name)
         {
+            if (name.Length > 1) name = name.Substring(0, 1);
             var result = "";
             switch (name)
             {

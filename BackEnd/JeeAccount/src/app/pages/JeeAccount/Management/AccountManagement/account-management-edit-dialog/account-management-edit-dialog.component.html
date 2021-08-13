@@ -135,7 +135,7 @@
                       >
                       </ngx-mat-select-search>
                     </mat-option>
-                    <mat-option *ngFor="let phongban of filterPhongBans | async" [value]="phongban.RowID">
+                    <mat-option *ngFor="let phongban of filterPhongBans | async" [value]="phongban.RowID" [disabled]="!phongban.IsActive">
                       {{ phongban.DepartmentName }}
                     </mat-option>
                   </mat-select>
@@ -154,7 +154,7 @@
                       >
                       </ngx-mat-select-search>
                     </mat-option>
-                    <mat-option *ngFor="let chucvu of filterChucVus | async" [value]="chucvu.RowID">
+                    <mat-option [disabled]="!chucvu.IsActive" *ngFor="let chucvu of filterChucVus | async" [value]="chucvu.RowID">
                       {{ chucvu.Title }}
                     </mat-option>
                   </mat-select>

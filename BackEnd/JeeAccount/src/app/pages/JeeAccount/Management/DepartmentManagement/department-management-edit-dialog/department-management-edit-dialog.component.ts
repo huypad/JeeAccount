@@ -13,13 +13,13 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DepartmentManagementService } from '../Sevices/department-management.service';
 import { AppListDTO } from '../../AccountManagement/Model/account-management.model';
-import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, Observable, ReplaySubject, Subscription } from 'rxjs';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { map, startWith } from 'rxjs/operators';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatSelect } from '@angular/material/select';
-import { DepartmentModel } from '../Model/department-management.model';
+import { DepartmentManagement, DepartmentManagementDTO, DepartmentModel } from '../Model/department-management.model';
 import { NhanVienMatchip } from '../../../_core/models/danhmuc.model';
 import { DanhMucChungService } from '../../../_core/services/danhmuc.service';
 import { LayoutUtilsService, MessageType } from '../../../_core/utils/layout-utils.service';
@@ -31,13 +31,13 @@ import { ResultModel } from '../../../_core/models/_base.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DepartmentManagementEditDialogComponent implements OnInit {
-  item: any = [];
+  item: any;
   itemForm = this.fb.group({
-    TenPhongBan: ['' + this.item, [Validators.required]],
-    QuanLyNhom: ['' + this.item],
+    TenPhongBan: ['', [Validators.required]],
+    QuanLyNhom: [''],
     FilterQuanLyNhom: [],
-    ThanhVien: ['' + this.item],
-    MoTa: ['' + this.item],
+    ThanhVien: [''],
+    MoTa: [''],
   });
   // Mat chip area
   visible = true;
@@ -46,11 +46,15 @@ export class DepartmentManagementEditDialogComponent implements OnInit {
   separatorKeysCodes: number[] = [ENTER, COMMA];
   filteredThanhViens: Observable<NhanVienMatchip[]>;
   thanhViens: string[] = [];
+  thanhViensDelete: string[] = [];
   allThanhviens: NhanVienMatchip[] = [];
   // End
   // ngx-mat-search area
   quanLys: NhanVienMatchip[] = [];
   filterQuanLys: ReplaySubject<NhanVienMatchip[]> = new ReplaySubject<NhanVienMatchip[]>();
+  isLoadingSubmit$: BehaviorSubject<boolean>;
+  isLoading$: BehaviorSubject<boolean>;
+  private subscriptions: Subscription[] = [];
   // End
   @ViewChild('thanhVienInput') thanhVienInput: ElementRef<HTMLInputElement>;
   @ViewChild('autoThanhVien') matAutocomplete: MatAutocomplete;
@@ -60,14 +64,30 @@ export class DepartmentManagementEditDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<DepartmentManagementEditDialogComponent>,
     private fb: FormBuilder,
     private departmentManagementService: DepartmentManagementService,
-    private changeDetect: ChangeDetectorRef,
     private danhmucService: DanhMucChungService,
-    private layoutUtilsService: LayoutUtilsService
+    private layoutUtilsService: LayoutUtilsService,
+    public cd: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    this.isLoadingSubmit$ = new BehaviorSubject(false);
+    this.isLoading$ = new BehaviorSubject(true);
     this.item = this.data.item;
-    this.danhmucService.GetMatchipNhanVien().subscribe((res: ResultModel<NhanVienMatchip>) => {
+    if (this.item.RowID > 0) {
+      this.isLoading$.next(true);
+      const sb2 = this.departmentManagementService.GetDepart(this.item.RowID).subscribe(
+        (res) => {
+          this.thanhViens = res.ThanhVien;
+          this.isLoading$.next(false);
+          this.cd.detectChanges();
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+      this.subscriptions.push(sb2);
+    }
+    const sb = this.danhmucService.GetMatchipNhanVien().subscribe((res: ResultModel<NhanVienMatchip>) => {
       if (res && res.status === 1) {
         // mat-chip
         this.allThanhviens = res.data;
@@ -75,50 +95,94 @@ export class DepartmentManagementEditDialogComponent implements OnInit {
           startWith(null),
           map((fruit: string | null) => (fruit ? this._filter(fruit) : this.allThanhviens.slice()))
         );
-        // ngx
+        // ngx search from
         this.quanLys = [...res.data];
         this.filterQuanLys.next([...res.data]);
         // listen for search field value changes
+        this.itemForm.controls.QuanLyNhom.patchValue(this.item.DepartmentManagerUsername);
         this.itemForm.controls.FilterQuanLyNhom.valueChanges.subscribe(() => {
           this.filterBanks();
         });
-        this.singleSelect.compareWith = (a: NhanVienMatchip, b: NhanVienMatchip) => a && b && a.Username === b.Username;
+        this.isLoading$.next(false);
+        this.initData();
+        this.cd.detectChanges();
       }
     });
+    this.subscriptions.push(sb);
+    const sb3 = this.isLoading$.subscribe((res) => {
+      if (!res) {
+        if (this.thanhViens) {
+          this.allThanhviens = this.allThanhviens.filter((item) => !this.thanhViens.includes(item.Username));
+          this.filteredThanhViens = this.itemForm.controls.ThanhVien.valueChanges.pipe(
+            startWith(null),
+            map((fruit: string | null) => (fruit ? this._filter(fruit) : this.allThanhviens.slice()))
+          );
+        } else {
+          this.thanhViens = [];
+        }
+      }
+    });
+    this.subscriptions.push(sb3);
+  }
+
+  initData() {
+    this.itemForm.controls.TenPhongBan.patchValue(this.item.DepartmentName);
+    this.itemForm.controls.MoTa.patchValue(this.item.Description);
   }
   onSubmit() {
     if (this.itemForm.valid) {
-      if (this.item) {
-        console.log('update');
-      }
       const depart = this.initDataFromFB();
-      this.create(depart);
+      if (this.item.RowID > 0) {
+        this.update(depart);
+      } else {
+        this.create(depart);
+      }
     } else {
       this.validateAllFormFields(this.itemForm);
     }
   }
-  update() {}
+
   create(depart: DepartmentModel) {
+    this.isLoadingSubmit$.next(true);
     this.departmentManagementService.createDepart(depart).subscribe((res) => {
       if (res && res.status === 1) {
+        this.isLoadingSubmit$.next(false);
         this.dialogRef.close(res.data);
       } else {
+        this.isLoadingSubmit$.next(false);
         this.layoutUtilsService.showActionNotification(res.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
       }
     });
   }
+
+  update(depart: DepartmentModel) {
+    this.isLoadingSubmit$.next(true);
+    this.departmentManagementService.UpdateDepart(depart).subscribe(
+      (res) => {
+        this.isLoadingSubmit$.next(false);
+        this.dialogRef.close(res);
+      },
+      (error) => {
+        this.isLoadingSubmit$.next(false);
+        this.layoutUtilsService.showActionNotification(error.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
+      }
+    );
+  }
+
   initDataFromFB(): DepartmentModel {
     const depart = new DepartmentModel();
     depart.clear();
     depart.DepartmentManager = this.itemForm.controls.QuanLyNhom.value;
     depart.DepartmentName = this.itemForm.controls.TenPhongBan.value;
-    depart.Note = this.itemForm.controls.MoTa.value;
+    depart.Description = this.itemForm.controls.MoTa.value;
     if (this.item) {
       depart.RowID = this.item.RowID;
     }
     depart.ThanhVien = this.thanhViens;
+    depart.ThanhVienDelete = this.thanhViensDelete;
     return depart;
   }
+
   validateAllFormFields(formGroup: FormGroup) {
     Object.keys(formGroup.controls).forEach((field) => {
       const control = formGroup.get(field);
@@ -129,14 +193,20 @@ export class DepartmentManagementEditDialogComponent implements OnInit {
       }
     });
   }
+
   goBack() {
     this.dialogRef.close();
   }
+
   add(event: MatChipInputEvent): void {
     const input = event.input;
     const value = event.value;
     if (value) {
       this.thanhViens.push(value);
+      const index = this.thanhViensDelete.indexOf(value);
+      if (index >= 0) {
+        this.thanhViensDelete.splice(index, 1);
+      }
     }
     if (input) {
       input.value = '';
@@ -147,6 +217,7 @@ export class DepartmentManagementEditDialogComponent implements OnInit {
     const index = this.thanhViens.indexOf(username);
     if (index >= 0) {
       this.thanhViens.splice(index, 1);
+      this.thanhViensDelete.push(username);
     }
   }
   selected(event: MatAutocompleteSelectedEvent): void {
@@ -172,5 +243,10 @@ export class DepartmentManagementEditDialogComponent implements OnInit {
     }
     // filter the banks
     this.filterQuanLys.next(this.quanLys.filter((item) => item.Display.toLowerCase().indexOf(search) > -1));
+  }
+
+  ngOnDestroy(): void {
+    this.departmentManagementService.ngOnDestroy();
+    this.subscriptions.forEach((sb) => sb.unsubscribe());
   }
 }

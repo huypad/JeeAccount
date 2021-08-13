@@ -1008,8 +1008,46 @@ namespace JeeAccount.Controllers
                 {
                     return Unauthorized(MessageReturnHelper.DangNhap());
                 }
+
                 var common = GeneralReponsitory.GetCommonInfo(_connectionString, userid);
                 return Ok(common);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpDelete("Delete/{userid}")]
+        public async Task<IActionResult> Delete(long userid)
+        {
+            try
+            {
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+                var Username = Ulities.GetUsernameByHeader(HttpContext.Request.Headers);
+                if (Username is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+                await _service.DeleteAccountManagement(token, Username, customData.JeeAccount.UserID, customData.JeeAccount.CustomerID, userid);
+                return Ok(MessageReturnHelper.ThanhCong());
+            }
+            catch (KhongDuocXoaException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongDuocXoaException(ex));
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieuException(ex));
             }
             catch (Exception ex)
             {

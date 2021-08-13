@@ -64,32 +64,12 @@ namespace JeeAccount.Classes
             return identity;
         }
 
-        public static List<JeeHRCoCauToChucModelFromDB> LstJeeHRCoCauToChucModelFromDBFromLstDepartmentDTO(List<DepartmentDTO> lst)
-        {
-            var list = new List<JeeHRCoCauToChucModelFromDB>();
-            foreach (var item in lst)
-            {
-                list.Add(JeeHRCoCauToChucModelFromDBFromDepartmentDTO(item));
-            }
-            return list;
-        }
-
         public static JeeHRCoCauToChucModelFromDB JeeHRCoCauToChucModelFromDBFromDepartmentDTO(DepartmentDTO dto)
         {
             var jeehr = new JeeHRCoCauToChucModelFromDB();
             jeehr.RowID = int.Parse(dto.RowID.ToString());
             jeehr.Title = dto.DepartmentName;
             return jeehr;
-        }
-
-        public static List<JeeHRCoCauToChucModelFromDB> LstJeeHRCoCauToChucModelFromDBFromLstFlatJeeHRCoCauToChucModel(List<FlatJeeHRCoCauToChucModel> lst)
-        {
-            var list = new List<JeeHRCoCauToChucModelFromDB>();
-            foreach (var item in lst)
-            {
-                list.Add(JeeHRCoCauToChucModelFromDBFromFlatJeeHRCoCauToChucModel(item));
-            }
-            return list;
         }
 
         public static JeeHRCoCauToChucModelFromDB JeeHRCoCauToChucModelFromDBFromFlatJeeHRCoCauToChucModel(FlatJeeHRCoCauToChucModel dto)

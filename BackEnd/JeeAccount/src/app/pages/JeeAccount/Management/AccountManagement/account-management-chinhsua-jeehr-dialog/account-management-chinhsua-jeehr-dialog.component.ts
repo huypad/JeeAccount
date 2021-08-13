@@ -275,7 +275,7 @@ export class AccountManagementChinhSuaJeeHRDialogComponent implements OnInit, On
   }
   update(acc: AccountManagementModel, withBack: boolean = false) {
     this.isLoadingSubmit$.next(true);
-    this.accountManagementService
+    const sb = this.accountManagementService
       .UpdateAccount(acc)
       .pipe(
         tap((res) => {
@@ -294,6 +294,7 @@ export class AccountManagementChinhSuaJeeHRDialogComponent implements OnInit, On
           this._errorMessage$.next(error);
         }
       );
+    this.subscriptions.push(sb);
   }
   goBack() {
     if (this.checkDataBeforeClose()) {

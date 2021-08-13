@@ -515,6 +515,18 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID
             }
         }
 
+        public static string IDENT_CURRENTCnn(string Tablename, DpsConnection cnn)
+        {
+            try
+            {
+                return cnn.ExecuteScalar($"SELECT IDENT_CURRENT ('{Tablename}') AS Current_Identity;").ToString();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public static async Task<IEnumerable<AppListDTO>> GetListAppByUserIDAsync(string connectionString, long UserID, long CustomerID = 0, bool IsActive = true)
         {
             DataTable dt = new DataTable();

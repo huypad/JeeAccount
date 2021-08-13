@@ -2,7 +2,7 @@
 <div class="sreach-advance-container" (clickOutside2)="clickOutSideFilter()" *ngIf="!(isLoading$ | async)">
   <div class="search" [formGroup]="searchGroup">
     <span style="padding-left: 0.69rem" class="svg-icon" [inlineSVG]="'./assets/media/svg/icons/General/Search.svg'"></span>
-    <input type="text" class="form-control" placeholder="{{ 'SEARCH.SEARCH1' | translate }}" formControlName="keyword" />
+    <input type="text" class="form-control" [placeholder]="titlekeyword" formControlName="keyword" />
     <button mat-icon-button>
       <mat-icon (click)="clearFilter()">close</mat-icon>
     </button>

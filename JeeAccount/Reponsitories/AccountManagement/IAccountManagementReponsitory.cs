@@ -90,5 +90,7 @@ namespace JeeAccount.Reponsitories
         void InsertAppCodeAccount(DpsConnection cnn, long UserID, List<int> AppID, string createdBy, bool IsAdmin = false);
 
         void RemoveAppCodeAccount(DpsConnection cnn, long UserID, List<int> AppID, string editBy);
+
+        void DeleteAccountManagement(string DeletedBy, long customerID, long userid);
     }
 }

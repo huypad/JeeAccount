@@ -1,3 +1,4 @@
+import { TranslateService } from '@ngx-translate/core';
 import { DanhMucChungService } from './../../_core/services/danhmuc.service';
 import {
   TreeJeeHRDepartmentDTO,
@@ -48,6 +49,7 @@ export class JeeSearchFormComponent implements OnInit, OnDestroy {
   datatree$: BehaviorSubject<any[]> = new BehaviorSubject<any>([]);
   lstPhongBanid: number[] = [];
   lstChucvu: SelectModel[];
+  titlekeyword: string = '';
   get isLoading$() {
     return this._isLoading$.asObservable();
   }
@@ -59,11 +61,13 @@ export class JeeSearchFormComponent implements OnInit, OnDestroy {
     public service: JeeSearchFormService,
     public cd: ChangeDetectorRef,
     public generalService: DanhMucChungService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    public trans: TranslateService
   ) {}
 
   ngOnInit() {
     this._isLoading$.next(true);
+    this.titlekeyword = this.trans.instant(this.showSearch.titlekeyword);
     const sb = this.generalService
       .getDSPhongBan()
       .pipe(
@@ -129,6 +133,7 @@ export class JeeSearchFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.clearFilter();
     this.subscriptions.forEach((sb) => sb.unsubscribe());
   }
   // search

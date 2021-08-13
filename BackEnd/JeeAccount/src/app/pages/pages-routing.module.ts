@@ -13,8 +13,7 @@ const routes: Routes = [
       },
       {
         path: 'comments',
-        loadChildren: () =>
-          import('./JeeAccount/Management/DemoComemnt/demo-comment.module').then((m) => m.DemoCommentModule),
+        loadChildren: () => import('./JeeAccount/Management/DemoComemnt/demo-comment.module').then((m) => m.DemoCommentModule),
       },
       {
         path: 'dashboard',
@@ -32,8 +31,13 @@ const routes: Routes = [
           import('./JeeAccount/Management/DepartmentManagement/department-management.module').then((m) => m.DepartmentManagementModule),
       },
       {
+        path: 'Management/JobtitleManagement',
+        loadChildren: () =>
+          import('./JeeAccount/Management/JobtitleManagement/jobtitle-management.module').then((m) => m.JobtitleManagementModule),
+      },
+      {
         path: '',
-        redirectTo: '/dashboard',
+        redirectTo: '/Management/AccountManagement',
         pathMatch: 'full',
       },
       {
@@ -48,4 +52,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class PagesRoutingModule { }
+export class PagesRoutingModule {}

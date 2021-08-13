@@ -1,12 +1,12 @@
 import { AccountManagementChinhSuaNoJeeHRDialogComponent } from './../account-management-chinhsua-nojeehr-dialog/account-management-chinhsua-nojeehr-dialog.component';
 import { AccountManagementEditJeeHRDialogComponent } from './../account-management-edit-jeehr-dialog/account-management-edit-jeehr-dialog.component';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, of, Subscription } from 'rxjs';
 import { SubheaderService } from 'src/app/_metronic/partials/layout';
 import { AccountManagementEditDialogComponent } from '../account-management-edit-dialog/account-management-edit-dialog.component';
-import { AccountManagementDTO, AppListDTO, PostImgModel } from '../Model/account-management.model';
+import { AppListDTO, PostImgModel } from '../Model/account-management.model';
 import { AccountManagementService } from '../Services/account-management.service';
 import { QuanLytrucTiepEditDialogComponent } from '../quan-ly-truc-tiep-edit-dialog/quan-ly-truc-tiep-edit-dialog.component';
 import { ChangeTinhTrangEditDialogComponent } from '../change-tinh-trang-edit-dialog/change-tinh-trang-edit-dialog.component';
@@ -16,7 +16,7 @@ import { DeleteEntityDialogComponent } from '../../../_shared/delete-entity-dial
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { GroupingState, PaginatorState } from 'src/app/_metronic/shared/crud-table';
 import { SortState } from './../../../../../_metronic/shared/crud-table/models/sort.model';
-import { catchError, debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { ResultModel } from '../../../_core/models/_base.model';
 import { AccountManagementChinhSuaJeeHRDialogComponent } from '../account-management-chinhsua-jeehr-dialog/account-management-chinhsua-jeehr-dialog.component';
 
@@ -25,7 +25,7 @@ import { AccountManagementChinhSuaJeeHRDialogComponent } from '../account-manage
   templateUrl: './account-management-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AccountManagementListComponent implements OnInit {
+export class AccountManagementListComponent implements OnInit, OnDestroy {
   // Table fields
   loadingSubject = new BehaviorSubject<boolean>(false);
   filterGroup: FormGroup;
@@ -252,9 +252,8 @@ export class AccountManagementListComponent implements OnInit {
     }
   }
 
-  delete(item) {
-    let saveMessageTranslateParam = '';
-    saveMessageTranslateParam += 'Xoá thành công';
+  delete(UserID: number) {
+    let saveMessageTranslateParam = 'COMMOM.XOATHANHCONG';
     const saveMessage = this.translate.instant(saveMessageTranslateParam);
     const messageType = MessageType.Create;
     const dialogRef = this.dialog.open(DeleteEntityDialogComponent, {
@@ -265,8 +264,17 @@ export class AccountManagementListComponent implements OnInit {
       if (!res) {
         this.accountManagementService.fetch();
       } else {
-        this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
-        this.accountManagementService.fetch();
+        this.accountManagementService.Delete(UserID).subscribe(
+          (res) => {
+            this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+          },
+          (error) => {
+            this.layoutUtilsService.showActionNotification(error.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
+          },
+          () => {
+            this.accountManagementService.fetch();
+          }
+        );
       }
     });
     this.subscriptions.push(sb);

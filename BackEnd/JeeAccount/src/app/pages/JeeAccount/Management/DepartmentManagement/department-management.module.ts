@@ -9,8 +9,9 @@ import { DepartmentManagementEditDialogComponent } from './department-management
 import { MatChipsModule } from '@angular/material/chips';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { InlineSVGModule } from 'ng-inline-svg';
-import { DepartmentChangeTinhTrangEditDialogComponent } from './department-change-tinh-trang-edit-dialog/department-change-tinh-trang-edit-dialog.component';
 import { JeeAccountModule } from 'src/app/pages/jee-account.module';
+import { ChangeTinhTrangDepartmentEditDialogComponent } from './change-tinh-trang-department-edit-dialog/change-tinh-trang-department-edit-dialog.component';
+import { DepartmentQuanLytrucTiepEditDialogComponent } from './department-quan-ly-truc-tiep-edit-dialog/department-quan-ly-truc-tiep-edit-dialog.component';
 
 const routes: Routes = [
   {
@@ -30,11 +31,22 @@ const routes: Routes = [
     DepartmentManagementComponent,
     DepartmentManagementListComponent,
     DepartmentManagementEditDialogComponent,
-    DepartmentChangeTinhTrangEditDialogComponent,
+    ChangeTinhTrangDepartmentEditDialogComponent,
+    DepartmentQuanLytrucTiepEditDialogComponent,
   ],
   imports: [CommonModule, RouterModule.forChild(routes), JeeAccountModule, MatChipsModule, NgxMatSelectSearchModule, InlineSVGModule],
-  providers: [DepartmentManagementService],
-  entryComponents: [DepartmentManagementEditDialogComponent, DepartmentChangeTinhTrangEditDialogComponent],
+  providers: [
+    DepartmentManagementService,
+    {
+      provide: MAT_DIALOG_DEFAULT_OPTIONS,
+      useValue: { hasBackdrop: true, height: 'auto', width: '700px', panelClass: 'mat-dialog-container-wrapper', disableClose: true },
+    },
+  ],
+  entryComponents: [
+    DepartmentManagementEditDialogComponent,
+    ChangeTinhTrangDepartmentEditDialogComponent,
+    DepartmentQuanLytrucTiepEditDialogComponent,
+  ],
   exports: [DepartmentManagementListComponent],
 })
 export class DepartmentManagementModule {}

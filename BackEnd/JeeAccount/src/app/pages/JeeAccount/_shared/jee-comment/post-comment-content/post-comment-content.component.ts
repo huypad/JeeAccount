@@ -110,7 +110,7 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
       this.isFocus.emit(true);
       this.clickButtonShowReply();
     }
-  } 
+  }
 
   clickButtonShowReply() {
     if (this.isFirstTime) {
@@ -155,51 +155,6 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
         share()
       )
       .subscribe();
-  }
-
-  pushItemReplyCommentInComment(commentDTO: CommentDTO, lstCommentDTO: CommentDTO[]) {
-    lstCommentDTO.forEach((comment) => {
-      commentDTO.Replies.push(comment);
-    });
-  }
-
-  deleteItemReplyCommentInComment(commentDTO: CommentDTO, lstStringObjectIDComment: string[]) {
-    lstStringObjectIDComment.forEach((commentID) => {
-      const index = commentDTO.Replies.findIndex((item) => item.Id === commentID);
-      if (index !== -1) {
-        commentDTO.Replies.splice(index, 1);
-      }
-    });
-  }
-
-  editItemReplyCommentInComment(commentDTO: CommentDTO, lstCommentDTO: CommentDTO[]) {
-    lstCommentDTO.forEach((comment) => {
-      const index = commentDTO.Replies.findIndex((item) => item.Id === comment.Id);
-      if (index !== -1) {
-        this.copyComment(commentDTO.Replies[index], comment);
-      }
-    });
-  }
-
-  copyComment(mainCommentDTO: CommentDTO, newCommentDTO: CommentDTO) {
-    if (mainCommentDTO.Text !== newCommentDTO.Text) mainCommentDTO.Text = newCommentDTO.Text;
-    if (mainCommentDTO.Attachs !== newCommentDTO.Attachs) mainCommentDTO.Attachs = newCommentDTO.Attachs;
-    if (mainCommentDTO.IsEdit !== newCommentDTO.IsEdit) mainCommentDTO.IsEdit = newCommentDTO.IsEdit;
-    if (mainCommentDTO.DateCreated !== newCommentDTO.DateCreated) mainCommentDTO.DateCreated = newCommentDTO.DateCreated;
-    if (mainCommentDTO.IsUserReply !== newCommentDTO.IsUserReply) mainCommentDTO.IsUserReply = newCommentDTO.IsUserReply;
-    if (mainCommentDTO.LengthReply !== newCommentDTO.LengthReply) mainCommentDTO.LengthReply = newCommentDTO.LengthReply;
-    if (mainCommentDTO.MostLengthReaction !== newCommentDTO.MostLengthReaction)
-      mainCommentDTO.MostLengthReaction = newCommentDTO.MostLengthReaction;
-    if (mainCommentDTO.MostTypeReaction !== newCommentDTO.MostTypeReaction)
-      mainCommentDTO.MostTypeReaction = newCommentDTO.MostTypeReaction;
-    if (mainCommentDTO.TotalLengthComment !== newCommentDTO.TotalLengthComment)
-      mainCommentDTO.TotalLengthComment = newCommentDTO.TotalLengthComment;
-    if (mainCommentDTO.TotalLengthReaction !== newCommentDTO.TotalLengthReaction)
-      mainCommentDTO.TotalLengthReaction = newCommentDTO.TotalLengthReaction;
-    if (mainCommentDTO.UserReaction !== newCommentDTO.UserReaction) mainCommentDTO.UserReaction = newCommentDTO.UserReaction;
-    if (mainCommentDTO.UserReactionColor !== newCommentDTO.UserReactionColor)
-      mainCommentDTO.UserReactionColor = newCommentDTO.UserReactionColor;
-    this.cd.detectChanges();
   }
 
   ngOnDestroy(): void {

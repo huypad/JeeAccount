@@ -13,6 +13,7 @@ import { DepartmentManagementDTO } from '../../DepartmentManagement/Model/depart
 import { DatePipe } from '@angular/common';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
+import { JobtitleManagementDTO } from '../../JobtitleManagement/Model/jobtitle-management.model';
 
 @Component({
   selector: 'app-account-management-edit-dialog',
@@ -43,14 +44,13 @@ export class AccountManagementEditDialogComponent implements OnInit, OnDestroy {
   // ngx-mat-search area
   phongBans: DepartmentManagementDTO[] = [];
   filterPhongBans: ReplaySubject<DepartmentManagementDTO[]> = new ReplaySubject<DepartmentManagementDTO[]>();
-  chucvus: SelectModel[] = [];
-  filterChucVus: ReplaySubject<SelectModel[]> = new ReplaySubject<SelectModel[]>();
+  chucvus: JobtitleManagementDTO[] = [];
+  filterChucVus: ReplaySubject<JobtitleManagementDTO[]> = new ReplaySubject<JobtitleManagementDTO[]>();
   private _isLoading$ = new BehaviorSubject<boolean>(false);
   private _isFirstLoading$ = new BehaviorSubject<boolean>(true);
   private _errorMessage$ = new BehaviorSubject<string>('');
   private subscriptions: Subscription[] = [];
   public isLoadingSubmit$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  private translate: TranslateService;
   get isLoading$() {
     return this._isLoading$.asObservable();
   }
@@ -69,7 +69,6 @@ export class AccountManagementEditDialogComponent implements OnInit, OnDestroy {
     private changeDetect: ChangeDetectorRef,
     private layoutUtilsService: LayoutUtilsService,
     public danhmuc: DanhMucChungService,
-    private authService: AuthService,
     public datepipe: DatePipe,
     private translateService: TranslateService
   ) {}
@@ -232,7 +231,8 @@ export class AccountManagementEditDialogComponent implements OnInit, OnDestroy {
         return;
       }
       const acc = this.prepareDataFromFB();
-      this.create(acc, withBack);
+      console.log(acc);
+      //this.create(acc, withBack);
     } else {
       this.validateAllFormFields(this.itemForm);
     }
@@ -288,7 +288,7 @@ export class AccountManagementEditDialogComponent implements OnInit, OnDestroy {
   }
   create(acc: AccountManagementModel, withBack: boolean = false) {
     this.isLoadingSubmit$.next(true);
-    this.accountManagementService
+    const sb = this.accountManagementService
       .createAccount(acc)
       .pipe(
         tap((res) => {
@@ -315,6 +315,7 @@ export class AccountManagementEditDialogComponent implements OnInit, OnDestroy {
           this._errorMessage$.next(error);
         }
       );
+    this.subscriptions.push(sb);
   }
   goBack() {
     if (this.checkDataBeforeClose()) {

@@ -18,5 +18,11 @@ namespace JeeAccount.Services.JobtitleManagementService
         bool CheckJobtitleExist(long CustomerID, string connectionString);
 
         ReturnSqlModel ChangeTinhTrang(long customerID, long RowID, string Note, long UserIdLogin);
+
+        JobtitleModel GetJobtitle(int rowid, long CustomerID);
+
+        void UpdateJobtitle(JobtitleModel job, long CustomerID, string Username, bool isJeeHR);
+
+        void DeleteJobtile(string DeletedBy, long customerID, int departmemntID);
     }
 }

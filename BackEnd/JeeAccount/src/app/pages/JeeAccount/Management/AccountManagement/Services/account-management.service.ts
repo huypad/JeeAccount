@@ -75,7 +75,6 @@ export class AccountManagementService extends ITableService<AccountManagementDTO
     });
   }
 
-
   createAccount(item: AccountManagementModel): Observable<any> {
     const httpHeaders = this.httpUtils.getHTTPHeaders();
     const url = API_PRODUCTS_URL + `/createAccount`;
@@ -114,6 +113,13 @@ export class AccountManagementService extends ITableService<AccountManagementDTO
     const httpHeaders = this.httpUtils.getHTTPHeaders();
     const url = API_PRODUCTS_URL + `/GetInfoByUsername/username=${username}`;
     return this.http.get<any>(url, {
+      headers: httpHeaders,
+    });
+  }
+  Delete(UserID: number): Observable<any> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const url = API_PRODUCTS_URL + `/Delete/${UserID}`;
+    return this.http.delete<any>(url, {
       headers: httpHeaders,
     });
   }

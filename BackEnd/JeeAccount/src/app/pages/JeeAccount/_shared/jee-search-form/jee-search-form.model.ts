@@ -7,7 +7,7 @@ export class showSearchFormModel {
   chucvuid: boolean;
   isAdmin: boolean;
   dakhoa: boolean;
-
+  titlekeyword: string;
   constructor() {
     this.username = true;
     this.tennhanvien = true;
@@ -17,6 +17,7 @@ export class showSearchFormModel {
     this.chucvuid = true;
     this.isAdmin = true;
     this.dakhoa = true;
+    this.titlekeyword = 'SEARCH.SEARCH1';
   }
 }
 

@@ -28,9 +28,9 @@ namespace JeeAccount.Services.DepartmentManagement
             HOST_JEEHR_API = configuration.GetValue<string>("Host:JeeHR_API");
         }
 
-        public ReturnSqlModel ChangeTinhTrang(long customerID, long RowID, string Note, long UserIdLogin)
+        public void ChangeTinhTrang(long customerID, long RowID, string Note, long UserIdLogin)
         {
-            return _reponsitory.ChangeTinhTrang(customerID, RowID, Note, UserIdLogin);
+            _reponsitory.ChangeTinhTrang(customerID, RowID, Note, UserIdLogin);
         }
 
         public bool CheckDepartmentExist(long CustomerID, string connectionString)
@@ -41,6 +41,26 @@ namespace JeeAccount.Services.DepartmentManagement
         public void CreateDepartment(DepartmentModel departmentModel, long CustomerID, string Username)
         {
             _reponsitory.CreateDepartment(departmentModel, CustomerID, Username);
+        }
+
+        public void UpdateDepartment(DepartmentModel departmentModel, long CustomerID, string Username, bool isJeeHR)
+        {
+            _reponsitory.UpdateDepartment(departmentModel, CustomerID, Username, isJeeHR);
+        }
+
+        public void UpdateDepartmentManager(string UsernameModifiedBy, long customerID, string DirectManagerUsername, int departmemntID)
+        {
+            _reponsitory.UpdateDepartmentManager(UsernameModifiedBy, customerID, DirectManagerUsername, departmemntID);
+        }
+
+        public void DeleteDepartmentManager(string DeletedBy, long customerID, int departmemntID)
+        {
+            _reponsitory.DeleteDepartmentManager(DeletedBy, customerID, departmemntID);
+        }
+
+        public DepartmentModel GetDepartment(int rowid, long CustomerID)
+        {
+            return _reponsitory.GetDepartment(rowid, CustomerID);
         }
 
         public async Task<IEnumerable<DepartmentDTO>> GetListDepartmentDefaultAsync(long custormerID)

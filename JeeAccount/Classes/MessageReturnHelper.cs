@@ -147,6 +147,16 @@ namespace JeeAccount.Classes
             };
         }
 
+        public static object KhongDuocXoaException(KhongDuocXoaException last_error)
+        {
+            return new
+            {
+                message = string.IsNullOrEmpty(last_error.Message) ? "Đối tượng đang được sử dụng. Không thể xoá!" : last_error.Message,
+                statusCode = ERRORCODE_BADREQEST,
+                error = last_error != null ? last_error.Message : "",
+            };
+        }
+
         public static object ErrorJeeHR(ErrorJeeHR errorJeehr)
         {
             return new
