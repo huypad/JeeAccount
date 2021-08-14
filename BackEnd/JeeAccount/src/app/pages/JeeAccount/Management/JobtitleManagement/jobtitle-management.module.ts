@@ -1,14 +1,14 @@
+import { JobtitleManagementEditDialogComponent } from './jobtitle-management-edit-dialog/jobtitle-management-edit-dialog.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
-import { JobtitleManagementComponent } from './Jobtitle-management.component';
-import { JobtitleManagementListComponent } from './Jobtitle-management-list/Jobtitle-management-list.component';
-import { JobtitleManagementEditDialogComponent } from './Jobtitle-management-edit-dialog/Jobtitle-management-edit-dialog.component';
 import { MatChipsModule } from '@angular/material/chips';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { InlineSVGModule } from 'ng-inline-svg';
 import { JeeAccountModule } from 'src/app/pages/jee-account.module';
+import { JobtitleManagementComponent } from './jobtitle-management.component';
+import { JobtitleManagementListComponent } from './jobtitle-management-list/jobtitle-management-list.component';
 import { ChangeTinhTrangJobtitleEditDialogComponent } from './change-tinh-trang-jobtitle-edit-dialog/change-tinh-trang-jobtitile-edit-dialog.component';
 import { JobtitleManagementService } from './Sevices/jobtitle-management.service';
 
