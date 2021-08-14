@@ -7,11 +7,12 @@ import { BehaviorSubject, merge, Subscription } from 'rxjs';
 import { SubheaderService } from 'src/app/_metronic/partials/layout';
 import { LayoutUtilsService, MessageType } from '../../../_core/utils/layout-utils.service';
 import { PaginatorState, SortState } from 'src/app/_metronic/shared/crud-table';
-import { JobtitleManagementService } from '../Sevices/jobtitle-management.service';
-import { JobtitleManagementEditDialogComponent } from '../Jobtitle-management-edit-dialog/Jobtitle-management-edit-dialog.component';
-import { ChangeTinhTrangJobtitleEditDialogComponent } from '../change-tinh-trang-jobtitle-edit-dialog/change-tinh-trang-jobtitile-edit-dialog.component';
 import { JobtitleModel } from '../Model/jobtitle-management.model';
 import { DeleteEntityDialogComponent } from '../../../_shared/delete-entity-dialog/delete-entity-dialog.component';
+import { AuthService } from 'src/app/modules/auth';
+import { JobtitleManagementService } from '../Sevices/jobtitle-management.service';
+import { JobtitleManagementEditDialogComponent } from '../jobtitle-management-edit-dialog/jobtitle-management-edit-dialog.component';
+import { ChangeTinhTrangJobtitleEditDialogComponent } from '../change-tinh-trang-jobtitle-edit-dialog/change-tinh-trang-jobtitile-edit-dialog.component';
 
 
 @Component({
@@ -25,7 +26,8 @@ export class JobtitleManagementListComponent implements OnInit {
     private translate: TranslateService,
     public subheaderService: SubheaderService,
     private layoutUtilsService: LayoutUtilsService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    public auth: AuthService
   ) {}
   //=================PageSize Table=====================
   pageSize: number = 50;
@@ -47,6 +49,7 @@ export class JobtitleManagementListComponent implements OnInit {
     this.sorting = this.jobtitleManagementService.sorting;
     const sb = this.jobtitleManagementService.isLoading$.subscribe((res) => (this.isLoading = res));
     this.subscriptions.push(sb);
+    console.log(this.auth.getAuthFromLocalStorage());
   }
 
   sort(column: string): void {
