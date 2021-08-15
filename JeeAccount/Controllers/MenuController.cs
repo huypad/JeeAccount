@@ -2,6 +2,7 @@
 using JeeAccount.Classes;
 using JeeAccount.Models;
 using JeeAccount.Models.Common;
+using JeeAccount.Reponsitories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -22,10 +23,12 @@ namespace JeeAccount.Controllers
     public class MenuController : ControllerBase
     {
         private readonly IConfiguration _config;
+        private readonly string _connectionString;
 
         public MenuController(IConfiguration configuration)
         {
             _config = configuration;
+            _connectionString = configuration.GetValue<string>("AppConfig:Connection");
         }
 
         #region Load menu
@@ -46,15 +49,19 @@ namespace JeeAccount.Controllers
             string id_menu = "0";
             try
             {
-                var loginData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
-                //LoginData loginData = lc._GetInfoUser(Token);
-                //if (loginData == null)
-                //    return JsonResultCommon.DangNhap();
-                //string id_menu_hr = CustomUserManager.GetRules(loginData.UserName.ToString());
-                string id_menu_hr = ",1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30"; // test
-                if (!string.IsNullOrEmpty(id_menu_hr))
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
                 {
-                    id_menu += id_menu_hr;
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+
+                if (!GeneralReponsitory.IsAdminApp(_connectionString, customData.JeeAccount.UserID, 14) && !GeneralReponsitory.IsAdminHeThong(_connectionString, customData.JeeAccount.UserID))
+                {
+                    id_menu += ",4";
+                }
+                else
+                {
+                    id_menu += ",1,2,3,4";
                 }
                 //select menu
                 sql = $@"select title, Target, Summary, '#' as ALink, ISNULL(Icon, 'flaticon-interface-7') as Icon, '' as title_, position, Code

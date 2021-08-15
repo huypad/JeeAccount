@@ -1,7 +1,7 @@
 import { CheckEditAppListByDTO } from './../Model/account-management.model';
 import { SelectModel } from '../../../_shared/jee-search-form/jee-search-form.model';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, OnDestroy, HostListener } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AccountManagementDTO, AccountManagementModel, AppListDTO } from '../Model/account-management.model';
 import { AccountManagementService } from '../Services/account-management.service';
@@ -14,6 +14,7 @@ import { DepartmentManagementDTO } from '../../DepartmentManagement/Model/depart
 import { DatePipe } from '@angular/common';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
+import { DeleteEntityDialogComponent } from '../../../_shared/delete-entity-dialog/delete-entity-dialog.component';
 
 @Component({
   selector: 'app-account-management-chinhsua-nojeehr-dialog',
@@ -32,12 +33,12 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
   filterPhongBans: ReplaySubject<DepartmentManagementDTO[]> = new ReplaySubject<DepartmentManagementDTO[]>();
   chucvus: SelectModel[] = [];
   filterChucVus: ReplaySubject<SelectModel[]> = new ReplaySubject<SelectModel[]>();
+  newpassword: string;
   private _isLoading$ = new BehaviorSubject<boolean>(false);
   private _isFirstLoading$ = new BehaviorSubject<boolean>(true);
   private _errorMessage$ = new BehaviorSubject<string>('');
   private subscriptions: Subscription[] = [];
   public isLoadingSubmit$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  private translate: TranslateService;
   get isLoading$() {
     return this._isLoading$.asObservable();
   }
@@ -55,9 +56,10 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
     public accountManagementService: AccountManagementService,
     private layoutUtilsService: LayoutUtilsService,
     public danhmuc: DanhMucChungService,
-    private authService: AuthService,
     public datepipe: DatePipe,
-    private translateService: TranslateService
+    public cd: ChangeDetectorRef,
+    private translate: TranslateService,
+    public dialog: MatDialog
   ) {}
 
   ngOnDestroy(): void {
@@ -92,6 +94,7 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
       this.itemData = this.data.item;
       this.userid = this.itemData.UserId;
       this.initItemData();
+      this.getPassword();
     } else {
       this.item = new AccountManagementModel();
     }
@@ -138,6 +141,43 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
     this.subscriptions.push(sb4);
   }
 
+  getPassword() {
+    var out = [];
+    for (var i = 0; i < this.itemData.Username.length; i++) {
+      out.push('*');
+    }
+    this.newpassword = out.join('');
+  }
+  resetPassword() {
+    let saveMessageTranslateParam = 'COMMOM.MATKHAUMOI';
+    let saveMessage = this.translate.instant(saveMessageTranslateParam);
+    const messageType = MessageType.Create;
+    const _title = this.translate.instant('COMMOM.RESETMATKHAU');
+    const _description = this.translate.instant('COMMOM.RESETMATKHAUDESCRIPTION');
+    const dialogRef = this.dialog.open(DeleteEntityDialogComponent, {
+      data: { desciption: _description, title: _title },
+      width: '450px',
+    });
+    const sb = dialogRef.afterClosed().subscribe((res) => {
+      if (res) {
+        this.accountManagementService.ResetPassword(this.itemData.Username).subscribe(
+          (res) => {
+            this.newpassword = res.newpassword;
+            saveMessage += ': ' + this.newpassword;
+            this.cd.detectChanges();
+            this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+          },
+          (error) => {
+            this.layoutUtilsService.showActionNotification(error.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
+          },
+          () => {
+            this.accountManagementService.fetch();
+          }
+        );
+      }
+    });
+    this.subscriptions.push(sb);
+  }
   initItemData() {
     this.item.Birthday = this.itemData.NgaySinh;
     this.item.Departmemt = this.itemData.Department;
@@ -318,9 +358,9 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
     if (this.checkDataBeforeClose()) {
       this.dialogRef.close();
     } else {
-      const _title = this.translateService.instant('CHECKPOPUP.TITLE');
-      const _description = this.translateService.instant('CHECKPOPUP.DESCRIPTION');
-      const _waitDesciption = this.translateService.instant('CHECKPOPUP.WAITDESCRIPTION');
+      const _title = this.translate.instant('CHECKPOPUP.TITLE');
+      const _description = this.translate.instant('CHECKPOPUP.DESCRIPTION');
+      const _waitDesciption = this.translate.instant('CHECKPOPUP.WAITDESCRIPTION');
       const popup = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
       popup.afterClosed().subscribe((res) => {
         res ? this.dialogRef.close() : undefined;

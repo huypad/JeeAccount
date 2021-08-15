@@ -39,6 +39,15 @@
               </mat-select>
             </mat-form-field>
           </div>
+          <div class="col-lg-6 mb-3" style="align-self: center">
+            <span>{{ 'COMMOM.USERNAME' | translate }}: {{ itemData.Username }}</span>
+          </div>
+          <div class="col-lg-6 mb-3">
+            <span>{{ 'COMMOM.PASSWORD' | translate }}: {{ newpassword }} </span>
+            <button (click)="resetPassword()" matTooltip="{{ 'COMMOM.RESETMATKHAU' | translate }}" mat-icon-button>
+              <mat-icon>sync</mat-icon>
+            </button>
+          </div>
           <div class="col-lg-12">
             <span>{{ 'ACCOUNTMANAGEMENT.UNGDUNGDUOCSUDUNG' | translate }}:</span>
           </div>

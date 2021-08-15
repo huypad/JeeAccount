@@ -123,4 +123,11 @@ export class AccountManagementService extends ITableService<AccountManagementDTO
       headers: httpHeaders,
     });
   }
+  ResetPassword(username: string): Observable<any> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const url = API_PRODUCTS_URL + `/resetPassword/?username=${username}`;
+    return this.http.get<any>(url, {
+      headers: httpHeaders,
+    });
+  }
 }

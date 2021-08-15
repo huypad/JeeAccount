@@ -135,6 +135,9 @@ export const locale = {
       NGAYSINH: 'Ngày sinh',
       LUUDONG: 'Lưu & đóng',
       LUUTIEPTUC: 'Lưu & tiếp tục',
+      RESETMATKHAU: 'Reset mật khẩu',
+      RESETMATKHAUDESCRIPTION: 'Bạn có muốn reset mật khẩu không?',
+      MATKHAUMOI: 'Mật khẩu mới',
     },
     dropdowntimkiem: {
       timkiem1: 'Tìm kiếm theo mã và họ tên',
@@ -212,6 +215,9 @@ export const locale = {
       TITLE: 'Xác nhận',
       DESCRIPTION: 'Bạn có các thay đổi chưa lưu. Bạn có muốn thoát?',
       WAITDESCRIPTION: 'Đang thoát',
+    },
+    INFO: {
+      THONGTINCANHAN: 'Thông tin cá nhân',
     },
   },
 };

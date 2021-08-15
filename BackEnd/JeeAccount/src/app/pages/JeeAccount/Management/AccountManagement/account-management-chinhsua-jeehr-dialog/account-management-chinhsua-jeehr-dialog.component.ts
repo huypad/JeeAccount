@@ -1,6 +1,6 @@
 import { AccountManagementDTO, CheckEditAppListByDTO } from './../Model/account-management.model';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, OnDestroy, HostListener } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AccountManagementModel, AppListDTO, JeeHRNhanVien } from '../Model/account-management.model';
 import { AccountManagementService } from '../Services/account-management.service';
@@ -11,6 +11,7 @@ import { ResultModel } from '../../../_core/models/_base.model';
 import { DatePipe } from '@angular/common';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
+import { DeleteEntityDialogComponent } from '../../../_shared/delete-entity-dialog/delete-entity-dialog.component';
 
 @Component({
   selector: 'app-account-management-chinhsua-jeehr-dialog',
@@ -32,13 +33,14 @@ export class AccountManagementChinhSuaJeeHRDialogComponent implements OnInit, On
   imgFile = '../assets/media/Img/NoImage.jpg';
   // ngx-mat-search area
   NhanViens: JeeHRNhanVien[] = [];
+  newpassword: string;
   filterNhanViens: ReplaySubject<JeeHRNhanVien[]> = new ReplaySubject<JeeHRNhanVien[]>();
   private _isLoading$ = new BehaviorSubject<boolean>(false);
   private _isFirstLoading$ = new BehaviorSubject<boolean>(true);
   private _errorMessage$ = new BehaviorSubject<string>('');
   private subscriptions: Subscription[] = [];
   public isLoadingSubmit$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  private translate: TranslateService;
+
   get isLoading$() {
     return this._isLoading$.asObservable();
   }
@@ -58,7 +60,9 @@ export class AccountManagementChinhSuaJeeHRDialogComponent implements OnInit, On
     private layoutUtilsService: LayoutUtilsService,
     public danhmuc: DanhMucChungService,
     public datepipe: DatePipe,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    public dialog: MatDialog,
+    public cd: ChangeDetectorRef
   ) {}
 
   ngOnDestroy(): void {
@@ -81,6 +85,7 @@ export class AccountManagementChinhSuaJeeHRDialogComponent implements OnInit, On
       this.itemData = this.data.item;
       this.userid = this.itemData.UserId;
       this.initItemData();
+      this.getPassword();
     } else {
       this.item = new AccountManagementModel();
     }
@@ -145,7 +150,43 @@ export class AccountManagementChinhSuaJeeHRDialogComponent implements OnInit, On
       .subscribe();
     this.subscriptions.push(sb5);
   }
-
+  getPassword() {
+    var out = [];
+    for (var i = 0; i < this.itemData.Username.length; i++) {
+      out.push('*');
+    }
+    this.newpassword = out.join('');
+  }
+  resetPassword() {
+    let saveMessageTranslateParam = 'COMMOM.MATKHAUMOI';
+    let saveMessage = this.translateService.instant(saveMessageTranslateParam);
+    const messageType = MessageType.Create;
+    const _title = this.translateService.instant('COMMOM.RESETMATKHAU');
+    const _description = this.translateService.instant('COMMOM.RESETMATKHAUDESCRIPTION');
+    const dialogRef = this.dialog.open(DeleteEntityDialogComponent, {
+      data: { desciption: _description, title: _title },
+      width: '450px',
+    });
+    const sb = dialogRef.afterClosed().subscribe((res) => {
+      if (res) {
+        this.accountManagementService.ResetPassword(this.itemData.Username).subscribe(
+          (res) => {
+            this.newpassword = res.newpassword;
+            saveMessage += ': ' + this.newpassword;
+            this.cd.detectChanges();
+            this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+          },
+          (error) => {
+            this.layoutUtilsService.showActionNotification(error.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
+          },
+          () => {
+            this.accountManagementService.fetch();
+          }
+        );
+      }
+    });
+    this.subscriptions.push(sb);
+  }
   initItemData() {
     this.item.Birthday = this.itemData.NgaySinh;
     this.item.Departmemt = this.itemData.Department;

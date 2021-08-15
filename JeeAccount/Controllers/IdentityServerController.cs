@@ -25,6 +25,7 @@ namespace JeeAccount.Controllers
         private const string LINK_UPDATE_CUSTOMDATASELF = LINK_IDENTITY_SERVER + "/user/updateCustomData/self";
         private const string LINK_CHANGE_USERSTATE = LINK_IDENTITY_SERVER + "/user/changeUserState";
         private const string LINK_CHANGEPASSWORD_INTERNAL = LINK_IDENTITY_SERVER + "/user/changePassword/internal";
+        private const string LINK_RESETPASSWORD = LINK_IDENTITY_SERVER + "/user/resetPassword";
 
         public async Task<HttpResponseMessage> addNewUser(IdentityServerAddNewUser identityServerUserModel, string Admin_access_token)
         {
@@ -94,6 +95,27 @@ namespace JeeAccount.Controllers
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(identityServerChangePasswordModel.USer_access_token);
+
+                var reponse = await client.PostAsync(url, httpContent);
+
+                return reponse;
+            }
+        }
+
+        public async Task<HttpResponseMessage> resetPasswordInternal(string internalToken, string username)
+        {
+            string url = LINK_RESETPASSWORD;
+            var content = new
+            {
+                username = username
+            };
+
+            var stringContent = await Task.Run(() => JsonConvert.SerializeObject(content));
+            var httpContent = new StringContent(stringContent, Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(internalToken);
 
                 var reponse = await client.PostAsync(url, httpContent);
 

@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -790,6 +791,10 @@ namespace JeeAccount.Controllers
                 {
                     return Unauthorized(MessageReturnHelper.DangNhap());
                 }
+                if (!GeneralReponsitory.IsAdminHeThong(_connectionString, customData.JeeAccount.UserID))
+                {
+                    return BadRequest(MessageReturnHelper.PhanQuyen());
+                }
                 var username = Ulities.GetUsernameByHeader(HttpContext.Request.Headers);
                 var isjeeHR = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customData.JeeAccount.CustomerID);
                 if (string.IsNullOrEmpty(username)) return Unauthorized(MessageReturnHelper.DangNhap());
@@ -820,6 +825,10 @@ namespace JeeAccount.Controllers
                 if (customData is null)
                 {
                     return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+                if (!GeneralReponsitory.IsAdminApp(_connectionString, customData.JeeAccount.UserID, 14) && !GeneralReponsitory.IsAdminHeThong(_connectionString, customData.JeeAccount.UserID))
+                {
+                    return BadRequest(MessageReturnHelper.PhanQuyen());
                 }
                 var username = Ulities.GetUsernameByHeader(HttpContext.Request.Headers);
                 if (string.IsNullOrEmpty(username)) return Unauthorized(MessageReturnHelper.DangNhap());
@@ -1090,6 +1099,92 @@ namespace JeeAccount.Controllers
                 var isAdmin = GeneralReponsitory.IsAdminApp(_connectionString, userid, appID);
 
                 return Ok(new { IsAdmin = isAdmin });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpGet("resetPassword")]
+        public async Task<IActionResult> resetPassword(string username)
+        {
+            try
+            {
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+                if (!GeneralReponsitory.IsAdminApp(_connectionString, customData.JeeAccount.UserID, 14) && !GeneralReponsitory.IsAdminHeThong(_connectionString, customData.JeeAccount.UserID))
+                {
+                    return BadRequest(MessageReturnHelper.PhanQuyen());
+                }
+                var identity = new IdentityServerController();
+                var res = await identity.resetPasswordInternal(GeneralService.GetInternalToken(_config), username);
+                if (res.IsSuccessStatusCode)
+                {
+                    string returnValue = await res.Content.ReadAsStringAsync();
+
+                    return Ok(new { newpassword = returnValue });
+                }
+                else if ((int)res.StatusCode == 401)
+                {
+                    return Unauthorized(MessageReturnHelper.PhanQuyen());
+                }
+                else
+                {
+                    string returnValue = await res.Content.ReadAsStringAsync();
+                    var x = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
+                    return BadRequest(MessageReturnHelper.Custom(x.message));
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpGet("save")]
+        public async Task<IActionResult> save()
+        {
+            try
+            {
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+                var lstCustomer = GeneralReponsitory.GetLstCustomerid(_connectionString);
+                var identityServerController = new IdentityServerController();
+                foreach (var customerID in lstCustomer)
+                {
+                    var lstUserid = GeneralReponsitory.GetLstUserIDByCustomerid(_connectionString, customerID);
+                    if (lstUserid is not null)
+                    {
+                        foreach (var UserID in lstUserid)
+                        {
+                            var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, UserID);
+                            var appCodes = GeneralReponsitory.GetListAppByUserID(_connectionString, commonInfo.UserID).Select(item => item.AppCode).ToList();
+                            var objCustomDataJeeAccount = identityServerController.JeeAccountCustomData(appCodes, commonInfo.UserID, customerID, commonInfo.StaffID);
+
+                            var updateIndentity = await identityServerController.UppdateCustomDataHttpResponse(token, commonInfo.Username, objCustomDataJeeAccount);
+
+                            if (!updateIndentity.IsSuccessStatusCode)
+                            {
+                                string returnValue = await updateIndentity.Content.ReadAsStringAsync();
+                                var res = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
+                                throw new Exception(res.message);
+                            }
+                        }
+                    }
+                }
+                return Ok();
             }
             catch (Exception ex)
             {

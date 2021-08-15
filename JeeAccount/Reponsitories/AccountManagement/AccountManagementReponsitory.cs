@@ -962,10 +962,6 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
 
             foreach (var id in AppID)
             {
-                if (id == 14)
-                {
-                    if (!GeneralReponsitory.IsAdminHeThongCnn(cnn, UserID) || GeneralReponsitory.IsAdminAppCnn(cnn, UserID, 14)) continue;
-                }
                 string sql2 = @$"select AppID from Account_App where UserID = @UserID and AppID = {id} and (Disable = 0 or Disable is null)";
                 var dtnew = cnn.CreateDataTable(sql2, Conds);
                 if (dtnew.Rows.Count > 0)
@@ -1016,7 +1012,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
             {
                 if (id == 14)
                 {
-                    if (!GeneralReponsitory.IsAdminHeThongCnn(cnn, UserID)) continue;
+                    if (GeneralReponsitory.IsAdminHeThongCnn(cnn, UserID)) continue;
                 }
                 if (GeneralReponsitory.IsAdminAppCnn(cnn, UserID, id)) continue;
                 string sql2 = @$"select AppID from Account_App where UserID = @UserID and AppID = {id} and (Disable = 0 or Disable is null)";
