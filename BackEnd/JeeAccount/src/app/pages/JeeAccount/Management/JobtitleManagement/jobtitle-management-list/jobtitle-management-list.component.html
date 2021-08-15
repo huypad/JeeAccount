@@ -4,7 +4,7 @@
     <div class="card-title">
       <span class="card-label">{{ 'JOBTITLEMANAGEMENT.DANHSACH' | translate }}</span>
     </div>
-    <div class="card-toolbar">
+    <div *ngIf="!isJeeHR" class="card-toolbar">
       <button mat-raised-button class="ja_button ja_btn-addnew" (click)="create()">{{ 'COMMOM.THEMMOI' | translate }}</button>
     </div>
   </div>
@@ -22,7 +22,7 @@
               (sort)="sort($event)"
             ></app-sort-icon>
           </th>
-          <th style="min-width: 100px; text-align: center">
+          <th *ngIf="!isJeeHR" style="min-width: 100px; text-align: center">
             <span>{{ 'COMMOM.TINHTRANG' | translate }}</span>
             <app-sort-icon
               column="tinhtrang"
@@ -31,10 +31,10 @@
               (sort)="sort($event)"
             ></app-sort-icon>
           </th>
-          <th style="min-width: 300px">
+          <th *ngIf="!isJeeHR" style="min-width: 300px">
             <span>{{ 'COMMOM.GHICHU' | translate }}</span>
           </th>
-          <th style="min-width: 100px; text-align: center">
+          <th *ngIf="!isJeeHR" style="min-width: 100px; text-align: center">
             <span>{{ 'COMMOM.THAOTAC' | translate }}</span>
           </th>
         </thead>
@@ -45,13 +45,13 @@
                 <span>{{ r.Title }}</span>
               </div>
             </td>
-            <td style="text-align: center">
+            <td style="text-align: center" *ngIf="!isJeeHR">
               <mat-slide-toggle (click)="changeTinhTrang(r.RowID)" [checked]="r.IsActive"> </mat-slide-toggle>
             </td>
-            <td>
+            <td *ngIf="!isJeeHR">
               <span>{{ r.Note }}</span>
             </td>
-            <td style="text-align: center">
+            <td style="text-align: center" *ngIf="!isJeeHR">
               <mat-icon (click)="update(r)" style="cursor: pointer; color: #1bc5bd; font-size: 16px" aria-hidden="false">
                 mode_edit</mat-icon
               >

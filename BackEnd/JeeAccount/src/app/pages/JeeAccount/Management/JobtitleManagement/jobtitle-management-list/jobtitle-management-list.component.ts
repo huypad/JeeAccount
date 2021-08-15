@@ -1,6 +1,7 @@
+import { environment } from 'src/environments/environment';
 import { GroupingState } from '../../../../../_metronic/shared/crud-table/models/grouping.model';
 import { FormGroup } from '@angular/forms';
-import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, merge, Subscription } from 'rxjs';
@@ -14,7 +15,6 @@ import { JobtitleManagementService } from '../Sevices/jobtitle-management.servic
 import { JobtitleManagementEditDialogComponent } from '../jobtitle-management-edit-dialog/jobtitle-management-edit-dialog.component';
 import { ChangeTinhTrangJobtitleEditDialogComponent } from '../change-tinh-trang-jobtitle-edit-dialog/change-tinh-trang-jobtitile-edit-dialog.component';
 
-
 @Component({
   selector: 'app-jobtitle-management-list',
   templateUrl: './jobtitle-management-list.component.html',
@@ -27,7 +27,8 @@ export class JobtitleManagementListComponent implements OnInit {
     public subheaderService: SubheaderService,
     private layoutUtilsService: LayoutUtilsService,
     public dialog: MatDialog,
-    public auth: AuthService
+    public auth: AuthService,
+    public cd: ChangeDetectorRef
   ) {}
   //=================PageSize Table=====================
   pageSize: number = 50;
@@ -39,7 +40,9 @@ export class JobtitleManagementListComponent implements OnInit {
   grouping: GroupingState;
   imgFile: string = '';
   isLoading: boolean = false;
-  isJeeHR: boolean;
+  isJeeHR: boolean = false;
+  data: any;
+  APPCODE_JEEHR = environment.APPCODE_JEEHR;
   private subscriptions: Subscription[] = [];
 
   ngOnInit() {
@@ -49,9 +52,21 @@ export class JobtitleManagementListComponent implements OnInit {
     this.sorting = this.jobtitleManagementService.sorting;
     const sb = this.jobtitleManagementService.isLoading$.subscribe((res) => (this.isLoading = res));
     this.subscriptions.push(sb);
-    console.log(this.auth.getAuthFromLocalStorage());
+    this.checkIsJeeHR();
   }
 
+  checkIsJeeHR() {
+    this.data = this.auth.getAuthFromLocalStorage();
+    const lstAppCode: string[] = this.data['user']['customData']['jee-account']['appCode'];
+    if (lstAppCode) {
+      if (lstAppCode.indexOf(this.APPCODE_JEEHR) != -1) {
+        this.isJeeHR = true;
+        this.cd.detectChanges();
+      } else {
+        this.isJeeHR = false;
+      }
+    }
+  }
   sort(column: string): void {
     const sorting = this.sorting;
     const isActiveColumn = sorting.column === column;

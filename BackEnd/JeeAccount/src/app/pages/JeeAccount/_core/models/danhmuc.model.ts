@@ -16,3 +16,7 @@ export interface CommonInfo {
   StaffID: number;
   CustomerID: number;
 }
+
+export interface IsAdmin {
+  IsAdmin: boolean;
+}

@@ -1,11 +1,9 @@
-import { SelectModel } from './../../../_shared/jee-search-form/jee-search-form.model';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AccountManagementModel, AppListDTO } from '../Model/account-management.model';
 import { AccountManagementService } from '../Services/account-management.service';
 import { ReplaySubject, of, BehaviorSubject, Subscription } from 'rxjs';
-import { AuthService } from 'src/app/modules/auth/_services/auth.service';
 import { LayoutUtilsService, MessageType } from '../../../_core/utils/layout-utils.service';
 import { DanhMucChungService } from '../../../_core/services/danhmuc.service';
 import { ResultModel } from '../../../_core/models/_base.model';

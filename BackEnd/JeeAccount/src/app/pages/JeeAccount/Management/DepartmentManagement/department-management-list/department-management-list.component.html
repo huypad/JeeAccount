@@ -1,4 +1,33 @@
-<style></style>
+<style>
+  .example-tree-invisible {
+    display: none;
+  }
+
+  .example-tree ul,
+  .example-tree li {
+    margin-top: 0;
+    margin-bottom: 0;
+    list-style-type: none;
+  }
+  .example-tree-node {
+    display: block;
+  }
+
+  .example-tree-node .example-tree-node {
+    padding-left: 20px;
+  }
+  .setBorder {
+    border-bottom: 1px solid black;
+    width: 40px;
+    height: 0px;
+    position: relative;
+    left: 0;
+    top: 15px;
+  }
+  .borderMain {
+    border-left: 1px solid black;
+  }
+</style>
 <div class="card card-custom card-sticky gutter-b">
   <div class="card-header">
     <div class="card-title">
@@ -6,17 +35,18 @@
     </div>
     <div class="card-search">
       <app-jee-search-form
+        *ngIf="!isJeeHR"
         [showSearch]="showSearch"
         (keywordEvent)="changeKeyword($event)"
         (filterEvent)="changeFilter($event)"
       ></app-jee-search-form>
     </div>
-    <div class="card-toolbar">
+    <div *ngIf="!isJeeHR" class="card-toolbar">
       <button mat-raised-button class="ja_button ja_btn-addnew" (click)="create()">{{ 'COMMOM.THEMMOI' | translate }}</button>
     </div>
   </div>
   <!-- body -->
-  <div class="card-body">
+  <div class="card-body" *ngIf="!isJeeHR">
     <div class="table-responsive angular-bootstrap-table" [ngStyle]="{ height: getHeight() }">
       <table class="table table-head-custom table-vertical-center overflow-hidden">
         <thead>
@@ -74,7 +104,9 @@
                 mode_edit</mat-icon
               >
               &nbsp;
-              <mat-icon (click)="delete(r.RowID)" style="cursor: pointer; color: red; font-size: 16px" aria-hidden="false">delete </mat-icon>
+              <mat-icon (click)="delete(r.RowID)" style="cursor: pointer; color: red; font-size: 16px" aria-hidden="false"
+                >delete
+              </mat-icon>
             </td>
           </tr>
         </tbody>
@@ -88,4 +120,29 @@
       (paginate)="paginate($event)"
     ></app-paginator>
   </div>
+</div>
+<div class="card card-custom card-sticky gutter-b" *ngIf="isJeeHR">
+  <cdk-tree #tree [dataSource]="dataSource" [treeControl]="treeControl">
+    <!-- This is the tree node template for leaf nodes -->
+    <cdk-nested-tree-node *cdkTreeNodeDef="let node" class="example-tree-node">
+      <div class="borderMain">
+        <!-- use a disabled button to provide padding for tree leaf -->
+        <div class="setBorder"></div>
+        <button mat-icon-button disabled></button>
+        {{ node.Title }}
+      </div>
+    </cdk-nested-tree-node>
+    <!-- This is the tree node template for expandable nodes -->
+    <cdk-nested-tree-node *cdkTreeNodeDef="let node; when: hasChild" class="example-tree-node">
+      <button mat-icon-button [attr.aria-label]="'Toggle ' + node.Title" cdkTreeNodeToggle>
+        <mat-icon class="mat-icon-rtl-mirror">
+          {{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+        </mat-icon>
+      </button>
+      {{ node.Title }}
+      <div [class.example-tree-invisible]="!treeControl.isExpanded(node)">
+        <ng-container cdkTreeNodeOutlet></ng-container>
+      </div>
+    </cdk-nested-tree-node>
+  </cdk-tree>
 </div>

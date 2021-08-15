@@ -1,13 +1,11 @@
+import { IsAdmin } from './../models/danhmuc.model';
 import { JobtitleManagementDTO } from './../../Management/JobtitleManagement/Model/jobtitle-management.model';
-import { SelectModel } from './../../_shared/jee-search-form/jee-search-form.model';
 import { DepartmentManagement } from './../../Management/DepartmentManagement/Model/department-management.model';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin, BehaviorSubject, of } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of } from 'rxjs';
 import { HttpUtilsService } from '../utils/http-utils.service';
 import { QueryParamsModel } from '../models/query-models/query-params.model';
-import { QueryResultsModel } from '../models/query-models/query-results.model';
 import { environment } from '../../../../../environments/environment';
 import { ResultObjectModel } from '../models/_base.model';
 import { DatePipe } from '@angular/common';
@@ -71,6 +69,16 @@ export class DanhMucChungService {
     return this.http.get<any>(url, { headers: httpHeaders });
   }
 
+  isAdminHeThong(userid: number): Observable<IsAdmin> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const url = API_URL + `/accountmanagement/CheckAdminHeThong/${userid}`;
+    return this.http.get<any>(url, { headers: httpHeaders });
+  }
+  isAdminApp(userid: number, appid: number): Observable<IsAdmin> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const url = API_URL + `/accountmanagement/CheckAdminApp/${userid}/${appid}`;
+    return this.http.get<any>(url, { headers: httpHeaders });
+  }
   sortObject(obj) {
     return Object.keys(obj)
       .sort()

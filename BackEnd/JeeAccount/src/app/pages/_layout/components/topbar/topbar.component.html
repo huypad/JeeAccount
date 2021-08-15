@@ -9,12 +9,12 @@
     <!--begin::Notifications-->
     <div class="topbar-item">
       <div class="btn btn-icon btn-icon-mobile btn-clean btn-lg mr-1 pulse pulse-primary" id="kt_quick_notifications_toggle">
-        <!-- <span [inlineSVG]="'./assets/media/svg/icons/Code/Compiling.svg'" [cacheSVG]="true"
-      class="svg-icon svg-icon-xl svg-icon-primary"></span> -->
-        <i class="flaticon2-bell-2" style="color: #3699ff"></i>
+        <i [ngClass]="{ Notify: numberInfo > 0 }" class="flaticon2-bell-2" style="color: #3699ff"></i>
+        <span class="badge" *ngIf="numberInfo > 0">{{ numberInfo }}</span>
         <span class="pulse-ring"></span>
       </div>
     </div>
+    <app-notifications-offcanvas (loadUnreadList)="updateNumberNoti($event)"> </app-notifications-offcanvas>
     <!--end::Notifications-->
   </ng-container>
 
@@ -23,7 +23,7 @@
     <div class="dropdown" ngbDropdown placement="bottom">
       <div class="topbar-item" data-toggle="dropdown" data-offset="10px,0px" ngbDropdownToggle>
         <div class="btn btn-icon btn-clean btn-dropdown btn-lg mr-1 pulse pulse-primary">
-          <!-- <span [inlineSVG]="'./assets/media/svg/icons/Code/Compiling.svg'" [cacheSVG]="true"
+          <!-- <span [inlineSVG]="'./assets/media/svg/icons/Code/Compiling.svg'" cacheSVG="true"
         class="svg-icon svg-icon-xl svg-icon-primary"></span> -->
           <i [ngClass]="{ Notify: numberInfo > 0 }" class="flaticon2-bell-2" style="color: #3699ff"></i>
           <span class="badge" *ngIf="numberInfo > 0">{{ numberInfo }}</span>
@@ -32,7 +32,7 @@
       </div>
       <div ngbDropdownMenu class="dropdown-menu p-0 m-0 dropdown-menu-anim-up dropdown-menu-lg width">
         <form>
-          <app-notifications-dropdown-inner (loadUnreadList)="updateNumberNoti($event)"></app-notifications-dropdown-inner>
+          <app-notifications-dropdown-inner (loadUnreadList)="updateNumberNoti($event)"> </app-notifications-dropdown-inner>
         </form>
       </div>
     </div>

@@ -46,7 +46,7 @@ export interface TreeJeeHRDepartmentDTO {
   Level: string;
   ParentID: string;
   Position: string;
-  Children: TreeJeeHRDepartmentDTO[];
+  Children?: TreeJeeHRDepartmentDTO[];
 }
 
 export interface FlatJeeHRDepartmentDTO {

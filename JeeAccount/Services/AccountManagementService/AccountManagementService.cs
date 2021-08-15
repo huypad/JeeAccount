@@ -73,17 +73,17 @@ namespace JeeAccount.Services.AccountManagementService
             {
                 if (!checkusedjeehr)
                 {
-                    whereStr += $" and (AccountList.LastName + ' ' + AccountList.FirstName like N'%{query.filter["keyword"]}%' " +
-$"or JobtitleList.JobtitleName like N'%{query.filter["keyword"]}%' " +
-$"or AccountList.Username like N'%{query.filter["keyword"]}%'" +
-$"or DepartmentList.DepartmentName like N'%{query.filter["keyword"]}%')";
+                    whereStr += $@" and (AccountList.LastName + ' ' + AccountList.FirstName like N'%{query.filter["keyword"]}%'
+                                or JobtitleList.JobtitleName like N'%{query.filter["keyword"]}%'
+                                or AccountList.Username like N'%{query.filter["keyword"]}%'
+                                or DepartmentList.DepartmentName like N'%{query.filter["keyword"]}%')";
                 }
                 else
                 {
-                    whereStr += $" and (AccountList.LastName + ' ' + AccountList.FirstName like N'%{query.filter["keyword"]}%' " +
-$"or AccountList.Jobtitle like N'%{query.filter["keyword"]}%' " +
-$"or AccountList.Username like N'%{query.filter["keyword"]}%'" +
-$"or AccountList.Department like N'%{query.filter["keyword"]}%')";
+                    whereStr += $@" and (AccountList.LastName + ' ' + AccountList.FirstName like N'%{query.filter["keyword"]}%'
+                                    or AccountList.Jobtitle like N'%{query.filter["keyword"]}%'
+                                    or AccountList.Username like N'%{query.filter["keyword"]}%'
+                                    or AccountList.Department like N'%{query.filter["keyword"]}%')";
                 }
             }
 

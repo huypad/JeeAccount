@@ -32,12 +32,13 @@ export class UserOffcanvasComponent implements OnInit {
     this.AppCode = environment.APPCODE;
     this.extrasUserOffcanvasDirection = `offcanvas-${this.layout.getProp('extras.user.offcanvas.direction')}`;
     this.user$ = this.auth.getAuthFromLocalStorage();
+    this.LoadNhacNho();
+  }
 
-    this.menuServices.Get_DSNhacNho().subscribe((res) => {
-      if (res.status == 1) {
-        this.listNhacNho = res.data;
-        this.changeDetectorRefs.detectChanges();
-      }
+  public LoadNhacNho() {
+    this.menuServices.data_share$.subscribe((data: any) => {
+      this.listNhacNho = data;
+      this.changeDetectorRefs.detectChanges();
     });
   }
 
@@ -122,17 +123,9 @@ export class UserOffcanvasComponent implements OnInit {
   }
 
   ChangeLink(item) {
-    if (this.AppCode == item.AppCode) {
-      if (item.Target == '_blank') {
-        window.open(item.WebAppLink, '_blank');
-      } else {
+    if (item.WebAppLink != null && item.WebAppLink != '') {
+      if (this.AppCode == item.AppCode) {
         this.router.navigate([item.WebAppLink]);
-      }
-    } else {
-      if (item.Target == '_blank') {
-        window.open(item.Link, '_blank');
-      } else {
-        window.location.href = item.Link;
       }
     }
   }

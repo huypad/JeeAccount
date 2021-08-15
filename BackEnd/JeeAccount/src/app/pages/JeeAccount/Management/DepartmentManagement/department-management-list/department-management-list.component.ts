@@ -1,19 +1,23 @@
+import { environment } from 'src/environments/environment';
 import { ChangeTinhTrangDepartmentEditDialogComponent } from './../change-tinh-trang-department-edit-dialog/change-tinh-trang-department-edit-dialog.component';
 import { GroupingState } from './../../../../../_metronic/shared/crud-table/models/grouping.model';
 import { FormGroup } from '@angular/forms';
-import { ChangeDetectionStrategy, Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ViewChild, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, merge, Subscription } from 'rxjs';
 import { SubheaderService } from 'src/app/_metronic/partials/layout';
 import { DepartmentManagementService } from '../Sevices/department-management.service';
 import { DepartmentManagementEditDialogComponent } from '../department-management-edit-dialog/department-management-edit-dialog.component';
-import { DepartmentManagementDTO, DepartmentModel } from '../Model/department-management.model';
+import { DepartmentManagementDTO, DepartmentModel, TreeJeeHRDepartmentDTO } from '../Model/department-management.model';
 import { LayoutUtilsService, MessageType } from '../../../_core/utils/layout-utils.service';
 import { PaginatorState, SortState } from 'src/app/_metronic/shared/crud-table';
 import { DepartmentQuanLytrucTiepEditDialogComponent } from '../department-quan-ly-truc-tiep-edit-dialog/department-quan-ly-truc-tiep-edit-dialog.component';
 import { showSearchFormModel } from '../../../_shared/jee-search-form/jee-search-form.model';
 import { DeleteEntityDialogComponent } from '../../../_shared/delete-entity-dialog/delete-entity-dialog.component';
+import { AuthService } from 'src/app/modules/auth';
+import { ArrayDataSource } from '@angular/cdk/collections';
+import { NestedTreeControl } from '@angular/cdk/tree';
 
 @Component({
   selector: 'app-department-management-list',
@@ -26,7 +30,9 @@ export class DepartmentManagementListComponent implements OnInit, OnDestroy {
     private translate: TranslateService,
     public subheaderService: SubheaderService,
     private layoutUtilsService: LayoutUtilsService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    public auth: AuthService,
+    public cd: ChangeDetectorRef
   ) {}
 
   //=================PageSize Table=====================
@@ -39,10 +45,18 @@ export class DepartmentManagementListComponent implements OnInit, OnDestroy {
   grouping: GroupingState;
   imgFile: string = '';
   isLoading: boolean = false;
-  isJeeHR: boolean;
+  isJeeHR: boolean = false;
+  data: any;
+  APPCODE_JEEHR = environment.APPCODE_JEEHR;
   showSearch = new showSearchFormModel();
   private subscriptions: Subscription[] = [];
+  datatree$: BehaviorSubject<any[]> = new BehaviorSubject<any>([]);
+  isTree: boolean = false;
 
+  treeControl = new NestedTreeControl<TreeJeeHRDepartmentDTO>((node) => node.Children);
+  dataSource: any;
+
+  hasChild = (_: number, node: TreeJeeHRDepartmentDTO) => !!node.Children && node.Children.length > 0;
   ngOnInit() {
     this.departmentManagementService.fetch();
     this.grouping = this.departmentManagementService.grouping;
@@ -51,8 +65,27 @@ export class DepartmentManagementListComponent implements OnInit, OnDestroy {
     const sb = this.departmentManagementService.isLoading$.subscribe((res) => (this.isLoading = res));
     this.subscriptions.push(sb);
     this.configShowSearch();
+    this.checkIsJeeHR();
+    this.departmentManagementService.items$.subscribe((res) => {
+      if (res) {
+        if (res.isTree) this.isTree = res.isTree;
+        this.dataSource = new ArrayDataSource(res.tree);
+        this.cd.detectChanges();
+      }
+    });
   }
-
+  checkIsJeeHR() {
+    this.data = this.auth.getAuthFromLocalStorage();
+    const lstAppCode: string[] = this.data['user']['customData']['jee-account']['appCode'];
+    if (lstAppCode) {
+      if (lstAppCode.indexOf(this.APPCODE_JEEHR) != -1) {
+        this.isJeeHR = true;
+        this.cd.detectChanges();
+      } else {
+        this.isJeeHR = false;
+      }
+    }
+  }
   configShowSearch() {
     this.showSearch.chucvu = false;
     this.showSearch.chucvuid = false;

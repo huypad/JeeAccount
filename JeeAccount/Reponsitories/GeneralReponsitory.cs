@@ -319,7 +319,7 @@ namespace JeeAccount.Reponsitories
 
         public static bool IsAdminAppCnn(DpsConnection cnn, long UserID, int AppID)
         {
-            string sql1 = $"select * from AccountList where IsAdmin = {AppID} and UserID = {UserID}";
+            string sql1 = $"select * from Account_App where UserID = {UserID} and AppID = {AppID} and IsAdmin = 1";
             DataTable dtCheck = cnn.CreateDataTable(sql1);
             if (dtCheck.Rows.Count == 0) return false;
             return true;
@@ -339,7 +339,7 @@ namespace JeeAccount.Reponsitories
 
         public static bool IsAdminApp(string connectionString, long UserID, int AppID)
         {
-            string sql1 = $"select * from AccountList where IsAdmin = {AppID} and UserID = {UserID}";
+            string sql1 = $"select * from Account_App where UserID = {UserID} and AppID = {AppID} and IsAdmin = 1";
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
                 DataTable dt = new DataTable();

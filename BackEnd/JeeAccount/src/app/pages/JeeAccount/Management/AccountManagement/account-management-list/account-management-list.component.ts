@@ -19,6 +19,7 @@ import { SortState } from './../../../../../_metronic/shared/crud-table/models/s
 import { catchError, tap } from 'rxjs/operators';
 import { ResultModel } from '../../../_core/models/_base.model';
 import { AccountManagementChinhSuaJeeHRDialogComponent } from '../account-management-chinhsua-jeehr-dialog/account-management-chinhsua-jeehr-dialog.component';
+import { AuthService } from 'src/app/modules/auth';
 
 @Component({
   selector: 'app-account-management-list',
@@ -37,6 +38,7 @@ export class AccountManagementListComponent implements OnInit, OnDestroy {
   isLoading: boolean = false;
   listApp: AppListDTO[] = [];
   isJeeHR: boolean;
+  isAdminHeThong: boolean;
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -45,7 +47,8 @@ export class AccountManagementListComponent implements OnInit, OnDestroy {
     public subheaderService: SubheaderService,
     private layoutUtilsService: LayoutUtilsService,
     public dialog: MatDialog,
-    public danhmuc: DanhMucChungService
+    public danhmuc: DanhMucChungService,
+    private auth: AuthService
   ) {}
 
   //=================PageSize Table=====================
@@ -59,6 +62,10 @@ export class AccountManagementListComponent implements OnInit, OnDestroy {
     const sb = this.accountManagementService.isLoading$.subscribe((res) => (this.isLoading = res));
     this.subscriptions.push(sb);
     this.loadListApp();
+    const userid = +this.auth.getAuthFromLocalStorage()['user']['customData']['jee-account']['userID'];
+    this.danhmuc.isAdminHeThong(userid).subscribe((res) => {
+      this.isAdminHeThong = res.IsAdmin;
+    });
   }
 
   loadListApp() {

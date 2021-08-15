@@ -63,6 +63,7 @@ export const locale = {
     Common: {
       notify_titile: 'Thông báo',
       xinchao: 'Xin chào',
+      chuacothongbao: 'Chưa có thông báo',
     },
     ECOMMERCE: {
       COMMON: {

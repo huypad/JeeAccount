@@ -67,7 +67,6 @@ export class JobtitleManagementEditDialogComponent implements OnInit, OnDestroy 
       const sb2 = this.jobtitleManagementService.GetJobtile(this.item.RowID).subscribe(
         (res) => {
           this.item = res;
-          console.log(res);
           this.thanhViens = res.ThanhVien;
           this.isLoading$.next(false);
           this.cd.detectChanges();
@@ -112,7 +111,6 @@ export class JobtitleManagementEditDialogComponent implements OnInit, OnDestroy 
   }
 
   initData() {
-    console.log('this.item', this.item);
     this.itemForm.controls.TenChucVu.patchValue(this.item.JobtitleName);
     this.itemForm.controls.MoTa.patchValue(this.item.Description);
   }

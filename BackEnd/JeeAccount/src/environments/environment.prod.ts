@@ -5,6 +5,9 @@ export const environment = {
   isMockEnabled: true,
   apiUrl: 'api',
   APPCODE: 'ACCOUNT',
+  APPCODE_JEEHR: 'JeeHR',
+  APPCONFIG_SSO: 'sso_token',
+  HOST_SOCKET: 'wss://socket.jee.vn',
   HOST_JEEACCOUNT_API: 'https://jeeaccount-api.jee.vn',
   HOST_IDENTITYSERVER_API: 'https://identityserver.jee.vn',
   HOST_PORTAL_API: 'https://portal.jee.vn',
@@ -15,5 +18,5 @@ export const environment = {
   HOST_JEECHAT: 'https://jeechat.jee.vn',
   //notification
   HOST_WEBSOCKET: 'wss://socket.jee.vn',
-  HOST_NOTIFICATION: 'https://notification.jee.vn/notification',
+  HOST_NOTIFICATION: 'https://notification.jee.vn',
 };

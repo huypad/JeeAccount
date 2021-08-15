@@ -36,6 +36,8 @@ import { LayoutUtilsService } from './pages/JeeAccount/_core/utils/layout-utils.
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { JeeAccountModule } from './pages/jee-account.module';
 import { DatePipe } from '@angular/common';
+import { UserOffcanvasComponent } from './_metronic/partials/layout/extras/offcanvas/user-offcanvas/user-offcanvas.component';
+
 // jee-comment
 
 function appInitializer(authService: AuthService) {
@@ -89,6 +91,7 @@ function appInitializer(authService: AuthService) {
     TokenStorage,
     MenuServices,
     DatePipe,
+    UserOffcanvasComponent,
     {
       provide: APP_INITIALIZER,
       useFactory: appInitializer,

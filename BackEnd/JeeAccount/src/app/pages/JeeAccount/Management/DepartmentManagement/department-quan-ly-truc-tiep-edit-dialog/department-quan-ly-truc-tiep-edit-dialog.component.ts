@@ -37,17 +37,14 @@ export class DepartmentQuanLytrucTiepEditDialogComponent implements OnInit, OnDe
   ) {}
 
   ngOnInit(): void {
-    console.log(this.data);
     this.isLoadingSubmit$ = new BehaviorSubject(false);
     this.isLoading$ = new BehaviorSubject(true);
     if (this.data.DepartmentManager === '') {
       this.item = new DepDirectManagerModel();
     } else {
-      console.log('this.data', this.data);
       this.item.RowID = +this.data.RowID;
       this.item.DepartmentManager = this.data.DepartmentManager;
     }
-    console.log(this.item);
     const sb = this.danhmucService.GetMatchipNhanVien().subscribe((res: ResultModel<NhanVienMatchip>) => {
       if (res && res.status === 1) {
         // ngx

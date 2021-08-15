@@ -107,7 +107,7 @@ export class JeeSearchFormComponent implements OnInit, OnDestroy {
 
   initDataPhongBan(data: DepartmentManagement) {
     this.isJeeHR = data.isJeeHR;
-    this.isTree = data.isTree;
+    if (data.isTree) this.isTree = data.isTree;
     if (this.isJeeHR) {
       if (this.isTree) {
         this.datatree$.next(data.tree);
@@ -147,7 +147,7 @@ export class JeeSearchFormComponent implements OnInit, OnDestroy {
       The user can type quite quickly in the input box, and that could trigger a lot of server requests. With this operator,
       we are limiting the amount of server requests emitted to a maximum of one every 150ms
       */
-        debounceTime(150),
+        debounceTime(300),
         distinctUntilChanged()
       )
       .subscribe((val) => {

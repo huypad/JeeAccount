@@ -7,7 +7,7 @@
     <div class="card-search">
       <app-jee-search-form (keywordEvent)="changeKeyword($event)" (filterEvent)="changeFilter($event)"></app-jee-search-form>
     </div>
-    <div class="card-toolbar">
+    <div *ngIf="isAdminHeThong" class="card-toolbar">
       <button mat-raised-button class="ja_button ja_btn-addnew" (click)="create()">{{ 'COMMOM.THEMMOI' | translate }}</button>
     </div>
   </div>
@@ -37,7 +37,7 @@
           <th style="min-width: 150px">
             <span>{{ 'ACCOUNTMANAGEMENT.PHONGBAN' | translate }}</span>
             <app-sort-icon
-              column="phongban"
+              column="phongbanid"
               [activeColumn]="sorting.column"
               [activeDirection]="sorting.direction"
               (sort)="sort($event)"
@@ -46,7 +46,7 @@
           <th style="min-width: 150px">
             <span>{{ 'COMMOM.CHUCVU' | translate }}</span>
             <app-sort-icon
-              column="chucvu"
+              column="chucvuid"
               [activeColumn]="sorting.column"
               [activeDirection]="sorting.direction"
               (sort)="sort($event)"

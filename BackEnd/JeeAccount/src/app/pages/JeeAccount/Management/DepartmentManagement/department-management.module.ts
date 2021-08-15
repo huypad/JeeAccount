@@ -12,6 +12,8 @@ import { InlineSVGModule } from 'ng-inline-svg';
 import { JeeAccountModule } from 'src/app/pages/jee-account.module';
 import { ChangeTinhTrangDepartmentEditDialogComponent } from './change-tinh-trang-department-edit-dialog/change-tinh-trang-department-edit-dialog.component';
 import { DepartmentQuanLytrucTiepEditDialogComponent } from './department-quan-ly-truc-tiep-edit-dialog/department-quan-ly-truc-tiep-edit-dialog.component';
+import { DropdownTreeModule } from 'dps-lib';
+import { CdkTreeModule } from '@angular/cdk/tree';
 
 const routes: Routes = [
   {
@@ -34,7 +36,16 @@ const routes: Routes = [
     ChangeTinhTrangDepartmentEditDialogComponent,
     DepartmentQuanLytrucTiepEditDialogComponent,
   ],
-  imports: [CommonModule, RouterModule.forChild(routes), JeeAccountModule, MatChipsModule, NgxMatSelectSearchModule, InlineSVGModule],
+  imports: [
+    CommonModule,
+    RouterModule.forChild(routes),
+    JeeAccountModule,
+    MatChipsModule,
+    NgxMatSelectSearchModule,
+    InlineSVGModule,
+    DropdownTreeModule,
+    CdkTreeModule,
+  ],
   providers: [
     DepartmentManagementService,
     {

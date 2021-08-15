@@ -50,7 +50,10 @@ export class AuthService implements OnDestroy {
   set currentUserValue(user: UserModel) {
     this.currentUserSubject.next(user);
   }
-
+  getUserId() {
+    var auth = this.getAuthFromLocalStorage();
+    return auth.user.customData['jee-account'].userID;
+  }
   autoGetUserFromSSO() {
     const auth = this.getAuthFromLocalStorage();
     if (auth) {

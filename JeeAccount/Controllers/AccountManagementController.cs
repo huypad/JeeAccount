@@ -1054,5 +1054,47 @@ namespace JeeAccount.Controllers
                 return BadRequest(MessageReturnHelper.Exception(ex));
             }
         }
+
+        [HttpGet("CheckAdminHeThong/{userid}")]
+        public IActionResult CheckAdminHeThong(long userid)
+        {
+            try
+            {
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+
+                var isAdmin = GeneralReponsitory.IsAdminHeThong(_connectionString, userid);
+
+                return Ok(new { IsAdmin = isAdmin });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpGet("CheckAdminApp/{userid}/{appID}")]
+        public IActionResult CheckAdminApp(long userid, int appID)
+        {
+            try
+            {
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+
+                var isAdmin = GeneralReponsitory.IsAdminApp(_connectionString, userid, appID);
+
+                return Ok(new { IsAdmin = isAdmin });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
     }
 }

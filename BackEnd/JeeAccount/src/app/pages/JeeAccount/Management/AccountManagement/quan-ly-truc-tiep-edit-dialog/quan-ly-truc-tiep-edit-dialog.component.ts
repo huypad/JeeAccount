@@ -55,7 +55,6 @@ export class QuanLytrucTiepEditDialogComponent implements OnInit, OnDestroy {
         });
         //  init data
         if (this.data.DirectManager) {
-          console.log(this.data);
           this.itemForm.controls.QuanLyNhom.setValue(this.data.DirectManager);
         }
         this.isLoading$.next(false);
