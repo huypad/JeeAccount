@@ -1150,46 +1150,5 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpGet("save")]
-        public async Task<IActionResult> save()
-        {
-            try
-            {
-                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
-                if (token is null)
-                {
-                    return Unauthorized(MessageReturnHelper.DangNhap());
-                }
-                var lstCustomer = GeneralReponsitory.GetLstCustomerid(_connectionString);
-                var identityServerController = new IdentityServerController();
-                foreach (var customerID in lstCustomer)
-                {
-                    var lstUserid = GeneralReponsitory.GetLstUserIDByCustomerid(_connectionString, customerID);
-                    if (lstUserid is not null)
-                    {
-                        foreach (var UserID in lstUserid)
-                        {
-                            var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, UserID);
-                            var appCodes = GeneralReponsitory.GetListAppByUserID(_connectionString, commonInfo.UserID).Select(item => item.AppCode).ToList();
-                            var objCustomDataJeeAccount = identityServerController.JeeAccountCustomData(appCodes, commonInfo.UserID, customerID, commonInfo.StaffID);
-
-                            var updateIndentity = await identityServerController.UppdateCustomDataHttpResponse(token, commonInfo.Username, objCustomDataJeeAccount);
-
-                            if (!updateIndentity.IsSuccessStatusCode)
-                            {
-                                string returnValue = await updateIndentity.Content.ReadAsStringAsync();
-                                var res = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
-                                throw new Exception(res.message);
-                            }
-                        }
-                    }
-                }
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(MessageReturnHelper.Exception(ex));
-            }
-        }
     }
 }

@@ -55,14 +55,8 @@ namespace JeeAccount.Controllers
                     return Unauthorized(MessageReturnHelper.DangNhap());
                 }
 
-                if (!GeneralReponsitory.IsAdminApp(_connectionString, customData.JeeAccount.UserID, 14) && !GeneralReponsitory.IsAdminHeThong(_connectionString, customData.JeeAccount.UserID))
-                {
-                    id_menu += ",4";
-                }
-                else
-                {
-                    id_menu += ",1,2,3,4";
-                }
+                id_menu += ",1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30";
+
                 //select menu
                 sql = $@"select title, Target, Summary, '#' as ALink, ISNULL(Icon, 'flaticon-interface-7') as Icon, '' as title_, position, Code
                 from Mainmenu where code in (select distinct groupname from Tbl_submenu where  Id_row in ({id_menu})) order by position
