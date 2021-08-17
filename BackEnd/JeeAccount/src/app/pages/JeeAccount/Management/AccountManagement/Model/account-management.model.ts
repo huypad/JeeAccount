@@ -36,6 +36,9 @@ export interface AppListDTO {
   CurrentVersion: string;
   LastUpdate: string;
   IsDefaultApp: boolean;
+  IsAdmin: boolean;
+  StartDate: string;
+  EndDate: string;
 }
 
 export interface CheckEditAppListByDTO {

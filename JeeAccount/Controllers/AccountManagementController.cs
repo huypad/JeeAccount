@@ -157,7 +157,11 @@ namespace JeeAccount.Controllers
                 var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, 0, img.Username);
                 var userid = commonInfo.UserID;
                 await _service.UpdateAvatarWithChangeUrlAvatar(Convert.ToInt64(userid), img.Username, customData.JeeAccount.CustomerID, img.imgFile).ConfigureAwait(false);
-                return Ok("Cập nhật thành công");
+                return Ok(MessageReturnHelper.ThanhCong());
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieuException(ex));
             }
             catch (Exception ex)
             {
@@ -1150,5 +1154,28 @@ namespace JeeAccount.Controllers
             }
         }
 
+        [HttpGet("GetPersonalInfo")]
+        public IActionResult GetPersonalInfo(long userid = 0)
+        {
+            try
+            {
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+                if (userid == 0) userid = customData.JeeAccount.UserID;
+                return Ok(GeneralReponsitory.GetPersonalInfoCustomData(userid, customData.JeeAccount.CustomerID, _connectionString));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
     }
 }

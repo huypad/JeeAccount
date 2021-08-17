@@ -512,13 +512,14 @@ namespace JeeAccount.Services.AccountManagementService
             personalInfo.Jobtitle = account.Jobtitle;
             personalInfo.Birthday = account.Birthday;
             personalInfo.Phonenumber = account.Phonemumber;
-            personalInfo.DepartmemtID = account.DepartmemtID;
+            personalInfo.DepartmemtID = account.DepartmemtID.ToString();
             personalInfo.Email = account.Email;
             personalInfo.Departmemt = account.Departmemt;
             personalInfo.Jobtitle = account.Jobtitle;
-            personalInfo.JobtitleID = account.JobtitleID;
+            personalInfo.JobtitleID = account.JobtitleID.ToString();
             personalInfo.Structure = "";
             personalInfo.StructureID = account.cocauid.ToString();
+            personalInfo.ChucvuID = account.chucvuid.ToString();
             personalInfo.BgColor = GeneralService.GetColorNameUser(GeneralService.GetFirstname(account.Fullname));
             JeeAccountCustomDataModel jee = new JeeAccountCustomDataModel();
             jee.AppCode = account.AppCode;
@@ -661,7 +662,7 @@ namespace JeeAccount.Services.AccountManagementService
                 var custom = new JeeAccountCustomData();
                 custom.customerID = commonInfo.CustomerID;
                 custom.staffID = commonInfo.StaffID;
-                var lstApp = await GeneralReponsitory.GetListAppByUserIDAsync(_connectionString, commonInfo.UserID);
+                var lstApp = await GeneralReponsitory.GetListAppByUserIDAsync(_connectionString, commonInfo.CustomerID, commonInfo.UserID);
                 custom.appCode = lstApp.Select(item => item.AppCode).ToList();
                 custom.userID = commonInfo.UserID;
                 return custom;

@@ -54,6 +54,7 @@ namespace JeeCustomer.ConsumerKafka
             try
             {
                 var obj = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomData>(value);
+                var objRemove = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomDataRoles>(value);
                 if (obj.updateField.Equals("jee-hr", StringComparison.OrdinalIgnoreCase))
                 {
                     var fieldvalue_json = JsonConvert.SerializeObject(obj.fieldValue);
@@ -66,7 +67,13 @@ namespace JeeCustomer.ConsumerKafka
                     }
                     var inputModel = new InputApiModel();
                     inputModel.Userid = obj.userId.ToString();
-                    GeneralReponsitory.InsertAppCodeJeeHRKafka(_config.GetValue<string>("AppConfig:Connection"), obj.userId);
+
+                    GeneralReponsitory.InsertAppCodeJeeHRKafka(_config.GetValue<string>("AppConfig:Connection"), obj.userId, false);
+                    if (string.IsNullOrEmpty(objRemove.fieldValue.roles))
+                    {
+                        GeneralReponsitory.RemoveAppCodeJeeHRKafka(_config.GetValue<string>("AppConfig:Connection"), obj.userId);
+                    }
+
                     _ = GeneralReponsitory.UpdateJeeAccountCustomDataByInputApiModel(inputModel, _config.GetValue<string>("AppConfig:Connection"), GetSecretToken());
                 }
                 string username = GetObjectDB($"select Username from AccountList where UserID = {obj.userId}", _config.GetValue<string>("AppConfig:Connection"));

@@ -24,5 +24,8 @@ namespace JeeAccount.Models.AccountManagement
         public bool IsShowApp { get; set; }
         public bool IsActive { get; set; }
         public bool IsAdmin { get; set; }
+        public string StartDate { get; set; }
+        public string EndDate { get; set; }
+
     }
 }

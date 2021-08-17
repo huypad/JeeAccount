@@ -12,13 +12,14 @@ namespace JeeAccount.Models.AccountManagement
         public override string Fullname { get; set; }
         public override string Name { get; set; }
         public override string Avatar { get; set; }
-        public int JobtitleID { get; set; }
+        public string JobtitleID { get; set; }
         public override string Jobtitle { get; set; }
         public override string Departmemt { get; set; }
-        public int DepartmemtID { get; set; }
+        public string DepartmemtID { get; set; }
         public override string Email { get; set; }
         public override string StructureID { get; set; }
         public string Structure { get; set; }
         public string BgColor { get; set; } = "";
+        public string ChucvuID { get; set; }
     }
 }

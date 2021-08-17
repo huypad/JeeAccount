@@ -158,4 +158,21 @@ namespace JeeAccount.Models
         [JsonProperty("fieldValue")]
         public object fieldValue { get; set; }
     }
+
+    public class ObjCustomDataRoles
+    {
+        [JsonProperty("userId")]
+        public long userId { get; set; }
+
+        [JsonProperty("updateField")]
+        public string updateField { get; set; }
+
+        [JsonProperty("fieldValue")]
+        public fieldValueRoles fieldValue { get; set; }
+    }
+
+    public class fieldValueRoles
+    {
+        public string roles { get; set; }
+    }
 }
