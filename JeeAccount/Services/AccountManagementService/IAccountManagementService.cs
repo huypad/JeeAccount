@@ -12,7 +12,7 @@ namespace JeeAccount.Services.AccountManagementService
     {
         Task<IEnumerable<AccountManagementDTO>> GetListAccountManagement(QueryParams query, long customerid);
 
-        Task UpdateAvatarWithChangeUrlAvatar(long UserId, string Username, long CustomerID, string apiUrl);
+        Task<object> UpdateAvatarWithChangeUrlAvatar(long UserId, string Username, long CustomerID, string apiUrl);
 
         Task<IEnumerable<AccUsernameModel>> GetListAccUsernameModel(long CustomerID);
 

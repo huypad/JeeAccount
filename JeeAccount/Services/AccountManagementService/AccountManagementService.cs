@@ -608,7 +608,7 @@ namespace JeeAccount.Services.AccountManagementService
             }
         }
 
-        public async Task UpdateAvatarWithChangeUrlAvatar(long UserId, string Username, long CustomerID, string base64)
+        public async Task<object> UpdateAvatarWithChangeUrlAvatar(long UserId, string Username, long CustomerID, string base64)
         {
             var identity = new IdentityServerController();
             try
@@ -622,6 +622,10 @@ namespace JeeAccount.Services.AccountManagementService
                 {
                     string returnValue = await res.Content.ReadAsStringAsync();
                     throw new Exception(returnValue);
+                }
+                else
+                {
+                    return await res.Content.ReadAsStringAsync();
                 }
             }
             catch (Exception ex)
@@ -684,14 +688,14 @@ namespace JeeAccount.Services.AccountManagementService
                     FileName = $"{username}.png",
                     Linkfile = $"images/avatars"
                 };
-                var upload = UploadFile.UploadFileImageMinio(up, _configuration);
+                var upload = UploadFile.UploadFileAllTypeMinio(up, _configuration);
                 if (upload.status)
                 {
                     linkAvatar = $"https://{HOST_MINIOSERVER}{upload.link}";
                 }
                 else
                 {
-                    throw new Exception("Cập nhật avatar thất bại");
+                    throw new Exception("Cập nhật avatar Cdn thất bại");
                 }
                 return linkAvatar;
             }

@@ -156,8 +156,8 @@ namespace JeeAccount.Controllers
                 }
                 var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, 0, img.Username);
                 var userid = commonInfo.UserID;
-                await _service.UpdateAvatarWithChangeUrlAvatar(Convert.ToInt64(userid), img.Username, customData.JeeAccount.CustomerID, img.imgFile).ConfigureAwait(false);
-                return Ok(MessageReturnHelper.ThanhCong());
+                var obj = await _service.UpdateAvatarWithChangeUrlAvatar(Convert.ToInt64(userid), img.Username, customData.JeeAccount.CustomerID, img.imgFile).ConfigureAwait(false);
+                return Ok(obj);
             }
             catch (KhongCoDuLieuException ex)
             {
@@ -1147,6 +1147,33 @@ namespace JeeAccount.Controllers
                     var x = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
                     return BadRequest(MessageReturnHelper.Custom(x.message));
                 }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpPost("changePassword")]
+        public async Task<IActionResult> changePassword(ChangePasswordModel model)
+        {
+            try
+            {
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+
+                var identity = new IdentityServerController();
+                var res = await identity.ChangePasswordAsyncInternal(GeneralService.GetInternalToken(_config), model);
+
+                return Ok(MessageReturnHelper.ThanhCong());
             }
             catch (Exception ex)
             {

@@ -229,8 +229,7 @@ export class AccountManagementEditDialogComponent implements OnInit, OnDestroy {
         return;
       }
       const acc = this.prepareDataFromFB();
-      console.log(acc);
-      //this.create(acc, withBack);
+      this.create(acc, withBack);
     } else {
       this.validateAllFormFields(this.itemForm);
     }

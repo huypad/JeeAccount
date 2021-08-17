@@ -80,25 +80,40 @@ namespace JeeAccount.Controllers
             }
         }
 
-        public async Task<HttpResponseMessage> changePassword(IdentityServerChangePasswordModel identityServerChangePasswordModel)
+        public async Task<object> ChangePasswordAsyncInternal(string internal_token, ChangePasswordModel model)
         {
-            string url = LINK_CHANGE_PASSWORD;
-            var content = new IdentityServerChangePassword
+            try
             {
-                password_old = identityServerChangePasswordModel.password_old,
-                password_new = identityServerChangePasswordModel.password_new,
-            };
+                string url = LINK_CHANGEPASSWORD_INTERNAL;
+                var content = new
+                {
+                    username = model.Username,
+                    password_old = model.PasswordOld,
+                    password_new = model.PaswordNew,
+                };
 
-            var stringContent = await Task.Run(() => JsonConvert.SerializeObject(content));
-            var httpContent = new StringContent(stringContent, Encoding.UTF8, "application/json");
+                var stringContent = await Task.Run(() => JsonConvert.SerializeObject(content));
+                var httpContent = new StringContent(stringContent, Encoding.UTF8, "application/json");
 
-            using (var client = new HttpClient())
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(internal_token);
+                    var reponse = await client.PostAsync(url, httpContent);
+                    string returnValue = await reponse.Content.ReadAsStringAsync();
+                    if (reponse.IsSuccessStatusCode)
+                    {
+                        return returnValue;
+                    }
+                    else
+                    {
+                        var res = JsonConvert.DeserializeObject<IdentityServerReturn>(returnValue);
+                        throw new Exception(res.message);
+                    }
+                }
+            }
+            catch (Exception)
             {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(identityServerChangePasswordModel.USer_access_token);
-
-                var reponse = await client.PostAsync(url, httpContent);
-
-                return reponse;
+                throw;
             }
         }
 
