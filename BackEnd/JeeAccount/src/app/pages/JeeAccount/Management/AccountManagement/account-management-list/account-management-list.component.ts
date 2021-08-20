@@ -4,7 +4,6 @@ import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, of, Subscription } from 'rxjs';
-import { SubheaderService } from 'src/app/_metronic/partials/layout';
 import { AccountManagementEditDialogComponent } from '../account-management-edit-dialog/account-management-edit-dialog.component';
 import { AppListDTO, PostImgModel } from '../Model/account-management.model';
 import { AccountManagementService } from '../Services/account-management.service';
@@ -44,7 +43,6 @@ export class AccountManagementListComponent implements OnInit, OnDestroy {
   constructor(
     public accountManagementService: AccountManagementService,
     private translate: TranslateService,
-    public subheaderService: SubheaderService,
     private layoutUtilsService: LayoutUtilsService,
     public dialog: MatDialog,
     public danhmuc: DanhMucChungService,

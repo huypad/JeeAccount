@@ -8,6 +8,7 @@ import { MenuServices } from 'src/app/_metronic/core/services/menu.service';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 
+const HOST_JEELANDINGPAGE = environment.HOST_JEELANDINGPAGE;
 @Component({
   selector: 'app-user-offcanvas',
   templateUrl: './user-offcanvas.component.html',
@@ -43,7 +44,7 @@ export class UserOffcanvasComponent implements OnInit {
   }
 
   quanlytaikhoan() {
-    window.open('https://jeeaccount.jee.vn/Management/AccountManagement', '_blank');
+    window.open(`${HOST_JEELANDINGPAGE}/ThongTinCaNhan`, '_blank');
   }
 
   logout() {

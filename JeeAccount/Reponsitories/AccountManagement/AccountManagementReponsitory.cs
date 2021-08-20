@@ -12,7 +12,6 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using static JeeAccount.Models.Common.Panigator;
 
 namespace JeeAccount.Reponsitories
 {

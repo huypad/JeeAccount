@@ -1,4 +1,4 @@
-export interface NhanVienMatchip {
+export class NhanVienMatchip {
   Fullname: string;
   Username: string;
   Display: string;

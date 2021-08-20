@@ -1,11 +1,13 @@
 using DPSinfra.Kafka;
 using DPSinfra.Logger;
 using DPSinfra.Vault;
+using JeeAccount.ControllersKafka;
 using JeeAccount.Reponsitories;
 using JeeAccount.Reponsitories.CustomerManagement;
 using JeeAccount.Reponsitories.DatabaseManagement;
 using JeeAccount.Reponsitories.JobtitleManagement;
 using JeeAccount.Reponsitories.Mail;
+using JeeAccount.Reponsitories.PermissionManagement;
 using JeeAccount.Services.AccountManagementService;
 using JeeAccount.Services.CommentService;
 using JeeAccount.Services.CustomerManagementService;
@@ -13,6 +15,7 @@ using JeeAccount.Services.DatabaseManagementService;
 using JeeAccount.Services.DepartmentManagement;
 using JeeAccount.Services.JobtitleManagementService;
 using JeeAccount.Services.MailService;
+using JeeAccount.Services.PermissionManagementService;
 using JeeAccount.Services.StructureManagementService;
 using JeeCustomer.ConsumerKafka;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -136,32 +139,35 @@ namespace JeeAccount
             #region add kafka consumer
 
             services.AddSingleton<IHostedService, AccountConsumerController>();
+            services.AddSingleton<IHostedService, PermissionConsumerController>();
 
             #endregion add kafka consumer
 
             #region add Repository
 
-            services.AddScoped<IAccountManagementReponsitory, AccountManagementReponsitory>();
-            services.AddScoped<ICustomerManagementReponsitory, CustomerManagementReponsitory>();
-            services.AddScoped<IDatabaseManagementRepositoty, DatabaseManagementRepositoty>();
-            services.AddScoped<IDepartmentManagementReponsitory, DepartmentManagementReponsitory>();
-            services.AddScoped<IMailReponsitory, MailReponsitory>();
-            services.AddScoped<IStructureManagementReponsitory, StructureManagementReponsitory>();
-            services.AddScoped<IWidgetDashBoardRepository, WidgetDashBoardRepository>();
-            services.AddScoped<IJobtitleManagementReponsitory, JobtitleManagementReponsitory>();
+            services.AddSingleton<IAccountManagementReponsitory, AccountManagementReponsitory>();
+            services.AddSingleton<ICustomerManagementReponsitory, CustomerManagementReponsitory>();
+            services.AddSingleton<IDatabaseManagementRepositoty, DatabaseManagementRepositoty>();
+            services.AddSingleton<IDepartmentManagementReponsitory, DepartmentManagementReponsitory>();
+            services.AddSingleton<IMailReponsitory, MailReponsitory>();
+            services.AddSingleton<IStructureManagementReponsitory, StructureManagementReponsitory>();
+            services.AddSingleton<IWidgetDashBoardRepository, WidgetDashBoardRepository>();
+            services.AddSingleton<IJobtitleManagementReponsitory, JobtitleManagementReponsitory>();
+            services.AddSingleton<IPermissionManagementRepository, PermissionManagementRepository>();
 
             #endregion add Repository
 
             #region add Services
 
-            services.AddScoped<IAccountManagementService, AccountManagementService>();
-            services.AddScoped<IDepartmentManagementService, DepartmentManagementService>();
-            services.AddScoped<ICustomerManagementService, CustomerManagementService>();
-            services.AddScoped<IDatabaseManagementService, DatabaseManagementService>();
-            services.AddScoped<IMailService, MailService>();
-            services.AddScoped<IStructureManagementService, StructureManagementService>();
-            services.AddScoped<ICommentService, CommentService>();
-            services.AddScoped<IJobtitleManagementService, JobtitleManagementService>();
+            services.AddSingleton<IAccountManagementService, AccountManagementService>();
+            services.AddSingleton<IDepartmentManagementService, DepartmentManagementService>();
+            services.AddSingleton<ICustomerManagementService, CustomerManagementService>();
+            services.AddSingleton<IDatabaseManagementService, DatabaseManagementService>();
+            services.AddSingleton<IMailService, MailService>();
+            services.AddSingleton<IStructureManagementService, StructureManagementService>();
+            services.AddSingleton<ICommentService, CommentService>();
+            services.AddSingleton<IJobtitleManagementService, JobtitleManagementService>();
+            services.AddSingleton<IPermissionManagementService, PermissionManagementService>();
 
             #endregion add Services
         }

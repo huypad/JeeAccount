@@ -172,18 +172,18 @@ export class JeeSearchFormComponent implements OnInit, OnDestroy {
 
   clickSearch() {
     const filter = {};
-    filter['keyword'] = this.filterGroup.controls['keyword'].value;
-    filter['username'] = this.filterGroup.controls['username'].value;
-    filter['tennhanvien'] = this.filterGroup.controls['tennhanvien'].value;
-    filter['chucvuid'] = this.filterGroup.controls['chucvuid'].value;
-    filter['isadmin'] = this.isAdmin;
-    filter['dakhoa'] = this.daKhoa;
+    if (this.filterGroup.controls['keyword'].value) filter['keyword'] = this.filterGroup.controls['keyword'].value;
+    if (this.filterGroup.controls['username'].value) filter['username'] = this.filterGroup.controls['username'].value;
+    if (this.filterGroup.controls['tennhanvien'].value) filter['tennhanvien'] = this.filterGroup.controls['tennhanvien'].value;
+    if (this.filterGroup.controls['chucvuid'].value) filter['chucvuid'] = this.filterGroup.controls['chucvuid'].value;
+    if (this.isAdmin) filter['isadmin'] = this.isAdmin;
+    if (this.daKhoa) filter['dakhoa'] = this.daKhoa;
     if (!this.filterGroup.controls['phongbanid'].value) {
       if (this.lstPhongBanid.length > 0) {
         filter['phongbanid'] = this.lstPhongBanid.join(',');
       }
     } else {
-      filter['phongbanid'] = this.filterGroup.controls['phongbanid'].value;
+      if (this.filterGroup.controls['phongbanid'].value) filter['phongbanid'] = this.filterGroup.controls['phongbanid'].value;
     }
     this.filterEvent.emit(filter);
   }
@@ -194,9 +194,10 @@ export class JeeSearchFormComponent implements OnInit, OnDestroy {
   clearFilter() {
     this.searchGroup.reset();
     this.filterGroup.reset();
-    this.clickSearch();
+    this.daKhoa = false;
     this.showFilter = false;
     this.lstPhongBanid = [];
+    this.clickSearch();
   }
 
   clickOutSideFilter() {

@@ -44,6 +44,17 @@ export class DanhMucChungService {
     return this.http.get<any>(url, { headers: httpHeaders });
   }
 
+  GetMatchipNhanvienNotAdminHeThong(): Observable<any> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const url = `${API_URL_GENERAL}/GetMatchipNhanvienNotAdminHeThong`;
+    return this.http.get<any>(url, { headers: httpHeaders });
+  }
+
+  GetMatchipNhanvienNotAdminApp(appid: number): Observable<any> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders(); 
+    const url = `${API_URL_GENERAL}/GetMatchipNhanvienNotAdminApp/${appid}`;
+    return this.http.get<any>(url, { headers: httpHeaders });
+  }
   GetSelectionDepartment(): Observable<any> {
     const httpHeaders = this.httpUtils.getHTTPHeaders();
     const url = `${API_URL_GENERAL}/GetSelectionDepartMent`;

@@ -1,0 +1,152 @@
+<style>
+  form {
+    min-width: 400px;
+    padding: 0;
+    margin: 0;
+    height: 48px;
+  }
+</style>
+<div class="card card-custom card-sticky gutter-b">
+  <div class="card-header">
+    <div class="card-title">
+      <form [formGroup]="itemForm" class="form form-label-right">
+        <mat-form-field class="example-full-width">
+          <mat-select formControlName="ListApp" placeholder="{{ 'ACCOUNTMANAGEMENT.TENCHUCVU' | translate }}" #singleSelect>
+            <mat-option>
+              <ngx-mat-select-search
+                noEntriesFoundLabel="{{ 'ACCOUNTMANAGEMENT.KHONGTIMTHAY' | translate }}"
+                placeholderLabel="{{ 'SEARCH.TIMKIEMTHEOTENCHUCVU' | translate }}"
+                formControlName="ListAppFilterCtrl"
+              >
+              </ngx-mat-select-search>
+            </mat-option>
+            <mat-option *ngFor="let app of filterListApps | async" [value]="app.AppID">
+              {{ app.AppName }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </form>
+    </div>
+    <div class="card-search">
+      <app-jee-search-form (keywordEvent)="changeKeyword($event)" (filterEvent)="changeFilter($event)"></app-jee-search-form>
+    </div>
+    <div *ngIf="isAdminHeThong" class="card-toolbar">
+      <button mat-raised-button class="ja_button ja_btn-addnew" (click)="create()">{{ 'COMMOM.THEMMOI' | translate }}</button>
+    </div>
+  </div>
+  <!-- body -->
+  <div class="card-body" *ngIf="!(isFirstLoading$ | async)">
+    <div class="table-responsive angular-bootstrap-table" [ngStyle]="{ height: getHeight() }">
+      <table class="table table-head-custom table-vertical-center overflow-hidden">
+        <thead>
+          <th class="pl-8" style="min-width: 250px">
+            <span>{{ 'ACCOUNTMANAGEMENT.NHANVIEN' | translate }}</span>
+            <app-sort-icon
+              column="nhanvien"
+              [activeColumn]="sorting.column"
+              [activeDirection]="sorting.direction"
+              (sort)="sort($event)"
+            ></app-sort-icon>
+          </th>
+          <th style="min-width: 200px">
+            <span>{{ 'COMMOM.USERNAME' | translate }}</span>
+            <app-sort-icon
+              column="tendangnhap"
+              [activeColumn]="sorting.column"
+              [activeDirection]="sorting.direction"
+              (sort)="sort($event)"
+            ></app-sort-icon>
+          </th>
+          <th style="min-width: 200px">
+            <span>{{ 'ACCOUNTMANAGEMENT.PHONGBAN' | translate }}</span>
+            <app-sort-icon
+              column="phongbanid"
+              [activeColumn]="sorting.column"
+              [activeDirection]="sorting.direction"
+              (sort)="sort($event)"
+            ></app-sort-icon>
+          </th>
+          <th style="min-width: 150px">
+            <span>{{ 'COMMOM.CHUCVU' | translate }}</span>
+            <app-sort-icon
+              column="chucvuid"
+              [activeColumn]="sorting.column"
+              [activeDirection]="sorting.direction"
+              (sort)="sort($event)"
+            ></app-sort-icon>
+          </th>
+          <th style="min-width: 250px; text-align: center">
+            <span>{{ 'ACCOUNTMANAGEMENT.QUANLYTRUCTIEP' | translate }}</span>
+          </th>
+          <th style="min-width: 150px; text-align: center">
+            <span>{{ 'COMMOM.TINHTRANG' | translate }}</span>
+            <app-sort-icon
+              column="tinhtrang"
+              [activeColumn]="sorting.column"
+              [activeDirection]="sorting.direction"
+              (sort)="sort($event)"
+            ></app-sort-icon>
+          </th>
+          <th style="min-width: 100px; text-align: center">
+            <span>{{ 'COMMOM.THAOTAC' | translate }}</span>
+          </th>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of service.items$ | async">
+            <td>
+              <div class="pl-10">
+                <div class="row" style="cursor: pointer">
+                  <ngx-avatar [size]="40" src="{{ r.AvartarImgURL }}" *ngIf="r"></ngx-avatar>
+                  <ngx-avatar [size]="40" [name]="r.FirstName" bgColor="{{ r.BgColor }}" *ngIf="!r.AvartarImgURL"></ngx-avatar>
+                  <span class="pl-3" style="align-self: center">
+                    {{ r.FullName }}
+                  </span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div>
+                <span>{{ r.Username }}</span>
+              </div>
+            </td>
+            <td>
+              <div>
+                <span>{{ r.Department }}</span>
+              </div>
+            </td>
+            <td>
+              <span>{{ r.Jobtitle }}</span>
+            </td>
+            <td style="text-align: center">
+              <div style="cursor: pointer">
+                <span *ngIf="r.DirectManager != ''">{{ r.DirectManager }}</span>
+                <span *ngIf="r.DirectManager == ''">
+                  <mat-icon>person_add</mat-icon>
+                </span>
+              </div>
+            </td>
+            <td style="text-align: center">
+              <mat-slide-toggle (click)="changeTinhTrang(r.Username)" [checked]="r.IsActive"> </mat-slide-toggle>
+            </td>
+            <td style="text-align: center">
+              <mat-icon
+                *ngIf="!r.IsAdmin"
+                (click)="delete(r.UserId)"
+                style="cursor: pointer; color: red; font-size: 16px"
+                aria-hidden="false"
+                >delete
+              </mat-icon>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- end: Table -->
+    <app-paginator
+      class="d-flex justify-content-between align-items-center flex-wrap"
+      [paginator]="paginator"
+      [isLoading]="isLoading"
+      (paginate)="paginate($event)"
+    ></app-paginator>
+  </div>
+</div>

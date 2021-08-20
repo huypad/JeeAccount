@@ -219,5 +219,13 @@ export const locale = {
     INFO: {
       THONGTINCANHAN: 'Thông tin cá nhân',
     },
+    PHANQUYEN: {
+      TITLE: 'Phân quyền quản trị tài khoản',
+      ADMINHETHONG: 'Quản trị hệ thống',
+      ADMINAPP: 'Quản trị ứng dụng',
+      THEMADMINHETHONG: 'Thêm quản trị hệ thống',
+      THEMMOIADMINHETHONG: 'Thêm mới quản trị hệ thống',
+      THEMADMINAPP: 'Thêm quản trị ứng dụng',
+    },
   },
 };

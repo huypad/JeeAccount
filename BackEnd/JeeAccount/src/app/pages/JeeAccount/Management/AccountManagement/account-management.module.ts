@@ -55,5 +55,6 @@ const routes: Routes = [
     AccountManagementChinhSuaJeeHRDialogComponent,
     AccountManagementEditJeeHRDialogComponent,
   ],
+  exports: [ChangeTinhTrangEditDialogComponent],
 })
 export class AccountManagementModule {}

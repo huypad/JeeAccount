@@ -36,8 +36,13 @@ const routes: Routes = [
           import('./JeeAccount/Management/JobtitleManagement/jobtitle-management.module').then((m) => m.JobtitleManagementModule),
       },
       {
+        path: 'Management/PermissionManagement',
+        loadChildren: () =>
+          import('./JeeAccount/Management/PermissionManagement/permission-management.module').then((m) => m.PermissionManagementModule),
+      },
+      {
         path: '',
-        redirectTo: 'Management/AccountManagement',
+        redirectTo: '/Management/AccountManagement',
         pathMatch: 'full',
       },
       {

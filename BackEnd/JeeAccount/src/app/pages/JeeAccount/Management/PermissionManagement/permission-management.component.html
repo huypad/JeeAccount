@@ -1,0 +1,22 @@
+<style>
+  :host ::ng-deep .mat-tab-body {
+    overflow: hidden !important;
+  }
+</style>
+<div class="card card-custom card-sticky gutter-b">
+  <div class="card-header">
+    <div class="card-title">
+      <span class="card-label">{{ 'PHANQUYEN.TITLE' | translate }}</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <mat-tab-group mat-align-tabs="start">
+      <mat-tab label="{{ 'PHANQUYEN.ADMINHETHONG' | translate }}"
+        ><app-permission-management-admin-he-thong-list></app-permission-management-admin-he-thong-list
+      ></mat-tab>
+      <mat-tab label="{{ 'PHANQUYEN.ADMINAPP' | translate }}"
+        ><app-permission-management-admin-app-list></app-permission-management-admin-app-list
+      ></mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

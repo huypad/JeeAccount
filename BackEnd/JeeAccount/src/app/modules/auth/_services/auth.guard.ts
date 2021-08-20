@@ -1,3 +1,4 @@
+import { environment } from './../../../../environments/environment.stage';
 import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import { AuthService } from './auth.service';
@@ -6,16 +7,18 @@ import { LayoutUtilsService, MessageType } from 'src/app/pages/JeeAccount/_core/
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
   constructor(private authService: AuthService, private router: Router, private layoutUtilsService: LayoutUtilsService) {}
-  appCode = 'ACCOUNT';
+  appCode = environment.APPCODE;
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
-    if (!this.authService.isAuthenticated()) {
-      if (this.authService.ssoToken$.getValue()) {
-        this.authService.accessToken$.next(this.authService.ssoToken$.getValue());
+    return new Promise<boolean>((resolve, reject) => {
+      if (!this.authService.isAuthenticated()) {
+        if (this.authService.ssoToken$.getValue()) {
+          this.authService.accessToken$.next(this.authService.ssoToken$.getValue());
+        }
+        resolve(this.canPassGuard());
+      } else {
+        resolve(this.canPassGuard());
       }
-      return this.canPassGuard();
-    } else {
-      return this.canPassGuard();
-    }
+    });
   }
 
   canPassGuard(): Promise<boolean> {

@@ -45,7 +45,7 @@ namespace JeeAccount.Services.AccountManagementService
 
         #region api giao diện
 
-        public async Task<IEnumerable<AccountManagementDTO>> GetListAccountManagement(QueryParams query, long customerid)
+        public async Task<IEnumerable<AccountManagementDTO>> GetListAccountManagement(QueryParams query, long customerid, bool IsFilterAdminHeThong = false)
         {
             query = query == null ? new QueryParams() : query;
 
@@ -131,12 +131,16 @@ namespace JeeAccount.Services.AccountManagementService
                 whereStr += $" and (AccountList.JobtitleID like N'%{query.filter["chucvuid"]}%') ";
             }
 
-            if (!string.IsNullOrEmpty(query.filter["isadmin"]))
+            if (!string.IsNullOrEmpty(query.filter["isadmin"]) && !IsFilterAdminHeThong)
             {
                 if (Convert.ToBoolean(query.filter["isadmin"]))
                 {
                     whereStr += $" and (AccountList.IsAdmin = 1) ";
                 }
+            }
+            else
+            {
+                whereStr += $" and (AccountList.IsAdmin = 1) ";
             }
 
             if (!string.IsNullOrEmpty(query.filter["dakhoa"]))
@@ -688,7 +692,7 @@ namespace JeeAccount.Services.AccountManagementService
                     FileName = $"{username}.png",
                     Linkfile = $"images/avatars"
                 };
-                var upload = UploadFile.UploadFileAllTypeMinio(up, _configuration);
+                var upload = UploadFile.UploadFileAllTypeMinio(up, _configuration, "image/png");
                 if (upload.status)
                 {
                     linkAvatar = $"https://{HOST_MINIOSERVER}{upload.link}";

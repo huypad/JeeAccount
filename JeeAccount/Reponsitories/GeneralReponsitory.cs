@@ -620,6 +620,54 @@ join AppList on AppList.AppID = Account_App.AppID";
             }
         }
 
+        public static async Task<IEnumerable<AppListDTO>> GetListAppByUserIDAsyncCnn(DpsConnection cnn, long UserID, long CustomerID, bool IsActive = true)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("UserID", UserID);
+            string selection = " AppList.*, Account_App.IsActive, Account_App.IsAdmin as AdminApp";
+            string join = @"join Account_App on Account_App.UserID = AccountList.UserID
+join AppList on AppList.AppID = Account_App.AppID";
+            string where = "where AccountList.UserID = @UserID and (AccountList.Disable = 0 or AccountList.Disable is null)";
+
+            selection += " , Customer_App.SoLuongNhanSu, Customer_App.StartDate, Customer_App.EndDate ";
+            join += " join Customer_App on Customer_App.AppID = AppList.AppID ";
+            where += " and Customer_App.CustomerID = @CustomerID";
+            Conds.Add("CustomerID", CustomerID);
+
+            if (IsActive)
+            {
+                where += " and  Account_App.IsActive = 1";
+            }
+
+            string sql = @$"select {selection} from AccountList {join} {where} order by Position";
+
+            dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+
+            var result = dt.AsEnumerable().Select(row => new AppListDTO
+            {
+                EndDate = (dt.Rows[0]["EndDate"] != DBNull.Value) ? ((DateTime)dt.Rows[0]["EndDate"]).ToString("dd/MM/yyyy") : "",
+                StartDate = (dt.Rows[0]["StartDate"] != DBNull.Value) ? ((DateTime)dt.Rows[0]["StartDate"]).ToString("dd/MM/yyyy") : "",
+                AppID = Int32.Parse(row["AppID"].ToString()),
+                APIUrl = row["APIUrl"].ToString(),
+                AppCode = row["AppCode"].ToString(),
+                AppName = row["AppName"].ToString(),
+                BackendURL = row["BackendURL"].ToString(),
+                CurrentVersion = row["CurrentVersion"].ToString(),
+                Description = row["Description"].ToString(),
+                LastUpdate = row["LastUpdate"].ToString(),
+                Note = row["Note"].ToString(),
+                ReleaseDate = row["ReleaseDate"].ToString(),
+                Icon = row["Icon"].ToString(),
+                Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
+                SoLuongNhanSu = (row["SoLuongNhanSu"] != DBNull.Value) ? Int32.Parse(row["SoLuongNhanSu"].ToString()) : 0,
+                IsShowApp = Convert.ToBoolean(row["IsShowApp"]),
+                IsActive = Convert.ToBoolean(row["IsActive"]),
+                IsAdmin = Convert.ToBoolean(row["AdminApp"]),
+            });
+            return result;
+        }
+
         public static IEnumerable<AppListDTO> GetListAppByUserID(string connectionString, long UserID, long CustomerID, bool CheckIsActive = true)
         {
             DataTable dt = new DataTable();
