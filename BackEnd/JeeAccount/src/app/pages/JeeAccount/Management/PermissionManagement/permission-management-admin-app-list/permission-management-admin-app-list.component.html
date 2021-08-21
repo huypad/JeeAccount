@@ -11,11 +11,11 @@
     <div class="card-title">
       <form [formGroup]="itemForm" class="form form-label-right">
         <mat-form-field class="example-full-width">
-          <mat-select formControlName="ListApp" placeholder="{{ 'ACCOUNTMANAGEMENT.TENCHUCVU' | translate }}" #singleSelect>
+          <mat-select formControlName="ListApp" placeholder="{{ 'SEARCH.TENUNGDUNG' | translate }}" #singleSelect>
             <mat-option>
               <ngx-mat-select-search
                 noEntriesFoundLabel="{{ 'ACCOUNTMANAGEMENT.KHONGTIMTHAY' | translate }}"
-                placeholderLabel="{{ 'SEARCH.TIMKIEMTHEOTENCHUCVU' | translate }}"
+                placeholderLabel="{{ 'SEARCH.TIMKIEMTHEOTENUNGDUNG' | translate }}"
                 formControlName="ListAppFilterCtrl"
               >
               </ngx-mat-select-search>

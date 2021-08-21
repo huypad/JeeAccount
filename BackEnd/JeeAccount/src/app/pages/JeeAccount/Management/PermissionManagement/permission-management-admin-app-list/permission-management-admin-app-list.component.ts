@@ -41,6 +41,7 @@ export class PermissionManagementAdminAppComponent implements OnInit, OnDestroy 
     ListAppFilterCtrl: [],
   });
   appCode = environment.APPCODE;
+  appCodeLanding = environment.APPCODE_LANDING;
   private subscriptions: Subscription[] = [];
   private _isFirstLoading$ = new BehaviorSubject<boolean>(true);
   get isFirstLoading$() {
@@ -68,6 +69,8 @@ export class PermissionManagementAdminAppComponent implements OnInit, OnDestroy 
             this.listApp = res.data;
             const index = this.listApp.findIndex((item) => item.AppCode === this.appCode);
             this.listApp.splice(index, 1);
+            const index2 = this.listApp.findIndex((item) => item.AppCode === this.appCodeLanding);
+            this.listApp.splice(index2, 1);
             this.filterListApps.next([...res.data]);
             this.itemForm.controls.ListAppFilterCtrl.valueChanges.subscribe(() => {
               this.profilterListApps();

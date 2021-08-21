@@ -6,6 +6,7 @@ export const environment = {
   apiUrl: 'api',
   APPCODE: 'ACCOUNT',
   APPCODE_JEEHR: 'JeeHR',
+  APPCODE_LANDING: 'LANDING',
   APPCONFIG_SSO: 'sso_token',
   HOST_SOCKET: 'wss://socket.jee.vn',
   HOST_JEEACCOUNT_API: 'https://jeeaccount-api.jee.com.vn',

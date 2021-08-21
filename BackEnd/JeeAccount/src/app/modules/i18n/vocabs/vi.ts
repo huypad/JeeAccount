@@ -162,6 +162,8 @@ export const locale = {
       TIMKIEMTHEOTENCHUCVU: 'Tìm kiếm theo tên chức vụ',
       TIMKIEMTHEOTENPHONGBAN: 'Tìm kiếm theo tên phòng ban',
       TIMTHEOTENNHANVIEN: 'Tìm theo tên nhân viên',
+      TIMKIEMTHEOTENUNGDUNG: 'Tìm kiếm theo tên ứng dụng',
+      TENUNGDUNG: 'Tên ứng dụng',
     },
     profile: {
       thongtincanhan: 'Thông tin cá nhân',
