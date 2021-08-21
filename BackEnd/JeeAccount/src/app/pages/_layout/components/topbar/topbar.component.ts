@@ -134,7 +134,6 @@ export class TopbarComponent implements OnInit, AfterViewInit {
     this.menuServices.Get_DSNhacNho().subscribe(res => {
       if (res.status == 1) {
         this.menuServices.data_share$.next(res.data);
-        this.userOffcanvasComponent.LoadNhacNho();
         this.changeDetectorRefs.detectChanges();
       }
     })

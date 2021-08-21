@@ -10,16 +10,10 @@ import { SubheaderModel } from '../_models/subheader.model';
   providedIn: 'root',
 })
 export class SubheaderService implements OnDestroy {
-  titleSubject: BehaviorSubject<string> = new BehaviorSubject<string>(
-    'Dashboard'
-  );
+  titleSubject: BehaviorSubject<string> = new BehaviorSubject<string>('Dashboard');
   descriptionSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
-  breadCrumbsSubject: BehaviorSubject<
-    BreadcrumbItemModel[]
-  > = new BehaviorSubject<BreadcrumbItemModel[]>([]);
-  subheaderVersionSubject: BehaviorSubject<string> = new BehaviorSubject<
-    string
-  >('v1'); // [1-6]
+  breadCrumbsSubject: BehaviorSubject<BreadcrumbItemModel[]> = new BehaviorSubject<BreadcrumbItemModel[]>([]);
+  subheaderVersionSubject: BehaviorSubject<string> = new BehaviorSubject<string>('v1'); // [1-6]
   // private fields
   private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
 
@@ -51,57 +45,32 @@ export class SubheaderService implements OnDestroy {
   updateAfterRouteChanges(pathName) {
     const aside = this.getBreadcrumbsAndTitle('kt_aside_menu', pathName);
     const header = this.getBreadcrumbsAndTitle('kt_header_menu', pathName);
-    const breadcrumbs =
-      aside && aside.breadcrumbs.length > 0
-        ? aside.breadcrumbs
-        : header.breadcrumbs;
+    const breadcrumbs = aside && aside.breadcrumbs.length > 0 ? aside.breadcrumbs : header.breadcrumbs;
 
     this.setBreadcrumbs(breadcrumbs);
 
-    this.setTitle(
-      aside && aside.title && aside.title.length > 0
-        ? aside.title
-        : header.title
-    );
+    this.setTitle(aside && aside.title && aside.title.length > 0 ? aside.title : header.title);
   }
 
   private getLinksFromMenu(menu): HTMLAnchorElement[] {
-    const parentLiElements = Array.from(
-      menu.getElementsByClassName('menu-item-open') || []
-    ) as HTMLElement[];
-    const childLiElements = Array.from(
-      menu.getElementsByClassName('menu-item-active') || []
-    ) as HTMLElement[];
+    const parentLiElements = Array.from(menu.getElementsByClassName('menu-item-open') || []) as HTMLElement[];
+    const childLiElements = Array.from(menu.getElementsByClassName('menu-item-active') || []) as HTMLElement[];
     const result: HTMLAnchorElement[] = [];
     parentLiElements.forEach((el) => {
-      const links = Array.from(
-        el.getElementsByClassName('menu-link') || []
-      ) as HTMLAnchorElement[];
+      const links = Array.from(el.getElementsByClassName('menu-link') || []) as HTMLAnchorElement[];
       if (links && links.length > 0) {
         const aLink = links[0];
-        if (
-          aLink.href &&
-          aLink.href.length &&
-          aLink.href.length > 0 &&
-          aLink.innerHTML !== '/'
-        ) {
+        if (aLink.href && aLink.href.length && aLink.href.length > 0 && aLink.innerHTML !== '/') {
           result.push(aLink);
         }
       }
     });
 
     childLiElements.forEach((el) => {
-      const links = Array.from(
-        el.getElementsByClassName('menu-link') || []
-      ) as HTMLAnchorElement[];
+      const links = Array.from(el.getElementsByClassName('menu-link') || []) as HTMLAnchorElement[];
       if (links && links.length > 0) {
         const aLink = links[0];
-        if (
-          aLink.href &&
-          aLink.href.length &&
-          aLink.href.length > 0 &&
-          aLink.innerHTML !== '/'
-        ) {
+        if (aLink.href && aLink.href.length && aLink.href.length > 0 && aLink.innerHTML !== '/') {
           result.push(aLink);
         }
       }
@@ -126,9 +95,7 @@ export class SubheaderService implements OnDestroy {
     activeLinks.forEach((link) => {
       const titleSpans = link.getElementsByClassName('menu-text');
       if (titleSpans) {
-        const titleSpan = Array.from(titleSpans).find(
-          (t) => t.innerHTML && t.innerHTML.trim().length > 0
-        );
+        const titleSpan = Array.from(titleSpans).find((t) => t.innerHTML && t.innerHTML.trim().length > 0);
         if (titleSpan) {
           result.breadcrumbs.push({
             title: titleSpan.innerHTML,
@@ -144,8 +111,7 @@ export class SubheaderService implements OnDestroy {
 
   private parseUrlAndReturnPathname(href): string {
     const url = document.createElement('a');
-    url.href =
-      'https://developer.mozilla.org:8080/en-US/search?q=URL#search-results-close-container';
+    url.href = 'https://developer.mozilla.org:8080/en-US/search?q=URL#search-results-close-container';
 
     return url.pathname;
   }

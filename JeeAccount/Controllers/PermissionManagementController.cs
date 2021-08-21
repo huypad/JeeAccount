@@ -67,7 +67,7 @@ namespace JeeAccount.Controllers
                 var lst = await _service.GetListAccountAdminAppNotAdminHeThong(query, customData.JeeAccount.CustomerID, appid).ConfigureAwait(false);
 
                 int total = lst.Count();
-                if (total == 0) return BadRequest(MessageReturnHelper.KhongCoDuLieu("danh sách tài khoản"));
+                if (total == 0) return Ok(MessageReturnHelper.Ok(lst, pageModel));
                 pageModel.TotalCount = lst.Count();
                 pageModel.AllPage = (int)Math.Ceiling(total / (decimal)query.record);
                 pageModel.Size = query.record;
@@ -116,7 +116,7 @@ namespace JeeAccount.Controllers
                 PageModel pageModel = new PageModel();
                 var lst = await _accountService.GetListAccountManagement(query, customData.JeeAccount.CustomerID, true).ConfigureAwait(false);
                 int total = lst.Count();
-                if (total == 0) return BadRequest(MessageReturnHelper.KhongCoDuLieu("danh sách tài khoản"));
+                if (total == 0) return Ok(MessageReturnHelper.Ok(lst, pageModel));
                 pageModel.TotalCount = lst.Count();
                 pageModel.AllPage = (int)Math.Ceiling(total / (decimal)query.record);
                 pageModel.Size = query.record;
@@ -172,7 +172,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpPost("CreateAdminApp/{appid}")]
-        public async Task<IActionResult> CreateAdminApp(string username, int appid)
+        public async Task<IActionResult> CreateAdminApp(NhanVienMatchip nv, int appid)
         {
             try
             {
@@ -181,10 +181,9 @@ namespace JeeAccount.Controllers
                 {
                     return Unauthorized(MessageReturnHelper.DangNhap());
                 }
-                var common = GeneralReponsitory.GetCommonInfo(_connectionString, 0, username);
                 var lstAppid = new List<int>();
                 lstAppid.Add(appid);
-                await _service.CreateAdminApp(common.UserID, username, customData.JeeAccount.CustomerID, customData.JeeAccount.UserID, lstAppid);
+                await _service.CreateAdminApp(nv.UserId, nv.Username, customData.JeeAccount.CustomerID, customData.JeeAccount.UserID, lstAppid);
                 return Ok(MessageReturnHelper.ThanhCong("Tạo Admin hệ thống"));
             }
             catch (KhongCoDuLieuException ex)

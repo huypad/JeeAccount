@@ -6,7 +6,6 @@ import { environment } from 'src/environments/environment';
 import { HttpUtilsService } from '../../../_core/utils/http-utils.service';
 import { ITableService } from '../../../_core/services/itable.service';
 import { AccountManagementDTO } from '../../AccountManagement/Model/account-management.model';
-import { AccModel } from '../model/permision-management.model';
 
 const API_PRODUCTS_URL = environment.HOST_JEEACCOUNT_API + '/api/permissionmanagement';
 

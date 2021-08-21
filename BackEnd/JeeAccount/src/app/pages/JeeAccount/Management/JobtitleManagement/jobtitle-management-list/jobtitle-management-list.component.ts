@@ -1,3 +1,4 @@
+import { showSearchFormModel } from './../../../_shared/jee-search-form/jee-search-form.model';
 import { environment } from 'src/environments/environment';
 import { GroupingState } from '../../../../../_metronic/shared/crud-table/models/grouping.model';
 import { FormGroup } from '@angular/forms';
@@ -44,7 +45,7 @@ export class JobtitleManagementListComponent implements OnInit {
   data: any;
   APPCODE_JEEHR = environment.APPCODE_JEEHR;
   private subscriptions: Subscription[] = [];
-
+  showSearch = new showSearchFormModel();
   ngOnInit() {
     this.jobtitleManagementService.fetch();
     this.grouping = this.jobtitleManagementService.grouping;
@@ -53,6 +54,16 @@ export class JobtitleManagementListComponent implements OnInit {
     const sb = this.jobtitleManagementService.isLoading$.subscribe((res) => (this.isLoading = res));
     this.subscriptions.push(sb);
     this.checkIsJeeHR();
+    this.configShowSearch();
+  }
+  configShowSearch() {
+    this.showSearch.phongban = false;
+    this.showSearch.phongbanid = false;
+    this.showSearch.dakhoa = true;
+    this.showSearch.isAdmin = false;
+    this.showSearch.tennhanvien = false;
+    this.showSearch.username = false;
+    this.showSearch.titlekeyword = 'SEARCH.SEARCH3';
   }
 
   checkIsJeeHR() {

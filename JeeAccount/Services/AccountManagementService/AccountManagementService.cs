@@ -138,7 +138,7 @@ namespace JeeAccount.Services.AccountManagementService
                     whereStr += $" and (AccountList.IsAdmin = 1) ";
                 }
             }
-            else
+            else if (IsFilterAdminHeThong)
             {
                 whereStr += $" and (AccountList.IsAdmin = 1) ";
             }

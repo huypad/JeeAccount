@@ -46,7 +46,6 @@ namespace JeeAccount.Controllers
             //string Token = lc.GetHeader(Request);
             DataSet ds = new DataSet();
             string sql = ""; ;
-            string id_menu = "0";
             try
             {
                 var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
@@ -54,21 +53,17 @@ namespace JeeAccount.Controllers
                 {
                     return Unauthorized(MessageReturnHelper.DangNhap());
                 }
-
-                id_menu += ",1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30";
-
                 //select menu
-                sql = $@"select title, Target, Summary, '#' as ALink, ISNULL(Icon, 'flaticon-interface-7') as Icon, '' as title_, position, Code
-                from Mainmenu where code in (select distinct groupname from Tbl_submenu where  Id_row in ({id_menu})) order by position
-                select title, AllowPermit, Target, Tbl_submenu.id_row, PhanLoai1, PhanLoai2, GroupName, ALink, Summary, AppLink, AppIcon, '' as title_ from Tbl_submenu  where id_row in ({id_menu}) order by position";
-                using (DpsConnection cnn = new DpsConnection(_config.GetValue<string>("AppConfig:Connection")))
+                sql = $@"select title, Target, Summary, ALink, ISNULL(Icon, 'flaticon-interface-7') as Icon, '' as title_, position, Code
+                from Mainmenu  order by position
+                select title, AllowPermit, Target, Tbl_submenu.id_row, PhanLoai1, PhanLoai2, GroupName, ALink, Summary, AppLink, AppIcon, '' as title_ from Tbl_submenu  order by position";
+
+                using (DpsConnection cnn = new DpsConnection(_connectionString))
                 {
                     ds = cnn.CreateDataSet(sql);
                     if (ds.Tables.Count == 0) return JsonResultCommon.ThatBai("Không có dữ liệu", cnn.LastError);
                 }
-
                 var data = from r in ds.Tables[0].AsEnumerable()
-                           orderby r["position"]
                            select new
                            {
                                Code = r["Code"].ToString(),
@@ -78,7 +73,7 @@ namespace JeeAccount.Controllers
                                Icon = r["Icon"].ToString(),
                                ALink = r["ALink"].ToString(),
                                Child = from c in ds.Tables[1].AsEnumerable()
-                                       where c["groupname"].ToString().Trim().Equals(r["Code"].ToString().Trim(), StringComparison.OrdinalIgnoreCase)
+                                       where c["groupname"].ToString().Trim().ToLower().Equals(r["Code"].ToString().Trim().ToLower())
                                        select new
                                        {
                                            Title = c["title"].ToString(),
@@ -87,8 +82,6 @@ namespace JeeAccount.Controllers
                                            Target = c["Target"].ToString(),
                                            GroupName = c["GroupName"].ToString(),
                                            ALink = c["ALink"].ToString(),
-                                           PhanLoai1 = c["PhanLoai1"].ToString(),//Dùng cho HR
-                                           PhanLoai2 = c["PhanLoai2"].ToString(),//Dùng cho HR
                                        },
                            };
 

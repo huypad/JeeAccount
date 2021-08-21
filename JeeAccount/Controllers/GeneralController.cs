@@ -149,7 +149,7 @@ namespace JeeAccount.Controllers
                             Fullname = row["Fullname"].ToString(),
                         });
 
-                    data = data.Where(item => lstUserIDAdminApp.Contains(item.UserId));
+                    data = data.Where(item => !lstUserIDAdminApp.Contains(item.UserId));
                 }
 
                 return JsonResultCommon.ThanhCong(data);

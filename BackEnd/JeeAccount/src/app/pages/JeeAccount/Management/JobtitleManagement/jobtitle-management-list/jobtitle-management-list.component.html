@@ -4,6 +4,14 @@
     <div class="card-title">
       <span class="card-label">{{ 'JOBTITLEMANAGEMENT.DANHSACH' | translate }}</span>
     </div>
+    <div class="card-search">
+      <app-jee-search-form
+        *ngIf="!isJeeHR"
+        [showSearch]="showSearch"
+        (keywordEvent)="changeKeyword($event)"
+        (filterEvent)="changeFilter($event)"
+      ></app-jee-search-form>
+    </div>
     <div *ngIf="!isJeeHR" class="card-toolbar">
       <button mat-raised-button class="ja_button ja_btn-addnew" (click)="create()">{{ 'COMMOM.THEMMOI' | translate }}</button>
     </div>

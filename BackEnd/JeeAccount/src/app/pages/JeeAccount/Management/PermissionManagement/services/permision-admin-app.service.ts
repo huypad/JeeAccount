@@ -4,6 +4,8 @@ import { environment } from 'src/environments/environment';
 import { HttpUtilsService } from '../../../_core/utils/http-utils.service';
 import { ITableService } from '../../../_core/services/itable.service';
 import { AccountManagementDTO } from '../../AccountManagement/Model/account-management.model';
+import { NhanVienMatchip } from '../../../_core/models/danhmuc.model';
+import { Observable } from 'rxjs';
 
 const API_PRODUCTS_URL = environment.HOST_JEEACCOUNT_API + '/api/permissionmanagement';
 
@@ -20,5 +22,17 @@ export class PermissionAdminAppService extends ITableService<AccountManagementDT
 
   ngOnDestroy(): void {
     this.subscriptions.forEach((sb) => sb.unsubscribe());
+  }
+
+  createAdminApp(item: NhanVienMatchip, appid: number): Observable<any> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const url = API_PRODUCTS_URL + `/CreateAdminApp/${appid}`;
+    return this.http.post<any>(url, item, { headers: httpHeaders });
+  }
+
+  RemoveAdminApp(userid: number, appid: number): Observable<any> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    const url = API_PRODUCTS_URL + `/RemoveAdminApp/${appid}/${userid}`;
+    return this.http.delete<any>(url, { headers: httpHeaders });
   }
 }

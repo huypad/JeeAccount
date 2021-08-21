@@ -16,6 +16,7 @@ import { AccountManagementService } from '../../AccountManagement/Services/accou
 import { DeleteEntityDialogComponent } from '../../../_shared/delete-entity-dialog/delete-entity-dialog.component';
 import { ChangeTinhTrangEditDialogComponent } from '../../AccountManagement/change-tinh-trang-edit-dialog/change-tinh-trang-edit-dialog.component';
 import { environment } from 'src/environments/environment';
+import { PermissionManagementAdminAppEditDialogComponent } from '../permission-management-admin-app-edit/permission-management-admin-app-edit.component';
 
 @Component({
   selector: 'app-permission-management-admin-app-list',
@@ -72,9 +73,13 @@ export class PermissionManagementAdminAppComponent implements OnInit, OnDestroy 
               this.profilterListApps();
             });
             this.itemForm.controls.ListApp.setValue(this.listApp[0].AppID);
-            this.service.API_URL_FIND += '/' + this.listApp[0].AppID;
+            const url = this.service.API_URL_FIND;
+            this.service.API_URL_FIND = url + '/' + this.listApp[0].AppID;
+            this.itemForm.controls.ListApp.valueChanges.subscribe((res) => {
+              this.service.API_URL_FIND = url + '/' + res;
+              this.service.fetch();
+            });
             this._isFirstLoading$.next(false);
-            //this.service.fetch();
             this.grouping = this.service.grouping;
             this.paginator = this.service.paginator;
             this.sorting = this.service.sorting;
@@ -106,41 +111,27 @@ export class PermissionManagementAdminAppComponent implements OnInit, OnDestroy 
   }
 
   create() {
+    const appid = +this.itemForm.controls.ListApp.value;
     let saveMessageTranslateParam = '';
     saveMessageTranslateParam += 'Thêm thành công';
     const saveMessage = this.translate.instant(saveMessageTranslateParam);
     const messageType = MessageType.Create;
-    // if (!this.isJeeHR) {
-    //   const dialogRef = this.dialog.open(AccountManagementEditDialogComponent, {
-    //     data: {},
-    //   });
-    //   const sb = dialogRef.afterClosed().subscribe((res) => {
-    //     if (!res) {
-    //       this.accountManagementService.fetch();
-    //     } else {
-    //       this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
-    //       this.accountManagementService.fetch();
-    //     }
-    //   });
-    //   this.subscriptions.push(sb);
-    // }
-    // if (this.isJeeHR) {
-    //   const dialogRef = this.dialog.open(AccountManagementEditJeeHRDialogComponent, {
-    //     data: {},
-    //   });
-    //   const sb = dialogRef.afterClosed().subscribe((res) => {
-    //     if (!res) {
-    //       this.accountManagementService.fetch();
-    //     } else {
-    //       this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
-    //       this.accountManagementService.fetch();
-    //     }
-    //   });
-    //   this.subscriptions.push(sb);
-    // }
+    const dialogRef = this.dialog.open(PermissionManagementAdminAppEditDialogComponent, {
+      data: { AppID: appid },
+    });
+    const sb = dialogRef.afterClosed().subscribe((res) => {
+      if (!res) {
+        this.service.fetch();
+      } else {
+        this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+        this.service.fetch();
+      }
+    });
+    this.subscriptions.push(sb);
   }
 
   delete(UserID: number) {
+    const appid = +this.itemForm.controls.ListApp.value;
     let saveMessageTranslateParam = 'COMMOM.XOATHANHCONG';
     const saveMessage = this.translate.instant(saveMessageTranslateParam);
     const messageType = MessageType.Create;
@@ -148,24 +139,24 @@ export class PermissionManagementAdminAppComponent implements OnInit, OnDestroy 
       data: {},
       width: '450px',
     });
-    // const sb = dialogRef.afterClosed().subscribe((res) => {
-    //   if (!res) {
-    //     this.accountManagementService.fetch();
-    //   } else {
-    //     this.accountManagementService.Delete(UserID).subscribe(
-    //       (res) => {
-    //         this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
-    //       },
-    //       (error) => {
-    //         this.layoutUtilsService.showActionNotification(error.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
-    //       },
-    //       () => {
-    //         this.accountManagementService.fetch();
-    //       }
-    //     );
-    //   }
-    // });
-    // this.subscriptions.push(sb);
+    const sb = dialogRef.afterClosed().subscribe((res) => {
+      if (!res) {
+        this.service.fetch();
+      } else {
+        this.service.RemoveAdminApp(UserID, appid).subscribe(
+          (res) => {
+            this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+          },
+          (error) => {
+            this.layoutUtilsService.showActionNotification(error.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
+          },
+          () => {
+            this.service.fetch();
+          }
+        );
+      }
+    });
+    this.subscriptions.push(sb);
   }
 
   ngOnDestroy(): void {

@@ -1,4 +1,3 @@
-import { AccountManagementService } from './../../AccountManagement/Services/account-management.service';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
@@ -7,8 +6,8 @@ import { NhanVienMatchip } from '../../../_core/models/danhmuc.model';
 import { DanhMucChungService } from '../../../_core/services/danhmuc.service';
 import { LayoutUtilsService, MessageType } from '../../../_core/utils/layout-utils.service';
 import { ResultModel } from '../../../_core/models/_base.model';
-import { AccDirectManagerModel } from '../../AccountManagement/Model/account-management.model';
 import { tap, finalize, catchError } from 'rxjs/operators';
+import { PermissionAdminAppService } from '../services/permision-admin-app.service';
 
 @Component({
   selector: 'app-permission-management-admin-app-edit-dialog',
@@ -17,8 +16,8 @@ import { tap, finalize, catchError } from 'rxjs/operators';
 })
 export class PermissionManagementAdminAppEditDialogComponent implements OnInit, OnDestroy {
   itemForm = this.fb.group({
-    QuanLyNhom: [],
-    FilterQuanLyNhom: [],
+    NhanVien: [],
+    FilterNhanVien: [],
   });
   // ngx-mat-search area
   quanLys: NhanVienMatchip[] = [];
@@ -26,36 +25,38 @@ export class PermissionManagementAdminAppEditDialogComponent implements OnInit, 
   isLoadingSubmit$: BehaviorSubject<boolean>;
   isLoading$: BehaviorSubject<boolean>;
   // End
+  appid: number;
   private subscriptions: Subscription[] = [];
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<PermissionManagementAdminAppEditDialogComponent>,
     private fb: FormBuilder,
-    private accountManagementService: AccountManagementService,
+    private service: PermissionAdminAppService,
     private danhmucService: DanhMucChungService,
-    public layoutUtilsService: LayoutUtilsService
+    private layoutUtilsService: LayoutUtilsService
   ) {}
 
   ngOnDestroy(): void {
     this.subscriptions.forEach((sb) => sb.unsubscribe());
-    this.accountManagementService.ngOnDestroy();
+    this.service.ngOnDestroy();
   }
   ngOnInit(): void {
     this.isLoadingSubmit$ = new BehaviorSubject(false);
     this.isLoading$ = new BehaviorSubject(true);
-    const sb = this.danhmucService.GetMatchipNhanVien().subscribe((res: ResultModel<NhanVienMatchip>) => {
+    this.appid = this.data.AppID;
+    const sb = this.danhmucService.GetMatchipNhanvienNotAdminApp(this.appid).subscribe((res: ResultModel<NhanVienMatchip>) => {
       if (res && res.status === 1) {
         // ngx
         this.quanLys = [...res.data];
         this.filterQuanLys.next([...res.data]);
         // listen for search field value changes
-        this.itemForm.controls.FilterQuanLyNhom.valueChanges.subscribe(() => {
+        this.itemForm.controls.FilterNhanVien.valueChanges.subscribe(() => {
           this.filterBanks();
         });
         //  init data
         if (this.data.DirectManager) {
-          this.itemForm.controls.QuanLyNhom.setValue(this.data.DirectManager);
+          this.itemForm.controls.NhanVien.setValue(this.data.DirectManager);
         }
         this.isLoading$.next(false);
       }
@@ -64,30 +65,20 @@ export class PermissionManagementAdminAppEditDialogComponent implements OnInit, 
   }
   onSubmit() {
     if (this.itemForm.valid) {
-      const directManagement = this.initDataFromFB();
-      if (!directManagement.DirectManager) {
-        this.layoutUtilsService.showActionNotification(
-          'Bắt buộc chọn quản lý trực tiếp',
-          MessageType.Read,
-          999999999,
-          true,
-          false,
-          3000,
-          'top',
-          0
-        );
-
+      const username = this.initDataFromFB();
+      if (!username) {
+        this.layoutUtilsService.showActionNotification('Bắt buộc chọn nhân viên', MessageType.Read, 999999999, true, false, 3000, 'top', 0);
         return;
       }
-      this.update(directManagement);
+      this.create(username);
     } else {
       this.validateAllFormFields(this.itemForm);
     }
   }
-  update(directManagement: AccDirectManagerModel) {
+  create(item: NhanVienMatchip) {
     this.isLoadingSubmit$.next(true);
-    const sb = this.accountManagementService
-      .UpdateDirectManager(directManagement)
+    const sb = this.service
+      .createAdminApp(item, this.appid)
       .pipe(
         tap((res) => {
           this.dialogRef.close(res);
@@ -96,7 +87,6 @@ export class PermissionManagementAdminAppEditDialogComponent implements OnInit, 
           this.isLoadingSubmit$.next(false);
         }),
         catchError((err) => {
-          console.log('???');
           this.layoutUtilsService.showActionNotification(err.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
           return of();
         })
@@ -105,12 +95,8 @@ export class PermissionManagementAdminAppEditDialogComponent implements OnInit, 
     this.subscriptions.push(sb);
   }
 
-  initDataFromFB(): AccDirectManagerModel {
-    const directManagement = new AccDirectManagerModel();
-    directManagement.clear();
-    directManagement.Username = this.data.Username;
-    directManagement.DirectManager = this.itemForm.controls.QuanLyNhom.value;
-    return directManagement;
+  initDataFromFB(): NhanVienMatchip {
+    return this.quanLys.find((nv) => nv.Username == this.itemForm.controls.NhanVien.value);
   }
 
   validateAllFormFields(formGroup: FormGroup) {
@@ -129,11 +115,11 @@ export class PermissionManagementAdminAppEditDialogComponent implements OnInit, 
   }
 
   protected filterBanks() {
-    if (!this.itemForm.controls.QuanLyNhom) {
+    if (!this.itemForm.controls.NhanVien) {
       return;
     }
     // get the search keyword
-    let search = this.itemForm.controls.FilterQuanLyNhom.value;
+    let search = this.itemForm.controls.FilterNhanVien.value;
     if (!search) {
       this.filterQuanLys.next([...this.quanLys]);
       return;

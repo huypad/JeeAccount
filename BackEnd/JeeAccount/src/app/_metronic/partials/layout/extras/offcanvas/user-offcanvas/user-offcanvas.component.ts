@@ -18,7 +18,7 @@ export class UserOffcanvasComponent implements OnInit {
   extrasUserOffcanvasDirection = 'offcanvas-right';
   user$: Observable<UserModel>;
   listNhacNho: any[] = [];
-  AppCode: string = '';
+  AppCode: string = environment.APPCODE;
 
   constructor(
     private layout: LayoutService,
@@ -30,16 +30,13 @@ export class UserOffcanvasComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.AppCode = environment.APPCODE;
     this.extrasUserOffcanvasDirection = `offcanvas-${this.layout.getProp('extras.user.offcanvas.direction')}`;
     this.user$ = this.auth.getAuthFromLocalStorage();
-    this.LoadNhacNho();
-  }
-
-  public LoadNhacNho() {
-    this.menuServices.data_share$.subscribe((data: any) => {
-      this.listNhacNho = data;
-      this.changeDetectorRefs.detectChanges();
+    this.menuServices.Get_DSNhacNho().subscribe((res) => {
+      if (res.status == 1) {
+        this.listNhacNho = res.data;
+        this.changeDetectorRefs.detectChanges();
+      }
     });
   }
 
@@ -127,7 +124,12 @@ export class UserOffcanvasComponent implements OnInit {
     if (item.WebAppLink != null && item.WebAppLink != '') {
       if (this.AppCode == item.AppCode) {
         this.router.navigate([item.WebAppLink]);
+      } else {
+        let link = environment.HOST_JEELANDINGPAGE + item.WebAppLink;
+        window.open(link, '_blank');
       }
+    } else {
+      window.open(environment.HOST_JEELANDINGPAGE, '_blank');
     }
   }
 }
