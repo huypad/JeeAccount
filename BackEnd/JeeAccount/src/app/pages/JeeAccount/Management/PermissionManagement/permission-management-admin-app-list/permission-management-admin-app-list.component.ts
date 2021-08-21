@@ -209,9 +209,13 @@ export class PermissionManagementAdminAppComponent implements OnInit, OnDestroy 
     });
     const sb = dialogRef.afterClosed().subscribe((res) => {
       if (!res) {
+        const url = this.service.API_URL_FIND;
+        this.service.API_URL_FIND = url + '/' + res;
         this.service.fetch();
       } else {
         this.layoutUtilsService.showActionNotification(saveMessage, messageType, 4000, true, false);
+        const url = this.service.API_URL_FIND;
+        this.service.API_URL_FIND = url + '/' + res;
         this.service.fetch();
       }
     });

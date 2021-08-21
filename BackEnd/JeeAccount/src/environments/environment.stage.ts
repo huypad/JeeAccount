@@ -13,7 +13,7 @@ export const environment = {
   HOST_PORTAL_API: 'https://portal.jee.com.vn',
   HOST_JEECOMMENT_API: 'https://jeecomment-api.jee.com.vn',
   HOST_JEELANDINGPAGE_API: 'https://jeeglobal-api.jee.vn',
-  HOST_JEELANDINGPAGE: 'https://jeeglobal.jee.vn',
+  HOST_JEELANDINGPAGE: 'https://app.jee.vn',
   HOST_JEECHAT_API: 'https://jeechat-api.jee.vn',
   HOST_JEECHAT: 'https://jeechat.jee.vn',
   //notification
