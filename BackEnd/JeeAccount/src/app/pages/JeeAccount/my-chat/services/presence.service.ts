@@ -95,7 +95,7 @@ export class PresenceService {
           });
         })
         .catch((err) => {
-          document.write(err);
+          //document.write(err);
           console.log('error', err);
         });
     } catch (err) {
