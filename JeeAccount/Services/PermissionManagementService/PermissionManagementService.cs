@@ -191,7 +191,15 @@ namespace JeeAccount.Services.PermissionManagementService
 
         private object ObjectUpdateAdminKafka(string appCode, long customerid, long userid, string username)
         {
-            return new { CustomerID = customerid, UserID = userid, Username = username, AppCode = appCode, Action = "setadmin" };
+            var common = GeneralReponsitory.GetCommonInfo(_connectionString, userid, username);
+            if (common.StaffID == 0)
+            {
+                return new { CustomerID = customerid, UserID = userid, Username = username, AppCode = appCode, Action = "setadmin" };
+            }
+            else
+            {
+                return new { CustomerID = customerid, UserID = userid, Username = username, StaffID = common.StaffID, AppCode = appCode, Action = "setadmin" };
+            }
         }
 
         public async Task RemoveAdminHeThong(long userid, string username, long customerid, long UpdateBy)
@@ -215,7 +223,15 @@ namespace JeeAccount.Services.PermissionManagementService
 
         private object ObjectRemoveAdminKafka(string appCode, long customerid, long userid, string username)
         {
-            return new { CustomerID = customerid, UserID = userid, Username = username, AppCode = appCode, Action = "remove" };
+            var common = GeneralReponsitory.GetCommonInfo(_connectionString, userid, username);
+            if (common.StaffID == 0)
+            {
+                return new { CustomerID = customerid, UserID = userid, Username = username, AppCode = appCode, Action = "remove" };
+            }
+            else
+            {
+                return new { CustomerID = customerid, UserID = userid, Username = username, StaffID = common.StaffID, AppCode = appCode, Action = "remove" };
+            }
         }
 
         public async Task RemoveAdminApp(long userid, string username, long customerid, long UpdateBy, List<int> AppID)
