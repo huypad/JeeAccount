@@ -675,6 +675,37 @@ namespace JeeAccount.Controllers
             }
         }
 
+        [HttpPost("UsernameOrUserID/internal")]
+        public IActionResult UsernameOrUserIDinternal(InputApiModel model)
+        {
+            try
+            {
+                var isToken = Ulities.IsInternaltoken(HttpContext.Request.Headers, _config.GetValue<string>("Jwt:internal_secret"));
+                if (isToken == false)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+
+                var commonInfo = GeneralReponsitory.GetCommonInfoByInputApiModel(_connectionString, model);
+
+                if (!string.IsNullOrEmpty(model.Username))
+                {
+                    return Ok(commonInfo.UserID);
+                }
+
+                if (!string.IsNullOrEmpty(model.Userid))
+                {
+                    return Ok(commonInfo.Username);
+                }
+
+                return BadRequest(MessageReturnHelper.KhongTonTai("UserID hoặc username"));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
         [HttpGet("GetListDirectManager")]
         public async Task<IActionResult> GetListDirectManager()
         {
