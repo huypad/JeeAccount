@@ -266,6 +266,7 @@ export class AccountManagementChinhSuaJeeHRDialogComponent implements OnInit, On
 
   prepareDataFromFB(): AccountManagementModel {
     const acc = new AccountManagementModel();
+    acc.Username = this.itemData.Username;
     const AppCode: string[] = [];
     const AppID: number[] = [];
     for (let index = 0; index < this.AppsFromArray.controls.length; index++) {
@@ -365,6 +366,8 @@ export class AccountManagementChinhSuaJeeHRDialogComponent implements OnInit, On
       empty.AppID = this.listApp.filter((item) => item.IsUsed).map((item) => item.AppID);
       return this.danhmuc.isEqual(empty, model);
     }
+    console.log('model', model);
+    console.log('this.item', this.item);
     return this.danhmuc.isEqual(model, this.item);
   }
 

@@ -15,7 +15,6 @@ namespace JeeAccount.Models.JeeHR
 
         public string TenChucVu { get; set; }
         public string MaNV { get; set; }
-        public double ID_NV { get; set; }
         public string Email { get; set; }
         public string TuNgay { get; set; }
         public DateTime NgayBatDauLamViec { get; set; }
@@ -25,7 +24,7 @@ namespace JeeAccount.Models.JeeHR
         public string avatar { get; set; }
         public string username { get; set; }
         public long structureid { get; set; }
-        public double jobtitleid { get; set; }
+        public long jobtitleid { get; set; }
         public long managerid { get; set; }
         public string manager { get; set; }
     }

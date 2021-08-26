@@ -108,7 +108,7 @@ namespace JeeAccount.Reponsitories.JobtitleManagement
                     if (!string.IsNullOrEmpty(JobtitleModel.Note)) val.Add("Note", JobtitleModel.Note);
                     val.Add("IsActive", 1);
                     val.Add("Disable", 0);
-                    val.Add("CreatedDate", DateTime.Now);
+                    val.Add("CreatedDate", DateTime.Now.ToUniversalTime());
                     val.Add("CreatedBy", Username);
                     val.Add("CustomerID", CustomerID);
                     if (!string.IsNullOrEmpty(JobtitleModel.Description)) val.Add("Description", JobtitleModel.Description);
@@ -231,12 +231,12 @@ namespace JeeAccount.Reponsitories.JobtitleManagement
                 var isTinhTrang = Convert.ToBoolean((bool)dt.Rows[0][0]);
                 if (isTinhTrang)
                 {
-                    val.Add("DeActiveDate", DateTime.Now);
+                    val.Add("DeActiveDate", DateTime.Now.ToUniversalTime());
                     val.Add("DeActiveBy", dtGetUsernameLogin.Rows[0][0]);
                 }
                 else
                 {
-                    val.Add("ActiveDate", DateTime.Now);
+                    val.Add("ActiveDate", DateTime.Now.ToUniversalTime());
                     val.Add("ActiveBy", dtGetUsernameLogin.Rows[0][0]);
                 }
                 val.Add("IsActive", !isTinhTrang);
@@ -275,7 +275,7 @@ namespace JeeAccount.Reponsitories.JobtitleManagement
 
                     val.Add("JobtitleName", job.JobtitleName);
                     if (!string.IsNullOrEmpty(job.Note)) val.Add("Note", job.Note);
-                    val.Add("LastModified", DateTime.Now);
+                    val.Add("LastModified", DateTime.Now.ToUniversalTime());
                     val.Add("ModifiedBy", Username);
                     if (!string.IsNullOrEmpty(job.Description)) val.Add("Description", job.Description);
 
@@ -360,7 +360,7 @@ namespace JeeAccount.Reponsitories.JobtitleManagement
             string sqlUserInDepartment = $"select JobtitleID from AccountList where JobtitleID = {JobtitleID} and CustomerID = {customerID}";
             Hashtable val = new Hashtable();
             val.Add("DeletedBy", DeletedBy);
-            val.Add("DeletedDate", DateTime.Now);
+            val.Add("DeletedDate", DateTime.Now.ToUniversalTime());
             val.Add("Disable", 1);
             val.Add("IsActive", 0);
 

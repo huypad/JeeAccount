@@ -729,12 +729,12 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                 var isTinhTrang = Convert.ToBoolean((bool)dt.Rows[0][0]);
                 if (isTinhTrang)
                 {
-                    val.Add("DeActiveDate", DateTime.Now);
+                    val.Add("DeActiveDate", DateTime.Now.ToUniversalTime());
                     val.Add("DeActiveBy", dtGetUsernameLogin.Rows[0][0]);
                 }
                 else
                 {
-                    val.Add("ActiveDate", DateTime.Now);
+                    val.Add("ActiveDate", DateTime.Now.ToUniversalTime());
                     val.Add("ActiveBy", dtGetUsernameLogin.Rows[0][0]);
                 }
                 val.Add("IsActive", !isTinhTrang);
@@ -783,7 +783,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                 }
                 val.Add("IsActive", 1);
                 val.Add("Disable", 0);
-                val.Add("CreatedDate", DateTime.Now);
+                val.Add("CreatedDate", DateTime.Now.ToUniversalTime());
                 val.Add("CreatedBy", username_createdby);
                 val.Add("CustomerID", CustomerID);
                 if (isAdmin)
@@ -975,7 +975,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                     var userid_createdBy = GeneralReponsitory.GetCommonInfoCnn(cnn, 0, createdBy).UserID;
                     Hashtable val2 = new Hashtable();
                     val2.Add("ActivatedBy", userid_createdBy);
-                    val2.Add("ActivatedDate", DateTime.Now);
+                    val2.Add("ActivatedDate", DateTime.Now.ToUniversalTime());
                     val2.Add("IsActive", 1);
 
                     SqlConditions conds = new SqlConditions();
@@ -992,7 +992,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                 Hashtable val = new Hashtable();
                 val.Add("UserID", UserID);
                 val.Add("AppID", id);
-                val.Add("CreatedDate", DateTime.Now);
+                val.Add("CreatedDate", DateTime.Now.ToUniversalTime());
                 val.Add("CreatedBy", createdBy);
                 val.Add("IsAdmin", IsAdmin);
                 val.Add("Disable", 0);
@@ -1023,13 +1023,13 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                 if (dtnew.Rows.Count == 0) continue;
                 var userid_Editby = GeneralReponsitory.GetCommonInfoCnn(cnn, 0, editBy).UserID;
                 Hashtable val = new Hashtable();
-                val.Add("InActiveDate", DateTime.Now);
+                val.Add("InActiveDate", DateTime.Now.ToUniversalTime());
                 val.Add("InActiveBy", userid_Editby);
                 val.Add("IsActive", 0);
 
                 SqlConditions conds = new SqlConditions();
                 conds.Add("UserID", UserID);
-                val.Add("AppID", id);
+                conds.Add("AppID", id);
 
                 int x = cnn.Update(val, conds, "Account_App");
                 if (x <= 0)
@@ -1117,7 +1117,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
         {
             Hashtable val = new Hashtable();
             val.Add("DeletedBy", DeletedBy);
-            val.Add("DeletedDate", DateTime.Now);
+            val.Add("DeletedDate", DateTime.Now.ToUniversalTime());
             val.Add("Disable", 1);
             val.Add("IsActive", 0);
 

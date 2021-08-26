@@ -31,6 +31,7 @@ namespace JeeAccount.Services.AccountManagementService
         private readonly string HOST_MINIOSERVER;
         private readonly string TopicAddNewCustomerUser;
         private readonly IProducer _producer;
+        private readonly string APPCODE_JEEHR;
 
         public AccountManagementService(IAccountManagementReponsitory reponsitory, IConfiguration configuration, IProducer producer)
         {
@@ -41,6 +42,7 @@ namespace JeeAccount.Services.AccountManagementService
             _configuration = configuration;
             TopicAddNewCustomerUser = _configuration.GetValue<string>("KafkaConfig:TopicProduce:JeeplatformInitialization");
             _producer = producer;
+            APPCODE_JEEHR = configuration.GetValue<string>("AppConfig:AppCode_JeeHR");
         }
 
         #region api giao diện
@@ -410,7 +412,7 @@ namespace JeeAccount.Services.AccountManagementService
             var lstAppIDCurrentCustomer = lstAppCurrentCustomer.Select(item => item.AppID).ToList();
             var lstAppCurrentUserid = GeneralReponsitory.GetListAppByUserID(_connectionString, account.Userid, customerID, false).ToList();
             var lstAppIDCurrentUserid = lstAppCurrentUserid.Select(item => item.AppID).ToList();
-
+            var lstAppCodeCurrentUserid = lstAppCurrentUserid.Select(item => item.AppCode).ToList();
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 try
@@ -428,18 +430,21 @@ namespace JeeAccount.Services.AccountManagementService
                     var listInsertAppCode = new List<string>();
                     for (var index = 0; index < account.AppID.Count; index++)
                     {
+                        //remove jeehr
+
+                        if (isJeeHR)
+                        {
+                            if (account.AppCode[index].Equals(APPCODE_JEEHR))
+                            {
+                                continue;
+                            }
+                        }
                         if (!lstAppIDCurrentUserid.Contains(account.AppID[index])) listInsertAppid.Add(account.AppID[index]);
-                        if (!lstAppIDCurrentUserid.Contains(account.AppID[index])) listInsertAppCode.Add(account.AppCode[index]);
-                    }
-                    //remove jeehr
-                    if (isJeeHR)
-                    {
-                        var index = account.AppCode.FindIndex(item => item.Equals("JeeHR"));
-                        listInsertAppid.RemoveAt(index);
+                        if (!lstAppCodeCurrentUserid.Contains(account.AppCode[index])) listInsertAppCode.Add(account.AppCode[index]);
                     }
 
                     _reponsitory.InsertAppCodeAccount(cnn, account.Userid, listInsertAppid, usernameCreatedBy, false);
-                    var listRemove = checkNotExisAppID(lstAppIDCurrentUserid, lstAppIDCurrentCustomer);
+                    var listRemove = checkNotExisAppID(account.AppID, lstAppIDCurrentCustomer);
                     _reponsitory.RemoveAppCodeAccount(cnn, account.Userid, listRemove, usernameCreatedBy);
 
                     var objCustomDataJeeAccount = identityServerController.JeeAccountCustomData(account.AppCode, commonInfo.UserID, customerID, commonInfo.StaffID);

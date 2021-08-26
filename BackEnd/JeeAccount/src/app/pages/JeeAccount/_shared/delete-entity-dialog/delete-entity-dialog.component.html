@@ -46,10 +46,10 @@
   </div>
 </div>
 <div class="modal-body" style="text-align: center">
-  <ng-container *ngIf="data.desciption">
-    <span>{{ data.desciption }}</span>
+  <ng-container *ngIf="data.description">
+    <span>{{ data.description }}</span>
   </ng-container>
-  <ng-container *ngIf="data.desciption === '' || data.desciption === undefined">
+  <ng-container *ngIf="data.description === '' || data.description === undefined">
     <span>{{ 'DELETE.DESCRIPTON' | translate }}</span>
   </ng-container>
 </div>
@@ -57,10 +57,10 @@
 <div class="modal-footer">
   <div>
     <button type="button" class="btn btn-primary btn-elevate" (click)="onNoClick()">
-      {{ data.nameButtonCancel ? data.nameButtonCancel : 'Không' }}</button
+      {{ nameButtonCancel }}</button
     >&nbsp;&nbsp;
     <button type="button" class="btn btn-light btn-elevate mr-1" (click)="onYesClick()">
-      {{ data.nameButtonOK ? data.nameButtonOK : 'Có' }}
+      {{ nameButtonOK }}
     </button>
   </div>
 </div>

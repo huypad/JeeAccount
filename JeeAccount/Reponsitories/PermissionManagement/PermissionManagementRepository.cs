@@ -231,7 +231,7 @@ join Account_App on Account_App.UserID = AccountList.UserID";
 
             Hashtable val2 = new Hashtable();
             val2.Add("IsAdmin", 1);
-            val2.Add("LastUpdate", DateTime.Now);
+            val2.Add("LastUpdate", DateTime.Now.ToUniversalTime());
             val2.Add("UpdatedBy", updateBy);
 
             SqlConditions Conds2 = new SqlConditions();
@@ -258,7 +258,7 @@ join Account_App on Account_App.UserID = AccountList.UserID";
 
             Hashtable val2 = new Hashtable();
             val2.Add("IsAdmin", 0);
-            val2.Add("LastUpdate", DateTime.Now);
+            val2.Add("LastUpdate", DateTime.Now.ToUniversalTime());
             val2.Add("UpdatedBy", updateBy);
 
             SqlConditions Conds2 = new SqlConditions();
@@ -274,7 +274,7 @@ join Account_App on Account_App.UserID = AccountList.UserID";
         {
             Hashtable val = new Hashtable();
             val.Add("IsAdmin", 1);
-            val.Add("LastUpdate", DateTime.Now);
+            val.Add("LastUpdate", DateTime.Now.ToUniversalTime());
             val.Add("UpdatedBy", updateBy);
             SqlConditions Conds = new SqlConditions();
             Conds.Add("UserID", userid);
@@ -290,7 +290,7 @@ join Account_App on Account_App.UserID = AccountList.UserID";
         {
             Hashtable val = new Hashtable();
             val.Add("IsAdmin", 0);
-            val.Add("LastUpdate", DateTime.Now);
+            val.Add("LastUpdate", DateTime.Now.ToUniversalTime());
             val.Add("UpdatedBy", updateBy);
             SqlConditions Conds = new SqlConditions();
             Conds.Add("UserID", userid);

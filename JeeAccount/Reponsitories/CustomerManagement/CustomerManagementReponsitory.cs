@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -56,7 +57,7 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
         {
             try
             {
-                DateTime start = DateTime.ParseExact(customerModel.RegisterDate, "dd/MM/yyyy", null);
+                DateTime start = DateTime.ParseExact(customerModel.RegisterDate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
                 for (var index = 0; index < customerModel.AppID.Count; index++)
                 {
                     Hashtable val = new Hashtable();
@@ -64,7 +65,7 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
                     val.Add("AppID", customerModel.AppID[index]);
                     if (customerModel.CurrentDBID[index] != -1) val.Add("DatabaseID", customerModel.CurrentDBID[index]);
                     val.Add("StartDate", start);
-                    val.Add("CreatedDate", DateTime.Now);
+                    val.Add("CreatedDate", DateTime.Now.ToUniversalTime());
                     val.Add("CreatedBy", 0);
                     val.Add("Status", 1);
                     val.Add("IsDefaultApply", 1);
@@ -72,7 +73,7 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
                     val.Add("PackageID", customerModel.GoiSuDung[index]);
                     if (!string.IsNullOrEmpty(customerModel.DeadlineDate))
                     {
-                        DateTime end = DateTime.ParseExact(customerModel.DeadlineDate, "dd/MM/yyyy", null);
+                        DateTime end = DateTime.ParseExact(customerModel.DeadlineDate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
                         val.Add("EndDate", end);
                     }
                     int x = cnn.Insert(val, "Customer_App");
@@ -109,7 +110,7 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
                 }
                 string username = customerModel.Code + ".admin";
                 val.Add("Gender", customerModel.Gender);
-                val.Add("RegisterDate", DateTime.Now);
+                val.Add("RegisterDate", DateTime.Now.ToUniversalTime());
 
                 #endregion val data
 
@@ -282,7 +283,7 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
             SqlConditions conds = new SqlConditions();
             try
             {
-                DateTime date = DateTime.ParseExact(EndDate, "dd/MM/yyyy", null);
+                DateTime date = DateTime.ParseExact(EndDate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
 
                 conds.Add("CustomerID", CustomerID);
                 conds.Add("AppID", AppID);

@@ -217,6 +217,8 @@ export const locale = {
       TITLE: 'Xác nhận',
       DESCRIPTION: 'Bạn có các thay đổi chưa lưu. Bạn có muốn thoát?',
       WAITDESCRIPTION: 'Đang thoát',
+      KHONG: 'Không',
+      CO: 'Có',
     },
     INFO: {
       THONGTINCANHAN: 'Thông tin cá nhân',

@@ -127,7 +127,9 @@ namespace JeeAccount.Services.CommentService
                 filesUrl.Images = new List<string>();
                 foreach (var base64 in attachs.Images)
                 {
-                    string filename = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffffffK");
+                    string filename =
+
+                        .Now.ToString("yyyy-MM-ddTHH:mm:ss.fffffffK");
                     upLoadFileModel up = new upLoadFileModel()
                     {
                         bs = Convert.FromBase64String(base64),

@@ -503,7 +503,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID where Acco
                     Hashtable val = new Hashtable();
                     val.Add("UserID", UserID);
                     val.Add("AppID", 1);
-                    val.Add("CreatedDate", DateTime.Now);
+                    val.Add("CreatedDate", DateTime.Now.ToUniversalTime());
                     val.Add("CreatedBy", "kafka");
                     val.Add("Disable", 0);
                     if (!IsAdmin) val.Add("IsAdmin", 0);

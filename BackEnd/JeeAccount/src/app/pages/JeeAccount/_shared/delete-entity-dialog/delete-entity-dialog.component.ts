@@ -1,3 +1,4 @@
+import { TranslateService } from '@ngx-translate/core';
 import { Component, HostListener, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
@@ -7,11 +8,25 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 })
 export class DeleteEntityDialogComponent implements OnInit {
   viewLoading: boolean = false;
-  constructor(public dialogRef: MatDialogRef<DeleteEntityDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {}
+  constructor(
+    public dialogRef: MatDialogRef<DeleteEntityDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    public trans: TranslateService
+  ) {}
 
+  nameButtonCancel: string;
+  nameButtonOK: string;
   ngOnInit() {
-    //if (this.data.doPositiveBtn)
-    //this.yesText = this.data.doPositiveBtn;
+    if (!this.data.nameButtonCancel) {
+      this.nameButtonCancel = this.trans.instant('CHECKPOPUP.KHONG');
+    } else {
+      this.nameButtonCancel = this.data.nameButtonCancel;
+    }
+    if (!this.data.nameButtonOK) {
+      this.nameButtonOK = this.trans.instant('CHECKPOPUP.CO');
+    } else {
+      this.nameButtonOK = this.data.nameButtonOK;
+    }
   }
 
   @HostListener('document:keydown', ['$event'])

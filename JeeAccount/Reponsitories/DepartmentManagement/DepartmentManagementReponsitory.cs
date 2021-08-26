@@ -116,7 +116,7 @@ namespace JeeAccount.Reponsitories
                     if (!string.IsNullOrEmpty(departmentModel.Note)) val.Add("Note", departmentModel.Note);
                     val.Add("IsActive", 1);
                     val.Add("Disable", 0);
-                    val.Add("CreatedDate", DateTime.Now);
+                    val.Add("CreatedDate", DateTime.Now.ToUniversalTime());
                     val.Add("CreatedBy", Username);
                     val.Add("CustomerID", CustomerID);
                     if (!string.IsNullOrEmpty(departmentModel.Description)) val.Add("Description", departmentModel.Description);
@@ -164,7 +164,7 @@ namespace JeeAccount.Reponsitories
                     val.Add("DepartmentName", departmentModel.DepartmentName);
                     if (!string.IsNullOrEmpty(departmentModel.DepartmentManager)) val.Add("DepartmentManager", departmentModel.DepartmentManager);
                     if (!string.IsNullOrEmpty(departmentModel.Note)) val.Add("Note", departmentModel.Note);
-                    val.Add("LastModified", DateTime.Now);
+                    val.Add("LastModified", DateTime.Now.ToUniversalTime());
                     val.Add("ModifiedBy", Username);
                     if (!string.IsNullOrEmpty(departmentModel.Description)) val.Add("Description", departmentModel.Description);
 
@@ -313,12 +313,12 @@ namespace JeeAccount.Reponsitories
                     var isTinhTrang = Convert.ToBoolean((bool)dt.Rows[0][0]);
                     if (isTinhTrang)
                     {
-                        val.Add("DeActiveDate", DateTime.Now);
+                        val.Add("DeActiveDate", DateTime.Now.ToUniversalTime());
                         val.Add("DeActiveBy", dtGetUsernameLogin.Rows[0][0]);
                     }
                     else
                     {
-                        val.Add("ActiveDate", DateTime.Now);
+                        val.Add("ActiveDate", DateTime.Now.ToUniversalTime());
                         val.Add("ActiveBy", dtGetUsernameLogin.Rows[0][0]);
                     }
                     val.Add("IsActive", !isTinhTrang);
@@ -355,7 +355,7 @@ namespace JeeAccount.Reponsitories
             Hashtable val = new Hashtable();
             val.Add("DepartmentManager", DirectManagerUsername);
             val.Add("ModifiedBy", UsernameModifiedBy);
-            val.Add("LastModified", DateTime.Now);
+            val.Add("LastModified", DateTime.Now.ToUniversalTime());
 
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", customerID);
@@ -382,7 +382,7 @@ namespace JeeAccount.Reponsitories
             string sqlUserInDepartment = $"select DepartmentID from AccountList where DepartmentID = {departmemntID} and CustomerID = {customerID}";
             Hashtable val = new Hashtable();
             val.Add("DeletedBy", DeletedBy);
-            val.Add("DeletedDate", DateTime.Now);
+            val.Add("DeletedDate", DateTime.Now.ToUniversalTime());
             val.Add("Disable", 1);
             val.Add("IsActive", 0);
 
