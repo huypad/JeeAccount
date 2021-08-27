@@ -442,12 +442,12 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID where Acco
             }
         }
 
-        public static async Task<HttpResponseMessage> UpdateJeeAccountCustomDataByInputApiModel(InputApiModel model, string connectionString, string jwt_internal)
+        public static async Task<HttpResponseMessage> UpdateJeeAccountCustomDataByInputApiModel(long StaffID, string connectionString, string jwt_internal)
         {
             try
             {
                 var indentityController = new IdentityServerController();
-                var commonInfo = GetCommonInfoByInputApiModel(connectionString, model);
+                var commonInfo = GetCommonInfo(connectionString, 0, "", StaffID);
                 var appCodes = GetListAppByUserID(connectionString, commonInfo.CustomerID, commonInfo.UserID, true);
                 var appCodesName = appCodes.Select(x => x.AppCode).ToList();
                 var objCustom = new ObjCustomData();
