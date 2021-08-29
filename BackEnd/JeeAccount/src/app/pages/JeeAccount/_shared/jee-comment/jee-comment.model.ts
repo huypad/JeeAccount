@@ -112,12 +112,17 @@ export class QueryFilterComment {
     this.ViewLengthComment = 10;
     this.Date = new Date();
   }
-
 }
-export interface ReturnFilterComment {
-  LstCreate: ChangeComment[];
-  LstEdit: ChangeComment[];
-  LstDelete: ChangeComment[];
+export class ReturnFilterComment {
+  LstCreate: ChangeComment[] = [];
+  LstEdit: ChangeComment[] = [];
+  LstDelete: ChangeComment[] = [];
+}
+
+export class ShowChangeComment {
+  lstCreate: ChangeComment[] = [];
+  lstEdit: ChangeComment[] = [];
+  lstDelete: ChangeComment[] = [];
 }
 
 export class ChangeComment {

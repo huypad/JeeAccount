@@ -675,7 +675,7 @@ namespace JeeAccount.Services.AccountManagementService
                 var custom = new JeeAccountCustomData();
                 custom.customerID = commonInfo.CustomerID;
                 custom.staffID = commonInfo.StaffID;
-                var lstApp = await GeneralReponsitory.GetListAppByUserIDAsync(_connectionString, commonInfo.CustomerID, commonInfo.UserID);
+                var lstApp = await GeneralReponsitory.GetListAppByUserIDAsync(_connectionString, commonInfo.UserID, commonInfo.CustomerID);
                 custom.appCode = lstApp.Select(item => item.AppCode).ToList();
                 custom.userID = commonInfo.UserID;
                 return custom;

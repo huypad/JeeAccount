@@ -285,6 +285,7 @@ namespace JeeAccount.Classes
                 ValidateAudience = false,
                 ValidateLifetime = false,
                 ValidateIssuerSigningKey = true,
+                ClockSkew = TimeSpan.Zero,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey)),
             };
             var user = handler.ValidateToken(token, validationParameters, out validatedToken);

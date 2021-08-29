@@ -1,3 +1,4 @@
+import { JeeCommentSignalrService } from './jee-comment-signalr.service';
 import { JeeCommentReactionShowComponent } from './reaction-comment-show/reaction-comment-show.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -38,7 +39,7 @@ import { ClickOutsideDirective } from './enter-comment-content/click-outside.dir
     FormsModule,
     PickerModule,
   ],
-  providers: [JeeCommentService],
+  providers: [JeeCommentService, JeeCommentSignalrService],
   entryComponents: [
     JeeCommentComponent,
     JeeCommentPostContentComponent,

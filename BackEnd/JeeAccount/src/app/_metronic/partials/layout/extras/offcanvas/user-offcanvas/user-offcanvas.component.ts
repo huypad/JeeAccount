@@ -1,3 +1,4 @@
+import { RemindService } from './../../../../../../pages/JeeAccount/_core/services/remind.service';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { LayoutService } from '../../../../../core';
 import { Observable } from 'rxjs';
@@ -26,12 +27,29 @@ export class UserOffcanvasComponent implements OnInit {
     public translate: TranslateService,
     private menuServices: MenuServices,
     private changeDetectorRefs: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private remindService: RemindService
   ) {}
 
   ngOnInit(): void {
     this.extrasUserOffcanvasDirection = `offcanvas-${this.layout.getProp('extras.user.offcanvas.direction')}`;
     this.user$ = this.auth.getAuthFromLocalStorage();
+    setTimeout(() => {
+      this.remindService.connectToken();
+    }, 500);
+    this.LoadDataNhacNho();
+    this.EventNhacNho();
+  }
+
+  public EventNhacNho() {
+    this.remindService.NewMess$.subscribe((res) => {
+      if (res) {
+        this.LoadDataNhacNho();
+      }
+    });
+  }
+
+  public LoadDataNhacNho() {
     this.menuServices.Get_DSNhacNho().subscribe((res) => {
       if (res.status == 1) {
         this.listNhacNho = res.data;

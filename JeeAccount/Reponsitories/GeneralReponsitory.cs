@@ -235,7 +235,7 @@ namespace JeeAccount.Reponsitories
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
                 var ListCustomerid = new List<long>();
-                string sql = $"select UserID from AccountList where CustomerID = {customerid}";
+                string sql = $"select UserID from AccountList where CustomerID = {customerid} and Disable = 0";
                 DataTable dt = new DataTable();
                 dt = cnn.CreateDataTable(sql);
                 if (dt.Rows.Count == 0) return null;
@@ -250,7 +250,7 @@ namespace JeeAccount.Reponsitories
         public static List<long> GetLstUserIDByCustomeridCnn(DpsConnection cnn, long customerid)
         {
             var ListCustomerid = new List<long>();
-            string sql = $"select UserID from AccountList where CustomerID = {customerid}";
+            string sql = $"select UserID from AccountList where CustomerID = {customerid} and Disable = 0";
             DataTable dt = new DataTable();
             dt = cnn.CreateDataTable(sql);
             if (dt.Rows.Count == 0) return null;
@@ -266,7 +266,7 @@ namespace JeeAccount.Reponsitories
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
                 var lst = new List<string>();
-                string sql = $"select Username from AccountList where CustomerID = {customerid}";
+                string sql = $"select Username from AccountList where CustomerID = {customerid} and Disable = 0";
                 DataTable dt = new DataTable();
                 dt = cnn.CreateDataTable(sql);
                 if (dt.Rows.Count == 0) return null;
@@ -283,7 +283,7 @@ namespace JeeAccount.Reponsitories
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
                 var lst = new List<long>();
-                string sql = $"select StaffID from AccountList where CustomerID = {customerid}";
+                string sql = $"select StaffID from AccountList where CustomerID = {customerid} and Disable = 0";
                 DataTable dt = new DataTable();
                 dt = cnn.CreateDataTable(sql);
                 if (dt.Rows.Count == 0) return null;
@@ -298,7 +298,7 @@ namespace JeeAccount.Reponsitories
         public static List<long> GetLstStaffIDByCustomeridCnn(DpsConnection cnn, long customerid)
         {
             var lst = new List<long>();
-            string sql = $"select StaffID from AccountList where CustomerID = {customerid}";
+            string sql = $"select StaffID from AccountList where CustomerID = {customerid} and Disable = 0";
             DataTable dt = new DataTable();
             dt = cnn.CreateDataTable(sql);
             if (dt.Rows.Count == 0) return null;
@@ -311,7 +311,7 @@ namespace JeeAccount.Reponsitories
 
         public static bool IsAdminHeThongCnn(DpsConnection cnn, long UserID)
         {
-            string sql1 = $"select * from AccountList where IsAdmin = 1 and UserID = {UserID}";
+            string sql1 = $"select * from AccountList where IsAdmin = 1 and UserID = {UserID} and Disable = 0";
             DataTable dtCheck = cnn.CreateDataTable(sql1);
             if (dtCheck.Rows.Count == 0) return false;
             return true;
@@ -319,7 +319,7 @@ namespace JeeAccount.Reponsitories
 
         public static bool IsAdminAppCnn(DpsConnection cnn, long UserID, int AppID)
         {
-            string sql1 = $"select * from Account_App where UserID = {UserID} and AppID = {AppID} and IsAdmin = 1";
+            string sql1 = $"select * from Account_App where UserID = {UserID} and AppID = {AppID} and IsAdmin = 1 and Account_App.Disable = 0";
             DataTable dtCheck = cnn.CreateDataTable(sql1);
             if (dtCheck.Rows.Count == 0) return false;
             return true;
@@ -339,7 +339,7 @@ namespace JeeAccount.Reponsitories
 
         public static bool IsAdminApp(string connectionString, long UserID, int AppID)
         {
-            string sql1 = $"select * from Account_App where UserID = {UserID} and AppID = {AppID} and IsAdmin = 1";
+            string sql1 = $"select * from Account_App where UserID = {UserID} and AppID = {AppID} and IsAdmin = 1 and Account_App.Disable = 0";
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
                 DataTable dt = new DataTable();
@@ -352,7 +352,7 @@ namespace JeeAccount.Reponsitories
         public static List<string> GetLstUsernameByCustomeridCnn(DpsConnection cnn, long customerid)
         {
             var lst = new List<string>();
-            string sql = $"select Username from AccountList where CustomerID = {customerid}";
+            string sql = $"select Username from AccountList where CustomerID = {customerid} and Disable = 0";
             DataTable dt = new DataTable();
             dt = cnn.CreateDataTable(sql);
             if (dt.Rows.Count == 0) return null;
@@ -448,7 +448,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID where Acco
             {
                 var indentityController = new IdentityServerController();
                 var commonInfo = GetCommonInfo(connectionString, 0, "", StaffID);
-                var appCodes = GetListAppByUserID(connectionString, commonInfo.CustomerID, commonInfo.UserID, true);
+                var appCodes = GetListAppByUserID(connectionString, commonInfo.UserID, commonInfo.CustomerID, true);
                 var appCodesName = appCodes.Select(x => x.AppCode).ToList();
                 var objCustom = new ObjCustomData();
                 objCustom.userId = commonInfo.UserID;
@@ -577,7 +577,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID where Acco
             string selection = " AppList.*, Account_App.IsActive, Account_App.IsAdmin as AdminApp";
             string join = @"join Account_App on Account_App.UserID = AccountList.UserID
 join AppList on AppList.AppID = Account_App.AppID";
-            string where = "where AccountList.UserID = @UserID and (AccountList.Disable = 0 or AccountList.Disable is null)";
+            string where = "where AccountList.UserID = @UserID and (AccountList.Disable = 0 or AccountList.Disable is null) and AccountList.Disable = 0";
 
             selection += " , Customer_App.SoLuongNhanSu, Customer_App.StartDate, Customer_App.EndDate ";
             join += " join Customer_App on Customer_App.AppID = AppList.AppID ";
@@ -586,10 +586,10 @@ join AppList on AppList.AppID = Account_App.AppID";
 
             if (IsActive)
             {
-                where += " and  Account_App.IsActive = 1";
+                where += " and  Account_App.IsActive = 1 ";
             }
 
-            string sql = @$"select {selection} from AccountList {join} {where} order by Position";
+            string sql = @$"select {selection} from AccountList {join} {where} and Account_App.Disable = 0 order by Position";
 
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
@@ -628,7 +628,7 @@ join AppList on AppList.AppID = Account_App.AppID";
             string selection = " AppList.*, Account_App.IsActive, Account_App.IsAdmin as AdminApp";
             string join = @"join Account_App on Account_App.UserID = AccountList.UserID
 join AppList on AppList.AppID = Account_App.AppID";
-            string where = "where AccountList.UserID = @UserID and (AccountList.Disable = 0 or AccountList.Disable is null)";
+            string where = "where AccountList.UserID = @UserID and (AccountList.Disable = 0 or AccountList.Disable is null) and AccountList.Disable = 0";
 
             selection += " , Customer_App.SoLuongNhanSu, Customer_App.StartDate, Customer_App.EndDate ";
             join += " join Customer_App on Customer_App.AppID = AppList.AppID ";
@@ -640,7 +640,7 @@ join AppList on AppList.AppID = Account_App.AppID";
                 where += " and  Account_App.IsActive = 1";
             }
 
-            string sql = @$"select {selection} from AccountList {join} {where} order by Position";
+            string sql = @$"select {selection} from AccountList {join} {where} and Account_App.Disable = 0 order by Position";
 
             dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
 
@@ -676,7 +676,7 @@ join AppList on AppList.AppID = Account_App.AppID";
             string selection = " AppList.*, Account_App.IsActive, Account_App.IsAdmin as AdminApp";
             string join = @"join Account_App on Account_App.UserID = AccountList.UserID
 join AppList on AppList.AppID = Account_App.AppID";
-            string where = "where AccountList.UserID = @UserID and (AccountList.Disable = 0 or AccountList.Disable is null)";
+            string where = "where AccountList.UserID = @UserID and (AccountList.Disable = 0 or AccountList.Disable is null) and AccountList.Disable = 0";
             if (CustomerID > 0)
             {
                 selection += " , Customer_App.SoLuongNhanSu, Customer_App.StartDate, Customer_App.EndDate ";
@@ -689,7 +689,7 @@ join AppList on AppList.AppID = Account_App.AppID";
                 where += " and Account_App.IsActive = 1";
             }
 
-            string sql = @$"select {selection} from AccountList {join} {where} order by Position";
+            string sql = @$"select {selection} from AccountList {join} {where} and Account_App.Disable = 0 order by Position";
 
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {

@@ -55,7 +55,7 @@ join Account_App on Account_App.UserID = AccountList.UserID";
             {
                 where += " AccountList.CustomerID = @CustomerID and AppID=@AppID and (AccountList.Disable != 1 or AccountList.Disable is null) and Account_App.IsAdmin = 1 and AccountList.IsAdmin = 0";
             }
-            where_order += $"where {where} ";
+            where_order += $"where {where} and Account_App.Disable = 0 ";
 
             if (!string.IsNullOrEmpty(orderBy)) where_order += $"order by {orderBy}";
 
@@ -113,7 +113,7 @@ join Account_App on Account_App.UserID = AccountList.UserID";
             {
                 where += " AccountList.CustomerID = @CustomerID and AppID=@AppID and (AccountList.Disable != 1 or AccountList.Disable is null) and Account_App.IsAdmin = 1 and AccountList.IsAdmin = 0";
             }
-            where_order += $"where {where} ";
+            where_order += $"where {where} and Account_App.Disable = 0 ";
 
             if (!string.IsNullOrEmpty(orderBy)) where_order += $"order by {orderBy}";
 

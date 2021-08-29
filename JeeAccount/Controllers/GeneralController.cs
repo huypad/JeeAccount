@@ -121,8 +121,8 @@ namespace JeeAccount.Controllers
                 string sqlAppAdmin = $@"select AppID, AccountList.UserID, Username, LastName + '' + FirstName as Fullname, LastName  + ' ' + FirstName + ' (' + Username + ')' as Display
                 from AccountList
                 left join Account_App on Account_App.UserID = AccountList.UserID
-                where CustomerID = @CustomerID and(AccountList.Disable != 1 or AccountList.Disable is null) and(AccountList.IsAdmin = 1 or Account_App.IsAdmin = 1)
-                and AppID = {appid}";
+                where CustomerID = @CustomerID and(AccountList.Disable != 1 or AccountList.Disable is null) and (AccountList.IsAdmin = 1 or Account_App.IsAdmin = 1)
+                and AppID = {appid} and Account_App.Disable = 0";
 
                 IEnumerable<NhanVienMatchip> dataAdminApp;
 

@@ -706,6 +706,7 @@ namespace JeeAccount.Controllers
             }
         }
 
+
         [HttpGet("GetListDirectManager")]
         public async Task<IActionResult> GetListDirectManager()
         {

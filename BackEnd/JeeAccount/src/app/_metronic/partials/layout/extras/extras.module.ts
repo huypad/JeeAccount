@@ -44,6 +44,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { FilterPipe } from './filter.pipe';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { RemindService } from 'src/app/pages/JeeAccount/_core/services/remind.service';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
@@ -107,6 +108,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     ChatService,
     MessageService,
     PresenceService,
+    RemindService,
   ],
   exports: [
     SearchDropdownInnerComponent,
