@@ -496,7 +496,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID where Acco
 
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
-                string sql2 = @$"select AppID from Account_App where UserID = @UserID and AppID = 1 and (Disable = 0 or Disable is null)";
+                string sql2 = @$"select AppID from Account_App where UserID = @UserID and AppID = 1 ";
                 var dtnew = cnn.CreateDataTable(sql2, Conds);
                 if (dtnew.Rows.Count == 0)
                 {
@@ -514,7 +514,28 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID where Acco
                     {
                         throw cnn.LastError;
                     }
+                } else
+                {
+                    string sql3 = @$"select AppID from Account_App where UserID = @UserID and AppID = 1 and IsActive = 0 or Disable = 1";
+                    var dt3 = cnn.CreateDataTable(sql3);
+                    Hashtable val2 = new Hashtable();
+                    val2.Add("ActivatedBy", 0);
+                    val2.Add("ActivatedDate", DateTime.Now.ToUniversalTime());
+                    val2.Add("IsActive", 1);
+                    val2.Add("Disable", 0);
+
+                    SqlConditions conds = new SqlConditions();
+                    conds.Add("UserID", UserID);
+                    val2.Add("AppID", 1);
+
+                    int z = cnn.Update(val2, conds, "Account_App");
+                    if (z <= 0)
+                    {
+                        throw cnn.LastError;
+                    }
                 }
+
+
             }
         }
 
@@ -526,7 +547,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID where Acco
 
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
-                string sql2 = @$"select AppID from Account_App where UserID = @UserID and AppID = 1 and (Disable = 0 or Disable is null)";
+                string sql2 = @$"select AppID from Account_App where UserID = @UserID and AppID = 1";
                 var dtnew = cnn.CreateDataTable(sql2, Conds);
 
                 if (dtnew.Rows.Count > 0)
@@ -534,6 +555,10 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID where Acco
                     Conds.Add("AppID", 1);
                     Hashtable val = new Hashtable();
                     val.Add("Disable", 1);
+                    val.Add("IsActive", 0);
+                    val.Add("InActiveDate", DateTime.Now.ToUniversalTime());
+                    val.Add("InActiveBy", 0);
+
                     int x = cnn.Update(val, Conds, "Account_App");
                     if (x <= 0)
                     {

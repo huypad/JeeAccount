@@ -106,7 +106,14 @@ export class LayoutUtilsService {
     nameButtonOK?: string
   ) {
     return this.dialog.open(DeleteEntityDialogComponent, {
-      data: { title, description, waitDesciption, doPositiveBtn, nameButtonCancel, nameButtonOK },
+      data: {
+        title: title,
+        description: description,
+        waitDesciption: waitDesciption,
+        doPositiveBtn: waitDesciption,
+        nameButtonCance: nameButtonCancel,
+        nameButtonOK: nameButtonOK,
+      },
       width: '440px',
       panelClass: 'no-padding',
     });

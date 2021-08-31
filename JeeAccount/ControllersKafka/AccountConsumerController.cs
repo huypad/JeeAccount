@@ -72,6 +72,14 @@ namespace JeeCustomer.ConsumerKafka
 
                         _ = GeneralReponsitory.UpdateJeeAccountCustomDataByInputApiModel(staffID.staffID, _config.GetValue<string>("AppConfig:Connection"), GetSecretToken());
                     }
+                    else if (obj.userId > 0)
+                    {
+                        GeneralReponsitory.InsertAppCodeJeeHRKafka(_config.GetValue<string>("AppConfig:Connection"), obj.userId, false);
+                        if (string.IsNullOrEmpty(objRemove.fieldValue.roles))
+                        {
+                            GeneralReponsitory.RemoveAppCodeJeeHRKafka(_config.GetValue<string>("AppConfig:Connection"), obj.userId);
+                        }
+                    }
                 }
                 string username = GetObjectDB($"select Username from AccountList where UserID = {obj.userId}", _config.GetValue<string>("AppConfig:Connection"));
                 if (!string.IsNullOrEmpty(username))

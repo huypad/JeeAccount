@@ -184,6 +184,7 @@ namespace JeeAccount.Controllers
                 var lstAppid = new List<int>();
                 lstAppid.Add(appid);
                 await _service.CreateAdminApp(nv.UserId, nv.Username, customData.JeeAccount.CustomerID, customData.JeeAccount.UserID, lstAppid);
+
                 return Ok(MessageReturnHelper.ThanhCong("Tạo Admin hệ thống"));
             }
             catch (KhongCoDuLieuException ex)

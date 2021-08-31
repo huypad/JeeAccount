@@ -163,6 +163,10 @@ namespace JeeAccount.Services.PermissionManagementService
                     string objectSUpdateAdmin = JsonConvert.SerializeObject(ObjectUpdateAdminKafka(appCode, customerid, userid, username));
                     await _producer.PublishAsync(TOPIC_UPDATEADMIN, objectSUpdateAdmin).ConfigureAwait(false);
                 }
+                var identityServerController = new IdentityServerController();
+                var common = GeneralReponsitory.GetCommonInfo(_connectionString, userid);
+                var jeeaccountObjCustom = identityServerController.JeeAccountCustomData(AppCodes.ToList(), userid, customerid, common.StaffID);
+                var update = await identityServerController.UpdateCustomDataInternal(GeneralService.GetInternalToken(_configuration), username, jeeaccountObjCustom);
             }
             catch (Exception)
             {
@@ -182,6 +186,10 @@ namespace JeeAccount.Services.PermissionManagementService
                     string objectSUpdateAdmin = JsonConvert.SerializeObject(ObjectUpdateAdminKafka(appCode, customerid, userid, username));
                     await _producer.PublishAsync(TOPIC_UPDATEADMIN, objectSUpdateAdmin);
                 }
+                var identityServerController = new IdentityServerController();
+                var common = GeneralReponsitory.GetCommonInfo(_connectionString, userid);
+                var jeeaccountObjCustom = identityServerController.JeeAccountCustomData(AppCodes.ToList(), userid, customerid, common.StaffID);
+                var update = await identityServerController.UpdateCustomDataInternal(GeneralService.GetInternalToken(_configuration), username, jeeaccountObjCustom);
             }
             catch (Exception)
             {

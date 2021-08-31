@@ -965,11 +965,11 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                 {
                     if (!GeneralReponsitory.IsAdminHeThongCnn(cnn, UserID) || GeneralReponsitory.IsAdminAppCnn(cnn, UserID, 14)) continue;
                 }
-                string sql2 = @$"select AppID from Account_App where UserID = @UserID and AppID = {id} and (Disable = 0 or Disable is null)";
+                string sql2 = @$"select AppID from Account_App where UserID = @UserID and AppID = {id}";
                 var dtnew = cnn.CreateDataTable(sql2, Conds);
                 if (dtnew.Rows.Count > 0)
                 {
-                    string sql3 = @$"select AppID from Account_App where UserID = @UserID and AppID = {id} and (Disable = 0 or Disable is null) and IsActive = 0";
+                    string sql3 = @$"select AppID from Account_App where UserID = @UserID and AppID = {id} and IsActive = 0 or Disable = 1";
                     var dt3 = cnn.CreateDataTable(sql3);
                     if (dt3.Rows.Count == 0) continue;
                     var userid_createdBy = GeneralReponsitory.GetCommonInfoCnn(cnn, 0, createdBy).UserID;
@@ -977,6 +977,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                     val2.Add("ActivatedBy", userid_createdBy);
                     val2.Add("ActivatedDate", DateTime.Now.ToUniversalTime());
                     val2.Add("IsActive", 1);
+                    val2.Add("Disable", 0);
 
                     SqlConditions conds = new SqlConditions();
                     conds.Add("UserID", UserID);

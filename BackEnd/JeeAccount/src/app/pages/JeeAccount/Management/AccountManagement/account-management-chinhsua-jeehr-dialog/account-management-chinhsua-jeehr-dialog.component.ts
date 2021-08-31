@@ -164,7 +164,7 @@ export class AccountManagementChinhSuaJeeHRDialogComponent implements OnInit, On
     const _title = this.translateService.instant('COMMOM.RESETMATKHAU');
     const _description = this.translateService.instant('COMMOM.RESETMATKHAUDESCRIPTION');
     const dialogRef = this.dialog.open(DeleteEntityDialogComponent, {
-      data: { desciption: _description, title: _title },
+      data: { description: _description, title: _title },
       width: '450px',
     });
     const sb = dialogRef.afterClosed().subscribe((res) => {
