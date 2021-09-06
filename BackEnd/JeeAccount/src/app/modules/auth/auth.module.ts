@@ -8,23 +8,12 @@ import { RegistrationComponent } from './registration/registration.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { LogoutComponent } from './logout/logout.component';
 import { AuthComponent } from './auth.component';
-import {TranslationModule} from '../i18n/translation.module';
+import { TranslationModule } from '../i18n/translation.module';
+import { CookieService } from 'ngx-cookie-service';
 
 @NgModule({
-  declarations: [
-    LoginComponent,
-    RegistrationComponent,
-    ForgotPasswordComponent,
-    LogoutComponent,
-    AuthComponent,
-  ],
-  imports: [
-    CommonModule,
-    TranslationModule,
-    AuthRoutingModule,
-    FormsModule,
-    ReactiveFormsModule,
-    HttpClientModule,
-  ]
+  declarations: [LoginComponent, RegistrationComponent, ForgotPasswordComponent, LogoutComponent, AuthComponent],
+  imports: [CommonModule, TranslationModule, AuthRoutingModule, FormsModule, ReactiveFormsModule, HttpClientModule],
+  providers: [CookieService],
 })
 export class AuthModule {}

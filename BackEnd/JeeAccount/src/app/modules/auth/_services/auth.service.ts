@@ -1,3 +1,4 @@
+import { CookieService } from 'ngx-cookie-service';
 import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, BehaviorSubject, of, Subscription } from 'rxjs';
 import { map, finalize } from 'rxjs/operators';
@@ -9,10 +10,13 @@ import jwt_decode from 'jwt-decode';
 import { AuthSSO } from '../_models/authSSO.model';
 
 const redirectUrl = environment.HOST_PORTAL_API + '/?redirectUrl=';
+const DOMAIN = environment.DOMAIN_COOKIES;
 const API_IDENTITY = `${environment.HOST_IDENTITYSERVER_API}`;
 const API_IDENTITY_LOGOUT = `${API_IDENTITY}/user/logout`;
 const API_IDENTITY_USER = `${API_IDENTITY}/user/me`;
 const API_IDENTITY_REFESHTOKEN = `${API_IDENTITY}/refresh`;
+const KEY_SSO_TOKEN = 'sso_token';
+const KEY_RESRESH_TOKEN = 'sso_refresh_token';
 @Injectable({
   providedIn: 'root',
 })
@@ -22,7 +26,7 @@ export class AuthService implements OnDestroy {
 
   // public fields
   currentUser$: Observable<UserModel>;
-  authSSOModel$: Observable<AuthSSO>;
+
   currentUserSubject: BehaviorSubject<UserModel> = new BehaviorSubject<UserModel>(undefined);
   authSSOModelSubject$: BehaviorSubject<AuthSSO> = new BehaviorSubject<AuthSSO>(undefined);
   // Private fields
@@ -30,16 +34,17 @@ export class AuthService implements OnDestroy {
   isFirstLoading$ = new BehaviorSubject<boolean>(true);
   errorMessage = new BehaviorSubject<string>(undefined);
   subscriptions: Subscription[] = [];
-  ssoToken$: BehaviorSubject<string> = new BehaviorSubject<string>(undefined);
-  authLocalStorageToken = `${environment.appVersion}-${environment.USERDATA_KEY}`;
-  accessToken$ = new BehaviorSubject<string>(undefined);
-  refreshToken$ = new BehaviorSubject<string>(undefined);
 
-  constructor(private http: HttpClient, private authHttpService: AuthHTTPService) {
+  private userSubject = new BehaviorSubject<any | null>(null);
+
+  public User$: Observable<any | null>;
+
+  constructor(private http: HttpClient, private authHttpService: AuthHTTPService, private cookieService: CookieService) {
     this.isLoading$ = new BehaviorSubject<boolean>(false);
-    this.currentUser$ = this.currentUserSubject.asObservable();
-    this.authSSOModel$ = this.authSSOModelSubject$.asObservable();
-    this.ssoToken$.next(this.getParamsSSO());
+    if (this.getAccessToken_cookie()) {
+      this.saveNewUserMe();
+    }
+    this.User$ = this.userSubject.asObservable();
     setInterval(() => this.autoGetUserFromSSO(), 60000);
   }
 
@@ -50,10 +55,35 @@ export class AuthService implements OnDestroy {
   set currentUserValue(user: UserModel) {
     this.currentUserSubject.next(user);
   }
+
+  set setUserValue(user: any) {
+    this.userSubject.next(user);
+  }
+
   getUserId() {
     var auth = this.getAuthFromLocalStorage();
     return auth.user.customData['jee-account'].userID;
   }
+  getAccessToken_cookie() {
+    const access_token = this.cookieService.get(KEY_SSO_TOKEN);
+    return access_token;
+  }
+
+  saveToken_cookie(access_token?: string, refresh_token?: string) {
+    if (access_token) this.cookieService.set(KEY_SSO_TOKEN, access_token, undefined, '/', DOMAIN);
+    if (refresh_token) this.cookieService.set(KEY_RESRESH_TOKEN, refresh_token, undefined, '/', DOMAIN);
+  }
+
+  getRefreshToken_cookie() {
+    const sso_token = this.cookieService.get(KEY_RESRESH_TOKEN);
+    return sso_token;
+  }
+
+  deleteAccessRefreshToken_cookie() {
+    this.cookieService.delete(KEY_SSO_TOKEN);
+    this.cookieService.delete(KEY_RESRESH_TOKEN);
+  }
+
   autoGetUserFromSSO() {
     const auth = this.getAuthFromLocalStorage();
     if (auth) {
@@ -61,24 +91,25 @@ export class AuthService implements OnDestroy {
     }
   }
 
-  saveNewUserMe(access_token?: string, refresh_token?: string) {
-    if (access_token) this.accessToken$.next(access_token);
-    if (refresh_token) this.refreshToken$.next(refresh_token);
+  saveNewUserMe(data?: any) {
+    if (data) {
+      this.userSubject.next(data);
+      this.saveToken_cookie(data.access_token, data.refresh_token);
+    }
     this.getUserMeFromSSO().subscribe(
       (data) => {
         if (data && data.access_token) {
-          this.saveLocalStorageToken(this.authLocalStorageToken, data);
+          this.saveToken_cookie(data.access_token, data.refresh_token);
         }
       },
       (error) => {
         this.refreshToken().subscribe(
           (data: AuthSSO) => {
             if (data && data.access_token) {
-              this.saveLocalStorageToken(this.authLocalStorageToken, data);
+              this.saveToken_cookie(data.access_token, data.refresh_token);
             }
           },
           (error) => {
-            localStorage.removeItem(this.authLocalStorageToken);
             this.logout();
           }
         );
@@ -87,14 +118,15 @@ export class AuthService implements OnDestroy {
   }
 
   isAuthenticated(): boolean {
-    const auth = this.getAuthFromLocalStorage();
-    if (auth) {
-      if (this.isTokenExpired(auth.access_token)) {
-        this.saveAuthSSOModelAccessTokenRefreshToken(auth);
+    const access_token = this.getAccessToken_cookie();
+    const refresh_token = this.getRefreshToken_cookie();
+    if (access_token) {
+      if (this.isTokenExpired(access_token)) {
+        this.saveToken_cookie(access_token);
         return true;
       }
-      if (this.isTokenExpired(auth.refresh_token)) {
-        this.saveAuthSSOModelAccessTokenRefreshToken(auth);
+      if (this.isTokenExpired(refresh_token)) {
+        this.saveToken_cookie(undefined, refresh_token);
         return true;
       }
     }
@@ -107,17 +139,6 @@ export class AuthService implements OnDestroy {
     return date.valueOf() > new Date().valueOf();
   }
 
-  saveAuthSSOModelAccessTokenRefreshToken(auth) {
-    if (!this.authSSOModelSubject$.getValue()) {
-      const authSSOModel = new AuthSSO();
-      authSSOModel.setAuthSSO(auth);
-      this.authSSOModelSubject$.next(authSSOModel);
-      this.authSSOModel$ = this.authSSOModelSubject$.asObservable();
-    }
-    if (!this.accessToken$.getValue()) this.accessToken$.next(auth.access_token);
-    if (!this.refreshToken$.getValue()) this.refreshToken$.next(auth.refresh_token);
-  }
-
   getTokenExpirationDate(auth: string): Date {
     let decoded: any = jwt_decode(auth);
     if (!decoded.exp) return null;
@@ -127,8 +148,23 @@ export class AuthService implements OnDestroy {
   }
 
   logout() {
-    let url = redirectUrl + document.location.protocol + '//' + document.location.hostname + ':' + document.location.port;
-    window.location.href = url;
+    if (this.getAccessToken_cookie()) {
+      this.logoutToSSO().subscribe(
+        (res) => {
+          this.userSubject.next(undefined);
+          this.deleteAccessRefreshToken_cookie();
+          let url = redirectUrl + document.location.protocol + '//' + document.location.hostname + ':' + document.location.port;
+          window.location.href = url;
+        },
+        (err) => {
+          console.log(err);
+        }
+      );
+    } else {
+      this.userSubject.next(undefined);
+      let url = redirectUrl + document.location.protocol + '//' + document.location.hostname + ':' + document.location.port;
+      window.location.href = url;
+    }
   }
 
   getParamsSSO() {
@@ -142,21 +178,7 @@ export class AuthService implements OnDestroy {
   }
 
   getAuthFromLocalStorage() {
-    try {
-      const authData = JSON.parse(localStorage.getItem(this.authLocalStorageToken));
-      if (authData === null) return undefined;
-      return authData;
-    } catch (error) {
-      return undefined;
-    }
-  }
-
-  saveLocalStorageToken(key: string, value: any) {
-    localStorage.setItem(key, JSON.stringify(value));
-    this.authSSOModelSubject$.next(value);
-    this.authSSOModel$ = this.authSSOModelSubject$.asObservable();
-    this.accessToken$.next(value.access_token);
-    this.refreshToken$.next(value.refresh_token);
+    return this.userSubject.value;
   }
 
   ngOnDestroy() {
@@ -165,11 +187,10 @@ export class AuthService implements OnDestroy {
 
   // call api identity server
   getUserMeFromSSO(): Observable<any> {
-    const accessToken = this.accessToken$.getValue();
     const url = API_IDENTITY_USER;
     const httpHeader = new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${this.getAccessToken_cookie()}`,
     });
     return this.http.get<any>(url, { headers: httpHeader });
   }
@@ -178,17 +199,16 @@ export class AuthService implements OnDestroy {
     const url = API_IDENTITY_REFESHTOKEN;
     const httpHeader = new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.refreshToken$.getValue()}`,
+      Authorization: `Bearer ${this.getRefreshToken_cookie()}`,
     });
     return this.http.post<any>(url, null, { headers: httpHeader });
   }
 
   logoutToSSO(): Observable<any> {
     const url = API_IDENTITY_LOGOUT;
-    const accessToken = this.accessToken$.getValue();
     const httpHeader = new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${this.getAccessToken_cookie()}`,
     });
     return this.http.post<any>(url, null, { headers: httpHeader });
   }

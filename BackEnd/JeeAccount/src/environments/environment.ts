@@ -20,4 +20,5 @@ export const environment = {
   //notification
   HOST_WEBSOCKET: 'wss://socket.jee.vn',
   HOST_NOTIFICATION: 'https://notification.jee.vn',
+  DOMAIN_COOKIES: 'localhost',
 };

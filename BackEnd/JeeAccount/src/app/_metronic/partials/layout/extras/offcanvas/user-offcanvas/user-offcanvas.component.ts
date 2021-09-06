@@ -63,10 +63,7 @@ export class UserOffcanvasComponent implements OnInit {
   }
 
   logout() {
-    this.auth.logoutToSSO().subscribe((res) => {
-      localStorage.removeItem(this.auth.authLocalStorageToken);
-      this.auth.logout();
-    });
+    this.auth.logout();
   }
 
   getNameUser(value: string) {

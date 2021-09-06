@@ -24,8 +24,8 @@ export class ChatService {
   private currentUserSource = new ReplaySubject<any>(1);
   currentUser$ = this.currentUserSource.asObservable();
   public authLocalStorageToken = `${environment.appVersion}-${environment.USERDATA_KEY}`;
-  constructor(private http: HttpClient, private presence: PresenceService) {}
-  private auth: AuthService;
+  constructor(private http: HttpClient, private presence: PresenceService, private auth: AuthService) {}
+
   // login(model: any){
   //   return this.http.post(this.baseUrl+'Account/login', model).pipe(
   //     map((res:User)=>{
@@ -48,14 +48,9 @@ export class ChatService {
   }
 
   public getAuthFromLocalStorage(): any {
-    try {
-      const authData = JSON.parse(localStorage.getItem(this.authLocalStorageToken));
-      return authData;
-    } catch (error) {
-      console.error(error);
-      return undefined;
-    }
+    return this.auth.getAuthFromLocalStorage();
   }
+
   getHttpHeaders() {
     const data = this.getAuthFromLocalStorage();
 

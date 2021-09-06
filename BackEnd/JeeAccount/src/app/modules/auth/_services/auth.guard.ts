@@ -8,11 +8,13 @@ import { LayoutUtilsService, MessageType } from 'src/app/pages/JeeAccount/_core/
 export class AuthGuard implements CanActivate {
   constructor(private authService: AuthService, private router: Router, private layoutUtilsService: LayoutUtilsService) {}
   appCode = environment.APPCODE;
+  HOST_JEELANDINGPAGE = environment.HOST_JEELANDINGPAGE;
+
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       if (!this.authService.isAuthenticated()) {
-        if (this.authService.ssoToken$.getValue()) {
-          this.authService.accessToken$.next(this.authService.ssoToken$.getValue());
+        if (this.authService.getParamsSSO()) {
+          this.authService.saveToken_cookie(this.authService.getParamsSSO());
         }
         resolve(this.canPassGuard());
       } else {
@@ -44,7 +46,7 @@ export class AuthGuard implements CanActivate {
   canPassGuardAccessToken(data) {
     return new Promise<boolean>((resolve, reject) => {
       if (data && data.access_token) {
-        this.authService.saveLocalStorageToken(this.authService.authLocalStorageToken, data);
+        this.authService.saveNewUserMe(data);
         const lstAppCode: string[] = data['user']['customData']['jee-account']['appCode'];
         if (lstAppCode) {
           if (lstAppCode.indexOf(this.appCode) === -1) {
@@ -58,9 +60,9 @@ export class AuthGuard implements CanActivate {
       }
     });
   }
+
   unauthorizedGuard() {
     return new Promise<boolean>((resolve, reject) => {
-      localStorage.clear();
       this.authService.logout();
       return resolve(false);
     });
@@ -79,9 +81,8 @@ export class AuthGuard implements CanActivate {
         0
       );
       this.authService.logoutToSSO().subscribe(() => {
-        localStorage.clear();
         popup.afterDismissed().subscribe((res) => {
-          this.authService.logout();
+          window.open(this.HOST_JEELANDINGPAGE);
           return resolve(false);
         });
       });
