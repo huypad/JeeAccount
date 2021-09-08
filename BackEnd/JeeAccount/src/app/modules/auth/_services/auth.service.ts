@@ -60,8 +60,8 @@ export class AuthService implements OnDestroy {
   }
 
   saveToken_cookie(access_token?: string, refresh_token?: string) {
-    if (access_token) this.cookieService.set(KEY_SSO_TOKEN, access_token, undefined, '/', DOMAIN, false, 'None');
-    if (refresh_token) this.cookieService.set(KEY_RESRESH_TOKEN, refresh_token, undefined, '/', DOMAIN, false, 'None');
+    if (access_token) this.cookieService.set(KEY_SSO_TOKEN, access_token, undefined, '/', DOMAIN);
+    if (refresh_token) this.cookieService.set(KEY_RESRESH_TOKEN, refresh_token, undefined, '/', DOMAIN);
   }
 
   getRefreshToken_cookie() {
@@ -70,8 +70,14 @@ export class AuthService implements OnDestroy {
   }
 
   deleteAccessRefreshToken_cookie() {
-    if (this.getAccessToken_cookie()) this.cookieService.delete(KEY_SSO_TOKEN);
-    if (this.getRefreshToken_cookie()) this.cookieService.delete(KEY_RESRESH_TOKEN);
+    const access_token = this.getAccessToken_cookie();
+    const refresh_token = this.getRefreshToken_cookie();
+    debugger;
+    this.cookieService.delete(KEY_SSO_TOKEN);
+    this.cookieService.delete(KEY_RESRESH_TOKEN);
+    const access_token2 = this.getAccessToken_cookie();
+    const refresh_token2 = this.getRefreshToken_cookie();
+    debugger;
   }
 
   autoGetUserFromSSO() {
@@ -145,16 +151,22 @@ export class AuthService implements OnDestroy {
   logout() {
     this.logoutToSSO().subscribe(
       (res) => {
+        const access_token = this.getAccessToken_cookie();
+        const refresh_token = this.getRefreshToken_cookie();
         this.userSubject.next(undefined);
         this.deleteAccessRefreshToken_cookie();
         let url = redirectUrl + document.location.protocol + '//' + document.location.hostname + ':' + document.location.port;
         window.location.href = url;
+        debugger;
       },
       (err) => {
+        const access_token = this.getAccessToken_cookie();
+        const refresh_token = this.getRefreshToken_cookie();
         this.userSubject.next(undefined);
         this.deleteAccessRefreshToken_cookie();
         let url = redirectUrl + document.location.protocol + '//' + document.location.hostname + ':' + document.location.port;
         window.location.href = url;
+        debugger;
       }
     );
   }
@@ -179,28 +191,31 @@ export class AuthService implements OnDestroy {
 
   // call api identity server
   getUserMeFromSSO(): Observable<any> {
+    const access_token = this.getAccessToken_cookie();
     const url = API_IDENTITY_USER;
     const httpHeader = new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.getAccessToken_cookie()}`,
+      Authorization: `Bearer ${access_token}`,
     });
     return this.http.get<any>(url, { headers: httpHeader });
   }
 
   refreshToken(): Observable<any> {
+    const refresh_token = this.getRefreshToken_cookie();
     const url = API_IDENTITY_REFESHTOKEN;
     const httpHeader = new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.getRefreshToken_cookie()}`,
+      Authorization: `Bearer ${refresh_token}`,
     });
     return this.http.post<any>(url, null, { headers: httpHeader });
   }
 
   logoutToSSO(): Observable<any> {
+    const access_token = this.getAccessToken_cookie();
     const url = API_IDENTITY_LOGOUT;
     const httpHeader = new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.getAccessToken_cookie()}`,
+      Authorization: `Bearer ${access_token}`,
     });
     return this.http.post<any>(url, null, { headers: httpHeader });
   }
