@@ -16,7 +16,7 @@ const API_IDENTITY_LOGOUT = `${API_IDENTITY}/user/logout`;
 const API_IDENTITY_USER = `${API_IDENTITY}/user/me`;
 const API_IDENTITY_REFESHTOKEN = `${API_IDENTITY}/user/refresh`;
 const KEY_SSO_TOKEN = 'sso_token';
-const KEY_RESRESH_TOKEN = 'sso_refresh_token';
+const KEY_RESRESH_TOKEN = 'sso_token_refresh';
 @Injectable({
   providedIn: 'root',
 })
@@ -60,8 +60,8 @@ export class AuthService implements OnDestroy {
   }
 
   saveToken_cookie(access_token?: string, refresh_token?: string) {
-    if (access_token) this.cookieService.set(KEY_SSO_TOKEN, access_token, undefined, '/', DOMAIN);
-    if (refresh_token) this.cookieService.set(KEY_RESRESH_TOKEN, refresh_token, undefined, '/', DOMAIN);
+    if (access_token) this.cookieService.set(KEY_SSO_TOKEN, access_token, undefined, '/', DOMAIN, false, 'None');
+    if (refresh_token) this.cookieService.set(KEY_RESRESH_TOKEN, refresh_token, undefined, '/', DOMAIN, false, 'None');
   }
 
   getRefreshToken_cookie() {
