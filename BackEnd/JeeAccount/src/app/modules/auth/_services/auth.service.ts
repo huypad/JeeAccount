@@ -14,7 +14,7 @@ const DOMAIN = environment.DOMAIN_COOKIES;
 const API_IDENTITY = `${environment.HOST_IDENTITYSERVER_API}`;
 const API_IDENTITY_LOGOUT = `${API_IDENTITY}/user/logout`;
 const API_IDENTITY_USER = `${API_IDENTITY}/user/me`;
-const API_IDENTITY_REFESHTOKEN = `${API_IDENTITY}/refresh`;
+const API_IDENTITY_REFESHTOKEN = `${API_IDENTITY}/user/refresh`;
 const KEY_SSO_TOKEN = 'sso_token';
 const KEY_RESRESH_TOKEN = 'sso_refresh_token';
 @Injectable({
@@ -37,14 +37,8 @@ export class AuthService implements OnDestroy {
 
   private userSubject = new BehaviorSubject<any | null>(null);
 
-  public User$: Observable<any | null>;
-
   constructor(private http: HttpClient, private authHttpService: AuthHTTPService, private cookieService: CookieService) {
     this.isLoading$ = new BehaviorSubject<boolean>(false);
-    if (this.getAccessToken_cookie()) {
-      this.saveNewUserMe();
-    }
-    this.User$ = this.userSubject.asObservable();
     setInterval(() => this.autoGetUserFromSSO(), 60000);
   }
 
@@ -54,10 +48,6 @@ export class AuthService implements OnDestroy {
 
   set currentUserValue(user: UserModel) {
     this.currentUserSubject.next(user);
-  }
-
-  set setUserValue(user: any) {
-    this.userSubject.next(user);
   }
 
   getUserId() {
@@ -80,8 +70,8 @@ export class AuthService implements OnDestroy {
   }
 
   deleteAccessRefreshToken_cookie() {
-    this.cookieService.delete(KEY_SSO_TOKEN);
-    this.cookieService.delete(KEY_RESRESH_TOKEN);
+    if (this.getAccessToken_cookie()) this.cookieService.delete(KEY_SSO_TOKEN);
+    if (this.getRefreshToken_cookie()) this.cookieService.delete(KEY_RESRESH_TOKEN);
   }
 
   autoGetUserFromSSO() {
@@ -94,11 +84,13 @@ export class AuthService implements OnDestroy {
   saveNewUserMe(data?: any) {
     if (data) {
       this.userSubject.next(data);
+
       this.saveToken_cookie(data.access_token, data.refresh_token);
     }
     this.getUserMeFromSSO().subscribe(
       (data) => {
         if (data && data.access_token) {
+          this.userSubject.next(data);
           this.saveToken_cookie(data.access_token, data.refresh_token);
         }
       },
@@ -106,6 +98,7 @@ export class AuthService implements OnDestroy {
         this.refreshToken().subscribe(
           (data: AuthSSO) => {
             if (data && data.access_token) {
+              this.userSubject.next(data);
               this.saveToken_cookie(data.access_token, data.refresh_token);
             }
           },
@@ -125,6 +118,8 @@ export class AuthService implements OnDestroy {
         this.saveToken_cookie(access_token);
         return true;
       }
+    }
+    if (refresh_token) {
       if (this.isTokenExpired(refresh_token)) {
         this.saveToken_cookie(undefined, refresh_token);
         return true;
@@ -148,23 +143,20 @@ export class AuthService implements OnDestroy {
   }
 
   logout() {
-    if (this.getAccessToken_cookie()) {
-      this.logoutToSSO().subscribe(
-        (res) => {
-          this.userSubject.next(undefined);
-          this.deleteAccessRefreshToken_cookie();
-          let url = redirectUrl + document.location.protocol + '//' + document.location.hostname + ':' + document.location.port;
-          window.location.href = url;
-        },
-        (err) => {
-          console.log(err);
-        }
-      );
-    } else {
-      this.userSubject.next(undefined);
-      let url = redirectUrl + document.location.protocol + '//' + document.location.hostname + ':' + document.location.port;
-      window.location.href = url;
-    }
+    this.logoutToSSO().subscribe(
+      (res) => {
+        this.userSubject.next(undefined);
+        this.deleteAccessRefreshToken_cookie();
+        let url = redirectUrl + document.location.protocol + '//' + document.location.hostname + ':' + document.location.port;
+        window.location.href = url;
+      },
+      (err) => {
+        this.userSubject.next(undefined);
+        this.deleteAccessRefreshToken_cookie();
+        let url = redirectUrl + document.location.protocol + '//' + document.location.hostname + ':' + document.location.port;
+        window.location.href = url;
+      }
+    );
   }
 
   getParamsSSO() {
@@ -241,5 +233,4 @@ export class AuthService implements OnDestroy {
   registration(newUser: UserModel): Observable<any> {
     throw new Error('Method not implemented.');
   }
-  // end method metronic call
 }

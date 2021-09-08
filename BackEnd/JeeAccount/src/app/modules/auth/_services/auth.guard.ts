@@ -2,7 +2,6 @@ import { environment } from './../../../../environments/environment.stage';
 import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import { AuthService } from './auth.service';
-import { AuthSSO } from '../_models/authSSO.model';
 import { LayoutUtilsService, MessageType } from 'src/app/pages/JeeAccount/_core/utils/layout-utils.service';
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
@@ -16,6 +15,7 @@ export class AuthGuard implements CanActivate {
         if (this.authService.getParamsSSO()) {
           this.authService.saveToken_cookie(this.authService.getParamsSSO());
         }
+
         resolve(this.canPassGuard());
       } else {
         resolve(this.canPassGuard());
@@ -31,7 +31,7 @@ export class AuthGuard implements CanActivate {
         },
         (error) => {
           this.authService.refreshToken().subscribe(
-            (data: AuthSSO) => {
+            (data) => {
               resolve(this.canPassGuardAccessToken(data));
             },
             (error) => {
@@ -57,6 +57,7 @@ export class AuthGuard implements CanActivate {
         } else {
           return resolve(this.unAppCodeAuthorizedGuard());
         }
+        return resolve(true);
       }
     });
   }
@@ -86,6 +87,7 @@ export class AuthGuard implements CanActivate {
           return resolve(false);
         });
       });
+      return resolve(false);
     });
   }
 }
