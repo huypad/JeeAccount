@@ -40,7 +40,6 @@ export class AuthService implements OnDestroy {
   User$: Observable<any> = this.userSubject.asObservable();
 
   constructor(private http: HttpClient, private authHttpService: AuthHTTPService, private cookieService: CookieService) {
-    debugger;
     this.isLoading$ = new BehaviorSubject<boolean>(false);
     if (this.getAccessToken_cookie()) {
       this.getUserMeFromSSO().subscribe(
@@ -96,8 +95,9 @@ export class AuthService implements OnDestroy {
   }
 
   saveToken_cookie(access_token?: string, refresh_token?: string) {
-    if (access_token) this.cookieService.set(KEY_SSO_TOKEN, access_token, undefined, '/', DOMAIN);
-    if (refresh_token) this.cookieService.set(KEY_RESRESH_TOKEN, refresh_token, undefined, '/', DOMAIN);
+    var d = 60 * 60 * 24 * 365;
+    if (access_token) this.cookieService.set(KEY_SSO_TOKEN, access_token, d, '/', DOMAIN);
+    if (refresh_token) this.cookieService.set(KEY_RESRESH_TOKEN, refresh_token, d, '/', DOMAIN);
   }
 
   getRefreshToken_cookie() {
@@ -106,8 +106,10 @@ export class AuthService implements OnDestroy {
   }
 
   deleteAccessRefreshToken_cookie() {
+    debugger;
     this.cookieService.delete(KEY_SSO_TOKEN, '/', DOMAIN);
     this.cookieService.delete(KEY_RESRESH_TOKEN, '/', DOMAIN);
+    debugger;
   }
 
   autoGetUserFromSSO() {
@@ -196,7 +198,12 @@ export class AuthService implements OnDestroy {
   prepareLogout() {
     this.deleteAccessRefreshToken_cookie();
     this.userSubject.next(null);
-    let url = redirectUrl + document.location.protocol + '//' + document.location.hostname + ':' + document.location.port;
+    let url = '';
+    if (document.location.port) {
+      url = redirectUrl + document.location.protocol + '//' + document.location.hostname + ':' + document.location.port;
+    } else {
+      url = redirectUrl + document.location.protocol + '//' + document.location.hostname;
+    }
     window.location.href = url;
   }
 
