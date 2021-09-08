@@ -37,8 +37,44 @@ export class AuthService implements OnDestroy {
 
   private userSubject = new BehaviorSubject<any | null>(null);
 
+  User$: Observable<any> = this.userSubject.asObservable();
+
   constructor(private http: HttpClient, private authHttpService: AuthHTTPService, private cookieService: CookieService) {
+    debugger;
     this.isLoading$ = new BehaviorSubject<boolean>(false);
+    if (this.getAccessToken_cookie()) {
+      this.getUserMeFromSSO().subscribe(
+        (data) => {
+          if (data && data.access_token) {
+            this.userSubject.next(data);
+            this.saveToken_cookie(data.access_token, data.refresh_token);
+          }
+        },
+        (error) => {
+          this.refreshToken().subscribe(
+            (data: AuthSSO) => {
+              if (data && data.access_token) {
+                this.userSubject.next(data);
+                this.saveToken_cookie(data.access_token, data.refresh_token);
+              }
+            },
+            (error) => {
+              this.logout();
+            }
+          );
+        },
+        () => {
+          setInterval(() => {
+            if (!this.getAccessToken_cookie() && !this.getRefreshToken_cookie()) this.logout();
+          }, 1000);
+          this.User$.subscribe((res) => {
+            if (!res) {
+              this.logout();
+            }
+          });
+        }
+      );
+    }
     setInterval(() => this.autoGetUserFromSSO(), 60000);
   }
 
@@ -70,14 +106,8 @@ export class AuthService implements OnDestroy {
   }
 
   deleteAccessRefreshToken_cookie() {
-    const access_token = this.getAccessToken_cookie();
-    const refresh_token = this.getRefreshToken_cookie();
-    debugger;
-    this.cookieService.delete(KEY_SSO_TOKEN);
-    this.cookieService.delete(KEY_RESRESH_TOKEN);
-    const access_token2 = this.getAccessToken_cookie();
-    const refresh_token2 = this.getRefreshToken_cookie();
-    debugger;
+    this.cookieService.delete(KEY_SSO_TOKEN, '/', DOMAIN);
+    this.cookieService.delete(KEY_RESRESH_TOKEN, '/', DOMAIN);
   }
 
   autoGetUserFromSSO() {
@@ -90,7 +120,6 @@ export class AuthService implements OnDestroy {
   saveNewUserMe(data?: any) {
     if (data) {
       this.userSubject.next(data);
-
       this.saveToken_cookie(data.access_token, data.refresh_token);
     }
     this.getUserMeFromSSO().subscribe(
@@ -149,26 +178,26 @@ export class AuthService implements OnDestroy {
   }
 
   logout() {
-    this.logoutToSSO().subscribe(
-      (res) => {
-        const access_token = this.getAccessToken_cookie();
-        const refresh_token = this.getRefreshToken_cookie();
-        this.userSubject.next(undefined);
-        this.deleteAccessRefreshToken_cookie();
-        let url = redirectUrl + document.location.protocol + '//' + document.location.hostname + ':' + document.location.port;
-        window.location.href = url;
-        debugger;
-      },
-      (err) => {
-        const access_token = this.getAccessToken_cookie();
-        const refresh_token = this.getRefreshToken_cookie();
-        this.userSubject.next(undefined);
-        this.deleteAccessRefreshToken_cookie();
-        let url = redirectUrl + document.location.protocol + '//' + document.location.hostname + ':' + document.location.port;
-        window.location.href = url;
-        debugger;
-      }
-    );
+    const access_token = this.getAccessToken_cookie();
+    if (access_token) {
+      this.logoutToSSO().subscribe(
+        (res) => {
+          this.prepareLogout();
+        },
+        (err) => {
+          this.prepareLogout();
+        }
+      );
+    } else {
+      this.prepareLogout();
+    }
+  }
+
+  prepareLogout() {
+    this.deleteAccessRefreshToken_cookie();
+    this.userSubject.next(null);
+    let url = redirectUrl + document.location.protocol + '//' + document.location.hostname + ':' + document.location.port;
+    window.location.href = url;
   }
 
   getParamsSSO() {
