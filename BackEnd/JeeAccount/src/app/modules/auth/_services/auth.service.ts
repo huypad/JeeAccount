@@ -95,9 +95,8 @@ export class AuthService implements OnDestroy {
   }
 
   saveToken_cookie(access_token?: string, refresh_token?: string) {
-    var d = 60 * 60 * 24 * 365;
-    if (access_token) this.cookieService.set(KEY_SSO_TOKEN, access_token, d, '/', DOMAIN);
-    if (refresh_token) this.cookieService.set(KEY_RESRESH_TOKEN, refresh_token, d, '/', DOMAIN);
+    if (access_token) this.cookieService.set(KEY_SSO_TOKEN, access_token, 365, '/', DOMAIN);
+    if (refresh_token) this.cookieService.set(KEY_RESRESH_TOKEN, refresh_token, 365, '/', DOMAIN);
   }
 
   getRefreshToken_cookie() {
