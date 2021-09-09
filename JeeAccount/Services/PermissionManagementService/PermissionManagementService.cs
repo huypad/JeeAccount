@@ -220,7 +220,7 @@ namespace JeeAccount.Services.PermissionManagementService
                 foreach (var appCode in AppCodes)
                 {
                     string objectSUpdateAdmin = JsonConvert.SerializeObject(ObjectRemoveAdminKafka(appCode, customerid, userid, username));
-                    _producer.PublishAsync(TOPIC_UPDATEADMIN, objectSUpdateAdmin);
+                    await _producer.PublishAsync(TOPIC_UPDATEADMIN, objectSUpdateAdmin);
                 }
             }
             catch (Exception)
