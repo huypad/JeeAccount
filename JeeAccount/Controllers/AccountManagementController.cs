@@ -594,6 +594,33 @@ namespace JeeAccount.Controllers
             }
         }
 
+        [HttpPost("UppdateCustomData/internal")]
+        public async Task<object> UppdateCustomDataInternal(ObjCustomData objCustomData)
+        {
+            try
+            {
+                var isToken = Ulities.IsInternaltoken(HttpContext.Request.Headers, _config.GetValue<string>("Jwt:internal_secret"));
+                if (isToken == false)
+                {
+                    return Unauthorized(MessageReturnHelper.DangNhap());
+                }
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                var identity = new IdentityServerController();
+                var common = GeneralReponsitory.GetCommonInfo(_connectionString, objCustomData.userId);
+                if (common == null || common.UserID == 0) return JsonResultCommon.KhongHopLe("object");
+                var update = await identity.UpdateCustomDataInternal(GeneralService.GetInternalToken(_config), common.Username, objCustomData);
+                if (!update.IsSuccessStatusCode)
+                {
+                    return JsonResultCommon.ThatBai(await update.Content.ReadAsStringAsync());
+                }
+                return JsonResultCommon.ThanhCong();
+            }
+            catch (Exception ex)
+            {
+                return JsonResultCommon.Exception(ex);
+            }
+        }
+
         [HttpGet("ListUsername")]
         public async Task<IActionResult> ListUsername()
         {
@@ -705,7 +732,6 @@ namespace JeeAccount.Controllers
                 return BadRequest(MessageReturnHelper.Exception(ex));
             }
         }
-
 
         [HttpGet("GetListDirectManager")]
         public async Task<IActionResult> GetListDirectManager()

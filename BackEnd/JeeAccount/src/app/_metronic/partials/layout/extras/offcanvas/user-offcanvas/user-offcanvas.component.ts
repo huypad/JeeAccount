@@ -63,7 +63,14 @@ export class UserOffcanvasComponent implements OnInit {
   }
 
   logout() {
-    this.auth.logout();
+    this.auth.logoutToSSO().subscribe(
+      (res) => {
+        this.auth.prepareLogout();
+      },
+      (err) => {
+        this.auth.prepareLogout();
+      }
+    );
   }
 
   getNameUser(value: string) {

@@ -64,13 +64,8 @@ export class AuthService implements OnDestroy {
         },
         () => {
           setInterval(() => {
-            if (!this.getAccessToken_cookie() && !this.getRefreshToken_cookie()) this.logout();
-          }, 1000);
-          this.User$.subscribe((res) => {
-            if (!res) {
-              this.logout();
-            }
-          });
+            if (!this.getAccessToken_cookie() && !this.getRefreshToken_cookie()) this.prepareLogout();
+          }, 3000);
         }
       );
     }
@@ -105,10 +100,8 @@ export class AuthService implements OnDestroy {
   }
 
   deleteAccessRefreshToken_cookie() {
-    debugger;
     this.cookieService.delete(KEY_SSO_TOKEN, '/', DOMAIN);
     this.cookieService.delete(KEY_RESRESH_TOKEN, '/', DOMAIN);
-    debugger;
   }
 
   autoGetUserFromSSO() {
@@ -196,7 +189,6 @@ export class AuthService implements OnDestroy {
 
   prepareLogout() {
     this.deleteAccessRefreshToken_cookie();
-    this.userSubject.next(null);
     let url = '';
     if (document.location.port) {
       url = redirectUrl + document.location.protocol + '//' + document.location.hostname + ':' + document.location.port;
@@ -282,5 +274,14 @@ export class AuthService implements OnDestroy {
   }
   registration(newUser: UserModel): Observable<any> {
     throw new Error('Method not implemented.');
+  }
+
+  getStaffId() {
+    var auth = this.getAuthFromLocalStorage();
+    return auth.user.customData['jee-account'].staffID;
+  }
+  getAppCodeId() {
+    var auth = this.getAuthFromLocalStorage();
+    return auth.user.customData['jee-account'].appCode;
   }
 }
