@@ -40,6 +40,7 @@ export class AuthService implements OnDestroy {
   User$: Observable<any> = this.userSubject.asObservable();
 
   constructor(private http: HttpClient, private authHttpService: AuthHTTPService, private cookieService: CookieService) {
+    console.log('create bao nhieu lan day');
     this.isLoading$ = new BehaviorSubject<boolean>(false);
     if (this.getAccessToken_cookie()) {
       this.getUserMeFromSSO().subscribe(
