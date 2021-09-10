@@ -995,7 +995,15 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                 val.Add("AppID", id);
                 val.Add("CreatedDate", DateTime.Now.ToUniversalTime());
                 val.Add("CreatedBy", createdBy);
-                val.Add("IsAdmin", IsAdmin);
+                if (IsAdmin)
+                {
+                    val.Add("IsAdmin", 1);
+
+                } else
+                {
+                    val.Add("IsAdmin", 0);
+
+                }
                 val.Add("Disable", 0);
                 val.Add("IsActive", 1);
                 int x = cnn.Insert(val, "Account_App");
