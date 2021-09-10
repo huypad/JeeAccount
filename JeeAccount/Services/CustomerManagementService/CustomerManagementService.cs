@@ -119,7 +119,7 @@ namespace JeeAccount.Services.CustomerManagementService
                     _accountManagementReponsitory.CreateAccount(isJeeHR, cnn, accountManagementModel, usernameAdmin, customerModel.RowID, true);
 
                     long userId = _accountManagementReponsitory.GetLastUserID(cnn);
-                    _accountManagementReponsitory.InsertAppCodeAccount(cnn, userId, customerModel.AppID, usernameAdmin);
+                    _accountManagementReponsitory.InsertAppCodeAccount(cnn, userId, customerModel.AppID, usernameAdmin, true);
 
                     IdentityServeAddAdminNewUser identity = new IdentityServeAddAdminNewUser
                     {
