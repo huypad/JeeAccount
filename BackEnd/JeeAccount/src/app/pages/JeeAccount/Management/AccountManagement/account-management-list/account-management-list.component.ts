@@ -53,7 +53,7 @@ export class AccountManagementListComponent implements OnInit, OnDestroy {
   pageSize: number = 50;
 
   ngOnInit() {
-    //this.accountManagementService.fetch();
+    this.accountManagementService.fetch();
     this.grouping = this.accountManagementService.grouping;
     this.paginator = this.accountManagementService.paginator;
     this.sorting = this.accountManagementService.sorting;

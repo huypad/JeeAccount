@@ -10,7 +10,6 @@ export class AuthGuard implements CanActivate {
   HOST_JEELANDINGPAGE = environment.HOST_JEELANDINGPAGE;
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
-    console.log('ki ta ki ta');
     return new Promise<boolean>((resolve, reject) => {
       if (!this.authService.isAuthenticated()) {
         if (this.authService.getParamsSSO()) {

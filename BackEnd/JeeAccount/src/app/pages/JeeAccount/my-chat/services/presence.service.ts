@@ -111,7 +111,6 @@ export class PresenceService {
     var _token = '';
     var _userID = -1;
     const data = this.auth.getAuthFromLocalStorage();
-    console.log('data', data);
 
     var _token = `Bearer ${data.access_token}`;
 
@@ -124,13 +123,10 @@ export class PresenceService {
 
   reconnectToken(): void {
     const data = this.auth.getAuthFromLocalStorage();
-    console.log('data', data);
-
     var _token = `Bearer ${data.access_token}`;
     this.hubConnection
       .start()
       .then((data: any) => {
-        console.log('Connect with ID', data);
         this.hubConnection.invoke('ReconnectToken', _token).then(() => {});
       })
       .catch((error: any) => {

@@ -88,7 +88,6 @@ export class PermissionManagementAdminHeThongEditDialogComponent implements OnIn
           this.isLoadingSubmit$.next(false);
         }),
         catchError((err) => {
-          console.log('???');
           this.layoutUtilsService.showActionNotification(err.error.message, MessageType.Read, 999999999, true, false, 3000, 'top', 0);
           return of();
         })
