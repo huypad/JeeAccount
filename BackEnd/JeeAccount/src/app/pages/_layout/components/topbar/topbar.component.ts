@@ -1,3 +1,4 @@
+import { RemindService } from './../../../JeeAccount/_core/services/remind.service';
 import { MenuServices } from 'src/app/_metronic/core/services/menu.service';
 import { Component, OnInit, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -21,7 +22,7 @@ import { UserOffcanvasComponent } from 'src/app/_metronic/partials/layout/extras
 })
 export class TopbarComponent implements OnInit, AfterViewInit {
   user$: Observable<UserModel>;
-  numberInfo: number
+  numberInfo: number;
   // tobbar extras
   extraSearchDisplay: boolean;
   extrasSearchLayout: 'offcanvas' | 'dropdown';
@@ -35,11 +36,17 @@ export class TopbarComponent implements OnInit, AfterViewInit {
   extrasLanguagesDisplay: boolean;
   extrasUserDisplay: boolean;
   extrasUserLayout: 'offcanvas' | 'dropdown';
+  SoLuongNhacNho: number = 0;
 
-  constructor(private layout: LayoutService, private auth: AuthService, public socket: SocketioService, private changeDetectorRefs: ChangeDetectorRef,
+  constructor(
+    private layout: LayoutService,
+    private auth: AuthService,
+    public socket: SocketioService,
+    private changeDetectorRefs: ChangeDetectorRef,
     private userOffcanvasComponent: UserOffcanvasComponent,
-    private menuServices: MenuServices,) {
-
+    private menuServices: MenuServices,
+    private remind_service: RemindService
+  ) {
     this.user$ = this.auth.getAuthFromLocalStorage();
   }
 
@@ -48,28 +55,18 @@ export class TopbarComponent implements OnInit, AfterViewInit {
     // this.extraSearchDisplay = this.layout.getProp('extras.search.display');
     this.extraSearchDisplay = false;
     this.extrasSearchLayout = this.layout.getProp('extras.search.layout');
-    this.extrasNotificationsDisplay = this.layout.getProp(
-      'extras.notifications.display'
-    );
-    this.extrasNotificationsLayout = this.layout.getProp(
-      'extras.notifications.layout'
-    );
-    this.extrasQuickActionsDisplay = this.layout.getProp(
-      'extras.quickActions.display'
-    );
-    this.extrasQuickActionsLayout = this.layout.getProp(
-      'extras.quickActions.layout'
-    );
+    this.extrasNotificationsDisplay = this.layout.getProp('extras.notifications.display');
+    this.extrasNotificationsLayout = this.layout.getProp('extras.notifications.layout');
+    this.extrasQuickActionsDisplay = this.layout.getProp('extras.quickActions.display');
+    this.extrasQuickActionsLayout = this.layout.getProp('extras.quickActions.layout');
     this.extrasCartDisplay = this.layout.getProp('extras.cart.display');
     this.extrasCartLayout = this.layout.getProp('extras.cart.layout');
-    this.extrasLanguagesDisplay = this.layout.getProp(
-      'extras.languages.display'
-    );
+    this.extrasLanguagesDisplay = this.layout.getProp('extras.languages.display');
     this.extrasUserDisplay = this.layout.getProp('extras.user.display');
     this.extrasUserLayout = this.layout.getProp('extras.user.layout');
-    this.extrasQuickPanelDisplay = this.layout.getProp(
-      'extras.quickPanel.display'
-    );
+    this.extrasQuickPanelDisplay = this.layout.getProp('extras.quickPanel.display');
+    this.EventNhacNho();
+    this.LoadDataNhacNho();
   }
 
   ngAfterViewInit(): void {
@@ -80,18 +77,12 @@ export class TopbarComponent implements OnInit, AfterViewInit {
         KTLayoutQuickSearch.init('kt_quick_search');
       }
 
-      if (
-        this.extrasNotificationsDisplay &&
-        this.extrasNotificationsLayout === 'offcanvas'
-      ) {
+      if (this.extrasNotificationsDisplay && this.extrasNotificationsLayout === 'offcanvas') {
         // Init Quick Notifications Offcanvas Panel
         KTLayoutQuickNotifications.init('kt_quick_notifications');
       }
 
-      if (
-        this.extrasQuickActionsDisplay &&
-        this.extrasQuickActionsLayout === 'offcanvas'
-      ) {
+      if (this.extrasQuickActionsDisplay && this.extrasQuickActionsLayout === 'offcanvas') {
         // Init Quick Actions Offcanvas Panel
         KTLayoutQuickActions.init('kt_quick_actions');
       }
@@ -117,25 +108,40 @@ export class TopbarComponent implements OnInit, AfterViewInit {
   }
   updateNumberNoti(value) {
     if (value == true) {
-      this.getNotiUnread()
+      this.getNotiUnread();
     }
   }
 
   getNotiUnread() {
-    this.socket.getNotificationList('unread').subscribe(res => {
+    this.socket.getNotificationList('unread').subscribe((res) => {
       let dem = 0;
-      res.forEach(x => dem++);
+      res.forEach((x) => dem++);
       this.numberInfo = dem;
       this.changeDetectorRefs.detectChanges();
-    })
+    });
   }
 
   onClick() {
-    this.menuServices.Get_DSNhacNho().subscribe(res => {
+    this.menuServices.Get_DSNhacNho().subscribe((res) => {
       if (res.status == 1) {
         this.menuServices.data_share$.next(res.data);
         this.changeDetectorRefs.detectChanges();
       }
-    })
+    });
+  }
+
+  EventNhacNho() {
+    this.remind_service.NewMess$.subscribe((res) => {
+      this.LoadDataNhacNho();
+    });
+  }
+
+  LoadDataNhacNho() {
+    this.menuServices.Count_SoLuongNhacNho().subscribe((res) => {
+      if (res) {
+        this.SoLuongNhacNho = res.data;
+        this.changeDetectorRefs.detectChanges();
+      }
+    });
   }
 }
