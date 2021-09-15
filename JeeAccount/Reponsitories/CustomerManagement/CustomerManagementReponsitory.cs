@@ -1,8 +1,10 @@
 ﻿using DpsLibs.Data;
 using JeeAccount.Classes;
+using JeeAccount.Controllers;
 using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.Common;
 using JeeAccount.Models.CustomerManagement;
+using JeeAccount.Services;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections;
@@ -17,10 +19,12 @@ namespace JeeAccount.Reponsitories.CustomerManagement
     public class CustomerManagementReponsitory : ICustomerManagementReponsitory
     {
         private readonly string _connectionString;
+        private IConfiguration _config;
 
         public CustomerManagementReponsitory(IConfiguration configuration)
         {
             _connectionString = configuration.GetValue<string>("AppConfig:Connection");
+            _config = configuration;
         }
 
         public List<string> AppCodes(DpsConnection cnn, long CustomerID)
@@ -236,6 +240,26 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
             }
         }
 
+        public async Task InsertCustomerApp(CustomerAppAddNumberStaffModel model)
+        {
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                cnn.BeginTransaction();
+
+                foreach (var item in model.LstCustomerAppDTO)
+                {
+                    var res = UpdateCustomerAppAddNumberStaffByCustomerIDAppID(item.CustomerID, item.AppID, item.SoLuongNhanSu, cnn);
+                    if (!res.Susscess)
+                    {
+                        cnn.RollbackTransaction();
+                        cnn.EndTransaction();
+                        await Task.FromResult(res);
+                    }
+                }
+                cnn.EndTransaction();
+            }
+        }
+
         private ReturnSqlModel UpdateCustomerAppAddNumberStaffByCustomerIDAppID(long CustomerID, long AppID, int numberSoLuong, DpsConnection cnn)
         {
             Hashtable val = new Hashtable();
@@ -311,6 +335,247 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
             {
                 dt = cnn.CreateDataTable(sql);
                 return dt.Rows[0][0].ToString();
+            }
+        }
+
+        public void UpdateCustomerAddDeletAppModelCnn(DpsConnection cnn, CustomerAddDeletAppModel customerModel, string CreatedBy, List<CommonInfo> commonInfos)
+        {
+            try
+            {
+                // Customer_App
+                AddCustomerAppNewCnn(cnn, customerModel, CreatedBy);
+                DeleteCustomerAppCnn(cnn, customerModel);
+
+                //Account_App
+                DeleteAccountAppCnn(cnn, customerModel, CreatedBy);
+                AddAccountAppNewCnn(cnn, customerModel, commonInfos, CreatedBy);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private void AddCustomerAppNewCnn(DpsConnection cnn, CustomerAddDeletAppModel customerModel, string CreatedBy)
+        {
+            try
+            {
+                for (var index = 0; index < customerModel.LstAddAppID.Count; index++)
+                {
+                    AddCustomer_AppCnn(cnn, customerModel, CreatedBy, index);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private void AddCustomer_AppCnn(DpsConnection cnn, CustomerAddDeletAppModel customerModel, string CreatedBy, int index)
+        {
+            string sql = $"select * from Customer_App where CustomerID = {customerModel.CustomerID} and AppID = {customerModel.LstAddAppID[index]}";
+
+            var dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count > 0)
+            {
+                Hashtable val = new Hashtable();
+                val.Add("StartDate", DateTime.UtcNow);
+                val.Add("CreatedDate", DateTime.UtcNow);
+                val.Add("CreatedBy", CreatedBy);
+                val.Add("Status", 1);
+                val.Add("SoLuongNhanSu", customerModel.SoLuongNhanSu[index]);
+                val.Add("PackageID", customerModel.GoiSuDung[index]);
+                val.Add("DatabaseID", customerModel.CurrentDBID[index]);
+
+                SqlConditions conds = new SqlConditions();
+                conds.Add("CustomerID", customerModel.CustomerID);
+                conds.Add("AppID", customerModel.LstAddAppID[index]);
+
+                if (!string.IsNullOrEmpty(customerModel.EndDate))
+                {
+                    DateTime end = DateTime.ParseExact(customerModel.EndDate, "dd/MM/yyyy", null);
+                    val.Add("EndDate", end);
+                }
+                int x = cnn.Update(val, conds, "Customer_App");
+                if (x <= 0)
+                {
+                    throw cnn.LastError;
+                }
+            }
+            else
+            {
+                Hashtable val = new Hashtable();
+                val.Add("CustomerID", customerModel.CustomerID);
+                val.Add("AppID", customerModel.LstAddAppID[index]);
+                val.Add("StartDate", DateTime.UtcNow);
+                val.Add("CreatedDate", DateTime.UtcNow);
+                val.Add("CreatedBy", CreatedBy);
+                val.Add("Status", 1);
+                val.Add("IsDefaultApply", 1);
+                val.Add("PackageID", customerModel.GoiSuDung[index]);
+                val.Add("SoLuongNhanSu", customerModel.SoLuongNhanSu[index]);
+                val.Add("DatabaseID", customerModel.CurrentDBID[index]);
+
+                if (!string.IsNullOrEmpty(customerModel.EndDate))
+                {
+                    DateTime end = DateTime.ParseExact(customerModel.EndDate, "dd/MM/yyyy", null);
+                    val.Add("EndDate", end);
+                }
+                int x = cnn.Insert(val, "Customer_App");
+                if (x <= 0)
+                {
+                    throw cnn.LastError;
+                }
+            }
+        }
+
+        private void DeleteCustomerAppCnn(DpsConnection cnn, CustomerAddDeletAppModel customerModel)
+        {
+            try
+            {
+                for (var index = 0; index < customerModel.LstDeleteAppID.Count; index++)
+                {
+                    DeleteCustomer_AppCnn(cnn, customerModel, index);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private void DeleteCustomer_AppCnn(DpsConnection cnn, CustomerAddDeletAppModel customerModel, int index)
+        {
+            string sql = $"select * from Customer_App where CustomerID = {customerModel.CustomerID}";
+            var dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count > 0)
+            {
+                SqlConditions conds = new SqlConditions();
+                conds.Add("CustomerID", customerModel.CustomerID);
+                conds.Add("AppID", customerModel.LstDeleteAppID[index]);
+                int x = cnn.Delete(conds, "Customer_App");
+                if (x <= 0)
+                {
+                    throw cnn.LastError;
+                }
+            }
+        }
+
+        private void AddAccountAppNewCnn(DpsConnection cnn, CustomerAddDeletAppModel customerModel, List<CommonInfo> commonInfos, string CreatedBy)
+        {
+            try
+            {
+                for (var index = 0; index < customerModel.LstDeleteAppID.Count; index++)
+                {
+                    foreach (var commonInfo in commonInfos)
+                    {
+                        AddAccount_AppCnn(cnn, customerModel, CreatedBy, index, commonInfo);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private void AddAccount_AppCnn(DpsConnection cnn, CustomerAddDeletAppModel customerModel, string CreatedBy, int index, CommonInfo commonInfo)
+        {
+            string sql = $"select * from Account_App where CustomerID = {customerModel.CustomerID} and UserID = {commonInfo.UserID}";
+
+            var dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count > 0)
+            {
+                Hashtable val = new Hashtable();
+                val.Add("AppID", customerModel.LstAddAppID[index]);
+                val.Add("Disable", 0);
+                val.Add("ActivatedDate", DateTime.UtcNow);
+                val.Add("UpdatedBy", CreatedBy);
+                val.Add("ActivatedBy", CreatedBy);
+
+                if (commonInfo.IsAdminHeThong)
+                {
+                    val.Add("IsAdmin", 1);
+                }
+                else
+                {
+                    val.Add("IsAdmin", 0);
+                }
+
+                val.Add("IsActive", 1);
+
+                SqlConditions conds = new SqlConditions();
+                conds.Add("UserID", commonInfo.UserID);
+                conds.Add("AppID", customerModel.LstAddAppID[index]);
+
+                int x = cnn.Update(val, conds, "Account_App");
+                if (x <= 0)
+                {
+                    throw cnn.LastError;
+                }
+            }
+            else
+            {
+                Hashtable val = new Hashtable();
+                val.Add("UserID", commonInfo.UserID);
+                val.Add("AppID", customerModel.LstAddAppID[index]);
+                val.Add("Disable", 0);
+                val.Add("CreatedDate", DateTime.UtcNow);
+                val.Add("CreatedBy", CreatedBy);
+                if (commonInfo.IsAdminHeThong)
+                {
+                    val.Add("IsAdmin", 1);
+                }
+                else
+                {
+                    val.Add("IsAdmin", 0);
+                }
+
+                val.Add("IsActive", 1);
+
+                int x = cnn.Insert(val, "Account_App");
+                if (x <= 0)
+                {
+                    throw cnn.LastError;
+                }
+            }
+        }
+
+        private void DeleteAccountAppCnn(DpsConnection cnn, CustomerAddDeletAppModel customerModel, string CreatedBy)
+        {
+            try
+            {
+                for (var index = 0; index < customerModel.LstDeleteAppID.Count; index++)
+                {
+                    DeleteAccount_AppCnn(cnn, customerModel, CreatedBy, index);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private void DeleteAccount_AppCnn(DpsConnection cnn, CustomerAddDeletAppModel customerModel, string CreatedBy, int index)
+        {
+            string sql = $"select * from Account_App where CustomerID = {customerModel.CustomerID}";
+            var dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count > 0)
+            {
+                Hashtable val = new Hashtable();
+                val.Add("Disable", 1);
+                val.Add("IsActive", 0);
+                val.Add("UpdatedBy", CreatedBy);
+
+                SqlConditions conds = new SqlConditions();
+                conds.Add("CustomerID", customerModel.CustomerID);
+                conds.Add("AppID", customerModel.LstDeleteAppID[index]);
+
+                int x = cnn.Update(val, conds, "Account_App");
+                if (x <= 0)
+                {
+                    throw cnn.LastError;
+                }
             }
         }
     }

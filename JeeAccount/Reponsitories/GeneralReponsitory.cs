@@ -49,7 +49,7 @@ namespace JeeAccount.Reponsitories
 
         public static bool CheckIsActiveByUserIDCnn(DpsConnection cnn, string UserId)
         {
-            string sql = $"select * from AccountList where UserId = {UserId} and IsActive = 1";
+            string sql = $"select * from AccountList where UserId = {UserId} and IsActive = 1 and AccountList.Disable = 0";
             DataTable dt = new DataTable();
             dt = cnn.CreateDataTable(sql);
             if (dt.Rows.Count == 0) return false;
@@ -58,7 +58,7 @@ namespace JeeAccount.Reponsitories
 
         public static bool CheckIsActiveByUsernameCnn(DpsConnection cnn, string username)
         {
-            string sql = $"select * from AccountList where username = '{username}' and IsActive = 1";
+            string sql = $"select * from AccountList where username = '{username}' and IsActive = 1 and AccountList.Disable = 0";
             DataTable dt = new DataTable();
             dt = cnn.CreateDataTable(sql);
             if (dt.Rows.Count == 0) return false;
@@ -67,7 +67,7 @@ namespace JeeAccount.Reponsitories
 
         public static bool CheckIsAdminByUsernameCnn(DpsConnection cnn, string username)
         {
-            string sql = $"select * from AccountList where username = '{username} 'and IsAdmin = 1";
+            string sql = $"select * from AccountList where username = '{username} 'and IsAdmin = 1 and AccountList.Disable = 0";
             DataTable dt = new DataTable();
             dt = cnn.CreateDataTable(sql);
             if (dt.Rows.Count == 0) return false;
@@ -108,7 +108,7 @@ namespace JeeAccount.Reponsitories
                 }
             }
             if (string.IsNullOrEmpty(where)) throw new Exception("UserID or Username or Staffid");
-            string sql = $"select UserID, Username, StaffID, CustomerID from AccountList where {where}";
+            string sql = $"select UserID, Username, StaffID, CustomerID, IsAdmin from AccountList where {where} and AccountList.Disable = 0";
             DataTable dt = new DataTable();
             dt = cnn.CreateDataTable(sql);
             if (dt.Rows.Count == 0) throw new Exception("UserID or Username or Staffid");
@@ -117,7 +117,8 @@ namespace JeeAccount.Reponsitories
                 CustomerID = Convert.ToInt32(row["CustomerID"]),
                 StaffID = row["StaffID"] != DBNull.Value ? Convert.ToInt64(row["StaffID"]) : 0,
                 UserID = Convert.ToInt64(row["UserID"]),
-                Username = row["Username"].ToString()
+                Username = row["Username"].ToString(),
+                IsAdminHeThong = row["IsAdmin"] != DBNull.Value ? Convert.ToBoolean(row["IsAdmin"]) : false,
             }).SingleOrDefault();
         }
 
@@ -155,7 +156,7 @@ namespace JeeAccount.Reponsitories
                 }
             }
             if (string.IsNullOrEmpty(where)) throw new ArgumentNullException("UserID or Username or Staffid");
-            string sql = $"select UserID, Username, StaffID, CustomerID from AccountList where {where}";
+            string sql = $"select UserID, Username, StaffID, CustomerID, IsAdmin from AccountList where {where} and AccountList.Disable = 0";
             DataTable dt = new DataTable();
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
@@ -166,7 +167,8 @@ namespace JeeAccount.Reponsitories
                     CustomerID = Convert.ToInt32(row["CustomerID"]),
                     StaffID = row["StaffID"] != DBNull.Value ? Convert.ToInt64(row["StaffID"]) : 0,
                     UserID = Convert.ToInt64(row["UserID"]),
-                    Username = row["Username"].ToString()
+                    Username = row["Username"].ToString(),
+                    IsAdminHeThong = row["IsAdmin"] != DBNull.Value ? Convert.ToBoolean(row["IsAdmin"]) : false,
                 }).SingleOrDefault();
             }
         }
@@ -216,6 +218,35 @@ namespace JeeAccount.Reponsitories
             return commonInfo;
         }
 
+        public static ICollection<CommonInfo> GetDSCommonInfo(string connectionString, int CustomerID)
+        {
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                return DSCommonInfo(cnn, CustomerID);
+            }
+        }
+
+        public static List<CommonInfo> GetDSCommonInfoCnn(DpsConnection cnn, int CustomerID)
+        {
+            return DSCommonInfo(cnn, CustomerID);
+        }
+
+        private static List<CommonInfo> DSCommonInfo(DpsConnection cnn, int CustomerID)
+        {
+            string sql = $"select UserID, Username, StaffID, CustomerID, IsAdmin from AccountList where CustomerID = {CustomerID} and AccountList.Disable = 0";
+            DataTable dt = new DataTable();
+            dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count == 0) throw new Exception("CustomerID not exist");
+            return dt.AsEnumerable().Select(row => new CommonInfo
+            {
+                CustomerID = Convert.ToInt32(row["CustomerID"]),
+                StaffID = row["StaffID"] != DBNull.Value ? Convert.ToInt64(row["StaffID"]) : 0,
+                UserID = Convert.ToInt64(row["UserID"]),
+                Username = row["Username"].ToString(),
+                IsAdminHeThong = row["IsAdmin"] != DBNull.Value ? Convert.ToBoolean(row["IsAdmin"]) : false,
+            }).ToList();
+        }
+
         public static List<long> GetLstCustomeridCnn(DpsConnection cnn)
         {
             var ListCustomerid = new List<long>();
@@ -235,7 +266,7 @@ namespace JeeAccount.Reponsitories
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
                 var ListCustomerid = new List<long>();
-                string sql = $"select UserID from AccountList where CustomerID = {customerid} and Disable = 0";
+                string sql = $"select UserID from AccountList where CustomerID = {customerid} and AccountList.Disable = 0";
                 DataTable dt = new DataTable();
                 dt = cnn.CreateDataTable(sql);
                 if (dt.Rows.Count == 0) return null;
@@ -250,7 +281,7 @@ namespace JeeAccount.Reponsitories
         public static List<long> GetLstUserIDByCustomeridCnn(DpsConnection cnn, long customerid)
         {
             var ListCustomerid = new List<long>();
-            string sql = $"select UserID from AccountList where CustomerID = {customerid} and Disable = 0";
+            string sql = $"select UserID from AccountList where CustomerID = {customerid} and AccountList.Disable = 0";
             DataTable dt = new DataTable();
             dt = cnn.CreateDataTable(sql);
             if (dt.Rows.Count == 0) return null;
@@ -266,7 +297,7 @@ namespace JeeAccount.Reponsitories
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
                 var lst = new List<string>();
-                string sql = $"select Username from AccountList where CustomerID = {customerid} and Disable = 0";
+                string sql = $"select Username from AccountList where CustomerID = {customerid} and AccountList.Disable = 0";
                 DataTable dt = new DataTable();
                 dt = cnn.CreateDataTable(sql);
                 if (dt.Rows.Count == 0) return null;
@@ -283,7 +314,7 @@ namespace JeeAccount.Reponsitories
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
                 var lst = new List<long>();
-                string sql = $"select StaffID from AccountList where CustomerID = {customerid} and Disable = 0";
+                string sql = $"select StaffID from AccountList where CustomerID = {customerid} and AccountList.Disable = 0";
                 DataTable dt = new DataTable();
                 dt = cnn.CreateDataTable(sql);
                 if (dt.Rows.Count == 0) return null;
@@ -298,7 +329,7 @@ namespace JeeAccount.Reponsitories
         public static List<long> GetLstStaffIDByCustomeridCnn(DpsConnection cnn, long customerid)
         {
             var lst = new List<long>();
-            string sql = $"select StaffID from AccountList where CustomerID = {customerid} and Disable = 0";
+            string sql = $"select StaffID from AccountList where CustomerID = {customerid} and AccountList.Disable = 0";
             DataTable dt = new DataTable();
             dt = cnn.CreateDataTable(sql);
             if (dt.Rows.Count == 0) return null;
@@ -311,7 +342,7 @@ namespace JeeAccount.Reponsitories
 
         public static bool IsAdminHeThongCnn(DpsConnection cnn, long UserID)
         {
-            string sql1 = $"select * from AccountList where IsAdmin = 1 and UserID = {UserID} and Disable = 0";
+            string sql1 = $"select * from AccountList where IsAdmin = 1 and UserID = {UserID} and AccountList.Disable = 0";
             DataTable dtCheck = cnn.CreateDataTable(sql1);
             if (dtCheck.Rows.Count == 0) return false;
             return true;
@@ -327,7 +358,7 @@ namespace JeeAccount.Reponsitories
 
         public static bool IsAdminHeThong(string connectionString, long UserID)
         {
-            string sql1 = $"select * from AccountList where IsAdmin = 1 and UserID = {UserID}";
+            string sql1 = $"select * from AccountList where IsAdmin = 1 and UserID = {UserID} and AccountList.Disable = 0";
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
                 DataTable dt = new DataTable();
@@ -352,7 +383,7 @@ namespace JeeAccount.Reponsitories
         public static List<string> GetLstUsernameByCustomeridCnn(DpsConnection cnn, long customerid)
         {
             var lst = new List<string>();
-            string sql = $"select Username from AccountList where CustomerID = {customerid} and Disable = 0";
+            string sql = $"select Username from AccountList where CustomerID = {customerid} and AccountList.Disable = 0";
             DataTable dt = new DataTable();
             dt = cnn.CreateDataTable(sql);
             if (dt.Rows.Count == 0) return null;
@@ -442,12 +473,12 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID where Acco
             }
         }
 
-        public static async Task<HttpResponseMessage> UpdateJeeAccountCustomDataByInputApiModel(long StaffID, string connectionString, string jwt_internal)
+        public static async Task<HttpResponseMessage> UpdateJeeAccountCustomDataByInputApiModel(long UserID, string connectionString, string jwt_internal)
         {
             try
             {
                 var indentityController = new IdentityServerController();
-                var commonInfo = GetCommonInfo(connectionString, 0, "", StaffID);
+                var commonInfo = GetCommonInfo(connectionString, UserID);
                 var appCodes = GetListAppByUserID(connectionString, commonInfo.UserID, commonInfo.CustomerID, true);
                 var appCodesName = appCodes.Select(x => x.AppCode).ToList();
                 var objCustom = new ObjCustomData();
@@ -461,6 +492,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID where Acco
                     UserID = commonInfo.UserID
                 };
                 var reponse = await indentityController.UpdateCustomDataInternal(jwt_internal, commonInfo.Username, objCustom);
+
                 return reponse;
             }
             catch (Exception)
@@ -484,86 +516,6 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID where Acco
                 if (x <= 0)
                 {
                     throw cnn.LastError;
-                }
-            }
-        }
-
-        public static void InsertAppCodeJeeHRKafka(string connectionString, long UserID, bool IsAdmin)
-        {
-            DataTable dt = new DataTable();
-            SqlConditions Conds = new SqlConditions();
-            Conds.Add("UserID", UserID);
-
-            using (DpsConnection cnn = new DpsConnection(connectionString))
-            {
-                string sql2 = @$"select AppID from Account_App where UserID = @UserID and AppID = 1 ";
-                var dtnew = cnn.CreateDataTable(sql2, Conds);
-                if (dtnew.Rows.Count == 0)
-                {
-                    Hashtable val = new Hashtable();
-                    val.Add("UserID", UserID);
-                    val.Add("AppID", 1);
-                    val.Add("CreatedDate", DateTime.Now.ToUniversalTime());
-                    val.Add("CreatedBy", "kafka");
-                    val.Add("Disable", 0);
-                    if (!IsAdmin) val.Add("IsAdmin", 0);
-                    if (IsAdmin) val.Add("IsAdmin", 1);
-                    val.Add("IsActive", 1);
-                    int x = cnn.Insert(val, "Account_App");
-                    if (x <= 0)
-                    {
-                        throw cnn.LastError;
-                    }
-                } else
-                {
-                    string sql3 = @$"select AppID from Account_App where UserID = @UserID and AppID = 1 and IsActive = 0 or Disable = 1";
-                    var dt3 = cnn.CreateDataTable(sql3);
-                    Hashtable val2 = new Hashtable();
-                    val2.Add("ActivatedBy", 0);
-                    val2.Add("ActivatedDate", DateTime.Now.ToUniversalTime());
-                    val2.Add("IsActive", 1);
-                    val2.Add("Disable", 0);
-
-                    SqlConditions conds = new SqlConditions();
-                    conds.Add("UserID", UserID);
-                    val2.Add("AppID", 1);
-
-                    int z = cnn.Update(val2, conds, "Account_App");
-                    if (z <= 0)
-                    {
-                        throw cnn.LastError;
-                    }
-                }
-
-
-            }
-        }
-
-        public static void RemoveAppCodeJeeHRKafka(string connectionString, long UserID)
-        {
-            DataTable dt = new DataTable();
-            SqlConditions Conds = new SqlConditions();
-            Conds.Add("UserID", UserID);
-
-            using (DpsConnection cnn = new DpsConnection(connectionString))
-            {
-                string sql2 = @$"select AppID from Account_App where UserID = @UserID and AppID = 1";
-                var dtnew = cnn.CreateDataTable(sql2, Conds);
-
-                if (dtnew.Rows.Count > 0)
-                {
-                    Conds.Add("AppID", 1);
-                    Hashtable val = new Hashtable();
-                    val.Add("Disable", 1);
-                    val.Add("IsActive", 0);
-                    val.Add("InActiveDate", DateTime.Now.ToUniversalTime());
-                    val.Add("InActiveBy", 0);
-
-                    int x = cnn.Update(val, Conds, "Account_App");
-                    if (x <= 0)
-                    {
-                        throw cnn.LastError;
-                    }
                 }
             }
         }
@@ -741,6 +693,102 @@ join AppList on AppList.AppID = Account_App.AppID";
                     IsAdmin = Convert.ToBoolean(row["AdminApp"]),
                 });
                 return result;
+            }
+        }
+
+        public static void InsertAppCodeJeeHRKafka(string connectionString, long UserID)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("UserID", UserID);
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                var isAdminHeThong = GeneralReponsitory.IsAdminHeThongCnn(cnn, UserID);
+
+                string sql2 = @$"select AppID from Account_App where UserID = @UserID and AppID = 1 ";
+                var dtnew = cnn.CreateDataTable(sql2, Conds);
+
+                if (dtnew.Rows.Count == 0)
+                {
+                    Hashtable val = new Hashtable();
+                    val.Add("UserID", UserID);
+                    val.Add("AppID", 1);
+                    val.Add("CreatedDate", DateTime.Now.ToUniversalTime());
+                    val.Add("CreatedBy", "kafkajeehr");
+                    val.Add("Disable", 0);
+                    if (!isAdminHeThong) val.Add("IsAdmin", 0);
+                    if (isAdminHeThong) val.Add("IsAdmin", 1);
+                    val.Add("IsActive", 1);
+
+                    int x = cnn.Insert(val, "Account_App");
+                    if (x <= 0)
+                    {
+                        throw cnn.LastError;
+                    }
+                }
+                else
+                {
+                    Hashtable val2 = new Hashtable();
+                    val2.Add("ActivatedBy", 0);
+                    val2.Add("ActivatedDate", DateTime.Now.ToUniversalTime());
+                    val2.Add("IsActive", 1);
+                    val2.Add("Disable", 0);
+                    val2.Add("UpdatedBy", 0);
+
+                    SqlConditions conds = new SqlConditions();
+                    conds.Add("UserID", UserID);
+                    conds.Add("AppID", 1);
+
+                    int z = cnn.Update(val2, conds, "Account_App");
+                    if (z <= 0)
+                    {
+                        throw cnn.LastError;
+                    }
+                }
+            }
+        }
+
+        public static void RemoveAppCodeJeeHRKafka(string connectionString, long UserID)
+        {
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("UserID", UserID);
+
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                string sql2 = @$"select AppID from Account_App where UserID = @UserID and AppID = 1";
+                var dtnew = cnn.CreateDataTable(sql2, Conds);
+
+                SqlConditions Conds2 = new SqlConditions();
+
+                if (dtnew.Rows.Count > 0)
+                {
+                    Conds2.Add("AppID", 1);
+                    Conds2.Add("UserID", UserID);
+
+                    Hashtable val = new Hashtable();
+
+                    val.Add("Disable", 1);
+                    val.Add("IsActive", 0);
+                    val.Add("InActiveDate", DateTime.Now.ToUniversalTime());
+                    val.Add("InActiveBy", "kafkajeehr");
+
+                    int x = cnn.Update(val, Conds2, "Account_App");
+                    if (x <= 0)
+                    {
+                        throw cnn.LastError;
+                    }
+                }
+            }
+        }
+
+        public static string GetObjectDB(string sql, string connectionString)
+        {
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                var x = cnn.ExecuteScalar(sql);
+                if (x != null)
+                    return x.ToString();
+                return "";
             }
         }
     }

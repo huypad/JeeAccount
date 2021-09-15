@@ -30,5 +30,7 @@ namespace JeeAccount.Services.CustomerManagementService
         Task<string> LockUnLockCustomer(long customerid, bool state);
 
         string CompanyCode(long customerid);
+
+        Task UpdateCustomerAddDeletAppModelCnn(CustomerAddDeletAppModel customer, string CreatedBy);
     }
 }

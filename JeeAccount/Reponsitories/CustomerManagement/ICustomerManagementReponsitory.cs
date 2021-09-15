@@ -30,5 +30,7 @@ namespace JeeAccount.Reponsitories.CustomerManagement
         Task<ReturnSqlModel> UpdateCustomerAppAddNumberStaff(CustomerAppAddNumberStaffModel model);
 
         string CompanyCode(long customerid);
+
+        void UpdateCustomerAddDeletAppModelCnn(DpsConnection cnn, CustomerAddDeletAppModel customerModel, string CreatedBy, List<CommonInfo> commonInfos);
     }
 }

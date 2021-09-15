@@ -11,5 +11,7 @@ namespace JeeAccount.Models.Common
         public string Username { get; set; }
         public long StaffID { get; set; }
         public long CustomerID { get; set; }
+
+        public bool IsAdminHeThong { get; set; } = false;
     }
 }

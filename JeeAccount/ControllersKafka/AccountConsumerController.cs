@@ -6,6 +6,7 @@ using JeeAccount.Controllers;
 using JeeAccount.Models;
 using JeeAccount.Models.AccountManagement;
 using JeeAccount.Reponsitories;
+using JeeAccount.Services;
 using JeeAccount.Services.AccountManagementService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -14,6 +15,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -63,77 +65,43 @@ namespace JeeCustomer.ConsumerKafka
 
                     if (staffID.staffID > 0)
                     {
-                        SaveStaffID(staffID.staffID, obj.userId, _config.GetValue<string>("AppConfig:Connection"));
-                        GeneralReponsitory.InsertAppCodeJeeHRKafka(_config.GetValue<string>("AppConfig:Connection"), obj.userId, false);
-                        if (string.IsNullOrEmpty(objRemove.fieldValue.roles))
-                        {
-                            GeneralReponsitory.RemoveAppCodeJeeHRKafka(_config.GetValue<string>("AppConfig:Connection"), obj.userId);
-                        }
+                        GeneralReponsitory.SaveStaffID(staffID.staffID, obj.userId, _config.GetValue<string>("AppConfig:Connection"));
+                    }
 
-                        _ = GeneralReponsitory.UpdateJeeAccountCustomDataByInputApiModel(staffID.staffID, _config.GetValue<string>("AppConfig:Connection"), GetSecretToken());
-                    }
-                    else if (obj.userId > 0)
+                    if (string.IsNullOrEmpty(objRemove.fieldValue.roles))
                     {
-                        GeneralReponsitory.InsertAppCodeJeeHRKafka(_config.GetValue<string>("AppConfig:Connection"), obj.userId, false);
-                        if (string.IsNullOrEmpty(objRemove.fieldValue.roles))
-                        {
-                            GeneralReponsitory.RemoveAppCodeJeeHRKafka(_config.GetValue<string>("AppConfig:Connection"), obj.userId);
-                        }
+                        GeneralReponsitory.RemoveAppCodeJeeHRKafka(_config.GetValue<string>("AppConfig:Connection"), obj.userId);
                     }
+                    else
+                    {
+                        GeneralReponsitory.InsertAppCodeJeeHRKafka(_config.GetValue<string>("AppConfig:Connection"), obj.userId);
+                    }
+
+                    _ = GeneralReponsitory.UpdateJeeAccountCustomDataByInputApiModel(obj.userId, _config.GetValue<string>("AppConfig:Connection"), GeneralService.GetInternalToken(_config));
                 }
-                string username = GetObjectDB($"select Username from AccountList where UserID = {obj.userId}", _config.GetValue<string>("AppConfig:Connection"));
+
+                string username = GeneralReponsitory.GetObjectDB($"select Username from AccountList where UserID = {obj.userId}", _config.GetValue<string>("AppConfig:Connection"));
                 if (!string.IsNullOrEmpty(username))
                 {
                     var identity = new IdentityServerController();
-                    _ = identity.UppdateCustomDataInternal(GetSecretToken(), username, obj);
+                    _ = identity.UppdateCustomDataInternal(GeneralService.GetInternalToken(_config), username, obj);
                 }
             }
             catch (Exception ex)
             {
                 var d2 = new GeneralLog()
                 {
-                    name = "jee-account",
+                    name = "jeeplatform.initialization.appupdate",
                     data = value,
-                    message = $"jeeplatform.initialization.appupdate error {ex.Message}"
+                    message = $"error {ex.Message}"
                 };
                 _logger.LogError(JsonConvert.SerializeObject(d2));
             }
         }
 
-        private string GetSecretToken()
+        public class FindStaffID
         {
-            var secret = _config.GetValue<string>("Jwt:internal_secret");
-            var projectName = _config.GetValue<string>("KafkaConfig:ProjectName");
-            var token = JsonWebToken.issueToken(new TokenClaims { projectName = projectName }, secret);
-            return token;
+            public long staffID { get; set; } = 0;
         }
-
-        private string GetObjectDB(string sql, string connectionString)
-        {
-            using (DpsConnection cnn = new DpsConnection(connectionString))
-            {
-                var x = cnn.ExecuteScalar(sql);
-                if (x != null)
-                    return x.ToString();
-                return "";
-            }
-        }
-
-        private void SaveStaffID(long StaffID, long userId, string connectionString)
-        {
-            using (DpsConnection cnn = new DpsConnection(connectionString))
-            {
-                Hashtable val = new Hashtable();
-                val.Add("StaffID", StaffID);
-                SqlConditions cond = new SqlConditions();
-                cond.Add("UserID", userId);
-                int x = cnn.Update(val, cond, "AccountList");
-            }
-        }
-    }
-
-    public class FindStaffID
-    {
-        public long staffID { get; set; } = 0;
     }
 }

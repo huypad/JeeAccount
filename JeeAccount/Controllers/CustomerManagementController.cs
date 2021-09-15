@@ -189,6 +189,25 @@ namespace JeeAccount.Controllers
             }
         }
 
+        [HttpPost("UpdateCustomerAddDeletAppModel")]
+        public async Task<IActionResult> UpdateCustomerAddDeletAppModel(CustomerAddDeletAppModel model)
+        {
+            try
+            {
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null) return NotFound("Secrectkey");
+                if (!token.Equals(_JeeCustomerSecrectkey)) return Unauthorized("Secrectkey Không hợp lệ");
+
+                string CreatedBy = "jeecustomer";
+                await _service.UpdateCustomerAddDeletAppModelCnn(model, CreatedBy);
+                return Ok(MessageReturnHelper.ThanhCong());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet("LockUnLockCustomer/{customerid}/{state}")]
         public async Task<IActionResult> LockUnLockCustomer(long customerid, bool state)
         {

@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JeeAccount.Services.CustomerManagementService
@@ -304,6 +305,39 @@ namespace JeeAccount.Services.CustomerManagementService
         public string CompanyCode(long customerid)
         {
             return _customerManagementReponsitory.CompanyCode(customerid);
+        }
+
+        public async Task UpdateCustomerAddDeletAppModelCnn(CustomerAddDeletAppModel customer, string CreatedBy)
+        {
+            using (DpsConnection cnn = new DpsConnection(ConnectionString))
+            {
+                try
+                {
+                    cnn.BeginTransaction();
+                    var lstCommonInfo = GeneralReponsitory.GetDSCommonInfoCnn(cnn, customer.CustomerID);
+                    _customerManagementReponsitory.UpdateCustomerAddDeletAppModelCnn(cnn, customer, CreatedBy, lstCommonInfo);
+
+                    var identity = new IdentityServerController();
+                    var internal_token = GeneralService.GetInternalToken(configuration);
+
+                    foreach (var commonInfo in lstCommonInfo)
+                    {
+                        var lstApps = await GeneralReponsitory.GetListAppByUserIDAsyncCnn(cnn, commonInfo.UserID, customer.CustomerID, true);
+                        var appCodes = lstApps.Select(item => item.AppCode).ToList();
+                        var objectJeeAccount = identity.JeeAccountCustomData(appCodes, commonInfo.UserID, customer.CustomerID, commonInfo.StaffID);
+                        var reponse = await identity.UpdateCustomDataInternal(internal_token, commonInfo.Username, objectJeeAccount);
+                        if (!reponse.IsSuccessStatusCode) throw new Exception(await reponse.Content.ReadAsStringAsync());
+                    }
+
+                    cnn.EndTransaction();
+                }
+                catch (Exception)
+                {
+                    cnn.RollbackTransaction();
+                    cnn.EndTransaction();
+                    throw;
+                }
+            }
         }
     }
 }

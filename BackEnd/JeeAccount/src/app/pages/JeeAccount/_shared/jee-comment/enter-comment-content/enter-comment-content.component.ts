@@ -1,21 +1,29 @@
 import { catchError, takeUntil, tap } from 'rxjs/operators';
 import { of, Subject, BehaviorSubject } from 'rxjs';
-import { ChangeDetectionStrategy, Component, Input, OnInit, ViewEncapsulation, ChangeDetectorRef, ElementRef, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnInit,
+  ViewEncapsulation,
+  ChangeDetectorRef,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+} from '@angular/core';
 import { JeeCommentService } from '../jee-comment.service';
 import { PostCommentModel } from '../jee-comment.model';
-
 
 @Component({
   selector: 'jeecomment-enter-comment-content',
   templateUrl: 'enter-comment-content.component.html',
   styleUrls: ['enter-comment-content.scss', '../jee-comment.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
-
-export class JeeCommentEnterCommentContentComponent implements OnInit {
+export class JeeCommentEnterCommentContentComponent implements OnInit, AfterViewInit {
   private readonly onDestroy = new Subject<void>();
-  constructor(public service: JeeCommentService, public cd: ChangeDetectorRef) { }
+  constructor(public service: JeeCommentService, public cd: ChangeDetectorRef) {}
 
   @Input() objectID: string = '';
   @Input() commentID: string = '';
@@ -32,19 +40,11 @@ export class JeeCommentEnterCommentContentComponent implements OnInit {
   inputTextArea: string;
 
   private _isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  get isLoading$() { return this._isLoading$.asObservable(); }
+  get isLoading$() {
+    return this._isLoading$.asObservable();
+  }
 
   ngOnInit() {
-    this.isFocus$
-      .pipe(
-        tap((res) => {
-          if (res) {
-            this.FocusTextarea();
-          }
-        }),
-        takeUntil(this.onDestroy),
-      ).subscribe();
-
     this.imagesUrl = [];
     this.imagesUrlArray = [];
     this.inputTextArea = '';
@@ -54,8 +54,22 @@ export class JeeCommentEnterCommentContentComponent implements OnInit {
     this.showSpanCancelNoFocus = false;
   }
 
+  ngAfterViewInit(): void {
+    this.isFocus$
+      .pipe(
+        tap((res) => {
+          if (res) {
+            this.FocusTextarea();
+          }
+        }),
+        takeUntil(this.onDestroy)
+      )
+      .subscribe();
+  }
+
   @ViewChild('txtarea') element: ElementRef;
   FocusTextarea() {
+    console.log('FocusTextarea');
     this.element.nativeElement.focus();
   }
 
@@ -83,7 +97,7 @@ export class JeeCommentEnterCommentContentComponent implements OnInit {
     this.imagesUrl.forEach((imageUrl) => {
       const base64 = imageUrl.split(',')[1];
       model.Attachs.Images.push(base64);
-    })
+    });
     return model;
   }
 
@@ -95,9 +109,11 @@ export class JeeCommentEnterCommentContentComponent implements OnInit {
   isEqual(object: PostCommentModel, otherObject: PostCommentModel): boolean {
     let checkValue = object.Text === otherObject.Text;
     let checkList = false;
-    if (object.Attachs.Files.length === otherObject.Attachs.Files.length &&
+    if (
+      object.Attachs.Files.length === otherObject.Attachs.Files.length &&
       object.Attachs.Images.length === otherObject.Attachs.Images.length &&
-      object.Attachs.Videos.length === otherObject.Attachs.Videos.length)
+      object.Attachs.Videos.length === otherObject.Attachs.Videos.length
+    )
       checkList = true;
 
     if (checkValue && checkList) return true;
@@ -105,26 +121,31 @@ export class JeeCommentEnterCommentContentComponent implements OnInit {
   }
 
   updateComment(model: PostCommentModel) {
-    this.service.postCommentModel(model)
-      .subscribe();
+    this.service.postCommentModel(model).subscribe();
   }
 
   postComment(model: PostCommentModel) {
     this._isLoading$.next(true);
-    this.service.postCommentModel(model).
-      pipe(
+    this.service
+      .postCommentModel(model)
+      .pipe(
         tap(
-          (res) => { },
-          catchError((err) => { console.log(err); return of() }),
+          (res) => {},
+          catchError((err) => {
+            console.log(err);
+            return of();
+          }),
           () => {
             this.ngOnInit();
             this.cd.detectChanges();
             setTimeout(() => {
               this._isLoading$.next(false);
             }, 750);
-          }),
-        takeUntil(this.onDestroy),
-      ).subscribe();
+          }
+        ),
+        takeUntil(this.onDestroy)
+      )
+      .subscribe();
   }
 
   onKeydown($event) {
@@ -156,7 +177,7 @@ export class JeeCommentEnterCommentContentComponent implements OnInit {
       reader.onload = () => {
         this.imagesUrl.push(reader.result as string);
         this.cd.detectChanges();
-      }
+      };
     }
   }
 
@@ -207,6 +228,4 @@ export class JeeCommentEnterCommentContentComponent implements OnInit {
       this.isClickIconEmoji = false;
     }
   }
-
-
 }
