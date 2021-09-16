@@ -1,3 +1,4 @@
+import { CommentDTO } from './../jee-comment.model';
 import { catchError, takeUntil, tap } from 'rxjs/operators';
 import { of, Subject, BehaviorSubject } from 'rxjs';
 import {
@@ -10,6 +11,9 @@ import {
   ElementRef,
   ViewChild,
   AfterViewInit,
+  EventEmitter,
+  Output,
+  HostListener,
 } from '@angular/core';
 import { JeeCommentService } from '../jee-comment.service';
 import { PostCommentModel } from '../jee-comment.model';
@@ -25,11 +29,18 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
   private readonly onDestroy = new Subject<void>();
   constructor(public service: JeeCommentService, public cd: ChangeDetectorRef) {}
 
-  @Input() objectID: string = '';
-  @Input() commentID: string = '';
-  @Input() replyCommentID: string = '';
-  @Input() isEdit?: boolean = false;
-  @Input() isFocus$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  @Input('objectID') objectID: string = '';
+  @Input('commentID') commentID: string = '';
+  @Input('replyCommentID') replyCommentID: string = '';
+
+  @Input('isEdit') set editing(isEdit: boolean) {
+    this.isEdit$.next(isEdit);
+  }
+  private isEdit$ = new BehaviorSubject<boolean>(false);
+  @Input('isFocus$') isFocus$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  @Input('editCommentModel') commentModelDto?: CommentDTO;
+
+  @Output('isEditEvent') isEditEvent = new EventEmitter<boolean>();
 
   showPopupEmoji: boolean;
   isClickIconEmoji: boolean;
@@ -55,6 +66,9 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
   }
 
   ngAfterViewInit(): void {
+    if (this.commentModelDto) {
+      this.initData();
+    }
     this.isFocus$
       .pipe(
         tap((res) => {
@@ -67,9 +81,24 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
       .subscribe();
   }
 
+  initData() {
+    this.inputTextArea = this.commentModelDto.Text;
+    this.imagesUrl = this.commentModelDto.Attachs.Images;
+    this.isEdit$
+      .pipe(
+        tap((res) => {
+          this.isEditEvent.emit(res);
+        }),
+        takeUntil(this.onDestroy)
+      )
+      .subscribe();
+
+    this.cd.detectChanges();
+    this.isFocus$.next(true);
+  }
+
   @ViewChild('txtarea') element: ElementRef;
   FocusTextarea() {
-    console.log('FocusTextarea');
     this.element.nativeElement.focus();
   }
 
@@ -79,8 +108,9 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
       if (this.checkCommentIsEqualEmpty(model)) {
         return;
       }
-      if (this.isEdit) {
+      if (this.isEdit$.value) {
         this.updateComment(model);
+        this.isEdit$.next(false);
       } else {
         this.postComment(model);
       }
@@ -121,7 +151,27 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
   }
 
   updateComment(model: PostCommentModel) {
-    this.service.postCommentModel(model).subscribe();
+    this._isLoading$.next(true);
+    this.service
+      .updateCommentModel(model)
+      .pipe(
+        tap(
+          (res) => {},
+          catchError((err) => {
+            console.log(err);
+            return of();
+          }),
+          () => {
+            this.ngOnInit();
+            this.cd.detectChanges();
+            setTimeout(() => {
+              this._isLoading$.next(false);
+            }, 750);
+          }
+        ),
+        takeUntil(this.onDestroy)
+      )
+      .subscribe();
   }
 
   postComment(model: PostCommentModel) {
@@ -136,7 +186,7 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
             return of();
           }),
           () => {
-            this.ngOnInit();
+            this.cancleComment();
             this.cd.detectChanges();
             setTimeout(() => {
               this._isLoading$.next(false);
@@ -191,6 +241,7 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
     this.imagesUrl = [];
     this.showSpanCancelFocus = false;
     this.showSpanCancelNoFocus = false;
+    this.isEdit$.next(false);
     this.cd.detectChanges();
   }
 

@@ -14,6 +14,10 @@ import {
 } from '@angular/core';
 import { JeeCommentService } from '../jee-comment.service';
 import { catchError, finalize, takeUntil, tap, share, switchMap } from 'rxjs/operators';
+import { TranslateService } from '@ngx-translate/core';
+import { DeleteEntityDialogComponent } from '../../delete-entity-dialog/delete-entity-dialog.component';
+import { LayoutUtilsService, MessageType } from '../../../_core/utils/layout-utils.service';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'jeecomment-post-comment-content',
@@ -39,7 +43,7 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
   isFocus$$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   ShowFilter$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   ShowSpinnerViewMore$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-
+  isEdit$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   //filter
   filterViewLengthComment: number = 10;
   filterDate: Date = new Date();
@@ -49,13 +53,20 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
   objectID: string = '';
   commentID: string = '';
   replyCommentID: string = '';
-  @Input() comment?: CommentDTO;
-  @Input() showCommentDefault?: boolean;
-  @Input() isDeteachChange$?: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  @Output() isFocus = new EventEmitter<any>();
+  @Input('comment') comment?: CommentDTO;
+  @Input('showCommentDefault') showCommentDefault?: boolean;
+  @Input('isDeteachChange$') isDeteachChange$?: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  @Output('isFocus') isFocus = new EventEmitter<boolean>();
 
   isDeteachChangeComment$?: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  constructor(public service: JeeCommentService, public cd: ChangeDetectorRef, private elementRef: ElementRef) {}
+  constructor(
+    public service: JeeCommentService,
+    public cd: ChangeDetectorRef,
+    private elementRef: ElementRef,
+    private translate: TranslateService,
+    public dialog: MatDialog,
+    private layoutUtilsService: LayoutUtilsService
+  ) {}
 
   ngOnInit() {
     if (this.isDeteachChange$) {
@@ -179,6 +190,91 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.ShowSpinnerViewMore$.next(false);
     }, 750);
+  }
+
+  edit() {
+    this.isEdit$.next(true);
+  }
+
+  isEditEventChange(isEdit: boolean) {
+    this.isEdit$.next(isEdit);
+  }
+
+  delete() {
+    let saveMessageTranslateParam = 'COMMOM.XOATHANHCONG';
+    const saveMessage = this.translate.instant(saveMessageTranslateParam);
+    const messageType = MessageType.Create;
+    const dialogRef = this.dialog.open(DeleteEntityDialogComponent, {
+      data: {},
+      width: '450px',
+    });
+    dialogRef
+      .afterClosed()
+      .pipe(
+        catchError((err) => {
+          console.log(err);
+          this._errorMessage$.next(err);
+          return of();
+        }),
+        finalize(() => {}),
+        takeUntil(this.onDestroy),
+        share()
+      )
+      .subscribe((res) => {
+        if (!res) {
+          this.isEdit$.next(false);
+        } else {
+          if (this.replyCommentID) {
+            this.service
+              .deleteReplyComment(this.objectID, this.commentID, this.replyCommentID)
+              .pipe(
+                catchError((err) => {
+                  console.log(err);
+                  this.layoutUtilsService.showActionNotification(
+                    err.error.message,
+                    MessageType.Read,
+                    999999999,
+                    true,
+                    false,
+                    3000,
+                    'top',
+                    0
+                  );
+                  this._errorMessage$.next(err);
+                  return of();
+                }),
+                finalize(() => {}),
+                takeUntil(this.onDestroy),
+                share()
+              )
+              .subscribe();
+          } else {
+            this.service
+              .deleteComment(this.objectID, this.commentID)
+              .pipe(
+                catchError((err) => {
+                  console.log(err);
+                  this.layoutUtilsService.showActionNotification(
+                    err.error.message,
+                    MessageType.Read,
+                    999999999,
+                    true,
+                    false,
+                    3000,
+                    'top',
+                    0
+                  );
+                  this._errorMessage$.next(err);
+                  return of();
+                }),
+                finalize(() => {}),
+                takeUntil(this.onDestroy),
+                share()
+              )
+              .subscribe();
+          }
+        }
+      });
   }
 
   @ViewChild('videoPlayer') videoplayer: ElementRef;

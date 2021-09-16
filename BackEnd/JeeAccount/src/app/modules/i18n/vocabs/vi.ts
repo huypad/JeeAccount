@@ -231,5 +231,18 @@ export const locale = {
       THEMMOIADMINHETHONG: 'Thêm mới quản trị hệ thống',
       THEMADMINAPP: 'Thêm quản trị ứng dụng',
     },
+    JEECOMMENT: {
+      TRALOI: 'Trả lời',
+      DASUA: 'Đã sửa',
+      XEMTHEMBINHLUAN: 'Xem thêm bình luận',
+      TOANBOBINHLUAN: 'Toàn bộ bình luận',
+      NHAN: 'Nhấn',
+      DE: 'để',
+      HUYBINHLUAN: 'huỷ bình luận',
+      THICH: 'Thích',
+      VIETBINHLUAN: 'Viết bình luận',
+      CHINHSUA: 'Chỉnh sửa',
+      XOA: 'Xoá',
+    },
   },
 };

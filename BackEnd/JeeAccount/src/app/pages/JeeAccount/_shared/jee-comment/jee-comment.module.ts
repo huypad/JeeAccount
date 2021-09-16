@@ -1,3 +1,4 @@
+import { TranslationModule } from './../../../../modules/i18n/translation.module';
 import { JeeCommentSignalrService } from './jee-comment-signalr.service';
 import { JeeCommentReactionShowComponent } from './reaction-comment-show/reaction-comment-show.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -17,7 +18,7 @@ import { FormsModule } from '@angular/forms';
 import { PickerModule } from '@ctrl/ngx-emoji-mart';
 import { JeeCommentEnterCommentContentComponent } from './enter-comment-content/enter-comment-content.component';
 import { ClickOutsideDirective } from './enter-comment-content/click-outside.directive';
-
+import { MatMenuModule } from '@angular/material/menu';
 @NgModule({
   declarations: [
     JeeCommentComponent,
@@ -38,6 +39,8 @@ import { ClickOutsideDirective } from './enter-comment-content/click-outside.dir
     MatTooltipModule,
     FormsModule,
     PickerModule,
+    MatMenuModule,
+    TranslationModule,
   ],
   providers: [JeeCommentService, JeeCommentSignalrService],
   entryComponents: [

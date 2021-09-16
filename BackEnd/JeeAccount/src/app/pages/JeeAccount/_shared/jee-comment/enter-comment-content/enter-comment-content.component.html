@@ -12,7 +12,7 @@
         (keydown)="onKeydown($event)"
         (keyup.enter)="validateCommentAndPost()"
         [(ngModel)]="inputTextArea"
-        placeholder="Viết bình luận"
+        placeholder="{{ 'JEECOMMENT.VIETBINHLUAN' | translate }}"
         class="textarea-input"
         cdkTextareaAutosize
       >
@@ -60,12 +60,14 @@
     </ng-container>
   </div>
   <div class="post-comment-cancle">
-    <span *ngIf="isLoading$ | async" class="click-show-spinner" [class.spinner]="isLoading$ | async"> </span>
+    <span *ngIf="isLoading$ | async" class="click-show-spinner" [class.spinner]="true"> </span>
     <ng-container *ngIf="showSpanCancelFocus">
-      Nhấn
+      {{ 'JEECOMMENT.NHAN' | translate }}
       <span> Esc </span>
-      để <span class="span-cancel-comment"> huỷ bình luận</span>
+      {{ 'JEECOMMENT.DE' | translate }} <span class="span-cancel-comment">{{ 'JEECOMMENT.HUYBINHLUAN' | translate }}</span>
     </ng-container>
-    <span (click)="cancleComment()" *ngIf="showSpanCancelNoFocus" class="span-cancel-comment-not-in-textarea">Huỷ bình luận</span>
+    <span (click)="cancleComment()" *ngIf="showSpanCancelNoFocus" class="span-cancel-comment-not-in-textarea">{{
+      'JEECOMMENT.HUYBINHLUAN' | translate
+    }}</span>
   </div>
 </ng-container>
