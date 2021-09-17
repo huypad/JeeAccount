@@ -70,10 +70,12 @@ export class Attach {
   Images: string[];
   Files: string[];
   Videos: string[];
+  FileNames: string[];
   constructor() {
     this.Images = [];
     this.Files = [];
     this.Videos = [];
+    this.FileNames = [];
   }
 }
 

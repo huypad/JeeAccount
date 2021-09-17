@@ -47,7 +47,9 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
   showSpanCancelFocus: boolean;
   showSpanCancelNoFocus: boolean;
   imagesUrl: string[];
-  imagesUrlArray: any[];
+  videosUrl: any[];
+  filesUrl: any[];
+  filesName: string[] = [];
   inputTextArea: string;
 
   private _isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -57,7 +59,8 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
 
   ngOnInit() {
     this.imagesUrl = [];
-    this.imagesUrlArray = [];
+    this.videosUrl = [];
+    this.filesUrl = [];
     this.inputTextArea = '';
     this.showPopupEmoji = false;
     this.isClickIconEmoji = false;
@@ -84,6 +87,8 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
   initData() {
     this.inputTextArea = this.commentModelDto.Text;
     this.imagesUrl = this.commentModelDto.Attachs.Images;
+    this.videosUrl = this.commentModelDto.Attachs.Videos;
+    this.filesUrl = this.commentModelDto.Attachs.Files;
     this.isEdit$
       .pipe(
         tap((res) => {
@@ -123,11 +128,20 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
     model.CommentID = this.commentID ? this.commentID : '';
     model.ReplyCommentID = this.replyCommentID ? this.replyCommentID : '';
     model.Text = this.inputTextArea;
-    model.Attachs.Images = [];
+    model.Attachs.FileNames = this.filesName;
     this.imagesUrl.forEach((imageUrl) => {
       const base64 = imageUrl.split(',')[1];
       model.Attachs.Images.push(base64);
     });
+    this.videosUrl.forEach((videoURL) => {
+      const base64 = videoURL.split(',')[1];
+      model.Attachs.Videos.push(base64);
+    });
+    this.filesUrl.forEach((fileUrl) => {
+      const base64 = fileUrl.split(',')[1];
+      model.Attachs.Files.push(base64);
+    });
+
     return model;
   }
 
@@ -222,13 +236,78 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
     const filesAmount = files.length;
     if (filesAmount > 0) this.showSpanCancelNoFocus = true;
     for (let i = 0; i < filesAmount; i++) {
-      let reader = new FileReader();
-      reader.readAsDataURL(files.item(i));
-      reader.onload = () => {
-        this.imagesUrl.push(reader.result as string);
-        this.cd.detectChanges();
-      };
+      const name = files[i].name;
+      if (this.isImage(name)) {
+        this.addImage(files.item(i));
+      } else if (this.isVideo(name)) {
+        this.addVideo(files.item(i));
+      } else {
+        this.filesName.push(name);
+        this.addFile(files.item(i));
+      }
     }
+  }
+
+  addFile(item) {
+    let reader = new FileReader();
+    reader.readAsDataURL(item);
+    reader.onload = () => {
+      this.filesUrl.push(reader.result as string);
+      this.cd.detectChanges();
+    };
+  }
+  addImage(item) {
+    let reader = new FileReader();
+    reader.readAsDataURL(item);
+    reader.onload = () => {
+      this.imagesUrl.push(reader.result as string);
+      this.cd.detectChanges();
+    };
+  }
+  addVideo(item) {
+    let reader = new FileReader();
+    reader.readAsDataURL(item);
+    reader.onload = () => {
+      this.videosUrl.push(reader.result);
+      this.cd.detectChanges();
+    };
+  }
+  getExtension(filename: string) {
+    var parts = filename.split('.');
+    return parts[parts.length - 1];
+  }
+
+  isImage(filename: string) {
+    const ext = this.getExtension(filename);
+    switch (ext.toLowerCase()) {
+      case 'jpg':
+      case 'gif':
+      case 'bmp':
+      case 'png':
+      case 'heic':
+      case 'heif':
+        return true;
+    }
+    return false;
+  }
+
+  isVideo(filename: string) {
+    var ext = this.getExtension(filename);
+    switch (ext.toLowerCase()) {
+      case 'm4v':
+      case 'avi':
+      case 'mpg':
+      case 'mp4':
+      case 'ts':
+      case 'mkv':
+      case 'webm':
+      case 'wmv':
+      case '3gpp':
+      case 'mpeg':
+      case 'ogv':
+        return true;
+    }
+    return false;
   }
 
   deletePreviewImage(index) {
@@ -236,9 +315,22 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
     this.cd.detectChanges();
   }
 
+  deletePreviewVideo(index) {
+    this.videosUrl.splice(index, 1);
+    this.cd.detectChanges();
+  }
+  deletePreviewFile(index) {
+    this.filesUrl.splice(index, 1);
+    this.filesName.splice(index, 1);
+    this.cd.detectChanges();
+  }
+
   cancleComment() {
     this.inputTextArea = '';
     this.imagesUrl = [];
+    this.videosUrl = [];
+    this.filesUrl = [];
+    this.filesName = [];
     this.showSpanCancelFocus = false;
     this.showSpanCancelNoFocus = false;
     this.isEdit$.next(false);

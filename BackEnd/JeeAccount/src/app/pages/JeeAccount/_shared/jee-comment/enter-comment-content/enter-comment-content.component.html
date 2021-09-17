@@ -3,7 +3,7 @@
     <div class="post-comment-avatar">
       <img id="img-avatar" src="{{ (service.mainUser$ | async).AvartarImgURL }}" />
     </div>
-    <div class="post-comment-input">
+    <div class="post-comment-input" style="align-items: center">
       <textarea
         #txtarea
         (focus)="focusFunction()"
@@ -51,12 +51,32 @@
             [multiple]="true"
           />
         </li>
+        <li (click)="files.click()" class="icon" style="margin-left: 2px !important">
+          <mat-icon>attach_file</mat-icon>
+        </li>
+        <input #files (change)="previewFileInput(files.files)" id="input-flie" accept="*" type="file" [multiple]="true" />
       </ul>
     </div>
+  </div>
+  <div class="post-comment-file">
+    <ng-container *ngFor="let file of filesUrl; let i = index">
+      <div>
+        <img height="27px" src="https://cdn.jee.vn/jee-comment/icons/attach_clip_file_save_icon.png" />
+        <span> {{ filesName[i] }} </span>
+        <span (click)="deletePreviewFile(i)" class="delete-preview-image"></span>
+      </div>
+    </ng-container>
   </div>
   <div class="enter-post-comment-image">
     <ng-container *ngFor="let imageUrl of imagesUrl; let i = index">
       <div class="img-preview"><img [src]="imageUrl" /><span (click)="deletePreviewImage(i)" class="delete-preview-image"></span></div>
+    </ng-container>
+  </div>
+  <div class="enter-post-comment-video">
+    <ng-container *ngFor="let videoUrl of videosUrl; let i = index">
+      <div class="video-preview">
+        <video [src]="videoUrl" controls></video><span (click)="deletePreviewVideo(i)" class="delete-preview-image"></span>
+      </div>
     </ng-container>
   </div>
   <div class="post-comment-cancle">

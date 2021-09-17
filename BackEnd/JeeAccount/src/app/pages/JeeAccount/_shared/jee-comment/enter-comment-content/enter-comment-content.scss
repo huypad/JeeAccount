@@ -23,6 +23,24 @@ $color-hover-x-button: #1ebcc5;
   }
 }
 
+.enter-post-comment-video {
+  padding-top: 0px;
+  video {
+    border: 0;
+    max-height: 47.5vh;
+    max-width: 80vw;
+    padding-bottom: 5px;
+    padding-right: 5px;
+    border-radius: 18px;
+  }
+}
+
+.video-preview {
+  display: inline-flex;
+  margin-right: 20px;
+  vertical-align: top;
+}
+
 .img-preview {
   display: inline-flex;
   margin-right: 20px;
@@ -90,5 +108,4 @@ $color-hover-x-button: #1ebcc5;
 
 .textarea-input {
   margin: 0;
-  padding: 0;
 }
