@@ -243,6 +243,10 @@ export const locale = {
       VIETBINHLUAN: 'Viết bình luận',
       CHINHSUA: 'Chỉnh sửa',
       XOA: 'Xoá',
+      BINHLUAN: 'Bình luận',
+      CHIASE: 'Chia sẻ',
+      KHONGHOPLE: 'Comment không hợp lệ hoặc đã bị xoá, vui lòng thử lại sau.',
+      BINHLUANMOINHAT: 'Bình luận mới nhất',
     },
   },
 };

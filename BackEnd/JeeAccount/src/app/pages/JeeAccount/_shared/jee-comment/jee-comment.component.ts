@@ -1,3 +1,4 @@
+import { TranslateService } from '@ngx-translate/core';
 import { JeeCommentSignalrService } from './jee-comment-signalr.service';
 import { HubConnection } from '@microsoft/signalr';
 import { BehaviorSubject, of, Subject, interval } from 'rxjs';
@@ -31,7 +32,8 @@ export class JeeCommentComponent implements OnInit {
   ShowSpinner$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   ShowFilter$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   ShowSpinnerViewMore$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-
+  currentLengthViewComment: number = 10;
+  labelFilterComment: string = '';
   //filter
   filterDate: Date = new Date();
 
@@ -49,10 +51,12 @@ export class JeeCommentComponent implements OnInit {
     public service: JeeCommentService,
     public cd: ChangeDetectorRef,
     private elementRef: ElementRef,
-    private signalrService: JeeCommentSignalrService
+    private signalrService: JeeCommentSignalrService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit() {
+    this.labelFilterComment = this.translate.instant('JEECOMMENT.BINHLUANMOINHAT');
     if (this.objectID) this.lstObjectID.push(this.objectID);
     if (this.showCommentDefault) {
       setTimeout(() => {
@@ -255,6 +259,8 @@ export class JeeCommentComponent implements OnInit {
 
   viewMoreComment() {
     this.item.ViewLengthComment += 10;
+    this.currentLengthViewComment = this.item.ViewLengthComment;
+    this.getShowTopic();
     this.ShowSpinnerViewMore$.next(true);
     setTimeout(() => {
       this.ShowSpinnerViewMore$.next(false);
@@ -271,5 +277,15 @@ export class JeeCommentComponent implements OnInit {
     const rect = this.elementRef.nativeElement.getBoundingClientRect();
     const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
     return isVisible;
+  }
+
+  showAllComment() {
+    this.item.ViewLengthComment = this.item.TotalLengthComment;
+    this.getShowTopic();
+  }
+
+  showNewComment() {
+    this.item.ViewLengthComment = this.currentLengthViewComment;
+    this.getShowTopic();
   }
 }
