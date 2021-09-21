@@ -21,7 +21,7 @@ namespace JeeAccount.Services.CustomerManagementService
 
         bool checkTrungCode(string Code);
 
-        Task<IdentityServerReturn> CreateCustomer(CustomerModel customerModel, string usernameAdmin);
+        Task<IdentityServerReturn> CreateCustomer(CustomerModel customerModel, string usernameAdmin, bool isImport);
 
         Task<ReturnSqlModel> UpdateCustomerAppGiaHanModel(CustomerAppGiaHanModel model);
 

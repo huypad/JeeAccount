@@ -214,7 +214,7 @@ namespace JeeCustomer.ConsumerKafka
                 {
                     cnn.BeginTransaction();
 
-                    _accountReponsitory.CreateAccount(true, cnn, account, usernameCreatedBy, customerID, false);
+                    _accountReponsitory.CreateAccount(true, cnn, account, usernameCreatedBy, customerID, false, false);
                     account.Userid = GeneralReponsitory.GetCommonInfoCnn(cnn, 0, account.Username).UserID;
                     _accountReponsitory.InsertAppCodeAccount(cnn, account.Userid, account.AppID, usernameCreatedBy, false);
 

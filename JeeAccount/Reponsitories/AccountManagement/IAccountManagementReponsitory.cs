@@ -75,7 +75,7 @@ namespace JeeAccount.Reponsitories
 
         bool ChangeTinhTrang(long customerID, string Username, string Note, long UserIdLogin);
 
-        void CreateAccount(bool isJeeHR, DpsConnection cnn, AccountManagementModel account, string usernameCreatedBy, long CustomerID, bool isAdmin = false);
+        void CreateAccount(bool isJeeHR, DpsConnection cnn, AccountManagementModel account, string usernameCreatedBy, long CustomerID, bool isAdmin, bool isImport);
 
         void UpdateAccount(bool isJeeHR, DpsConnection cnn, AccountManagementModel account, long CustomerID);
 

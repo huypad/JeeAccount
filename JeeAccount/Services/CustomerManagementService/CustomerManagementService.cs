@@ -77,7 +77,7 @@ namespace JeeAccount.Services.CustomerManagementService
             return token;
         }
 
-        public async Task<IdentityServerReturn> CreateCustomer(CustomerModel customerModel, string usernameAdmin)
+        public async Task<IdentityServerReturn> CreateCustomer(CustomerModel customerModel, string usernameAdmin, bool isImport)
         {
             using (DpsConnection cnn = new DpsConnection(ConnectionString))
             {
@@ -121,7 +121,7 @@ namespace JeeAccount.Services.CustomerManagementService
                         Password = customerModel.Password,
                     };
                     var isJeeHR = appcodes.Contains("JeeHR");
-                    _accountManagementReponsitory.CreateAccount(isJeeHR, cnn, accountManagementModel, usernameAdmin, customerModel.RowID, true);
+                    _accountManagementReponsitory.CreateAccount(isJeeHR, cnn, accountManagementModel, usernameAdmin, customerModel.RowID, true, isImport);
 
                     long userId = _accountManagementReponsitory.GetLastUserID(cnn);
                     _accountManagementReponsitory.InsertAppCodeAccount(cnn, userId, customerModel.AppID, usernameAdmin, true);

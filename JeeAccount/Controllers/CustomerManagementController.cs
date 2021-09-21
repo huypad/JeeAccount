@@ -121,8 +121,8 @@ namespace JeeAccount.Controllers
 
         #region api for customer
 
-        [HttpPost("CreateCustomer")]
-        public async Task<IActionResult> CreateCustomer([FromBody] CustomerModel model)
+        [HttpPost("CreateCustomer/{isImport}")]
+        public async Task<IActionResult> CreateCustomer([FromBody] CustomerModel model, bool isImport)
         {
             try
             {
@@ -130,7 +130,12 @@ namespace JeeAccount.Controllers
                 if (token is null) return NotFound("Secrectkey");
                 if (!token.Equals(_JeeCustomerSecrectkey)) return NotFound("Secrectkey Không hợp lệ");
 
-                var create = await _service.CreateCustomer(model, "jeecustomer");
+                var useradmin = "jeecustomer";
+                if (isImport)
+                {
+                    useradmin = "importjeecustomer";
+                }
+                var create = await _service.CreateCustomer(model, useradmin, isImport);
                 if (create.statusCode == 0)
                 {
                     return Ok(create);

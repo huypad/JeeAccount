@@ -785,13 +785,17 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
             }
         }
 
-        public void CreateAccount(bool isJeeHR, DpsConnection cnn, AccountManagementModel account, string username_createdby, long CustomerID, bool isAdmin = false)
+        public void CreateAccount(bool isJeeHR, DpsConnection cnn, AccountManagementModel account, string username_createdby, long CustomerID, bool isAdmin, bool isImport)
         {
             Hashtable val = new Hashtable();
             try
             {
                 #region val data
 
+                if (isImport)
+                {
+                    val.Add("Password", account.Password);
+                }
                 if (account.Fullname is not null)
                 {
                     string FirstName = GeneralService.GetFirstname(account.Fullname);
@@ -799,7 +803,6 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                     val.Add("FirstName", FirstName);
                     val.Add("LastName", Lastname);
                 }
-                if (string.IsNullOrEmpty(account.Password)) val.Add("Password", account.Password);
                 if (account.Username is not null) val.Add("Username", account.Username);
                 if (account.DepartmemtID != 0) val.Add("DepartmentID", account.DepartmemtID);
                 if (!string.IsNullOrEmpty(account.Departmemt) && isJeeHR)
