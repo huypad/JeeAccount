@@ -98,7 +98,7 @@ namespace JeeCustomer.ConsumerKafka
                     _ = GeneralReponsitory.UpdateJeeAccountCustomDataByInputApiModel(obj.userId, _connectionString, GeneralService.GetInternalToken(_config));
 
                     string _password = GeneralReponsitory.GetObjectDB($"select Password from AccountList where UserID = {obj.userId}", _connectionString).Trim();
-                    if (string.IsNullOrEmpty(_password))
+                    if (!string.IsNullOrEmpty(_password))
                     {
                         var d5 = new GeneralLog()
                         {
@@ -169,7 +169,6 @@ namespace JeeCustomer.ConsumerKafka
                                 _logger.LogTrace(JsonConvert.SerializeObject(d2));
                             }
                         }
-
                     }
                 }
             }
