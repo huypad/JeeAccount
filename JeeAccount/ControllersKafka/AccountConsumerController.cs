@@ -131,6 +131,16 @@ namespace JeeCustomer.ConsumerKafka
                             {
                                 try
                                 {
+                                    if (string.IsNullOrEmpty(item.username))
+                                    {
+                                        var d6 = new GeneralLog()
+                                        {
+                                            name = "import jeehr thất bại",
+                                            data = $"{item.username} ({commonInfo.CustomerID})",
+                                            message = $"username bị null"
+                                        };
+                                        _logger.LogError(JsonConvert.SerializeObject(d6));
+                                    }
                                     var account = new AccountManagementModel();
                                     account.Username = item.username;
                                     account.StaffID = item.IDNV;
