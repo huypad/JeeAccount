@@ -1265,6 +1265,7 @@ namespace JeeAccount.Controllers
             }
         }
 
+        /*
         [HttpPost("testkafkajeehr")]
         public async Task<IActionResult> testkafkajeehr()
         {
@@ -1305,6 +1306,6 @@ namespace JeeAccount.Controllers
             {
                 return BadRequest(MessageReturnHelper.Exception(ex));
             }
-        }
+        }*/
     }
 }
