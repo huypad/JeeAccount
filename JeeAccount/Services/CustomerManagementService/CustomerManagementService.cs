@@ -119,6 +119,7 @@ namespace JeeAccount.Services.CustomerManagementService
                         Phonemumber = customerModel.Phone,
                         Username = customerModel.Username,
                         Password = customerModel.Password,
+                        StaffID = customerModel.StaffID
                     };
                     var isJeeHR = appcodes.Contains("JeeHR");
                     _accountManagementReponsitory.CreateAccount(isJeeHR, cnn, accountManagementModel, usernameAdmin, customerModel.RowID, true, isImport);
@@ -137,6 +138,7 @@ namespace JeeAccount.Services.CustomerManagementService
                                 AppCode = appcodes,
                                 CustomerID = customerModel.RowID,
                                 UserID = userId,
+                                StaffID = customerModel.StaffID
                             },
                             PersonalInfo = new PersonalInfoCustomData
                             {

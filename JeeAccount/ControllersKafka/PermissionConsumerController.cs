@@ -55,6 +55,12 @@ namespace JeeAccount.ControllersKafka
             {
                 var obj = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomData>(value);
                 var objRemove = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomDataRoles>(value);
+                string username = GeneralReponsitory.GetObjectDB($"select Username from AccountList where UserID = {obj.userId}", _config.GetValue<string>("AppConfig:Connection"));
+                if (!string.IsNullOrEmpty(username))
+                {
+                    var identity = new IdentityServerController();
+                    _ = identity.UppdateCustomDataInternal(GeneralService.GetInternalToken(_config), username, obj);
+                }
                 if (obj.updateField.Equals("jee-hr", StringComparison.OrdinalIgnoreCase))
                 {
                     var fieldvalue_json = JsonConvert.SerializeObject(obj.fieldValue);
@@ -76,13 +82,6 @@ namespace JeeAccount.ControllersKafka
                     }
 
                     _ = GeneralReponsitory.UpdateJeeAccountCustomDataByInputApiModel(obj.userId, _config.GetValue<string>("AppConfig:Connection"), GeneralService.GetInternalToken(_config));
-                }
-
-                string username = GeneralReponsitory.GetObjectDB($"select Username from AccountList where UserID = {obj.userId}", _config.GetValue<string>("AppConfig:Connection"));
-                if (!string.IsNullOrEmpty(username))
-                {
-                    var identity = new IdentityServerController();
-                    _ = identity.UppdateCustomDataInternal(GeneralService.GetInternalToken(_config), username, obj);
                 }
             }
             catch (Exception ex)

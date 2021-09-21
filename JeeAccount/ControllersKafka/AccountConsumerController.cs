@@ -68,6 +68,12 @@ namespace JeeCustomer.ConsumerKafka
             try
             {
                 var obj = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomData>(value);
+                string username = GeneralReponsitory.GetObjectDB($"select Username from AccountList where UserID = {obj.userId}", _connectionString);
+                if (!string.IsNullOrEmpty(username))
+                {
+                    var identity = new IdentityServerController();
+                    _ = identity.UppdateCustomDataInternal(GeneralService.GetInternalToken(_config), username, obj);
+                }
                 var objRemove = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomDataRoles>(value);
                 if (obj.updateField.Equals("jee-hr", StringComparison.OrdinalIgnoreCase))
                 {
@@ -91,7 +97,8 @@ namespace JeeCustomer.ConsumerKafka
 
                     _ = GeneralReponsitory.UpdateJeeAccountCustomDataByInputApiModel(obj.userId, _connectionString, GeneralService.GetInternalToken(_config));
 
-                    if (IsPasswordExist(obj.userId))
+                    string _password = GeneralReponsitory.GetObjectDB($"select Password from AccountList where UserID = {obj.userId}", _connectionString).Trim();
+                    if (string.IsNullOrEmpty(_password))
                     {
                         var d5 = new GeneralLog()
                         {
@@ -103,7 +110,7 @@ namespace JeeCustomer.ConsumerKafka
 
                         var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, obj.userId);
                         string _username = commonInfo.Username;
-                        string _password = GeneralReponsitory.GetObjectDB($"select Password from AccountList where UserID = {obj.userId}", _connectionString).Trim();
+
                         GeneralReponsitory.RemovePassword(_connectionString, obj.userId);
 
                         var identity = new IdentityServerController();
@@ -118,55 +125,52 @@ namespace JeeCustomer.ConsumerKafka
                         var appInts = lstApp.Select(item => item.AppID).ToList();
 
                         var internal_token = GeneralService.GetInternalToken(_config);
-                        foreach (var item in ds)
+                        if (ds != null)
                         {
-                            try
+                            foreach (var item in ds)
                             {
-                                var account = new AccountManagementModel();
-                                account.Username = item.username;
-                                account.StaffID = item.IDNV;
-                                account.AppCode = appCodes;
-                                account.AppID = appInts;
-                                account.Birthday = item.NgaySinh;
-                                account.chucvuid = 33;
-                                account.cocauid = 1;
-                                account.JobtitleID = Int32.Parse(item.jobtitleid.ToString());
-                                account.Jobtitle = item.TenChucVu;
-                                account.Departmemt = item.Structure;
-                                account.DepartmemtID = Int32.Parse(item.structureid.ToString());
-                                account.Email = item.Email;
-                                account.Fullname = item.HoTen;
-                                account.ImageAvatar = item.avatar;
-                                account.Phonemumber = item.PhoneNumber;
-                                CreateAccountJeeHRNormalKafka(identity, internal_token, commonInfo.CustomerID, "importjeehr", account);
-                            }
-                            catch (Exception ex)
-                            {
-                                var d3 = new GeneralLog()
+                                try
                                 {
-                                    name = "import jeehr",
+                                    var account = new AccountManagementModel();
+                                    account.Username = item.username;
+                                    account.StaffID = item.IDNV;
+                                    account.AppCode = appCodes;
+                                    account.AppID = appInts;
+                                    account.Birthday = item.NgaySinh;
+                                    account.chucvuid = 33;
+                                    account.cocauid = 1;
+                                    account.JobtitleID = Int32.Parse(item.jobtitleid.ToString());
+                                    account.Jobtitle = item.TenChucVu;
+                                    account.Departmemt = item.Structure;
+                                    account.DepartmemtID = Int32.Parse(item.structureid.ToString());
+                                    account.Email = item.Email;
+                                    account.Fullname = item.HoTen;
+                                    account.ImageAvatar = item.avatar;
+                                    account.Phonemumber = item.PhoneNumber;
+                                    CreateAccountJeeHRNormalKafka(identity, internal_token, commonInfo.CustomerID, "importjeehr", account);
+                                }
+                                catch (Exception ex)
+                                {
+                                    var d3 = new GeneralLog()
+                                    {
+                                        name = "import jeehr",
+                                        data = item.username + "(" + commonInfo.CustomerID + ")",
+                                        message = $"error {ex.Message}"
+                                    };
+                                    _logger.LogError(JsonConvert.SerializeObject(d3));
+                                }
+
+                                var d2 = new GeneralLog()
+                                {
+                                    name = "import jeehr thành công",
                                     data = item.username + "(" + commonInfo.CustomerID + ")",
-                                    message = $"error {ex.Message}"
+                                    message = $"thành công"
                                 };
-                                _logger.LogError(JsonConvert.SerializeObject(d3));
+                                _logger.LogTrace(JsonConvert.SerializeObject(d2));
                             }
-
-                            var d2 = new GeneralLog()
-                            {
-                                name = "import jeehr thành công",
-                                data = item.username + "(" + commonInfo.CustomerID + ")",
-                                message = $"thành công"
-                            };
-                            _logger.LogTrace(JsonConvert.SerializeObject(d2));
                         }
-                    }
-                }
 
-                string username = GeneralReponsitory.GetObjectDB($"select Username from AccountList where UserID = {obj.userId}", _connectionString);
-                if (!string.IsNullOrEmpty(username))
-                {
-                    var identity = new IdentityServerController();
-                    _ = identity.UppdateCustomDataInternal(GeneralService.GetInternalToken(_config), username, obj);
+                    }
                 }
             }
             catch (Exception ex)
@@ -211,9 +215,9 @@ namespace JeeCustomer.ConsumerKafka
                             message = $"đã thêm staffid"
                         };
                         _logger.LogTrace(JsonConvert.SerializeObject(d3));
-
                         return;
                     }
+                    else if (common.StaffID > 0) return;
                     var d2 = new GeneralLog()
                     {
                         name = "import jeehr",
