@@ -147,6 +147,7 @@ namespace JeeCustomer.ConsumerKafka
                                     account.Fullname = item.HoTen;
                                     account.ImageAvatar = item.avatar;
                                     account.Phonemumber = item.PhoneNumber;
+                                    account.Password = item.cmnd;
                                     CreateAccountJeeHRNormalKafka(identity, internal_token, commonInfo.CustomerID, "importjeehr", account);
                                 }
                                 catch (Exception ex)
