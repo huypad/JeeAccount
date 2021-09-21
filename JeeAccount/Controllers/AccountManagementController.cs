@@ -1264,5 +1264,47 @@ namespace JeeAccount.Controllers
                 return BadRequest(MessageReturnHelper.Exception(ex));
             }
         }
+
+        [HttpPost("testkafkajeehr")]
+        public async Task<IActionResult> testkafkajeehr()
+        {
+            try
+            {
+                var appcode = new List<string>();
+                appcode.Add("JeeHR");
+                var objHR = new
+                {
+                    CustomerID = 27,
+                    AppCode = appcode,
+                    UserID = 78232,
+                    Username = "admin_tt",
+                    IsInitial = true,
+                    IsAdmin = true,
+                    customerModel = new
+                    {
+                        Code = "tt",
+                        RegisterDate = "21/09/2021",
+                        DeadlineDate = "",
+                        PakageID = 4,
+                        CompanyName = "Công ty Cổ Phần Tín Tốc",
+                        Address = "32 Lê Lai, Phường 4, Quận Gò Vấp",
+                        Phone = "0965729799",
+                        Note = "",
+                        Nguoidaidien = "Bùi Thành Lộc",
+                        CustomerID = 27,
+                        UsernameAdmin = "admin_tt",
+                        PasswordAdmin = "@admintt",
+                        Email = "",
+                    }
+                };
+                await _producer.PublishAsync(_config.GetValue<string>("KafkaConfig:TopicProduce:JeeplatformInitialization"), JsonConvert.SerializeObject(objHR));
+
+                return Ok(objHR);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
     }
 }

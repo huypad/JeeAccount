@@ -103,8 +103,7 @@ namespace JeeCustomer.ConsumerKafka
 
                         var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, obj.userId);
                         string _username = commonInfo.Username;
-                        string _password_Encrypt = GeneralReponsitory.GetObjectDB($"select Password from AccountList where UserID = {obj.userId}", _connectionString);
-                        string _password = DpsLibs.Common.EncDec.Decrypt(_password_Encrypt, Constant.PASSWORD_ED);
+                        string _password = GeneralReponsitory.GetObjectDB($"select Password from AccountList where UserID = {obj.userId}", _connectionString).Trim();
                         GeneralReponsitory.RemovePassword(_connectionString, obj.userId);
 
                         var identity = new IdentityServerController();
@@ -201,6 +200,20 @@ namespace JeeCustomer.ConsumerKafka
             {
                 if (GeneralReponsitory.IsExistUsernameCnn(cnn, account.Username, customerID))
                 {
+                    var common = GeneralReponsitory.GetCommonInfoCnn(cnn, 0, account.Username);
+                    if (common.StaffID == 0)
+                    {
+                        GeneralReponsitory.SaveStaffIDCnn(common.UserID, account.StaffID, cnn);
+                        var d3 = new GeneralLog()
+                        {
+                            name = "import jeehr",
+                            data = account.Username + "(" + customerID + ")",
+                            message = $"đã thêm staffid"
+                        };
+                        _logger.LogTrace(JsonConvert.SerializeObject(d3));
+
+                        return;
+                    }
                     var d2 = new GeneralLog()
                     {
                         name = "import jeehr",
@@ -220,6 +233,7 @@ namespace JeeCustomer.ConsumerKafka
 
                     var identity = GeneralReponsitory.InitIdentityServerUserModel(customerID, account);
                     string userId = identity.customData.JeeAccount.UserID.ToString();
+
                     var createUser = identityServerController.AddNewUserInternalNotAysnc(identity, inernal_token);
                     if (!createUser.IsSuccessful)
                     {
