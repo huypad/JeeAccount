@@ -47,6 +47,8 @@ namespace JeeAccount.Reponsitories
 
         Task<IEnumerable<AppListDTO>> GetListAppByCustomerIDAsync(long customerID);
 
+        IEnumerable<AppListDTO> GetListAppByCustomerID(long customerID);
+
         Task<string> GetDirectManagerByUserID(string userid);
 
         Task<string> GetDirectManagerByUsername(string username);
@@ -63,13 +65,9 @@ namespace JeeAccount.Reponsitories
 
         Task<IEnumerable<AccUsernameModel>> ListNhanVienCapDuoiDirectManagerByDirectManagerJeeHRAsync(string DirectManager);
 
-        Task<IEnumerable<AppListDTO>> GetListInfoAppByCustomerIDAsync(long customerID);
-
         long GetCurrentIdentity(DpsConnection cnn);
 
         long GetLastUserID(DpsConnection cnn);
-
-        List<int> GetAppIdByAppCode(DpsConnection cnn, List<string> AppCode);
 
         Task<IEnumerable<CustomerAppDTO>> GetListCustomerAppByCustomerIDFromAccountAsync(long customerID);
 

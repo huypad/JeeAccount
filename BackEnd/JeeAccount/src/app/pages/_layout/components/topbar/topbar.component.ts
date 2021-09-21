@@ -101,7 +101,6 @@ export class TopbarComponent implements OnInit, AfterViewInit {
         // Init Quick User Panel
         KTLayoutQuickUser.init('kt_quick_user');
       }
-
       // Init Header Topbar For Mobile Mode
       KTLayoutHeaderTopbar.init('kt_header_mobile_topbar_toggle');
     });

@@ -1,0 +1,53 @@
+.choose-users-box {
+  margin: 0;
+  background-color: white;
+  z-index: 99;
+  border: 1px solid white;
+  border-radius: 18px;
+}
+
+.choose-users-box {
+  margin: -15px;
+  margin-top: 0;
+  min-width: 260px;
+
+  .users-container {
+    max-height: 260px;
+    overflow-y: hidden;
+    z-index: 99;
+
+    .user-item {
+      display: flex;
+      padding: 5px 10px;
+      cursor: pointer;
+
+      label {
+        padding: 3px 5px 3px 5px;
+        position: absolute;
+        top: -24px;
+        right: 0px;
+        border-radius: 10px;
+        font-size: 11px;
+        color: #fff;
+        background: #333;
+        visibility: hidden;
+      }
+
+      &:hover {
+        background-color: #eee;
+        border-radius: 18px;
+
+        label {
+          visibility: visible;
+        }
+      }
+
+      img {
+        height: 35px;
+        width: 35px;
+        border-radius: 50%;
+        margin-right: 10px;
+      }
+    }
+  }
+}

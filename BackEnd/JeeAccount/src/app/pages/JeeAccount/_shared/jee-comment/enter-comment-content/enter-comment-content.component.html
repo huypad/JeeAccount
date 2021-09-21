@@ -4,19 +4,45 @@
       <img id="img-avatar" src="{{ (service.mainUser$ | async).AvartarImgURL }}" />
     </div>
     <div class="post-comment-input" style="align-items: center">
-      <textarea
+      <!-- <div
         #txtarea
+        spellcheck="false"
+        contenteditable
         (focus)="focusFunction()"
         (focusout)="focusOutFunction()"
         (keyup.escape)="cancleComment()"
         (keydown)="onKeydown($event)"
         (keyup.enter)="validateCommentAndPost()"
-        [(ngModel)]="inputTextArea"
-        placeholder="{{ 'JEECOMMENT.VIETBINHLUAN' | translate }}"
         class="textarea-input"
         cdkTextareaAutosize
-      >
-      </textarea>
+        [popover]="myPopover"
+        [popoverOnHover]="false"
+        data-outline-editor="true"
+        role="textbox"
+      ></div>
+      <popover-content #myPopover popoverPlacement="left" [closeOnClickOutside]="true">
+        <tag-comment-show [data]="listUser" (ItemSelected)="ItemSelected($event)"> </tag-comment-show>
+      </popover-content> -->
+      <!-- <div
+        #txtarea
+        spellcheck="false"
+        contenteditable
+        (keydown)="onKeydown($event)"
+        class="textarea-input"
+        data-outline-editor="true"
+        role="textbox"
+      ></div> -->
+      <div
+        #txtarea
+        spellcheck="false"
+        contenteditable
+        (keydown)="onKeydown($event)"
+        class="textarea-input"
+        data-outline-editor="true"
+        (keyup.enter)="validateCommentAndPost()"
+        role="textbox"
+      ></div>
+      <tag-comment-show [data]="listUser" (ItemSelected)="ItemSelected($event)"> </tag-comment-show>
       <ul class="comment-icon">
         <li class="icon">
           <span>

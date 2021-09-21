@@ -111,7 +111,7 @@ export class JeeCommentService {
     this.getDSUserCommentInfo()
       .pipe(
         tap((res) => {
-          if (res && res.status == 1) {
+          if (res) {
             const usernamelogin = this._authService.getAuthFromLocalStorage()['user']['username'];
             res.data.forEach((element) => {
               // init ListUserCommentInfo
@@ -123,6 +123,9 @@ export class JeeCommentService {
               item.Jobtitle = element.Jobtitle;
               item.FullName = element.FullName;
               item.Display = element.FullName ? element.FullName : element.Username;
+              item.BgColor = element.BgColor;
+              item.FirstName = element.FirstName;
+              item.UserId = element.UserId;
               this._lstUser.push(item);
 
               // init main User Login
@@ -143,7 +146,7 @@ export class JeeCommentService {
 
   private getDSUserCommentInfo(): Observable<any> {
     const httpHeaders = this.httpUtils.getHTTPHeaders();
-    const url = API_JEEACCOUNT_URL + `/accountmanagement/usernamesByCustermerID`;
+    const url = API_JEEACCOUNT_URL + `/accountmanagement/GetListAccountManagement?query.more=true`;
     return this.http.get<any>(url, {
       headers: httpHeaders,
     });

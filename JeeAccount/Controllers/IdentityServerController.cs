@@ -2,6 +2,7 @@
 using JeeAccount.Models.AccountManagement;
 using JeeAccount.Services.AccountManagementService;
 using Newtonsoft.Json;
+using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -430,19 +431,78 @@ namespace JeeAccount.Controllers
             }
         }
 
+        public ObjectLogin ObjectLogin(string username, string password)
+        {
+            string url = LINK_LOGIN;
+            var content = new
+            {
+                username = username,
+                password = password
+            };
+
+            var stringContent = JsonConvert.SerializeObject(content);
+
+            var client = new RestClient(url);
+            var request = new RestRequest(Method.POST);
+
+            request.AddJsonBody(stringContent);
+            IRestResponse response = client.Execute(request);
+            return JsonConvert.DeserializeObject<ObjectLogin>(response.Content);
+        }
+
+        public ObjectUserme ObjectUserme(string access_token)
+        {
+            var url = LINK_INFO_USER_LOGGED;
+            var client = new RestClient(url);
+            var request = new RestRequest(Method.GET);
+            request.AddHeader("Authorization", access_token);
+            IRestResponse response = client.Execute(request);
+            return JsonConvert.DeserializeObject<ObjectUserme>(response.Content);
+        }
+
+        public IRestResponse AddNewUserInternalNotAysnc(IdentityServerAddNewUser identityServerUserModel, string internal_token)
+        {
+            string url = LINK_ADD_NEWUSER_INTERNAL;
+            var content = new
+            {
+                username = identityServerUserModel.username,
+                password = identityServerUserModel.password,
+                customData = identityServerUserModel.customData,
+            };
+
+            var stringContent = JsonConvert.SerializeObject(content);
+
+            var client = new RestClient(url);
+            var request = new RestRequest(Method.POST);
+
+            request.AddJsonBody(stringContent);
+
+            request.AddHeader("Authorization", internal_token);
+
+            return client.Execute(request);
+        }
+
         public ObjCustomData JeeAccountCustomData(List<string> appCodes, long UserID, long CustomerID, long StaffID)
         {
-            ObjCustomData obj = new ObjCustomData();
-            obj.fieldValue = new
+            try
             {
-                customerID = CustomerID,
-                appCode = appCodes,
-                userID = UserID,
-                staffID = StaffID
-            };
-            obj.updateField = "jee-account";
-            obj.userId = UserID;
-            return obj;
+                if (appCodes.Count == 0) throw new Exception("List AppCode không có dữ liệu");
+                ObjCustomData obj = new ObjCustomData();
+                obj.fieldValue = new
+                {
+                    customerID = CustomerID,
+                    appCode = appCodes,
+                    userID = UserID,
+                    staffID = StaffID
+                };
+                obj.updateField = "jee-account";
+                obj.userId = UserID;
+                return obj;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

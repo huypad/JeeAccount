@@ -68,8 +68,6 @@ namespace JeeAccount.Services.AccountManagementService
 
         Task<HttpResponseMessage> ResetPasswordRootCustomer(CustomerResetPasswordModel model);
 
-        string UpdateAvatar(string username, string base64);
-
         Task<IEnumerable<CheckEditAppListByDTO>> GetEditListAppByUserIDByListCustomerId(long userid, long customerid);
 
         Task UpdateAccount(bool isJeeHR, string Admin_accessToken, long customerID, string usernameCreatedBy, AccountManagementModel account);

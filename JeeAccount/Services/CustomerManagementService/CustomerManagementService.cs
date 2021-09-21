@@ -1,4 +1,5 @@
 ﻿using DPSinfra.Kafka;
+using DPSinfra.Logger;
 using DPSinfra.Utils;
 using DpsLibs.Data;
 using JeeAccount.Classes;
@@ -12,6 +13,7 @@ using JeeAccount.Reponsitories.CustomerManagement;
 using JeeAccount.Services.AccountManagementService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
@@ -30,8 +32,9 @@ namespace JeeAccount.Services.CustomerManagementService
         private IAccountManagementReponsitory _accountManagementReponsitory;
         private IConfiguration configuration;
         private IAccountManagementService _accountManagementService;
+        private readonly ILogger<CustomerManagementService> _logger;
 
-        public CustomerManagementService(IProducer producer, IConfiguration configuration, ICustomerManagementReponsitory customerManagementReponsitory, IAccountManagementReponsitory accountManagementReponsitory, IAccountManagementService accountManagementService)
+        public CustomerManagementService(IProducer producer, IConfiguration configuration, ICustomerManagementReponsitory customerManagementReponsitory, IAccountManagementReponsitory accountManagementReponsitory, IAccountManagementService accountManagementService, ILogger<CustomerManagementService> logger)
         {
             this._customerManagementReponsitory = customerManagementReponsitory;
             this.identityServerController = new IdentityServerController();
@@ -40,6 +43,7 @@ namespace JeeAccount.Services.CustomerManagementService
             this.producer = producer;
             this.configuration = configuration;
             _accountManagementService = accountManagementService;
+            _logger = logger;
         }
 
         public IEnumerable<CustomerModelDTO> GetListCustomer()
@@ -208,12 +212,27 @@ namespace JeeAccount.Services.CustomerManagementService
                         await producer.PublishAsync(TopicAddNewCustomer, JsonConvert.SerializeObject(obj));
                     }
 
+                    var d2 = new GeneralLog()
+                    {
+                        name = "create customer CustomerManagementService",
+                        data = JsonConvert.SerializeObject(customerModel),
+                        message = $"create customer thành công"
+                    };
+                    _logger.LogTrace(JsonConvert.SerializeObject(d2));
+
                     return addNewUser;
                 }
                 catch (Exception ex)
                 {
                     cnn.RollbackTransaction();
                     cnn.EndTransaction();
+                    var d2 = new GeneralLog()
+                    {
+                        name = "Lỗi create customer CustomerManagementService",
+                        data = JsonConvert.SerializeObject(customerModel),
+                        message = $"error {ex.Message}"
+                    };
+                    _logger.LogError(JsonConvert.SerializeObject(d2));
                     identityServerReturn = TranferDataHelper.TranformIdentityServerException(ex);
                     return identityServerReturn;
                 }

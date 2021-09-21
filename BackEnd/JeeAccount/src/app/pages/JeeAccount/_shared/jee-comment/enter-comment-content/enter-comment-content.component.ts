@@ -1,4 +1,4 @@
-import { CommentDTO } from './../jee-comment.model';
+import { CommentDTO, UserCommentInfo } from './../jee-comment.model';
 import { catchError, takeUntil, tap } from 'rxjs/operators';
 import { of, Subject, BehaviorSubject } from 'rxjs';
 import {
@@ -13,10 +13,10 @@ import {
   AfterViewInit,
   EventEmitter,
   Output,
-  HostListener,
 } from '@angular/core';
 import { JeeCommentService } from '../jee-comment.service';
 import { PostCommentModel } from '../jee-comment.model';
+import { PopoverContentComponent } from 'ngx-smart-popover';
 
 @Component({
   selector: 'jeecomment-enter-comment-content',
@@ -51,6 +51,14 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
   filesUrl: any[];
   filesName: string[] = [];
   inputTextArea: string;
+  reg = /@\w*(\.[A-Za-z]\w*)|\@[A-Za-z]\w*/gm;
+  @ViewChild('myPopover') myPopover: PopoverContentComponent;
+  selected: any[] = [];
+  it: any = {};
+  CommentTemp: string = '';
+  index: number = -1;
+  @ViewChild('txtarea') txtarea: ElementRef;
+  listUser: UserCommentInfo[] = [];
 
   private _isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   get isLoading$() {
@@ -66,6 +74,37 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
     this.isClickIconEmoji = false;
     this.showSpanCancelFocus = false;
     this.showSpanCancelNoFocus = false;
+    this.listUser = this.service.lstUser;
+  }
+
+  getKeyword() {
+    let i = this.CommentTemp.lastIndexOf('@');
+    if (i >= 0) {
+      let temp = this.CommentTemp.slice(i);
+      if (temp.includes('  ')) {
+        return '';
+      }
+      return this.CommentTemp.slice(i).replace('@', '');
+    }
+    return '';
+  }
+
+  getListTagUser(chuoi, array) {
+    var arr = [];
+    var user = [];
+    chuoi.split(' ').forEach((element) => {
+      if (element[0] == '@') {
+        user.push(element);
+      }
+    });
+    user = Array.from(new Set(user));
+    user.forEach((element) => {
+      var x = array.find((x) => x.username == element.substr(1));
+      if (x) {
+        arr.push(x);
+      }
+    });
+    return arr;
   }
 
   ngAfterViewInit(): void {
@@ -89,6 +128,9 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
     this.imagesUrl = this.commentModelDto.Attachs.Images;
     this.videosUrl = this.commentModelDto.Attachs.Videos;
     this.filesUrl = this.commentModelDto.Attachs.Files;
+    this.commentModelDto.Attachs.Files.forEach((file) => {
+      this.filesName.push(file.split('/')[file.split('/').length - 1]);
+    });
     this.isEdit$
       .pipe(
         tap((res) => {
@@ -102,24 +144,29 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
     this.isFocus$.next(true);
   }
 
-  @ViewChild('txtarea') element: ElementRef;
   FocusTextarea() {
-    this.element.nativeElement.focus();
+    this.txtarea.nativeElement.focus();
+  }
+
+  getContent($event) {
+    console.log($event.target.innerHTML);
   }
 
   validateCommentAndPost() {
-    if (!this._isLoading$.value) {
-      const model = this.prepareComment();
-      if (this.checkCommentIsEqualEmpty(model)) {
-        return;
-      }
-      if (this.isEdit$.value) {
-        this.updateComment(model);
-        this.isEdit$.next(false);
-      } else {
-        this.postComment(model);
-      }
-    }
+    console.log(this.txtarea.nativeElement);
+    this.pasteHtmlAtCaret('<span class="text-normal">random</span>&#8203;', this.txtarea.nativeElement);
+    // if (!this._isLoading$.value) {
+    //   const model = this.prepareComment();
+    //   if (this.checkCommentIsEqualEmpty(model)) {
+    //     return;
+    //   }
+    //   if (this.isEdit$.value) {
+    //     this.updateComment(model);
+    //     this.isEdit$.next(false);
+    //   } else {
+    //     this.postComment(model);
+    //   }
+    // }
   }
 
   prepareComment(): PostCommentModel {
@@ -141,7 +188,6 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
       const base64 = fileUrl.split(',')[1];
       model.Attachs.Files.push(base64);
     });
-
     return model;
   }
 
@@ -159,7 +205,6 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
       object.Attachs.Videos.length === otherObject.Attachs.Videos.length
     )
       checkList = true;
-
     if (checkValue && checkList) return true;
     return false;
   }
@@ -213,12 +258,26 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
   }
 
   onKeydown($event) {
-    if (($event.ctrlKey && $event.keyCode == 13) || ($event.altKey && $event.keyCode == 13)) {
-      this.inputTextArea = this.inputTextArea + '\n';
-    } else if ($event.keyCode == 13) {
-      $event.preventDefault();
+    let data = this.txtarea.nativeElement.innerHTML;
+
+    var match = data.match(this.reg);
+
+    if (match) {
     }
+    console.log('match', match);
+
+    //  check cancel keyword
+    if (data)
+      if (($event.ctrlKey && $event.keyCode == 13) || ($event.altKey && $event.keyCode == 13)) {
+        this.inputTextArea = this.inputTextArea + '\n';
+      } else if ($event.keyCode == 13) {
+        $event.preventDefault();
+      }
     this.focusFunction();
+  }
+
+  checkUser(text, value) {
+    return text.search('@' + value.hoten);
   }
 
   toggleEmojiPicker() {
@@ -227,8 +286,8 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
   }
 
   addEmoji(event) {
-    const data = this.inputTextArea + `${event.emoji.native}`;
-    this.inputTextArea = data;
+    const data = this.txtarea.nativeElement.innerHTML + `${event.emoji.native}`;
+    this.txtarea.nativeElement.innerHTML = data;
     this.showPopupEmoji = false;
   }
 
@@ -369,6 +428,94 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
     } else {
       this.showPopupEmoji = false;
       this.isClickIconEmoji = false;
+    }
+  }
+
+  ItemSelected(data) {
+    this.selected.push(data);
+    let i = this.CommentTemp.lastIndexOf('@');
+    this.CommentTemp = this.CommentTemp.substr(0, i) + '@' + data.hoten + '  ';
+    //this.myPopover.hide();
+    let ele = <HTMLInputElement>this.txtarea.nativeElement;
+    // if (this.index >= 0) {
+    //   ele = <HTMLInputElement>document.getElementById('CommentRep' + this.index);
+    // }
+    ele.value = this.CommentTemp;
+    this.inputTextArea = this.CommentTemp;
+    ele.focus();
+    this.cd.detectChanges();
+  }
+
+  setEndOfContenteditable(contentEditableElement) {
+    var range, selection;
+    range = document.createRange();
+    range.selectNodeContents(contentEditableElement);
+    range.collapse(false);
+    selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+
+  elementContainsSelection(el) {
+    var sel;
+    if (window.getSelection) {
+      sel = window.getSelection();
+      if (sel.rangeCount > 0) {
+        for (var i = 0; i < sel.rangeCount; ++i) {
+          if (!this.isOrContains(sel.getRangeAt(i).commonAncestorContainer, el)) {
+            return false;
+          }
+        }
+        return true;
+      }
+    } else if ((sel = document.getSelection()) && sel.type != 'Control') {
+      return this.isOrContains(sel.createRange().parentElement(), el);
+    }
+    return false;
+  }
+
+  isOrContains(node, container) {
+    while (node) {
+      if (node === container) {
+        return true;
+      }
+      node = node.parentNode;
+    }
+    return false;
+  }
+
+  pasteHtmlAtCaret(html, el) {
+    var sel, range;
+    if (window.getSelection) {
+      sel = window.getSelection();
+      if (this.elementContainsSelection(el)) {
+        if (sel.getRangeAt && sel.rangeCount) {
+          range = sel.getRangeAt(0);
+          range.deleteContents();
+
+          let el = document.createElement('div');
+          el.innerHTML = html;
+          var frag = document.createDocumentFragment(),
+            node,
+            lastNode;
+          while ((node = el.firstChild)) {
+            lastNode = frag.appendChild(node);
+          }
+          range.insertNode(frag);
+
+          // Preserve the selection
+          if (lastNode) {
+            range = range.cloneRange();
+            range.setStartAfter(lastNode);
+            range.collapse(false);
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
+        }
+      } else {
+        this.setEndOfContenteditable(el);
+        this.pasteHtmlAtCaret(html, el);
+      }
     }
   }
 }

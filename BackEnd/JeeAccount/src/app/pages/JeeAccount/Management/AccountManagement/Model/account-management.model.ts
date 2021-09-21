@@ -6,6 +6,7 @@ export class AccountManagementDTO {
   CustomerID: number;
   PhoneNumber: string;
   Email: string;
+  re;
   Jobtitle: string;
   JobtitleID: number;
   NgaySinh: string;

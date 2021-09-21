@@ -51,6 +51,19 @@ export class PostCommentModel {
   }
 }
 
+export class Attach {
+  Images: string[];
+  Files: string[];
+  Videos: string[];
+  FileNames: string[];
+  constructor() {
+    this.Images = [];
+    this.Files = [];
+    this.Videos = [];
+    this.FileNames = [];
+  }
+}
+
 export class ReactionCommentModel {
   TopicCommentID: string;
   CommentID: string;
@@ -63,19 +76,6 @@ export class ReactionCommentModel {
     this.ReplyCommentID = '';
     this.UserReaction = '';
     this.UserOldReaction = '';
-  }
-}
-
-export class Attach {
-  Images: string[];
-  Files: string[];
-  Videos: string[];
-  FileNames: string[];
-  constructor() {
-    this.Images = [];
-    this.Files = [];
-    this.Videos = [];
-    this.FileNames = [];
   }
 }
 
@@ -97,13 +97,16 @@ export class Reaction {
 }
 
 export class UserCommentInfo {
+  UserId: number;
   Username: string;
   FullName: string;
   Jobtitle: string;
   AvartarImgURL: string;
   PhoneNumber: string;
   Email: string;
-  Display: string;
+  Display: string = '';
+  FirstName: string;
+  BgColor: string;
 }
 
 export class QueryFilterComment {

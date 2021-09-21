@@ -146,25 +146,6 @@ $background-comment: white;
   padding-left: 10px;
 }
 
-.textarea-input {
-  font-weight: 400;
-  width: 100%;
-  resize: none;
-  border: none;
-  width: 100%;
-  height: 100%;
-  display: block;
-  border: 0;
-  box-sizing: border-box;
-  box-shadow: none;
-  outline: none;
-  overflow: hidden;
-  background-color: $hover-color;
-  flex-grow: 1;
-  flex-shrink: 1;
-  text-overflow: ellipsis;
-}
-
 .comment-icon {
   direction: ltr;
   display: flex;

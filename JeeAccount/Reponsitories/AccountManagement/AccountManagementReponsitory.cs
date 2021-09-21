@@ -506,6 +506,42 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null) and IsAdmin
             }
         }
 
+        public IEnumerable<AppListDTO> GetListAppByCustomerID(long customerID)
+        {
+            DataTable dt = new DataTable();
+            SqlConditions Conds = new SqlConditions();
+            Conds.Add("CustomerID", customerID);
+
+            string sql = @"select AppList.*, SoLuongNhanSu, Customer_App.IsDefaultApply from AppList
+                            join Customer_App on Customer_App.AppID = AppList.AppID
+                            where CustomerID = @CustomerID order by Position  ";
+
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                dt = cnn.CreateDataTable(sql, Conds);
+                var result = dt.AsEnumerable().Select(row => new AppListDTO
+                {
+                    AppID = Int32.Parse(row["AppID"].ToString()),
+                    APIUrl = row["APIUrl"].ToString(),
+                    AppCode = row["AppCode"].ToString(),
+                    AppName = row["AppName"].ToString(),
+                    BackendURL = row["BackendURL"].ToString(),
+                    CurrentVersion = row["CurrentVersion"].ToString(),
+                    Description = row["Description"].ToString(),
+                    LastUpdate = row["LastUpdate"].ToString(),
+                    Note = row["Note"].ToString(),
+                    ReleaseDate = row["ReleaseDate"].ToString(),
+                    SoLuongNhanSu = Convert.ToInt32(row["SoLuongNhanSu"]),
+                    IsShowApp = Convert.ToBoolean(row["IsShowApp"]),
+                    IsDefaultApp = Convert.ToBoolean((bool)row["IsDefaultApply"]),
+                    Icon = row["Icon"].ToString(),
+                    Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
+                });
+
+                return result;
+            }
+        }
+
         public async Task<IEnumerable<UserNameDTO>> GetListUsernameByAppcodeAsync(long custormerID, string appcode)
         {
             DataTable dt = new DataTable();
@@ -763,6 +799,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                     val.Add("FirstName", FirstName);
                     val.Add("LastName", Lastname);
                 }
+                if (string.IsNullOrEmpty(account.Password)) val.Add("Password", account.Password);
                 if (account.Username is not null) val.Add("Username", account.Username);
                 if (account.DepartmemtID != 0) val.Add("DepartmentID", account.DepartmemtID);
                 if (!string.IsNullOrEmpty(account.Departmemt) && isJeeHR)
@@ -998,11 +1035,10 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                 if (IsAdmin)
                 {
                     val.Add("IsAdmin", 1);
-
-                } else
+                }
+                else
                 {
                     val.Add("IsAdmin", 0);
-
                 }
                 val.Add("Disable", 0);
                 val.Add("IsActive", 1);
@@ -1045,52 +1081,6 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                 {
                     throw cnn.LastError;
                 }
-            }
-        }
-
-        public List<int> GetAppIdByAppCode(DpsConnection cnn, List<string> AppCode)
-        {
-            List<int> appid = new List<int>();
-            foreach (string code in AppCode)
-            {
-                var id = cnn.ExecuteScalar($"select AppId from AppList where AppCode = '{code}'");
-                appid.Add(Int32.Parse(id.ToString()));
-            }
-            return appid;
-        }
-
-        public async Task<IEnumerable<AppListDTO>> GetListInfoAppByCustomerIDAsync(long customerID)
-        {
-            DataTable dt = new DataTable();
-            SqlConditions Conds = new SqlConditions();
-            Conds.Add("CustomerID", customerID);
-
-            string sql = @"select AppList.*,  Customer_App.IsDefaultApply from AppList
-                        join Customer_App on Customer_App.AppID = AppList.AppID
-                        where CustomerID = @CustomerID";
-
-            using (DpsConnection cnn = new DpsConnection(_connectionString))
-            {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
-                var result = dt.AsEnumerable().Select(row => new AppListDTO
-                {
-                    AppID = Int32.Parse(row["AppID"].ToString()),
-                    APIUrl = row["APIUrl"].ToString(),
-                    AppCode = row["AppCode"].ToString(),
-                    AppName = row["AppName"].ToString(),
-                    BackendURL = row["BackendURL"].ToString(),
-                    CurrentVersion = row["CurrentVersion"].ToString(),
-                    Description = row["Description"].ToString(),
-                    LastUpdate = row["LastUpdate"].ToString(),
-                    Note = row["Note"].ToString(),
-                    ReleaseDate = row["ReleaseDate"].ToString(),
-                    IsDefaultApp = Convert.ToBoolean((bool)row["IsDefaultApply"]),
-                    Icon = row["Icon"].ToString(),
-                    Position = string.IsNullOrEmpty(row["Position"].ToString()) ? 0 : Int32.Parse(row["Position"].ToString()),
-                    IsShowApp = Convert.ToBoolean(row["IsShowApp"])
-                });
-
-                return result;
             }
         }
 

@@ -91,4 +91,25 @@ namespace JeeAccount.Models
         [JsonProperty("staffID")]
         public long StaffID { get; set; } = 0;
     }
+
+    public class ObjectUserme
+    {
+        [JsonProperty("user")]
+        public User user { get; set; }
+
+        [JsonProperty("access_token")]
+        public string access_token { get; set; }
+
+        [JsonProperty("refresh_token")]
+        public string refresh_token { get; set; }
+    }
+
+    public class ObjectLogin
+    {
+        [JsonProperty("access_token")]
+        public string access_token { get; set; }
+
+        [JsonProperty("refresh_token")]
+        public string refresh_token { get; set; }
+    }
 }

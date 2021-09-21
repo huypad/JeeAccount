@@ -1,6 +1,6 @@
 $color-x-button: black;
 $color-hover-x-button: #1ebcc5;
-
+$hover-color: #f2f2f2;
 .enter-post-comment {
   padding-right: 16px;
 }
@@ -108,4 +108,21 @@ $color-hover-x-button: #1ebcc5;
 
 .textarea-input {
   margin: 0;
+  font-weight: 400;
+  width: 100%;
+  resize: none;
+  border: none;
+  height: 100%;
+  display: block;
+  border: 0;
+  box-sizing: border-box;
+  box-shadow: none;
+  outline: none;
+  overflow: hidden;
+  background-color: $hover-color;
+}
+
+.text-normal {
+  font-weight: 500;
+  color: red;
 }

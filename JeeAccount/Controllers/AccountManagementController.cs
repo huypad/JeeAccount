@@ -23,6 +23,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using static JeeAccount.Models.Common.Panigator;
+using static JeeCustomer.ConsumerKafka.AccountConsumerController;
 
 namespace JeeAccount.Controllers
 {
@@ -580,6 +581,7 @@ namespace JeeAccount.Controllers
                 {
                     return JsonResultCommon.BatBuoc("Thông tin đăng nhập CustomData");
                 }
+                if (objCustomData.fieldValue.Equals("jee-account")) return JsonResultCommon.ThatBai("Bạn không có quyền update field jee-account");
                 var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
                 var update = await _service.UppdateCustomData(token, objCustomData, customData.JeeAccount.CustomerID);
                 if (update.data is null)

@@ -354,8 +354,8 @@ namespace JeeAccount.Services.AccountManagementService
             var listAppCode = account.AppCode.ToList();
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                if (IsExistUsernameCnn(cnn, account.Username, customerID)) throw new TrungDuLieuExceoption("Username");
-                if (!string.IsNullOrEmpty(account.ImageAvatar) && !isJeeHR) account.ImageAvatar = UpdateAvatar(account.Username, account.ImageAvatar);
+                if (GeneralReponsitory.IsExistUsernameCnn(cnn, account.Username, customerID)) throw new TrungDuLieuExceoption("Username");
+                if (!string.IsNullOrEmpty(account.ImageAvatar) && !isJeeHR) account.ImageAvatar = GeneralReponsitory.UpdateAvatar(account.Username, account.ImageAvatar, _configuration, HOST_MINIOSERVER, customerID);
                 try
                 {
                     cnn.BeginTransaction();
@@ -368,7 +368,7 @@ namespace JeeAccount.Services.AccountManagementService
                         account.AppID.RemoveAt(index);
                     }
                     _reponsitory.InsertAppCodeAccount(cnn, account.Userid, account.AppID, usernameCreatedBy, false);
-                    var identity = InitIdentityServerUserModel(customerID, account);
+                    var identity = GeneralReponsitory.InitIdentityServerUserModel(customerID, account);
                     string userId = identity.customData.JeeAccount.UserID.ToString();
                     var createUser = await identityServerController.addNewUser(identity, Admin_accessToken);
                     if (!createUser.IsSuccessStatusCode)
@@ -507,40 +507,6 @@ namespace JeeAccount.Services.AccountManagementService
             return lst;
         }
 
-        private IdentityServerAddNewUser InitIdentityServerUserModel(long customerID, AccountManagementModel account)
-        {
-            IdentityServerAddNewUser identity = new IdentityServerAddNewUser();
-            identity.username = account.Username;
-            identity.password = account.Password;
-            CustomData customData = new CustomData();
-            PersonalInfoCustomData personalInfo = new PersonalInfoCustomData();
-            personalInfo.Name = GeneralService.GetFirstname(account.Fullname);
-            personalInfo.Avatar = account.ImageAvatar;
-            personalInfo.Departmemt = account.Departmemt;
-            personalInfo.Fullname = account.Fullname;
-            personalInfo.Jobtitle = account.Jobtitle;
-            personalInfo.Birthday = account.Birthday;
-            personalInfo.Phonenumber = account.Phonemumber;
-            personalInfo.DepartmemtID = account.DepartmemtID.ToString();
-            personalInfo.Email = account.Email;
-            personalInfo.Departmemt = account.Departmemt;
-            personalInfo.Jobtitle = account.Jobtitle;
-            personalInfo.JobtitleID = account.JobtitleID.ToString();
-            personalInfo.Structure = "";
-            personalInfo.StructureID = account.cocauid.ToString();
-            personalInfo.ChucvuID = account.chucvuid.ToString();
-            personalInfo.BgColor = GeneralService.GetColorNameUser(GeneralService.GetFirstname(account.Fullname));
-            JeeAccountCustomDataModel jee = new JeeAccountCustomDataModel();
-            jee.AppCode = account.AppCode;
-            jee.CustomerID = customerID;
-            jee.UserID = account.Userid;
-            jee.StaffID = account.StaffID;
-            customData.JeeAccount = jee;
-            customData.PersonalInfo = personalInfo;
-            identity.customData = customData;
-            return identity;
-        }
-
         public async Task<IdentityServerReturn> UpdatePersonalInfoCustomData(string Admin_access_token, PersonalInfoCustomData personalInfoCustom, long userId, long customerId)
         {
             using (DpsConnection cnn = new DpsConnection(_connectionString))
@@ -622,7 +588,7 @@ namespace JeeAccount.Services.AccountManagementService
             var identity = new IdentityServerController();
             try
             {
-                string avatar = UpdateAvatar(Username, base64);
+                string avatar = GeneralReponsitory.UpdateAvatar(Username, base64, _configuration, HOST_MINIOSERVER, CustomerID);
 
                 _reponsitory.UpdateAvatar(avatar, UserId, CustomerID);
                 var personal = GeneralReponsitory.GetPersonalInfoCustomData(UserId, CustomerID, _connectionString);
@@ -684,48 +650,6 @@ namespace JeeAccount.Services.AccountManagementService
             {
                 throw new Exception($"{model.Userid}-{model.Username}-{ex.Message}");
             }
-        }
-
-        public string UpdateAvatar(string username, string base64)
-        {
-            try
-            {
-                var linkAvatar = "";
-                upLoadFileModel up = new upLoadFileModel()
-                {
-                    bs = Convert.FromBase64String(base64),
-                    FileName = $"{username}.png",
-                    Linkfile = $"images/avatars"
-                };
-                var upload = UploadFile.UploadFileAllTypeMinio(up, _configuration, "image/png");
-                if (upload.status)
-                {
-                    linkAvatar = $"https://{HOST_MINIOSERVER}{upload.link}";
-                }
-                else
-                {
-                    throw new Exception("Cập nhật avatar Cdn thất bại");
-                }
-                return linkAvatar;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        private bool IsExistUsernameCnn(DpsConnection cnn, string username, long customerid = 0)
-        {
-            string sql = "";
-            if (customerid != 0)
-            {
-                sql = $"select Username from AccountList where Username = '{username}' and CustomerID = {customerid}";
-            }
-            else
-            {
-                sql = $"select Username from AccountList where Username = '{username}'";
-            }
-            return GeneralReponsitory.IsExistCnn(sql, cnn);
         }
 
         public async Task<IEnumerable<CheckEditAppListByDTO>> GetEditListAppByUserIDByListCustomerId(long userid, long customerid)

@@ -101,7 +101,7 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
             {
                 #region val data
 
-                if (customerModel.RowID != 0) val.Add("RowID", customerModel.RowID);
+                val.Add("RowID", customerModel.RowID);
                 val.Add("Code", customerModel.Code);
                 val.Add("CompanyName", customerModel.CompanyName);
                 val.Add("RegisterName", customerModel.RegisterName);
@@ -112,7 +112,7 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
                 {
                     val.Add("Note", customerModel.Note);
                 }
-                string username = customerModel.Code + ".admin";
+                string username = customerModel.Username;
                 val.Add("Gender", customerModel.Gender);
                 val.Add("RegisterDate", DateTime.Now.ToUniversalTime());
 

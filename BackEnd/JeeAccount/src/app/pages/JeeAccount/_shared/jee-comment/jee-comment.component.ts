@@ -281,11 +281,13 @@ export class JeeCommentComponent implements OnInit {
 
   showAllComment() {
     this.item.ViewLengthComment = this.item.TotalLengthComment;
+    this.labelFilterComment = this.translate.instant('JEECOMMENT.TOANBOBINHLUAN');
     this.getShowTopic();
   }
 
   showNewComment() {
     this.item.ViewLengthComment = this.currentLengthViewComment;
+    this.labelFilterComment = this.translate.instant('JEECOMMENT.BINHLUANMOINHAT');
     this.getShowTopic();
   }
 }

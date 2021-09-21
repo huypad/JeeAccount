@@ -1,5 +1,6 @@
 ﻿using JeeAccount.Models.JeeHR;
 using Newtonsoft.Json;
+using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +35,20 @@ namespace JeeAccount.Controllers
                 var res = JsonConvert.DeserializeObject<ReturnJeeHR<NhanVienJeeHR>>(returnValue);
                 return res;
             }
+        }
+
+        public List<NhanVienJeeHR> GetDSNhanVienNotAysnc(string access_token)
+        {
+            string url = $"{_HOST_API_JEEHR}/{GET_DSNHANVIEN}";
+
+            var client = new RestClient(url);
+            var request = new RestRequest(Method.GET);
+
+            request.AddHeader("Authorization", access_token);
+            IRestResponse response = client.Execute(request);
+            var res = JsonConvert.DeserializeObject<ReturnJeeHR<NhanVienJeeHR>>(response.Content);
+            if (res.status == 0) throw new Exception("Trong kafka không thể lấy được danh sách nhân viên JeeHR");
+            return res.data;
         }
 
         public async Task<ReturnJeeHR<NhanVienDuocQuanLyTrucTiep>> GetDSNhanVienTheoQuanLyTrucTiep(string access_token, long staffiD)

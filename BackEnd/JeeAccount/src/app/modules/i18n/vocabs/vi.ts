@@ -246,7 +246,7 @@ export const locale = {
       BINHLUAN: 'Bình luận',
       CHIASE: 'Chia sẻ',
       KHONGHOPLE: 'Comment không hợp lệ hoặc đã bị xoá, vui lòng thử lại sau.',
-      BINHLUANMOINHAT: 'Bình luận mới nhất',
+      BINHLUANMOINHAT: 'Bình luận gần đây nhất',
     },
   },
 };

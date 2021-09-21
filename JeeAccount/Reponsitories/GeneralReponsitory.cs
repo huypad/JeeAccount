@@ -1,4 +1,5 @@
-﻿using DpsLibs.Data;
+﻿using DPSinfra.UploadFile;
+using DpsLibs.Data;
 using JeeAccount.Classes;
 using JeeAccount.Controllers;
 using JeeAccount.Models;
@@ -6,6 +7,7 @@ using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.Common;
 using JeeAccount.Models.JeeHR;
 using JeeAccount.Services;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -481,6 +483,10 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID where Acco
                 var commonInfo = GetCommonInfo(connectionString, UserID);
                 var appCodes = GetListAppByUserID(connectionString, commonInfo.UserID, commonInfo.CustomerID, true);
                 var appCodesName = appCodes.Select(x => x.AppCode).ToList();
+                if (appCodes.Count() == 0)
+                {
+                    throw new Exception("List App Code không có dữ liệu");
+                }
                 var objCustom = new ObjCustomData();
                 objCustom.userId = commonInfo.UserID;
                 objCustom.updateField = "jee-account";
@@ -534,7 +540,23 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID where Acco
             }
         }
 
-        public static string IDENT_CURRENTCnn(string Tablename, DpsConnection cnn)
+        public static void RemovePassword(string connectionString, long UserID)
+        {
+            Hashtable val = new Hashtable();
+            val.Add("Password", DBNull.Value);
+            SqlConditions conditions = new SqlConditions();
+            conditions.Add("UserID", UserID);
+            using (DpsConnection cnn = new DpsConnection(connectionString))
+            {
+                int x = cnn.Update(val, conditions, "AccountList");
+                if (x <= 0)
+                {
+                    throw cnn.LastError;
+                }
+            }
+        }
+
+        public static string Current_IdentityTableCnn(string Tablename, DpsConnection cnn)
         {
             try
             {
@@ -770,7 +792,7 @@ join AppList on AppList.AppID = Account_App.AppID";
                     val.Add("Disable", 1);
                     val.Add("IsActive", 0);
                     val.Add("InActiveDate", DateTime.Now.ToUniversalTime());
-                    val.Add("InActiveBy", "kafkajeehr");
+                    val.Add("InActiveBy", 0);
 
                     int x = cnn.Update(val, Conds2, "Account_App");
                     if (x <= 0)
@@ -790,6 +812,82 @@ join AppList on AppList.AppID = Account_App.AppID";
                     return x.ToString();
                 return "";
             }
+        }
+
+        public static bool IsExistUsernameCnn(DpsConnection cnn, string username, long customerid = 0)
+        {
+            string sql = "";
+            if (customerid != 0)
+            {
+                sql = $"select Username from AccountList where Username = '{username}' and CustomerID = {customerid}";
+            }
+            else
+            {
+                sql = $"select Username from AccountList where Username = '{username}'";
+            }
+            return IsExistCnn(sql, cnn);
+        }
+
+        public static string UpdateAvatar(string username, string base64, IConfiguration configuration, string HOST_MINIOSERVER, long CustomerID)
+        {
+            try
+            {
+                var linkAvatar = "";
+                upLoadFileModel up = new upLoadFileModel()
+                {
+                    bs = Convert.FromBase64String(base64),
+                    FileName = $"{username}.png",
+                    Linkfile = $"{CustomerID}/images/avatars"
+                };
+                var upload = UploadFile.UploadFileAllTypeMinio(up, configuration, "image/png");
+                if (upload.status)
+                {
+                    linkAvatar = $"https://{HOST_MINIOSERVER}{upload.link}";
+                }
+                else
+                {
+                    throw new Exception("Cập nhật avatar Cdn thất bại");
+                }
+                return linkAvatar;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public static IdentityServerAddNewUser InitIdentityServerUserModel(long customerID, AccountManagementModel account)
+        {
+            IdentityServerAddNewUser identity = new IdentityServerAddNewUser();
+            identity.username = account.Username;
+            identity.password = account.Password;
+            CustomData customData = new CustomData();
+            PersonalInfoCustomData personalInfo = new PersonalInfoCustomData();
+            personalInfo.Name = GeneralService.GetFirstname(account.Fullname);
+            personalInfo.Avatar = account.ImageAvatar;
+            personalInfo.Departmemt = account.Departmemt;
+            personalInfo.Fullname = account.Fullname;
+            personalInfo.Jobtitle = account.Jobtitle;
+            personalInfo.Birthday = account.Birthday;
+            personalInfo.Phonenumber = account.Phonemumber;
+            personalInfo.DepartmemtID = account.DepartmemtID.ToString();
+            personalInfo.Email = account.Email;
+            personalInfo.Departmemt = account.Departmemt;
+            personalInfo.Jobtitle = account.Jobtitle;
+            personalInfo.JobtitleID = account.JobtitleID.ToString();
+            personalInfo.Structure = "";
+            personalInfo.StructureID = account.cocauid.ToString();
+            personalInfo.ChucvuID = account.chucvuid.ToString();
+            personalInfo.BgColor = GeneralService.GetColorNameUser(GeneralService.GetFirstname(account.Fullname));
+            JeeAccountCustomDataModel jee = new JeeAccountCustomDataModel();
+            jee.AppCode = account.AppCode;
+            jee.CustomerID = customerID;
+            jee.UserID = account.Userid;
+            jee.StaffID = account.StaffID;
+            customData.JeeAccount = jee;
+            customData.PersonalInfo = personalInfo;
+            identity.customData = customData;
+            return identity;
         }
     }
 }
