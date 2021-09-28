@@ -20,9 +20,9 @@ import { PickerModule } from '@ctrl/ngx-emoji-mart';
 import { JeeCommentEnterCommentContentComponent } from './enter-comment-content/enter-comment-content.component';
 import { ClickOutsideDirective } from './enter-comment-content/click-outside.directive';
 import { MatMenuModule } from '@angular/material/menu';
-import { PopoverModule } from 'ngx-smart-popover';
 import { TagCommentShowComponent } from './tag-comment-show/tag-comment-show.component';
 import { EmojiModule } from '@ctrl/ngx-emoji-mart/ngx-emoji';
+
 @NgModule({
   declarations: [
     JeeCommentComponent,
@@ -46,7 +46,6 @@ import { EmojiModule } from '@ctrl/ngx-emoji-mart/ngx-emoji';
     PickerModule,
     MatMenuModule,
     TranslationModule,
-    PopoverModule,
     AvatarModule,
     ReactiveFormsModule,
     EmojiModule,

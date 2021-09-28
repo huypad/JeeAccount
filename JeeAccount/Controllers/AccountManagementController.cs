@@ -1307,5 +1307,24 @@ namespace JeeAccount.Controllers
                 return BadRequest(MessageReturnHelper.Exception(ex));
             }
         }*/
+
+        [HttpPost("testkafkajeehr")]
+        public async Task<IActionResult> testkafkajeehr()
+        {
+            try
+            {
+                var identity = new IdentityServerController();
+                var lstCustomer = GeneralReponsitory.GetLstCustomerid(_connectionString);
+                var lstAppCode = GeneralReponsitory.GetListAppByUserID(_connectionString, 77111, 25, true).Select(item => item.AppCode);
+                var objectCustomerJeeHR = identity.JeeAccountCustomData(lstAppCode.ToList(), 77111, 25, 2316);
+                var res = await identity.UpdateCustomDataInternal(GeneralService.GetInternalToken(_config), "huytran", objectCustomerJeeHR);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
     }
 }

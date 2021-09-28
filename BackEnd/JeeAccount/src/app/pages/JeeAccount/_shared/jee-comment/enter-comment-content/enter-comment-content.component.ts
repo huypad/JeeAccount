@@ -1,6 +1,6 @@
 import { CommentDTO, UserCommentInfo } from './../jee-comment.model';
 import { catchError, takeUntil, tap } from 'rxjs/operators';
-import { of, Subject, BehaviorSubject } from 'rxjs';
+import { of, Subject, BehaviorSubject, Observable } from 'rxjs';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -16,7 +16,6 @@ import {
 } from '@angular/core';
 import { JeeCommentService } from '../jee-comment.service';
 import { PostCommentModel } from '../jee-comment.model';
-import { PopoverContentComponent } from 'ngx-smart-popover';
 
 @Component({
   selector: 'jeecomment-enter-comment-content',
@@ -51,15 +50,20 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
   filesUrl: any[];
   filesName: string[] = [];
   inputTextArea: string;
-  reg = /@\w*(\.[A-Za-z]\w*)|\@[A-Za-z]\w*/gm;
-  @ViewChild('myPopover') myPopover: PopoverContentComponent;
-  selected: any[] = [];
-  it: any = {};
-  CommentTemp: string = '';
-  index: number = -1;
-  @ViewChild('txtarea') txtarea: ElementRef;
-  listUser: UserCommentInfo[] = [];
 
+  subjectSreachTag = new BehaviorSubject<string>('');
+  sreachTag$: Observable<string> = this.subjectSreachTag.asObservable();
+  @ViewChild('txtarea') txtarea: ElementRef;
+
+  //tag zone
+  reg =
+    /@\w*(\.[A-Za-záàạãảâẩấầẫậăặắằẳôốồộổỗõỏòóọủũụùủúỉìịỉíĩơởỡờớợđêểềểệễÁÀẠÃẢÂẨẤẪẬẨẦẪĂẶẲẴẶẮÔỐỒỘỔỖÕÒÓỌỎÚÙŨỦỤỦỈÌỊÍỈĨƠỞỠỢỚỜÊỂỀỆỄEẾĐ_ ]*$\w*)|\@[A-Za-záàạãảâẩấầẫậăặắằẳôốồộổỗõỏòóọủũụùủúỉìịỉíĩơởỡờớợđêểềểệễÁÀẠÃẢÂẨẤẪẬẨẦẪĂẶẲẴẶẮÔỐỒỘỔỖÕÒÓỌỎÚÙŨỦỤỦỈÌỊÍỈĨƠỞỠỢỚỜÊỂỀỆỄEẾĐ_ ]*$\w*/gm;
+
+  @ViewChild('tagcommentshow') tagcommentshow: ElementRef;
+  private _matchReg: string[] = [];
+  private _inputTemporary: string = '';
+  private _posCursorInTextarea: number = 0;
+  private _currentPosCursorInTextarea: number = 0;
   private _isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   get isLoading$() {
     return this._isLoading$.asObservable();
@@ -74,37 +78,6 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
     this.isClickIconEmoji = false;
     this.showSpanCancelFocus = false;
     this.showSpanCancelNoFocus = false;
-    this.listUser = this.service.lstUser;
-  }
-
-  getKeyword() {
-    let i = this.CommentTemp.lastIndexOf('@');
-    if (i >= 0) {
-      let temp = this.CommentTemp.slice(i);
-      if (temp.includes('  ')) {
-        return '';
-      }
-      return this.CommentTemp.slice(i).replace('@', '');
-    }
-    return '';
-  }
-
-  getListTagUser(chuoi, array) {
-    var arr = [];
-    var user = [];
-    chuoi.split(' ').forEach((element) => {
-      if (element[0] == '@') {
-        user.push(element);
-      }
-    });
-    user = Array.from(new Set(user));
-    user.forEach((element) => {
-      var x = array.find((x) => x.username == element.substr(1));
-      if (x) {
-        arr.push(x);
-      }
-    });
-    return arr;
   }
 
   ngAfterViewInit(): void {
@@ -121,6 +94,8 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
         takeUntil(this.onDestroy)
       )
       .subscribe();
+
+    this.hideCommentTag();
   }
 
   initData() {
@@ -153,20 +128,18 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
   }
 
   validateCommentAndPost() {
-    console.log(this.txtarea.nativeElement);
-    this.pasteHtmlAtCaret('<span class="text-normal">random</span>&#8203;', this.txtarea.nativeElement);
-    // if (!this._isLoading$.value) {
-    //   const model = this.prepareComment();
-    //   if (this.checkCommentIsEqualEmpty(model)) {
-    //     return;
-    //   }
-    //   if (this.isEdit$.value) {
-    //     this.updateComment(model);
-    //     this.isEdit$.next(false);
-    //   } else {
-    //     this.postComment(model);
-    //   }
-    // }
+    if (!this._isLoading$.value) {
+      const model = this.prepareComment();
+      if (this.checkCommentIsEqualEmpty(model)) {
+        return;
+      }
+      if (this.isEdit$.value) {
+        this.updateComment(model);
+        this.isEdit$.next(false);
+      } else {
+        this.postComment(model);
+      }
+    }
   }
 
   prepareComment(): PostCommentModel {
@@ -258,26 +231,37 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
   }
 
   onKeydown($event) {
-    let data = this.txtarea.nativeElement.innerHTML;
+    // tag zone
+    this._currentPosCursorInTextarea = $event.target.selectionStart;
+    console.log('this._currentPosCursorInTextarea', this._currentPosCursorInTextarea);
+    if (this._posCursorInTextarea > this._currentPosCursorInTextarea) this._posCursorInTextarea = this._currentPosCursorInTextarea;
+    console.log('this._posCursorInTextarea', this._posCursorInTextarea);
+    console.log('this.inputTextArea', this.inputTextArea);
+    console.log('this.inputTextArealength', this.inputTextArea.length);
 
-    var match = data.match(this.reg);
-
-    if (match) {
+    let input = this.inputTextArea.substr(this._posCursorInTextarea, this.inputTextArea.length - this._posCursorInTextarea);
+    console.log('input', input);
+    this._matchReg = input.match(this.reg);
+    if (this._matchReg) {
+      this.splitMatchAndSreachTagUser(this._matchReg);
+      this.showCommentTag();
+    } else {
+      this.hideCommentTag();
     }
-    console.log('match', match);
-
     //  check cancel keyword
-    if (data)
-      if (($event.ctrlKey && $event.keyCode == 13) || ($event.altKey && $event.keyCode == 13)) {
-        this.inputTextArea = this.inputTextArea + '\n';
-      } else if ($event.keyCode == 13) {
-        $event.preventDefault();
-      }
+    if (($event.ctrlKey && $event.keyCode == 13) || ($event.altKey && $event.keyCode == 13)) {
+      this.inputTextArea = this.inputTextArea + '\n';
+    } else if ($event.keyCode == 13) {
+      $event.preventDefault();
+    }
     this.focusFunction();
   }
 
-  checkUser(text, value) {
-    return text.search('@' + value.hoten);
+  splitMatchAndSreachTagUser(match: string[]) {
+    if (match != null && match.length > 0) {
+      let tagValue = match[length - 1].split('@')[1];
+      this.subjectSreachTag.next(tagValue);
+    }
   }
 
   toggleEmojiPicker() {
@@ -315,6 +299,7 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
       this.cd.detectChanges();
     };
   }
+
   addImage(item) {
     let reader = new FileReader();
     reader.readAsDataURL(item);
@@ -323,6 +308,7 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
       this.cd.detectChanges();
     };
   }
+
   addVideo(item) {
     let reader = new FileReader();
     reader.readAsDataURL(item);
@@ -331,6 +317,7 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
       this.cd.detectChanges();
     };
   }
+
   getExtension(filename: string) {
     var parts = filename.split('.');
     return parts[parts.length - 1];
@@ -431,91 +418,21 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
     }
   }
 
-  ItemSelected(data) {
-    this.selected.push(data);
-    let i = this.CommentTemp.lastIndexOf('@');
-    this.CommentTemp = this.CommentTemp.substr(0, i) + '@' + data.hoten + '  ';
-    //this.myPopover.hide();
-    let ele = <HTMLInputElement>this.txtarea.nativeElement;
-    // if (this.index >= 0) {
-    //   ele = <HTMLInputElement>document.getElementById('CommentRep' + this.index);
-    // }
-    ele.value = this.CommentTemp;
-    this.inputTextArea = this.CommentTemp;
-    ele.focus();
+  ItemSelected(user: UserCommentInfo) {
+    this.hideCommentTag();
+    let i = this.inputTextArea.lastIndexOf('@');
+    this.inputTextArea = this.inputTextArea.substr(0, i) + '@' + '' + user.FullName + ' ';
+    this._posCursorInTextarea = this.inputTextArea.length;
+    this.txtarea.nativeElement.focus();
     this.cd.detectChanges();
   }
 
-  setEndOfContenteditable(contentEditableElement) {
-    var range, selection;
-    range = document.createRange();
-    range.selectNodeContents(contentEditableElement);
-    range.collapse(false);
-    selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
+  showCommentTag() {
+    this.tagcommentshow.nativeElement.style.display = 'block';
   }
 
-  elementContainsSelection(el) {
-    var sel;
-    if (window.getSelection) {
-      sel = window.getSelection();
-      if (sel.rangeCount > 0) {
-        for (var i = 0; i < sel.rangeCount; ++i) {
-          if (!this.isOrContains(sel.getRangeAt(i).commonAncestorContainer, el)) {
-            return false;
-          }
-        }
-        return true;
-      }
-    } else if ((sel = document.getSelection()) && sel.type != 'Control') {
-      return this.isOrContains(sel.createRange().parentElement(), el);
-    }
-    return false;
-  }
-
-  isOrContains(node, container) {
-    while (node) {
-      if (node === container) {
-        return true;
-      }
-      node = node.parentNode;
-    }
-    return false;
-  }
-
-  pasteHtmlAtCaret(html, el) {
-    var sel, range;
-    if (window.getSelection) {
-      sel = window.getSelection();
-      if (this.elementContainsSelection(el)) {
-        if (sel.getRangeAt && sel.rangeCount) {
-          range = sel.getRangeAt(0);
-          range.deleteContents();
-
-          let el = document.createElement('div');
-          el.innerHTML = html;
-          var frag = document.createDocumentFragment(),
-            node,
-            lastNode;
-          while ((node = el.firstChild)) {
-            lastNode = frag.appendChild(node);
-          }
-          range.insertNode(frag);
-
-          // Preserve the selection
-          if (lastNode) {
-            range = range.cloneRange();
-            range.setStartAfter(lastNode);
-            range.collapse(false);
-            sel.removeAllRanges();
-            sel.addRange(range);
-          }
-        }
-      } else {
-        this.setEndOfContenteditable(el);
-        this.pasteHtmlAtCaret(html, el);
-      }
-    }
+  hideCommentTag() {
+    this.tagcommentshow.nativeElement.style.display = 'none';
+    //this.subjectLstUser.next(this.service.lstUser);
   }
 }

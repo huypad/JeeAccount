@@ -2,8 +2,11 @@
   margin: 0;
   background-color: white;
   z-index: 99;
-  border: 1px solid white;
+  --tw-border-opacity: 1;
+  border: 2px solid;
+  border-color: rgba(209, 213, 219, var(--tw-border-opacity));
   border-radius: 18px;
+  padding: 2px;
 }
 
 .choose-users-box {
@@ -13,7 +16,7 @@
 
   .users-container {
     max-height: 260px;
-    overflow-y: hidden;
+    overflow-y: auto;
     z-index: 99;
 
     .user-item {

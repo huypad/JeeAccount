@@ -2,8 +2,8 @@
   <div class="users-container">
     <div class="user-item" (click)="select(user)" *ngFor="let user of listUser">
       <div class="align-items-center d-flex">
-        <ngx-avatar [size]="30" src="{{ user.image }}" *ngIf="user.image; else bindText"></ngx-avatar>
-        <ng-template #bindText>
+        <ngx-avatar [size]="30" src="{{ user.AvartarImgURL }}" *ngIf="user.AvartarImgURL; else elsAvatar"></ngx-avatar>
+        <ng-template #elsAvatar>
           <ngx-avatar [textSizeRatio]="2.5" [size]="30" bgColor="{{ user.BgColor }}" [name]="user.FirstName"></ngx-avatar>
         </ng-template>
       </div>

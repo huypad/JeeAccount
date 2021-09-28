@@ -131,6 +131,7 @@ export class JeeCommentService {
               // init main User Login
               if (usernamelogin === item.Username) this._mainUser$.next(item);
             });
+            this._lstUser.sort((a, b) => a.FullName.localeCompare(b.FullName));
           } else {
             this._errorMessage$.next(res.error.message);
             return of();

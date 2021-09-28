@@ -126,3 +126,14 @@ $hover-color: #f2f2f2;
   font-weight: 500;
   color: red;
 }
+
+.comment-zone {
+  position: relative;
+}
+
+.tag-comment-show {
+  position: absolute;
+  left: 50%;
+  margin-left: -134px;
+  bottom: 55px;
+}
