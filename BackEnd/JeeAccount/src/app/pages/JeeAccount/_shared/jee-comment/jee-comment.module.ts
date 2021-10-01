@@ -22,6 +22,8 @@ import { ClickOutsideDirective } from './enter-comment-content/click-outside.dir
 import { MatMenuModule } from '@angular/material/menu';
 import { TagCommentShowComponent } from './tag-comment-show/tag-comment-show.component';
 import { EmojiModule } from '@ctrl/ngx-emoji-mart/ngx-emoji';
+import { JeecommentPopoverDirective } from './bottom-info-reaction-comment-show/jeecomment-popover.directive';
+import { BottomInfoReactionCommentShowComponent } from './bottom-info-reaction-comment-show/bottom-info-reaction-comment-show.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +34,8 @@ import { EmojiModule } from '@ctrl/ngx-emoji-mart/ngx-emoji';
     JeeCommentReactionShowComponent,
     ClickOutsideDirective,
     TagCommentShowComponent,
+    JeecommentPopoverDirective,
+    BottomInfoReactionCommentShowComponent,
   ],
   imports: [
     CommonModule,
@@ -57,6 +61,7 @@ import { EmojiModule } from '@ctrl/ngx-emoji-mart/ngx-emoji';
     JeeCommentReactionContentComponent,
     JeeCommentReactionShowComponent,
     TagCommentShowComponent,
+    BottomInfoReactionCommentShowComponent,
   ],
   exports: [
     JeeCommentComponent,

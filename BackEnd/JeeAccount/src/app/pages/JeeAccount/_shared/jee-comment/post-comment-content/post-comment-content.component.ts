@@ -18,6 +18,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { DeleteEntityDialogComponent } from '../../delete-entity-dialog/delete-entity-dialog.component';
 import { LayoutUtilsService, MessageType } from '../../../_core/utils/layout-utils.service';
 import { MatDialog } from '@angular/material/dialog';
+import { AuthService } from 'src/app/modules/auth';
 
 @Component({
   selector: 'jeecomment-post-comment-content',
@@ -65,7 +66,8 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
     private elementRef: ElementRef,
     private translate: TranslateService,
     public dialog: MatDialog,
-    private layoutUtilsService: LayoutUtilsService
+    private layoutUtilsService: LayoutUtilsService,
+    private _auth: AuthService
   ) {}
 
   ngOnInit() {
@@ -286,5 +288,20 @@ export class JeeCommentPostContentComponent implements OnInit, OnDestroy {
     const rect = this.elementRef.nativeElement.getBoundingClientRect();
     const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
     return isVisible;
+  }
+
+  isShowEdit(username: string): boolean {
+    let mainUsername = this._auth.getAuthFromLocalStorage()['user']['username'];
+    if (username === mainUsername) {
+      return true;
+    }
+    return false;
+  }
+
+  mouseEnterReactionCommentShow(event) {
+    console.log('okela');
+  }
+  mouseLeaveReactionCommentShow(event) {
+    console.log('huhu');
   }
 }

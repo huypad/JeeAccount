@@ -24,16 +24,12 @@ export class CommentDTO {
   TotalLengthReaction: number;
   MostLengthReaction: number[];
   MostTypeReaction: string[];
+  Tag: TagComment[] = [];
 }
 
-export class TopicCommnet {
-  Id: string;
-  Comments: Comment[];
-
-  constructor() {
-    this.Id = '';
-    this.Comments = [];
-  }
+export class TagComment {
+  Display: string;
+  Username: string;
 }
 
 export class PostCommentModel {
@@ -42,12 +38,14 @@ export class PostCommentModel {
   ReplyCommentID: string;
   Text: string;
   Attachs: Attach;
+  Tag: TagComment[];
   constructor() {
     this.TopicCommentID = '';
     this.CommentID = '';
     this.ReplyCommentID = '';
     this.Text = '';
     this.Attachs = new Attach();
+    this.Tag = [];
   }
 }
 

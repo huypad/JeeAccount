@@ -25,6 +25,10 @@ export class JeeCommentService {
     return this._mainUser$.asObservable();
   }
 
+  get mainUser() {
+    return this._mainUser$.value;
+  }
+
   get lstUser() {
     return this._lstUser;
   }
@@ -204,4 +208,7 @@ export class JeeCommentService {
       headers: httpHeaders,
     });
   }
+
+  // hàm notify
+  public notifyComment(item: any) {}
 }

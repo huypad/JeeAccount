@@ -1,4 +1,4 @@
-import { CommentDTO, UserCommentInfo } from './../jee-comment.model';
+import { CommentDTO, UserCommentInfo, TagComment } from './../jee-comment.model';
 import { catchError, takeUntil, tap } from 'rxjs/operators';
 import { of, Subject, BehaviorSubject, Observable } from 'rxjs';
 import {
@@ -61,10 +61,11 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
 
   @ViewChild('tagcommentshow') tagcommentshow: ElementRef;
   private _matchReg: string[] = [];
-  private _inputTemporary: string = '';
   private _posCursorInTextarea: number = 0;
   private _currentPosCursorInTextarea: number = 0;
   private _isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private _lstTag: TagComment[] = [];
+
   get isLoading$() {
     return this._isLoading$.asObservable();
   }
@@ -100,6 +101,8 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
 
   initData() {
     this.inputTextArea = this.commentModelDto.Text;
+    this._currentPosCursorInTextarea = this.inputTextArea.length - 1;
+    this._posCursorInTextarea = this.inputTextArea.length - 1;
     this.imagesUrl = this.commentModelDto.Attachs.Images;
     this.videosUrl = this.commentModelDto.Attachs.Videos;
     this.filesUrl = this.commentModelDto.Attachs.Files;
@@ -148,6 +151,7 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
     model.CommentID = this.commentID ? this.commentID : '';
     model.ReplyCommentID = this.replyCommentID ? this.replyCommentID : '';
     model.Text = this.inputTextArea;
+    model.Tag = this.getTagFromInput(model.Text);
     model.Attachs.FileNames = this.filesName;
     this.imagesUrl.forEach((imageUrl) => {
       const base64 = imageUrl.split(',')[1];
@@ -162,6 +166,15 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
       model.Attachs.Files.push(base64);
     });
     return model;
+  }
+
+  getTagFromInput(input: string) {
+    var lstTag = [];
+    this._lstTag.forEach((element) => {
+      if (input.search('@' + element.Display) >= 0) lstTag.push(element);
+    });
+    console.log(this._lstTag);
+    return lstTag;
   }
 
   checkCommentIsEqualEmpty(model: PostCommentModel): boolean {
@@ -212,7 +225,10 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
       .postCommentModel(model)
       .pipe(
         tap(
-          (res) => {},
+          (res) => {
+            // TODO: viết api notify trong này
+            this.service.notifyComment(model);
+          },
           catchError((err) => {
             console.log(err);
             return of();
@@ -233,14 +249,8 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
   onKeydown($event) {
     // tag zone
     this._currentPosCursorInTextarea = $event.target.selectionStart;
-    console.log('this._currentPosCursorInTextarea', this._currentPosCursorInTextarea);
     if (this._posCursorInTextarea > this._currentPosCursorInTextarea) this._posCursorInTextarea = this._currentPosCursorInTextarea;
-    console.log('this._posCursorInTextarea', this._posCursorInTextarea);
-    console.log('this.inputTextArea', this.inputTextArea);
-    console.log('this.inputTextArealength', this.inputTextArea.length);
-
     let input = this.inputTextArea.substr(this._posCursorInTextarea, this.inputTextArea.length - this._posCursorInTextarea);
-    console.log('input', input);
     this._matchReg = input.match(this.reg);
     if (this._matchReg) {
       this.splitMatchAndSreachTagUser(this._matchReg);
@@ -259,7 +269,7 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
 
   splitMatchAndSreachTagUser(match: string[]) {
     if (match != null && match.length > 0) {
-      let tagValue = match[length - 1].split('@')[1];
+      let tagValue = match[match.length - 1].split('@')[1];
       this.subjectSreachTag.next(tagValue);
     }
   }
@@ -379,6 +389,7 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
     this.filesName = [];
     this.showSpanCancelFocus = false;
     this.showSpanCancelNoFocus = false;
+    this.hideCommentTag();
     this.isEdit$.next(false);
     this.cd.detectChanges();
   }
@@ -399,6 +410,9 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
     } else {
       this.showSpanCancelNoFocus = false;
     }
+    setTimeout(() => {
+      this.hideCommentTag();
+    }, 100);
   }
 
   checkValueExistCommentModel(): boolean {
@@ -421,9 +435,13 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
   ItemSelected(user: UserCommentInfo) {
     this.hideCommentTag();
     let i = this.inputTextArea.lastIndexOf('@');
-    this.inputTextArea = this.inputTextArea.substr(0, i) + '@' + '' + user.FullName + ' ';
+    this.inputTextArea = this.inputTextArea.substr(0, i) + '@' + user.FullName + ' ';
     this._posCursorInTextarea = this.inputTextArea.length;
     this.txtarea.nativeElement.focus();
+    var tag = new TagComment();
+    tag.Display = user.FullName;
+    tag.Username = user.Username;
+    this._lstTag.push(tag);
     this.cd.detectChanges();
   }
 
@@ -433,6 +451,5 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
 
   hideCommentTag() {
     this.tagcommentshow.nativeElement.style.display = 'none';
-    //this.subjectLstUser.next(this.service.lstUser);
   }
 }

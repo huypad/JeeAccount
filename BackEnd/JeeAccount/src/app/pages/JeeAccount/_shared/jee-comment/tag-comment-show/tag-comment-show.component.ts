@@ -28,13 +28,10 @@ export class TagCommentShowComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.listUser = this.service.lstUser;
-
     const sb = this.sreach$.subscribe((res) => {
       let input = res.toLowerCase();
       if (input) {
-        console.log(input);
         const data = this.listUser.slice().filter((val) => val.FullName.toLowerCase().indexOf(res) >= 0);
-        console.log('data', data);
         if (data.length > 0) {
           this.listUser = data;
         } else {

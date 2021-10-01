@@ -19,12 +19,14 @@
                 *ngIf="comment.Attachs.Images.length == 0 && comment.Attachs.Videos.length === 0"
               >
                 <jeecomment-reaction-comment-show
+                  (mouseenter)="mouseEnterReactionCommentShow($event)"
+                  (mouseleave)="mouseLeaveReactionCommentShow($event)"
                   [isDeteachChange$]="isDeteachChangeComment$"
                   [comment]="comment"
                 ></jeecomment-reaction-comment-show>
               </div>
             </div>
-            <div class="icon-edit-report" [matMenuTriggerFor]="menu">
+            <div class="icon-edit-report" [matMenuTriggerFor]="menu" *ngIf="isShowEdit(comment.Username)">
               <span>
                 <div class="hover-icon" tabindex="0">
                   <span class="show-when-hover">
@@ -58,6 +60,7 @@
                 *ngIf="comment.Attachs.Images.length > 0 && comment.Attachs.Videos.length === 0"
               >
                 <jeecomment-reaction-comment-show
+                  jeecommentPopover="hello word!"
                   [isDeteachChange$]="isDeteachChangeComment$"
                   [comment]="comment"
                 ></jeecomment-reaction-comment-show>
@@ -69,6 +72,7 @@
               </video>
               <div class="post-comment-reaction-show show-video" *ngIf="comment.Attachs.Videos.length > 0">
                 <jeecomment-reaction-comment-show
+                  jeecommentPopover="hello word!"
                   [isDeteachChange$]="isDeteachChangeComment$"
                   [comment]="comment"
                 ></jeecomment-reaction-comment-show>
