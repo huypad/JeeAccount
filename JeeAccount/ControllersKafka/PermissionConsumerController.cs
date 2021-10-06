@@ -26,6 +26,7 @@ namespace JeeAccount.ControllersKafka
         private Consumer _consumer;
         private IProducer _producer;
         private readonly ILogger<PermissionConsumerController> _logger;
+        private readonly string _connectionString;
 
         public PermissionConsumerController(IConfiguration config, IProducer producer, ILogger<PermissionConsumerController> logger)
         {
@@ -33,6 +34,7 @@ namespace JeeAccount.ControllersKafka
             _consumer = new Consumer(_config, _config.GetValue<string>("KafkaConfig:Consumer:JeeAccountGroup"));
             _producer = producer;
             _logger = logger;
+            _connectionString = _config.GetValue<string>("AppConfig:Connection");
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -54,7 +56,7 @@ namespace JeeAccount.ControllersKafka
             try
             {
                 var obj = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomData>(value);
-                var objRemove = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomDataRoles>(value);
+                var objRemove = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomJeeHRDataRoles>(value);
                 string username = GeneralReponsitory.GetObjectDB($"select Username from AccountList where UserID = {obj.userId}", _config.GetValue<string>("AppConfig:Connection"));
                 if (!string.IsNullOrEmpty(username))
                 {
@@ -63,25 +65,26 @@ namespace JeeAccount.ControllersKafka
                 }
                 if (obj.updateField.Equals("jee-hr", StringComparison.OrdinalIgnoreCase))
                 {
-                    var fieldvalue_json = JsonConvert.SerializeObject(obj.fieldValue);
+                    var objJeeHR = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomJeeHRDataRoles>(value);
 
-                    var staffID = JsonConvert.DeserializeObject<FindStaffID>(fieldvalue_json);
-
-                    if (staffID.staffID > 0)
+                    if (objJeeHR.fieldValue != null)
                     {
-                        GeneralReponsitory.SaveStaffID(staffID.staffID, obj.userId, _config.GetValue<string>("AppConfig:Connection"));
-                    }
+                        if (objJeeHR.fieldValue.staffID > 0)
+                        {
+                            GeneralReponsitory.SaveStaffID(objJeeHR.fieldValue.staffID, obj.userId, _connectionString);
+                        }
 
-                    if (string.IsNullOrEmpty(objRemove.fieldValue.roles))
-                    {
-                        GeneralReponsitory.RemoveAppCodeJeeHRKafka(_config.GetValue<string>("AppConfig:Connection"), obj.userId);
-                    }
-                    else
-                    {
-                        GeneralReponsitory.InsertAppCodeJeeHRKafka(_config.GetValue<string>("AppConfig:Connection"), obj.userId);
-                    }
+                        if (string.IsNullOrEmpty(objJeeHR.fieldValue.roles))
+                        {
+                            GeneralReponsitory.RemoveAppCodeJeeHRKafka(_connectionString, obj.userId);
+                        }
+                        else
+                        {
+                            GeneralReponsitory.InsertAppCodeJeeHRKafka(_connectionString, obj.userId);
+                        }
 
-                    _ = GeneralReponsitory.UpdateJeeAccountCustomDataByInputApiModel(obj.userId, _config.GetValue<string>("AppConfig:Connection"), GeneralService.GetInternalToken(_config));
+                        _ = GeneralReponsitory.UpdateJeeAccountCustomDataByInputApiModel(obj.userId, _connectionString, GeneralService.GetInternalToken(_config));
+                    }
                 }
             }
             catch (Exception ex)
