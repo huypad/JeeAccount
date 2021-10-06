@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -74,28 +75,28 @@ namespace JeeCustomer.ConsumerKafka
                     var identity = new IdentityServerController();
                     _ = identity.UppdateCustomDataInternal(GeneralService.GetInternalToken(_config), username, obj);
                 }
-                var objRemove = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomDataRoles>(value);
                 if (obj.updateField.Equals("jee-hr", StringComparison.OrdinalIgnoreCase))
                 {
-                    var fieldvalue_json = JsonConvert.SerializeObject(obj.fieldValue);
+                    var objJeeHR = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomJeeHRDataRoles>(value);
 
-                    var staffID = JsonConvert.DeserializeObject<FindStaffID>(fieldvalue_json);
-
-                    if (staffID.staffID > 0)
+                    if (objJeeHR.fieldValue != null)
                     {
-                        GeneralReponsitory.SaveStaffID(staffID.staffID, obj.userId, _connectionString);
-                    }
+                        if (objJeeHR.fieldValue.staffID > 0)
+                        {
+                            GeneralReponsitory.SaveStaffID(objJeeHR.fieldValue.staffID, obj.userId, _connectionString);
+                        }
 
-                    if (string.IsNullOrEmpty(objRemove.fieldValue.roles))
-                    {
-                        GeneralReponsitory.RemoveAppCodeJeeHRKafka(_connectionString, obj.userId);
-                    }
-                    else
-                    {
-                        GeneralReponsitory.InsertAppCodeJeeHRKafka(_connectionString, obj.userId);
-                    }
+                        if (string.IsNullOrEmpty(objJeeHR.fieldValue.roles))
+                        {
+                            GeneralReponsitory.RemoveAppCodeJeeHRKafka(_connectionString, obj.userId);
+                        }
+                        else
+                        {
+                            GeneralReponsitory.InsertAppCodeJeeHRKafka(_connectionString, obj.userId);
+                        }
 
-                    _ = GeneralReponsitory.UpdateJeeAccountCustomDataByInputApiModel(obj.userId, _connectionString, GeneralService.GetInternalToken(_config));
+                        _ = GeneralReponsitory.UpdateJeeAccountCustomDataByInputApiModel(obj.userId, _connectionString, GeneralService.GetInternalToken(_config));
+                    }
 
                     string _password = GeneralReponsitory.GetObjectDB($"select Password from AccountList where UserID = {obj.userId}", _connectionString).Trim();
                     if (!string.IsNullOrEmpty(_password))

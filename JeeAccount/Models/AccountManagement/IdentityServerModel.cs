@@ -159,7 +159,7 @@ namespace JeeAccount.Models
         public object fieldValue { get; set; }
     }
 
-    public class ObjCustomDataRoles
+    public class ObjCustomJeeHRDataRoles
     {
         [JsonProperty("userId")]
         public long userId { get; set; }
@@ -173,6 +173,7 @@ namespace JeeAccount.Models
 
     public class fieldValueRoles
     {
-        public string roles { get; set; }
+        public string roles { get; set; } = "";
+        public long staffID { get; set; } = 0;
     }
 }
