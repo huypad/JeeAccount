@@ -67,7 +67,19 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
                     Hashtable val = new Hashtable();
                     val.Add("CustomerID", CustomerID);
                     val.Add("AppID", customerModel.AppID[index]);
-                    if (customerModel.CurrentDBID[index] != -1) val.Add("DatabaseID", customerModel.CurrentDBID[index]);
+                    if (customerModel.CurrentDBID[index] != -1)
+                    {
+                        val.Add("DatabaseID", customerModel.CurrentDBID[index]);
+                    }
+                    else
+                    {
+                        string sqlCurrentDB = $"select CurrentDatabaseID from AppList where AppID = {customerModel.AppID[index]}";
+                        var dt = cnn.CreateDataTable(sqlCurrentDB);
+                        if (dt.Rows[0]["CurrentDatabaseID"] != DBNull.Value)
+                        {
+                            val.Add("DatabaseID", Int32.Parse(dt.Rows[0]["CurrentDatabaseID"].ToString()));
+                        }
+                    }
                     val.Add("StartDate", start);
                     val.Add("CreatedDate", DateTime.Now.ToUniversalTime());
                     val.Add("CreatedBy", 0);
@@ -86,12 +98,12 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
                         return new ReturnSqlModel(cnn.LastError.ToString(), Constant.ERRORCODE_EXCEPTION);
                     }
                 }
+                return new ReturnSqlModel();
             }
             catch (Exception ex)
             {
                 return new ReturnSqlModel(ex.Message, Constant.ERRORCODE_EXCEPTION);
             }
-            return new ReturnSqlModel();
         }
 
         public ReturnSqlModel CreateCustomer(DpsConnection cnn, CustomerModel customerModel)
