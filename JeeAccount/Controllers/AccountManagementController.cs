@@ -1265,37 +1265,37 @@ namespace JeeAccount.Controllers
             }
         }
 
-        /*
         [HttpPost("testkafkajeehr")]
         public async Task<IActionResult> testkafkajeehr()
         {
             try
             {
                 var appcode = new List<string>();
+                var lstPakage = new List<int>();
                 appcode.Add("JeeHR");
                 var objHR = new
                 {
-                    CustomerID = 27,
+                    CustomerID = 123124,
                     AppCode = appcode,
-                    UserID = 78232,
-                    Username = "admin_tt",
+                    UserID = 79268,
+                    Username = "demo.admin",
                     IsInitial = true,
                     IsAdmin = true,
                     customerModel = new
                     {
-                        Code = "tt",
-                        RegisterDate = "21/09/2021",
+                        Code = "demo",
+                        RegisterDate = "01/10/2021",
                         DeadlineDate = "",
                         PakageID = 4,
-                        CompanyName = "Công ty Cổ Phần Tín Tốc",
-                        Address = "32 Lê Lai, Phường 4, Quận Gò Vấp",
-                        Phone = "0965729799",
+                        CompanyName = "Công ty TNHH ABC",
+                        Address = "66 Trần Tấn",
+                        Phone = "09030612461",
                         Note = "",
-                        Nguoidaidien = "Bùi Thành Lộc",
-                        CustomerID = 27,
-                        UsernameAdmin = "admin_tt",
-                        PasswordAdmin = "@admintt",
-                        Email = "",
+                        Nguoidaidien = "Hồ Văn Lực",
+                        CustomerID = 123124,
+                        UsernameAdmin = "demo.admin",
+                        PasswordAdmin = "Demo!983!",
+                        Email = "hovanluc@gmail.com",
                     }
                 };
                 await _producer.PublishAsync(_config.GetValue<string>("KafkaConfig:TopicProduce:JeeplatformInitialization"), JsonConvert.SerializeObject(objHR));
@@ -1306,25 +1306,32 @@ namespace JeeAccount.Controllers
             {
                 return BadRequest(MessageReturnHelper.Exception(ex));
             }
-        }*/
+        }
 
+        /*
         [HttpPost("testkafkajeehr")]
         public async Task<IActionResult> testkafkajeehr()
         {
             try
             {
                 var identity = new IdentityServerController();
-                var lstCustomer = GeneralReponsitory.GetLstCustomerid(_connectionString);
-                var lstAppCode = GeneralReponsitory.GetListAppByUserID(_connectionString, 77111, 25, true).Select(item => item.AppCode);
-                var objectCustomerJeeHR = identity.JeeAccountCustomData(lstAppCode.ToList(), 77111, 25, 2316);
-                var res = await identity.UpdateCustomDataInternal(GeneralService.GetInternalToken(_config), "huytran", objectCustomerJeeHR);
+                var customerid = 1119;
+                var lstAppCode = await _service.GetListAppByCustomerIDAsync(customerid);
+                var lstAppId = lstAppCode.Select(item => item.AppID);
+                var lstAPpString = lstAppCode.Select(item => item.AppCode);
+                var lstUSer = GeneralReponsitory.GetLstUserIDByCustomerid(_connectionString, customerid);
+                foreach (var userid in lstUSer)
+                {
+                    var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, userid);
+                    var objectCustomerJeeHR = identity.JeeAccountCustomData(lstAPpString.ToList(), commonInfo.UserID, commonInfo.CustomerID, commonInfo.StaffID);
+                    var res = await identity.UpdateCustomDataInternal(GeneralService.GetInternalToken(_config), commonInfo.Username, objectCustomerJeeHR);
+                }
 
                 return Ok();
             }
             catch (Exception ex)
             {
                 return BadRequest(MessageReturnHelper.Exception(ex));
-            }
-        }
+            }*/
     }
 }

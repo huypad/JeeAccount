@@ -9,5 +9,7 @@ namespace JeeAccount.Reponsitories.DatabaseManagement
     public interface IDatabaseManagementRepositoty
     {
         DatabaseListDTO GetDBByCustomerIDAppCode(long customerID, string appCode);
+
+        IEnumerable<DatabaseDTO> GetDBDatabaseDTO();
     }
 }

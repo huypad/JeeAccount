@@ -41,5 +41,23 @@ where DatabaseList.AppCode = '{appCode}' and Customer_App.CustomerID = @Customer
                 }).SingleOrDefault();
             }
         }
+
+        public IEnumerable<DatabaseDTO> GetDBDatabaseDTO()
+        {
+            DataTable dt = new DataTable();
+            string sql = "select * from DatabaseList";
+
+            using (DpsConnection cnn = new DpsConnection(_connectionString))
+            {
+                dt = cnn.CreateDataTable(sql);
+                return dt.AsEnumerable().Select(row => new DatabaseDTO
+                {
+                    AppCode = row["AppCode"].ToString(),
+                    Title = row["Title"].ToString(),
+                    AppID = int.Parse(row["AppID"].ToString()),
+                    RowID = int.Parse(row["RowID"].ToString())
+                });
+            }
+        }
     }
 }

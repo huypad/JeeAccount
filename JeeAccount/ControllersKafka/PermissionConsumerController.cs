@@ -71,7 +71,7 @@ namespace JeeAccount.ControllersKafka
                     {
                         if (objJeeHR.fieldValue.staffID > 0)
                         {
-                            GeneralReponsitory.SaveStaffID(objJeeHR.fieldValue.staffID, obj.userId, _connectionString);
+                            GeneralReponsitory.SaveStaffID(obj.userId, objJeeHR.fieldValue.staffID, _connectionString);
                         }
 
                         if (string.IsNullOrEmpty(objJeeHR.fieldValue.roles))

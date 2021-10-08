@@ -700,6 +700,11 @@ namespace JeeAccount.Services.AccountManagementService
             }
         }
 
+        public void InsertAppCodeAccount(DpsConnection cnn, long UserID, List<int> AppID, string createdBy, bool IsAdmin = false)
+        {
+            _reponsitory.InsertAppCodeAccount(cnn, UserID, AppID, createdBy, IsAdmin);
+        }
+
         #endregion api new
     }
 }

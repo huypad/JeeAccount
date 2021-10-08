@@ -20,5 +20,10 @@ namespace JeeAccount.Services.DatabaseManagementService
         {
             return databaseManagementRepositoty.GetDBByCustomerIDAppCode(CustomerID, appCode);
         }
+
+        public IEnumerable<DatabaseDTO> GetDBDatabaseDTO()
+        {
+            return databaseManagementRepositoty.GetDBDatabaseDTO();
+        }
     }
 }

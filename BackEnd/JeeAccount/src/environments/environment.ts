@@ -9,7 +9,7 @@ export const environment = {
   APPCODE_LANDING: 'LANDING',
   APPCONFIG_SSO: 'sso_token',
   HOST_SOCKET: 'wss://socket.jee.vn',
-  HOST_JEEACCOUNT_API: 'https://jeeaccount-api.jee.vn',
+  HOST_JEEACCOUNT_API: 'https://localhost:5001',
   HOST_IDENTITYSERVER_API: 'https://identityserver.jee.vn',
   HOST_PORTAL_API: 'https://portal.jee.vn',
   HOST_JEECOMMENT_API: 'https://jeecomment-api.jee.vn', //https://localhost:5005 https://jeecomment-api.jee.vn

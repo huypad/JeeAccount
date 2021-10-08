@@ -73,5 +73,7 @@ namespace JeeAccount.Services.AccountManagementService
         Task UpdateAccount(bool isJeeHR, string Admin_accessToken, long customerID, string usernameCreatedBy, AccountManagementModel account);
 
         Task DeleteAccountManagement(string token, string DeletedBy, long DeletedByID, long customerID, long userid);
+
+        void InsertAppCodeAccount(DpsConnection cnn, long UserID, List<int> AppID, string createdBy, bool IsAdmin = false);
     }
 }
