@@ -69,6 +69,14 @@ namespace JeeCustomer.ConsumerKafka
             try
             {
                 var obj = Newtonsoft.Json.JsonConvert.DeserializeObject<ObjCustomData>(value);
+                var traceLog = new GeneralLog()
+                {
+                    name = obj.updateField,
+                    data = value,
+                    message = _config.GetValue<string>("KafkaConfig:TopicConsume:JeeplatformInitializationAppupdate")
+                };
+                _logger.LogTrace(JsonConvert.SerializeObject(traceLog));
+
                 string username = GeneralReponsitory.GetObjectDB($"select Username from AccountList where UserID = {obj.userId}", _connectionString);
                 if (!string.IsNullOrEmpty(username))
                 {
