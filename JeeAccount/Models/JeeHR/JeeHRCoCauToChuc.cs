@@ -47,7 +47,7 @@ namespace JeeAccount.Models.JeeHR
 
     public class JeeHRChucVu
     {
-        public int ID { get; set; }
+        public string ID { get; set; }
         public string Title { get; set; }
     }
 

@@ -93,7 +93,8 @@ namespace JeeAccount.Classes
         public static JeeHRChucVuToJeeHRFromDB JeeHRChucVuToJeeHRFromDBFromJeeHRChucvu(JeeHRChucVu jeeHRChucVu)
         {
             var data = new JeeHRChucVuToJeeHRFromDB();
-            data.RowID = jeeHRChucVu.ID;
+
+            data.RowID = Int32.Parse(jeeHRChucVu.ID.Replace(".0", ""));
             data.Title = jeeHRChucVu.Title;
             return data;
         }
