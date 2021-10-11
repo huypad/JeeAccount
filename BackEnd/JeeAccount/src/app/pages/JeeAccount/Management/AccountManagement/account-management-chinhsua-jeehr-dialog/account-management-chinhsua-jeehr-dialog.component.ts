@@ -94,6 +94,8 @@ export class AccountManagementChinhSuaJeeHRDialogComponent implements OnInit, On
       .pipe(
         tap((res: ResultModel<CheckEditAppListByDTO>) => {
           if (res) {
+            const index = res.data.findIndex((item) => item.AppID === 14);
+            res.data.splice(index, 1);
             this.listApp = res.data;
             this.addCheckboxes();
             this.initItemListApp();

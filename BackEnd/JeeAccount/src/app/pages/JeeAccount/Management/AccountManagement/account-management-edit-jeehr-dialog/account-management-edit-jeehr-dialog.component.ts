@@ -92,6 +92,8 @@ export class AccountManagementEditJeeHRDialogComponent implements OnInit, OnDest
       .pipe(
         tap((res: ResultModel<AppListDTO>) => {
           if (res) {
+            const index = res.data.findIndex((item) => item.AppID === 14);
+            res.data.splice(index, 1);
             this.listApp = res.data;
             this.addCheckboxes();
           }
