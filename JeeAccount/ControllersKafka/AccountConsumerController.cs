@@ -152,7 +152,7 @@ namespace JeeCustomer.ConsumerKafka
                                     }
                                     var account = new AccountManagementModel();
                                     account.Username = item.username;
-                                    account.StaffID = item.IDNV;
+                                    account.StaffID = Int32.Parse(item.IDNV.Replace(".0", ""));
                                     account.AppCode = appCodes;
                                     account.AppID = appInts;
                                     account.Birthday = item.NgaySinh;

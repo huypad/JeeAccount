@@ -316,7 +316,7 @@ namespace JeeAccount.Reponsitories
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
                 var lst = new List<long>();
-                string sql = $"select StaffID from AccountList where CustomerID = {customerid} and AccountList.Disable = 0";
+                string sql = $"select StaffID from AccountList where CustomerID = {customerid} and AccountList.Disable = 0 and StaffID is not null";
                 DataTable dt = new DataTable();
                 dt = cnn.CreateDataTable(sql);
                 if (dt.Rows.Count == 0) return null;
@@ -331,7 +331,7 @@ namespace JeeAccount.Reponsitories
         public static List<long> GetLstStaffIDByCustomeridCnn(DpsConnection cnn, long customerid)
         {
             var lst = new List<long>();
-            string sql = $"select StaffID from AccountList where CustomerID = {customerid} and AccountList.Disable = 0";
+            string sql = $"select StaffID from AccountList where CustomerID = {customerid} and AccountList.Disable = 0 and StaffID is not null";
             DataTable dt = new DataTable();
             dt = cnn.CreateDataTable(sql);
             if (dt.Rows.Count == 0) return null;

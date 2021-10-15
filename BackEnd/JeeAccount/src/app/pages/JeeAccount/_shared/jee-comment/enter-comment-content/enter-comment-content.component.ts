@@ -280,8 +280,8 @@ export class JeeCommentEnterCommentContentComponent implements OnInit, AfterView
   }
 
   addEmoji(event) {
-    const data = this.txtarea.nativeElement.innerHTML + `${event.emoji.native}`;
-    this.txtarea.nativeElement.innerHTML = data;
+    const data = this.inputTextArea + `${event.emoji.native}`;
+    this.inputTextArea = data;
     this.showPopupEmoji = false;
   }
 

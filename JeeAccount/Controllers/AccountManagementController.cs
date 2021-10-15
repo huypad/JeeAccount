@@ -1027,9 +1027,35 @@ namespace JeeAccount.Controllers
                 }
                 var jeeHRController = new JeeHRController(HOST_JEEHR_API);
                 var lst = await jeeHRController.GetDSNhanVien(token);
-                var listStaffId = GeneralReponsitory.GetLstStaffIDByCustomerid(_connectionString, customData.JeeAccount.CustomerID);
                 if (lst.status == 0) return BadRequest(MessageReturnHelper.ErrorJeeHR(lst.error));
-                var lstData = lst.data.Where(item => !listStaffId.Contains(item.IDNV));
+
+                var newLst = new List<NhanVienJeeHRNew>();
+                foreach (var item in lst.data)
+                {
+                    var newJeehr = new NhanVienJeeHRNew();
+                    newJeehr.avatar = item.avatar;
+                    newJeehr.cmnd = item.cmnd;
+                    newJeehr.Email = item.Email;
+                    newJeehr.HoTen = item.HoTen;
+                    newJeehr.IDNV = Int32.Parse(item.IDNV.Replace(".0", ""));
+                    newJeehr.jobtitleid = Int32.Parse(item.jobtitleid.Replace(".0", ""));
+                    newJeehr.managerid = Int32.Parse(item.managerid.Replace(".0", ""));
+                    newJeehr.manager = item.manager;
+                    newJeehr.MaNV = item.MaNV;
+                    newJeehr.NgaySinh = item.NgaySinh;
+                    newJeehr.Phai = item.Phai;
+                    newJeehr.PhoneNumber = item.PhoneNumber;
+                    newJeehr.Structure = item.Structure;
+                    newJeehr.structureid = Int32.Parse(item.structureid.Replace(".0", ""));
+                    newJeehr.TenChucVu = item.TenChucVu;
+                    newJeehr.Title = item.Title;
+                    newJeehr.TuNgay = item.TuNgay;
+                    newJeehr.username = item.username;
+                    newLst.Add(newJeehr);
+                }
+
+                var listStaffId = GeneralReponsitory.GetLstStaffIDByCustomerid(_connectionString, customData.JeeAccount.CustomerID);
+                var lstData = newLst.Where(item => !listStaffId.Contains(item.IDNV));
                 return Ok(lstData);
             }
             catch (Exception ex)
@@ -1055,9 +1081,37 @@ namespace JeeAccount.Controllers
                 }
                 var jeeHRController = new JeeHRController(HOST_JEEHR_API);
                 var lst = await jeeHRController.GetDSNhanVien(token);
-                var listStaffId = GeneralReponsitory.GetLstStaffIDByCustomerid(_connectionString, customData.JeeAccount.CustomerID);
                 if (lst.status == 0) return BadRequest(MessageReturnHelper.ErrorJeeHR(lst.error));
-                var lstData = lst.data.Where(item => listStaffId.Contains(item.IDNV));
+
+                var newLst = new List<NhanVienJeeHRNew>();
+                foreach (var item in lst.data)
+                {
+                    var newJeehr = new NhanVienJeeHRNew();
+                    newJeehr.avatar = item.avatar;
+                    newJeehr.cmnd = item.cmnd;
+                    newJeehr.Email = item.Email;
+                    newJeehr.HoTen = item.HoTen;
+                    newJeehr.IDNV = Int32.Parse(item.IDNV.Replace(".0", ""));
+                    newJeehr.jobtitleid = Int32.Parse(item.jobtitleid.Replace(".0", ""));
+                    newJeehr.managerid = Int32.Parse(item.managerid.Replace(".0", ""));
+                    newJeehr.manager = item.manager;
+                    newJeehr.MaNV = item.MaNV;
+                    newJeehr.NgaySinh = item.NgaySinh;
+                    newJeehr.Phai = item.Phai;
+                    newJeehr.PhoneNumber = item.PhoneNumber;
+                    newJeehr.Structure = item.Structure;
+                    newJeehr.structureid = Int32.Parse(item.structureid.Replace(".0", ""));
+                    newJeehr.TenChucVu = item.TenChucVu;
+                    newJeehr.Title = item.Title;
+                    newJeehr.TuNgay = item.TuNgay;
+                    newJeehr.username = item.username;
+                    newLst.Add(newJeehr);
+                }
+
+                var listStaffId = GeneralReponsitory.GetLstStaffIDByCustomerid(_connectionString, customData.JeeAccount.CustomerID);
+
+                if (lst.status == 0) return BadRequest(MessageReturnHelper.ErrorJeeHR(lst.error));
+                var lstData = newLst.Where(item => listStaffId.Contains(item.IDNV));
                 return Ok(lstData);
             }
             catch (Exception ex)
