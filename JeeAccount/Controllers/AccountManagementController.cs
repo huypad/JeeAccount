@@ -1030,6 +1030,7 @@ namespace JeeAccount.Controllers
                 if (lst.status == 0) return BadRequest(MessageReturnHelper.ErrorJeeHR(lst.error));
 
                 var newLst = new List<NhanVienJeeHRNew>();
+                if (lst.data.Count == 0) return BadRequest(MessageReturnHelper.KhongCoDuLieu());
                 foreach (var item in lst.data)
                 {
                     var newJeehr = new NhanVienJeeHRNew();
@@ -1329,27 +1330,27 @@ namespace JeeAccount.Controllers
                 appcode.Add("JeeHR");
                 var objHR = new
                 {
-                    CustomerID = 123124,
+                    CustomerID = 123149,
                     AppCode = appcode,
-                    UserID = 79268,
-                    Username = "demo.admin",
+                    UserID = 79292,
+                    Username = "demo1.admin",
                     IsInitial = true,
                     IsAdmin = true,
                     customerModel = new
                     {
-                        Code = "demo",
+                        Code = "demo1",
                         RegisterDate = "01/10/2021",
                         DeadlineDate = "",
                         PakageID = 4,
-                        CompanyName = "Công ty TNHH ABC",
+                        CompanyName = "Công ty demo",
                         Address = "66 Trần Tấn",
-                        Phone = "09030612461",
+                        Phone = "0903046321",
                         Note = "",
-                        Nguoidaidien = "Hồ Văn Lực",
-                        CustomerID = 123124,
-                        UsernameAdmin = "demo.admin",
-                        PasswordAdmin = "Demo!983!",
-                        Email = "hovanluc@gmail.com",
+                        Nguoidaidien = "Nguyến Chí Sanh",
+                        CustomerID = 123149,
+                        UsernameAdmin = "demo1.admin",
+                        PasswordAdmin = "demo1@123",
+                        Email = "nguyenchisanh@gmail.com",
                     }
                 };
                 await _producer.PublishAsync(_config.GetValue<string>("KafkaConfig:TopicProduce:JeeplatformInitialization"), JsonConvert.SerializeObject(objHR));
@@ -1362,30 +1363,27 @@ namespace JeeAccount.Controllers
             }
         }
 
-        /*
-        [HttpPost("testkafkajeehr")]
-        public async Task<IActionResult> testkafkajeehr()
+        [HttpPost("updateStaffID")]
+        public async Task<IActionResult> updateStaffID()
         {
             try
             {
                 var identity = new IdentityServerController();
-                var customerid = 1119;
-                var lstAppCode = await _service.GetListAppByCustomerIDAsync(customerid);
-                var lstAppId = lstAppCode.Select(item => item.AppID);
-                var lstAPpString = lstAppCode.Select(item => item.AppCode);
-                var lstUSer = GeneralReponsitory.GetLstUserIDByCustomerid(_connectionString, customerid);
-                foreach (var userid in lstUSer)
-                {
-                    var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, userid);
-                    var objectCustomerJeeHR = identity.JeeAccountCustomData(lstAPpString.ToList(), commonInfo.UserID, commonInfo.CustomerID, commonInfo.StaffID);
-                    var res = await identity.UpdateCustomDataInternal(GeneralService.GetInternalToken(_config), commonInfo.Username, objectCustomerJeeHR);
-                }
+                long customerid = 123149;
+                long userid = 79393;
+                long staffid = 30;
+                string username = "demo1.linhnv";
+                var lstApp = GeneralReponsitory.GetListAppByUserID(_connectionString, userid, customerid);
+                var lstAppString = lstApp.Select(item => item.AppCode).ToList();
+                var objectCustomerJeeHR = identity.JeeAccountCustomData(lstAppString, userid, customerid, staffid);
+                var res = await identity.UpdateCustomDataInternal(GeneralService.GetInternalToken(_config), username, objectCustomerJeeHR);
 
-                return Ok();
+                return Ok(res.Content.ReadAsStringAsync());
             }
             catch (Exception ex)
             {
                 return BadRequest(MessageReturnHelper.Exception(ex));
-            }*/
+            }
+        }
     }
 }

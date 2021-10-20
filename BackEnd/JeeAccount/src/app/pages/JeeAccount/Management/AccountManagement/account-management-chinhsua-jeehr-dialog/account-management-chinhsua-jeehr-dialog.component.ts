@@ -291,6 +291,7 @@ export class AccountManagementChinhSuaJeeHRDialogComponent implements OnInit, On
       if (nhanvien.jobtitleid != 0) acc.Jobtitle = nhanvien.TenChucVu;
       acc.ImageAvatar = nhanvien.avatar;
       acc.Birthday = nhanvien.NgaySinh;
+      acc.StaffID = nhanvien.IDNV;
     }
     return acc;
   }
@@ -361,16 +362,8 @@ export class AccountManagementChinhSuaJeeHRDialogComponent implements OnInit, On
 
   checkDataBeforeClose(): boolean {
     const model = this.prepareDataFromFB();
-    if (this.item.Username === '') {
-      const empty = new AccountManagementModel();
-      empty.Username = `${this.CompanyCode}.`;
-      empty.AppCode = this.listApp.filter((item) => item.IsUsed).map((item) => item.AppCode);
-      empty.AppID = this.listApp.filter((item) => item.IsUsed).map((item) => item.AppID);
-      return this.danhmuc.isEqual(empty, model);
-    }
-    console.log('model', model);
-    console.log('this.item', this.item);
-    return this.danhmuc.isEqual(model, this.item);
+    if (this.item.AppID.length !== model.AppID.length || model.Username !== this.item.Username) return false;
+    return true;
   }
 
   @HostListener('window:beforeunload', ['$event'])

@@ -63,6 +63,7 @@ export class AccountManagementModel {
   AppID: number[];
   DepartmemtID: number;
   JobtitleID: number;
+  StaffID: number;
   constructor() {
     this.Fullname = '';
     this.ImageAvatar = '';
@@ -77,6 +78,7 @@ export class AccountManagementModel {
     this.AppCode = [];
     this.AppID = [];
     this.Birthday = '';
+    this.StaffID = 0;
   }
 }
 

@@ -114,12 +114,17 @@
               <span>{{ r.Jobtitle }}</span>
             </td>
             <td style="text-align: center">
-              <div style="cursor: pointer" (click)="openQuanLyTrucTiepEdit(r.Username, r.DirectManagerUsername)">
+              <ng-container *ngIf="isJeeHR; else isNotJeeHR">
                 <span *ngIf="r.DirectManager != ''">{{ r.DirectManager }}</span>
-                <span *ngIf="r.DirectManager == ''">
-                  <mat-icon>person_add</mat-icon>
-                </span>
-              </div>
+              </ng-container>
+              <ng-template #isNotJeeHR>
+                <div style="cursor: pointer" (click)="openQuanLyTrucTiepEdit(r.Username, r.DirectManagerUsername)">
+                  <span *ngIf="r.DirectManager != ''">{{ r.DirectManager }}</span>
+                  <span *ngIf="r.DirectManager == ''">
+                    <mat-icon>person_add</mat-icon>
+                  </span>
+                </div>
+              </ng-template>
             </td>
             <td style="text-align: center">
               <mat-slide-toggle (click)="changeTinhTrang(r.Username)" [checked]="r.IsActive"> </mat-slide-toggle>

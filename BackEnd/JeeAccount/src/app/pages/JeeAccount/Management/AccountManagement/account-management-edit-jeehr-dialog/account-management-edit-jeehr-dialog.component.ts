@@ -229,6 +229,7 @@ export class AccountManagementEditJeeHRDialogComponent implements OnInit, OnDest
       acc.Password = this.itemForm.controls.MatKhau.value;
       acc.ImageAvatar = nhanvien.avatar;
       acc.Birthday = nhanvien.NgaySinh;
+      acc.StaffID = nhanvien.IDNV;
     }
     return acc;
   }
