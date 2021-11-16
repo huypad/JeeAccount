@@ -7,7 +7,7 @@ pipeline {
 
         NODE_ENV = "production"
         
-        REMOTE_URL = "https://jenkins.jee.vn/view/jeeaccount/job/REMOTE%20jeeaccount%20backend/buildWithParameters"
+        REMOTE_URL = "https://jenkins.jee.vn/view/jeeaccount/job/REMOTE%20jeeaccount%20backend/build"
         REMOTE_BUILD_TOKEN = "URvfMrgfPc3TE55mTGMYc2XNffFvgYgABNwLLtesQVRdg4Y2hHypV5mKGhPqMG2F"
 
         service = ""
