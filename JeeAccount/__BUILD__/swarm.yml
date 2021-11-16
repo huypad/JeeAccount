@@ -19,6 +19,7 @@ services:
       MinioConfig__MinioServer: ${HOST_CDN}
       KafkaConfig__Brokers: ${KAFKA_BROKER}
       Host__JeeComment_API: ${HOST_JEECOMMENT_API}
+      Host__JeeHR_API: ${HOST_JEEHR_API}
       AppConfig__Connection: ${APP_CONNECTION}
       AppConfig__Secrectkey__JeeCustomer: ${APP_KEY_JEECUSTOMER}
       AppConfig__AppCode_JeeHR: ${APPCODE_JEEHR}
