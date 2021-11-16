@@ -3,6 +3,7 @@ ARG NODE_ENV
 WORKDIR /app
 COPY ./package.json ./
 COPY ./package-lock.json ./
+COPY ./dps-lib-3.1.11.tgz ./
 RUN npm install --production=false
 COPY . .
 RUN npm run build_docker --configuration=${NODE_ENV}
