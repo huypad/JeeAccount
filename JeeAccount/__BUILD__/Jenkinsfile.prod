@@ -22,7 +22,7 @@ pipeline {
         stage('Build image') {
             steps {
                 script {
-                    dir("LandingPage"){
+                    dir("JeeAccount"){
                         service = docker.build("${REGISTRY_HOST}/${REGISTRY_PUBLISHER}/${PROJECT_NAME}:latest")
                     }
                 }
