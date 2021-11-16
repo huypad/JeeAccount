@@ -1,0 +1,63 @@
+pipeline {
+    environment {
+        REGISTRY_HOST = "registry.jee.com.vn"
+        REGISTRY_PUBLISHER = "dps"
+        REGISTRY_CRED = "registry"
+        PROJECT_NAME = "jeeaccount-api"
+        DOMAIN = "jee.com.vn"
+        SUBDOMAIN = "jeeaccount-api"
+        STACK_NAME = "jeeaccount"
+
+        ASPNETCORE_ENVIRONMENT = "Staging"
+        VAULT_ENDPOINT = "http://vault:8200"
+        VAULT_TOKEN = "s.KQZZuANDstIS5wVjJjjnPJYL"
+        KAFKA_BROKER = "kafka:9999"
+        HOST_CDN = "cdn.jee.com.vn"
+        HOST_JEECOMMENT_API = "http://jeecomment_api"
+        HOST_JEEHR_API = "http://jeehr_api"
+        APP_CONNECTION = "Data Source=192.168.2.92,1433;Initial Catalog=JeeAccount;User ID=jee_account;Password=JeeLo0c@l_AccountDb"
+        APP_KEY_JEECUSTOMER = "YygaNR3BjUteGUfrbzCaS9E5PaWmmYEmC9pwULwq5gHYQ4NR2bHUMujUZAcWsk9R"
+        APPCODE_JEEHR = "JeeHR"
+
+        service = ""
+    }
+    agent any
+    stages {
+        stage('Clone repository') {
+            steps {
+                script {
+                    checkout scm
+                }
+            }
+        }
+        stage('Build image') {
+            steps {
+                script {
+                    dir("JeeAccount"){
+                        service = docker.build("${REGISTRY_HOST}/${REGISTRY_PUBLISHER}/${PROJECT_NAME}:latest")
+                    }
+                }
+            }
+        }
+        stage('Push image') {
+            steps {
+                script {
+                    docker.withRegistry("https://${REGISTRY_HOST}", REGISTRY_CRED) {
+                        service.push("latest")
+                    }
+                }
+            }
+        }
+        stage('Stack deploy') {
+            steps {
+                script {
+                    docker.withRegistry("https://${REGISTRY_HOST}", REGISTRY_CRED) {
+                        dir("JeeAccount/__BUILD__"){
+                            sh "docker stack deploy -c swarm.yml --with-registry-auth ${STACK_NAME}"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

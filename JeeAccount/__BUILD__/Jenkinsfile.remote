@@ -1,0 +1,45 @@
+pipeline {
+    environment {
+        REGISTRY_HOST = "registry.jee.vn"
+        REGISTRY_PUBLISHER = "dps"
+        REGISTRY_CRED = "registry"
+        PROJECT_NAME = "jeeaccount-api"
+        DOMAIN = "jee.vn"
+        SUBDOMAIN = "jeeaccount-api"
+        STACK_NAME = "jeeaccount"
+
+        ASPNETCORE_ENVIRONMENT = "Production"
+        VAULT_ENDPOINT = "http://vault:8200"
+        VAULT_TOKEN = "s.F2Ds4Bv6q1KxIO6uk58k9Tfu"
+        KAFKA_BROKER = "kafka1:9999,kafka2:9999,kafka3:9999"
+        HOST_CDN = "cdn.jee.vn"
+        HOST_JEECOMMENT_API = "http://jeecomment_api"
+        HOST_JEEHR_API = "http://jeehr_api"
+        APP_CONNECTION = "Data Source=192.168.199.4,1433;Initial Catalog=JeeAccount;User ID=jeeaccount;Password=@DpsJe3@cCountD\$ev@DPS"
+        APP_KEY_JEECUSTOMER = "sJoPSvHUHmbFvbzGC8Yp4LKUZtQ6M6pRalM3IST9cMJNGk2v2ZQETFJp87XNWAoQ4tUWGIRPwQRBpI1vtWSDgYfzbjXJZwNNT2PujJmP1YNznfURNRjLD10N0fx7qshYsDsk2dE49ifjJ4xnl0yOIUoOLwHf3dm9"
+        APPCODE_JEEHR = "JeeHR"
+
+        service = ""
+    }
+    agent any
+    stages {
+        stage('Clone repository') {
+            steps {
+                script {
+                    checkout scm
+                }
+            }
+        }
+        stage('Stack deploy') {
+            steps {
+                script {
+                    docker.withRegistry("https://${REGISTRY_HOST}", REGISTRY_CRED) {
+                        dir("JeeAccount/__BUILD__"){
+                            sh "docker stack deploy -c swarm.yml --with-registry-auth ${STACK_NAME}"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
