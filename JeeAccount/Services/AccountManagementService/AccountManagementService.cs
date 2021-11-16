@@ -1,4 +1,5 @@
 ﻿using DPSinfra.Kafka;
+using DPSinfra.Logger;
 using DPSinfra.UploadFile;
 using DPSinfra.Utils;
 using DpsLibs.Data;
@@ -9,6 +10,7 @@ using JeeAccount.Models.AccountManagement;
 using JeeAccount.Models.Common;
 using JeeAccount.Reponsitories;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
@@ -32,8 +34,9 @@ namespace JeeAccount.Services.AccountManagementService
         private readonly string TopicAddNewCustomerUser;
         private readonly IProducer _producer;
         private readonly string APPCODE_JEEHR;
+        private readonly ILogger<AccountManagementService> _logger;
 
-        public AccountManagementService(IAccountManagementReponsitory reponsitory, IConfiguration configuration, IProducer producer)
+        public AccountManagementService(IAccountManagementReponsitory reponsitory, IConfiguration configuration, IProducer producer, ILogger<AccountManagementService> logger)
         {
             _reponsitory = reponsitory;
             identityServerController = new IdentityServerController();
@@ -43,6 +46,8 @@ namespace JeeAccount.Services.AccountManagementService
             TopicAddNewCustomerUser = _configuration.GetValue<string>("KafkaConfig:TopicProduce:JeeplatformInitialization");
             _producer = producer;
             APPCODE_JEEHR = configuration.GetValue<string>("AppConfig:AppCode_JeeHR");
+            _logger = logger;
+
         }
 
         #region api giao diện
@@ -389,6 +394,14 @@ namespace JeeAccount.Services.AccountManagementService
                         StaffID = account.StaffID
                     };
                     await _producer.PublishAsync(TopicAddNewCustomerUser, JsonConvert.SerializeObject(obj));
+
+                    var d2 = new GeneralLog()
+                    {
+                        name = "CreateAccount",
+                        data = JsonConvert.SerializeObject(obj),
+                        message = $"Tạo account mới"
+                    };
+                    _logger.LogTrace(JsonConvert.SerializeObject(d2));
                 }
                 catch (Exception)
                 {
@@ -474,6 +487,16 @@ namespace JeeAccount.Services.AccountManagementService
                                 StaffID = account.StaffID
                             };
                             await _producer.PublishAsync(TopicAddNewCustomerUser, JsonConvert.SerializeObject(obj));
+
+
+                            var d2 = new GeneralLog()
+                            {
+                                name = "UpdateAccount",
+                                data = JsonConvert.SerializeObject(obj),
+                                message = $"Update account"
+                            };
+                            _logger.LogTrace(JsonConvert.SerializeObject(d2));
+
                         }
                         else
                         {
@@ -488,6 +511,15 @@ namespace JeeAccount.Services.AccountManagementService
                                 StaffID = account.StaffID
                             };
                             await _producer.PublishAsync(TopicAddNewCustomerUser, JsonConvert.SerializeObject(obj));
+
+
+                            var d2 = new GeneralLog()
+                            {
+                                name = "UpdateAccount",
+                                data = JsonConvert.SerializeObject(obj),
+                                message = $"Update account"
+                            };
+                            _logger.LogTrace(JsonConvert.SerializeObject(d2));
                         }
                     }
                 }

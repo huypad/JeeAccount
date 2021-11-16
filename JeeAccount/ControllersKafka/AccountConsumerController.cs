@@ -284,10 +284,19 @@ namespace JeeCustomer.ConsumerKafka
                         UserID = account.Userid,
                         Username = account.Username,
                         IsInitial = false,
-                        IsAdmin = false
+                        IsAdmin = false,
+                        StaffID = account.StaffID
                     };
 
                     _producer.PublishAsync(TopicAddNewCustomerUser, JsonConvert.SerializeObject(obj));
+
+                    var d2 = new GeneralLog()
+                    {
+                        name = "CreateAccountJeeHRNormalKafka",
+                        data = JsonConvert.SerializeObject(obj),
+                        message = $"CreateAccountJeeHRNormalKafka"
+                    };
+                    _logger.LogTrace(JsonConvert.SerializeObject(d2));
                 }
                 catch (Exception)
                 {
