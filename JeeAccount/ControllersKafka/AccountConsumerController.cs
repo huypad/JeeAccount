@@ -261,13 +261,13 @@ namespace JeeCustomer.ConsumerKafka
                     if (!createUser.IsSuccessful)
                     {
                         string returnValue = createUser.Content;
-                        var d2 = new GeneralLog()
+                        var d3 = new GeneralLog()
                         {
                             name = "import jeehr",
                             data = account.Username + "(" + customerID + ")",
                             message = $"Lỗi identity server {returnValue}"
                         };
-                        _logger.LogError(JsonConvert.SerializeObject(d2));
+                        _logger.LogError(JsonConvert.SerializeObject(d3));
                         cnn.RollbackTransaction();
                         cnn.EndTransaction();
                         return;
