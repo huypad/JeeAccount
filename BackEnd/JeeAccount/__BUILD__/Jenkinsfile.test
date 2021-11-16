@@ -24,7 +24,7 @@ pipeline {
         stage('Build image') {
             steps {
                 script {
-                    dir("Backend/JeeAccount"){
+                    dir("BackEnd/JeeAccount"){
                         service = docker.build("${REGISTRY_HOST}/${REGISTRY_PUBLISHER}/${PROJECT_NAME}:latest", "--build-arg NODE_ENV=${NODE_ENV} -f Dockerfile .")
                     }
                 }
@@ -43,7 +43,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry("https://${REGISTRY_HOST}", REGISTRY_CRED) {
-                        dir("Backend/JeeAccount/__BUILD__"){
+                        dir("BackEnd/JeeAccount/__BUILD__"){
                             sh "docker stack deploy -c swarm.yml --with-registry-auth ${STACK_NAME}"
                         }
                     }
