@@ -32,5 +32,7 @@ namespace JeeAccount.Reponsitories.CustomerManagement
         string CompanyCode(long customerid);
 
         void UpdateCustomerAddDeletAppModelCnn(DpsConnection cnn, CustomerAddDeletAppModel customerModel, string CreatedBy, List<CommonInfo> commonInfos);
+
+        CustomerModelDTO GetCustomerCnn(DpsConnection cnn, long CustomerID);
     }
 }

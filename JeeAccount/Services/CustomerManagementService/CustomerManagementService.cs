@@ -33,7 +33,7 @@ namespace JeeAccount.Services.CustomerManagementService
         private IConfiguration configuration;
         private IAccountManagementService _accountManagementService;
         private readonly ILogger<CustomerManagementService> _logger;
-
+        private readonly string TopicAddNewCustomer;
         public CustomerManagementService(IProducer producer, IConfiguration configuration, ICustomerManagementReponsitory customerManagementReponsitory, IAccountManagementReponsitory accountManagementReponsitory, IAccountManagementService accountManagementService, ILogger<CustomerManagementService> logger)
         {
             this._customerManagementReponsitory = customerManagementReponsitory;
@@ -44,6 +44,8 @@ namespace JeeAccount.Services.CustomerManagementService
             this.configuration = configuration;
             _accountManagementService = accountManagementService;
             _logger = logger;
+            TopicAddNewCustomer = configuration.GetValue<string>("KafkaConfig:TopicProduce:JeeplatformInitialization");
+
         }
 
         public IEnumerable<CustomerModelDTO> GetListCustomer()
@@ -328,6 +330,7 @@ namespace JeeAccount.Services.CustomerManagementService
             return _customerManagementReponsitory.CompanyCode(customerid);
         }
 
+        
         public async Task UpdateCustomerAddDeletAppModelCnn(CustomerAddDeletAppModel customer, string CreatedBy)
         {
             using (DpsConnection cnn = new DpsConnection(ConnectionString))
@@ -336,18 +339,90 @@ namespace JeeAccount.Services.CustomerManagementService
                 {
                     cnn.BeginTransaction();
                     var lstCommonInfo = GeneralReponsitory.GetDSCommonInfoCnn(cnn, customer.CustomerID);
-                    _customerManagementReponsitory.UpdateCustomerAddDeletAppModelCnn(cnn, customer, CreatedBy, lstCommonInfo);
+                    lstCommonInfo = lstCommonInfo.Where(item => item.IsAdminHeThong).ToList();
+                    var commonInfoFirst = lstCommonInfo.First();
+
+                    var lstAddCommonInfo = new List<CommonInfo>();
+                    lstAddCommonInfo.Add(commonInfoFirst);
+
+
+                    _customerManagementReponsitory.UpdateCustomerAddDeletAppModelCnn(cnn, customer, CreatedBy, lstAddCommonInfo);
 
                     var identity = new IdentityServerController();
                     var internal_token = GeneralService.GetInternalToken(configuration);
 
-                    foreach (var commonInfo in lstCommonInfo)
+                    foreach (var commonInfo in lstAddCommonInfo)
                     {
                         var lstApps = await GeneralReponsitory.GetListAppByUserIDAsyncCnn(cnn, commonInfo.UserID, customer.CustomerID, true);
                         var appCodes = lstApps.Select(item => item.AppCode).ToList();
                         var objectJeeAccount = identity.JeeAccountCustomData(appCodes, commonInfo.UserID, customer.CustomerID, commonInfo.StaffID);
                         var reponse = await identity.UpdateCustomDataInternal(internal_token, commonInfo.Username, objectJeeAccount);
                         if (!reponse.IsSuccessStatusCode) throw new Exception(await reponse.Content.ReadAsStringAsync());
+                    }
+
+
+                    // kafak
+                    if (customer.LstAddAppID.Count > 0)
+                    {
+                        var lstAppCodeKafka = new List<string>();
+                        var lstApp = await GeneralReponsitory.GetListAppByUserIDAsyncCnn(cnn, commonInfoFirst.UserID, customer.CustomerID);
+                        foreach (var app in lstApp)
+                        {
+                            if (customer.LstAddAppID.Contains(app.AppID))
+                            {
+                                lstAppCodeKafka.Add(app.AppCode);
+                            }
+                        }
+
+                        var customerInfo =  _customerManagementReponsitory.GetCustomerCnn(cnn, customer.CustomerID);
+
+                        var personalInfo = GeneralReponsitory.GetPersonalInfoCustomDataCnn(cnn, commonInfoFirst.UserID, customer.CustomerID, ConnectionString);
+
+                        var index = customer.LstAddAppID.FindIndex(id => id == 1);
+                        if (index > -1)
+                        {
+                            var objHR = new
+                            {
+                                CustomerID = customer.CustomerID,
+                                AppCode = lstAppCodeKafka,
+                                UserID = commonInfoFirst.UserID,
+                                Username = commonInfoFirst.Username,
+                                IsInitial = true,
+                                IsAdmin = true,
+                                customerModel = new
+                                {
+                                    Code = customerInfo.Code,
+                                    RegisterDate = customerInfo.RegisterDate,
+                                    DeadlineDate = customer.EndDate,
+                                    PakageID = customer.GoiSuDung[index],
+                                    CompanyName = customerInfo.CompanyName,
+                                    Address = customerInfo.Address,
+                                    Phone = customerInfo.Phone,
+                                    Note = customerInfo.Note,
+                                    Nguoidaidien = customerInfo.RegisterName,
+                                    CustomerID = customerInfo.RowID,
+                                    UsernameAdmin = commonInfoFirst.Username,
+                                    PasswordAdmin = "",
+                                    Email = personalInfo.Email
+                                }
+                            };
+                            await producer.PublishAsync(TopicAddNewCustomer, JsonConvert.SerializeObject(objHR));
+                        }
+                        else
+                        {
+                            var obj = new
+                            {
+                                CustomerID = customer.CustomerID,
+                                AppCode = lstAppCodeKafka,
+                                UserID = commonInfoFirst.UserID,
+                                Username = commonInfoFirst.Username,
+                                IsInitial = true,
+                                IsAdmin = true
+                            };
+
+                            await producer.PublishAsync(TopicAddNewCustomer, JsonConvert.SerializeObject(obj));
+                        }
+
                     }
 
                     cnn.EndTransaction();

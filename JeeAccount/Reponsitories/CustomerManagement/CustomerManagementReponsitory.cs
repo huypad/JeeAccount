@@ -180,8 +180,7 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
         {
             DataTable dt = new DataTable();
 
-            string sql = @"select * from CustomerList
-                           where RowId=@RowId";
+            string sql = @"select * from CustomerList";
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
                 dt = cnn.CreateDataTable(sql);
@@ -198,6 +197,30 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
                     Status = Int32.Parse(row["Status"].ToString()),
                 });
             }
+        }
+
+        public CustomerModelDTO GetCustomerCnn(DpsConnection cnn, long CustomerID)
+        {
+            DataTable dt = new DataTable();
+
+            string sql = $@"select * from CustomerList
+                           where RowId = {CustomerID}";
+
+            dt = cnn.CreateDataTable(sql);
+            if (dt.Rows.Count == 0) return null;
+            return new CustomerModelDTO
+            {
+                Address = dt.Rows[0]["Address"].ToString(),
+                Code = dt.Rows[0]["Code"].ToString(),
+                CompanyName = dt.Rows[0]["CompanyName"].ToString(),
+                Note = dt.Rows[0]["Note"].ToString(),
+                Phone = dt.Rows[0]["Phone"].ToString(),
+                RegisterDate = dt.Rows[0]["RegisterDate"].ToString(),
+                RegisterName = dt.Rows[0]["RegisterName"].ToString(),
+                RowID = Int32.Parse(dt.Rows[0]["RowID"].ToString()),
+                Status = Int32.Parse(dt.Rows[0]["Status"].ToString()),
+            };
+     
         }
 
         public IEnumerable<CustomerModelDTO> GetListCustomer(string whereSrt, string orderByStr)
@@ -361,6 +384,7 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
                 //Account_App
                 DeleteAccountAppCnn(cnn, customerModel, CreatedBy);
                 AddAccountAppNewCnn(cnn, customerModel, commonInfos, CreatedBy);
+
             }
             catch (Exception)
             {
@@ -477,7 +501,7 @@ join AppList on Customer_App.AppID = AppList.AppID where CustomerID = @CustomerI
         {
             try
             {
-                for (var index = 0; index < customerModel.LstDeleteAppID.Count; index++)
+                for (var index = 0; index < customerModel.LstAddAppID.Count; index++)
                 {
                     foreach (var commonInfo in commonInfos)
                     {

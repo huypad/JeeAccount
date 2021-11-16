@@ -1330,27 +1330,27 @@ namespace JeeAccount.Controllers
                 appcode.Add("JeeHR");
                 var objHR = new
                 {
-                    CustomerID = 123149,
+                    CustomerID = 1119,
                     AppCode = appcode,
-                    UserID = 79292,
-                    Username = "demo1.admin",
+                    UserID = 56609,
+                    Username = "huypad",
                     IsInitial = true,
                     IsAdmin = true,
                     customerModel = new
                     {
-                        Code = "demo1",
-                        RegisterDate = "01/10/2021",
-                        DeadlineDate = "",
+                        Code = "dainam",
+                        RegisterDate = "16/11/2021",
+                        DeadlineDate = "20/11/2022",
                         PakageID = 4,
-                        CompanyName = "Công ty demo",
-                        Address = "66 Trần Tấn",
-                        Phone = "0903046321",
+                        CompanyName = "Công ty cổ phần Đại Nam",
+                        Address = "P.Hiệp An, TP Thủ Dầu Một, Bình Dương",
+                        Phone = "0904710170",
                         Note = "",
-                        Nguoidaidien = "Nguyến Chí Sanh",
-                        CustomerID = 123149,
-                        UsernameAdmin = "demo1.admin",
-                        PasswordAdmin = "demo1@123",
-                        Email = "nguyenchisanh@gmail.com",
+                        Nguoidaidien = "Trần Văn Huy",
+                        CustomerID = 1119,
+                        UsernameAdmin = "huypad",
+                        PasswordAdmin = "1231123",
+                        Email = "huytv@dps.com.vn",
                     }
                 };
                 await _producer.PublishAsync(_config.GetValue<string>("KafkaConfig:TopicProduce:JeeplatformInitialization"), JsonConvert.SerializeObject(objHR));

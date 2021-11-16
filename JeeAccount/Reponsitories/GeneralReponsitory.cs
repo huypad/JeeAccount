@@ -475,6 +475,64 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID where Acco
             }
         }
 
+        public static PersonalInfoCustomData GetPersonalInfoCustomDataCnn(DpsConnection cnn, long UserID, long CustomerID, string connectionString)
+        {
+            try
+            {
+                DataTable dt = new DataTable();
+                SqlConditions Conds = new SqlConditions();
+  
+                Conds.Add("CustomerID", CustomerID);
+                Conds.Add("UserID", UserID);
+
+                var isJeeHR = IsUsedJeeHRCustomeridCnn(cnn, CustomerID);
+
+                string SQL_DSINFO_DEFAULT = @"select UserID, Username, Email, LastName +' ' + FirstName as FullName
+                        , FirstName as Name, LastName, AvartarImgURL as Avatar, JobtitleList.JobtitleName as Jobtitle, JobtitleID , DepartmentID,
+                        DepartmentList.DepartmentName as Department, PhoneNumber, AccountList.CustomerID, cocauid, ChucVuID, Birthday, DirectManager,
+                        AccountList.IsActive, IsAdmin, AccountList.Note
+                        from AccountList
+left join DepartmentList on DepartmentList.RowID = AccountList.DepartmentID
+left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID where AccountList.CustomerID = @CustomerID and AccountList.UserID = @UserID";
+
+                string SQL_DSINFO_JEEHR = @"select UserID, Username, email, LastName +' '+FirstName as FullName,
+                        FirstName as Name, LastName, AvartarImgURL as Avatar, Jobtitle, JobtitleID, IsActive, IsAdmin, Note,
+                        Department, DepartmentID, PhoneNumber, CustomerID, cocauid, ChucVuID, Birthday, DirectManager
+                        from AccountList where AccountList.CustomerID = @CustomerID and AccountList.UserID = @UserID";
+
+                string sql = SQL_DSINFO_DEFAULT;
+                if (isJeeHR) sql = SQL_DSINFO_JEEHR;
+
+                dt = cnn.CreateDataTable(sql, Conds);
+                if (dt.Rows.Count == 0)
+                    throw new KhongCoDuLieuException("Tài khoản");
+
+                return new PersonalInfoCustomData
+                {
+                    Avatar = (dt.Rows[0]["Avatar"] != DBNull.Value) ? dt.Rows[0]["Avatar"].ToString() : "",
+                    Birthday = (dt.Rows[0]["Birthday"] != DBNull.Value) ? ((DateTime)dt.Rows[0]["Birthday"]).ToString("dd/MM/yyyy") : "",
+                    Departmemt = (dt.Rows[0]["Department"] != DBNull.Value) ? dt.Rows[0]["Department"].ToString() : "",
+                    Fullname = (dt.Rows[0]["Fullname"] != DBNull.Value) ? dt.Rows[0]["Fullname"].ToString() : "",
+                    Jobtitle = (dt.Rows[0]["Jobtitle"] != DBNull.Value) ? dt.Rows[0]["Jobtitle"].ToString() : "",
+                    Name = (dt.Rows[0]["Name"] != DBNull.Value) ? dt.Rows[0]["Name"].ToString() : "",
+                    Phonenumber = (dt.Rows[0]["Phonenumber"] != DBNull.Value) ? dt.Rows[0]["PhoneNumber"].ToString() : "",
+                    StructureID = (dt.Rows[0]["cocauid"] != DBNull.Value) ? dt.Rows[0]["cocauid"].ToString() : "",
+                    BgColor = GeneralService.GetColorNameUser(dt.Rows[0]["Name"].ToString().Substring(0, 1)),
+                    DepartmemtID = (dt.Rows[0]["DepartmentID"] != DBNull.Value) ? dt.Rows[0]["DepartmentID"].ToString() : "",
+                    Email = (dt.Rows[0]["Email"] != DBNull.Value) ? dt.Rows[0]["Email"].ToString() : "",
+                    JobtitleID = (dt.Rows[0]["JobtitleID"] != DBNull.Value) ? dt.Rows[0]["JobtitleID"].ToString() : "",
+                    Structure = (dt.Rows[0]["Department"] != DBNull.Value) ? dt.Rows[0]["Department"].ToString() : "",
+                    ChucvuID = (dt.Rows[0]["ChucvuID"] != DBNull.Value) ? dt.Rows[0]["ChucvuID"].ToString() : "",
+                };
+      
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
         public static async Task<HttpResponseMessage> UpdateJeeAccountCustomDataByInputApiModel(long UserID, string connectionString, string jwt_internal)
         {
             try

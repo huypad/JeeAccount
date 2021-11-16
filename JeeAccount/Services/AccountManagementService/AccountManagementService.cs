@@ -385,7 +385,8 @@ namespace JeeAccount.Services.AccountManagementService
                         UserID = account.Userid,
                         Username = account.Username,
                         IsInitial = false,
-                        IsAdmin = false
+                        IsAdmin = false,
+                        StaffID = account.StaffID
                     };
                     await _producer.PublishAsync(TopicAddNewCustomerUser, JsonConvert.SerializeObject(obj));
                 }
@@ -469,7 +470,8 @@ namespace JeeAccount.Services.AccountManagementService
                                 UserID = account.Userid,
                                 Username = account.Username,
                                 IsInitial = false,
-                                IsAdmin = false
+                                IsAdmin = false,
+                                StaffID = account.StaffID
                             };
                             await _producer.PublishAsync(TopicAddNewCustomerUser, JsonConvert.SerializeObject(obj));
                         }
@@ -482,7 +484,8 @@ namespace JeeAccount.Services.AccountManagementService
                                 UserID = account.Userid,
                                 Username = account.Username,
                                 IsInitial = true,
-                                IsAdmin = false
+                                IsAdmin = false,
+                                StaffID = account.StaffID
                             };
                             await _producer.PublishAsync(TopicAddNewCustomerUser, JsonConvert.SerializeObject(obj));
                         }
