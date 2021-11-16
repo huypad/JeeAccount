@@ -5,10 +5,9 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
-COPY ["JeeAccount/JeeAccount.csproj", "JeeAccount/"]
-RUN dotnet restore "JeeAccount/JeeAccount.csproj"
-COPY JeeAccount JeeAccount/
-WORKDIR "/src/JeeAccount"
+COPY ["./JeeAccount.csproj", "./"]
+RUN dotnet restore "./JeeAccount.csproj"
+COPY . .
 RUN dotnet build "JeeAccount.csproj" -c Release -o /app/build
 
 FROM build AS publish
