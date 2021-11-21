@@ -108,8 +108,24 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
             const index = res.data.findIndex((item) => item.AppID === 14);
             res.data.splice(index, 1);
             this.listApp = res.data;
-            this.addCheckboxes();
-            this.initItemListApp();
+            this.accountManagementService.GetListAppByCustomerID().subscribe(data => {
+              const lstApp = data.data;
+              lstApp.forEach(app => {
+                let isExist = false;
+                this.listApp.forEach(item => {
+                  if (item.AppID === app.AppID) {
+                    isExist = true;
+                  }
+                });
+                if (!isExist && app.AppID !== 14) {
+                  const noApp: CheckEditAppListByDTO = { AppID: app.AppID, AppCode : app.AppCode,
+                    AppName : app.AppName, Disable : false, IsUsed : false };
+                  this.listApp.push(noApp);
+                }
+              });
+              this.addCheckboxes();
+              this.initItemListApp();
+            });
           }
         }),
         finalize(() => {
