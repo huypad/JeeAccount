@@ -106,20 +106,25 @@ export class AccountManagementChinhSuaNoJeeHRDialogComponent implements OnInit, 
         tap((res: ResultModel<CheckEditAppListByDTO>) => {
           if (res) {
             const index = res.data.findIndex((item) => item.AppID === 14);
-            res.data.splice(index, 1);
+            if (index > -1) res.data.splice(index, 1);
             this.listApp = res.data;
-            this.accountManagementService.GetListAppByCustomerID().subscribe(data => {
+            this.accountManagementService.GetListAppByCustomerID().subscribe((data) => {
               const lstApp = data.data;
-              lstApp.forEach(app => {
+              lstApp.forEach((app) => {
                 let isExist = false;
-                this.listApp.forEach(item => {
+                this.listApp.forEach((item) => {
                   if (item.AppID === app.AppID) {
                     isExist = true;
                   }
                 });
                 if (!isExist && app.AppID !== 14) {
-                  const noApp: CheckEditAppListByDTO = { AppID: app.AppID, AppCode : app.AppCode,
-                    AppName : app.AppName, Disable : false, IsUsed : false };
+                  const noApp: CheckEditAppListByDTO = {
+                    AppID: app.AppID,
+                    AppCode: app.AppCode,
+                    AppName: app.AppName,
+                    Disable: false,
+                    IsUsed: false,
+                  };
                   this.listApp.push(noApp);
                 }
               });

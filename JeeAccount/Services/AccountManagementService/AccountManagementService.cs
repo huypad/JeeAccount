@@ -442,6 +442,9 @@ namespace JeeAccount.Services.AccountManagementService
                     account.Userid = commonInfo.UserID;
                     var listInsertAppid = new List<int>();
                     var listInsertAppCode = new List<string>();
+
+                    var appCodeNotActive = lstAppCurrentUserid.Where(x => !x.IsActive).Select(item => item.AppID).ToList();
+
                     for (var index = 0; index < account.AppID.Count; index++)
                     {
                         //remove jeehr
@@ -453,8 +456,19 @@ namespace JeeAccount.Services.AccountManagementService
                                 continue;
                             }
                         }
-                        if (!lstAppIDCurrentUserid.Contains(account.AppID[index])) listInsertAppid.Add(account.AppID[index]);
-                        if (!lstAppCodeCurrentUserid.Contains(account.AppCode[index])) listInsertAppCode.Add(account.AppCode[index]);
+
+
+                        if (!lstAppIDCurrentUserid.Contains(account.AppID[index])) {
+                            listInsertAppid.Add(account.AppID[index]);
+                            listInsertAppCode.Add(account.AppCode[index]);
+                        }
+
+                        if (appCodeNotActive.Contains(account.AppID[index]))
+                        {
+                            listInsertAppid.Add(account.AppID[index]);
+                            listInsertAppCode.Add(account.AppCode[index]);
+                        }
+
                     }
 
                     _reponsitory.InsertAppCodeAccount(cnn, account.Userid, listInsertAppid, usernameCreatedBy, false);
@@ -689,9 +703,7 @@ namespace JeeAccount.Services.AccountManagementService
 
         public async Task<IEnumerable<CheckEditAppListByDTO>> GetEditListAppByUserIDByListCustomerId(long userid, long customerid)
         {
-            var appListCustomer = await GetListAppByCustomerIDAsync(customerid);
-            var appIdCustomer = appListCustomer.Select(item => item.AppID).ToList();
-            var appListUserid = await GeneralReponsitory.GetListAppByUserIDAsync(_connectionString, userid, customerid, false);
+            var appListUserid = await GeneralReponsitory.GetListAppByUserIDAsync(_connectionString, userid, customerid, true);
             var isAdminHeThong = GeneralReponsitory.IsAdminHeThong(_connectionString, userid);
             appListUserid = appListUserid.ToList();
             var lst = new List<CheckEditAppListByDTO>();
@@ -701,7 +713,7 @@ namespace JeeAccount.Services.AccountManagementService
                 editApp.AppID = item.AppID;
                 editApp.AppCode = item.AppCode;
                 editApp.AppName = item.AppName;
-                if (appIdCustomer.Contains(item.AppID) && item.IsActive)
+                if (item.IsActive)
                 {
                     editApp.IsUsed = true;
                 }

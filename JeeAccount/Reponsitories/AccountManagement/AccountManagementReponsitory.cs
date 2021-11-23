@@ -1009,8 +1009,8 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                 var dtnew = cnn.CreateDataTable(sql2, Conds);
                 if (dtnew.Rows.Count > 0)
                 {
-                    string sql3 = @$"select AppID from Account_App where UserID = @UserID and AppID = {id} and IsActive = 0 or Disable = 1";
-                    var dt3 = cnn.CreateDataTable(sql3);
+                    string sql3 = @$"select AppID from Account_App where UserID = @UserID and AppID = {id} and (IsActive = 0 or Disable = 1)";
+                    var dt3 = cnn.CreateDataTable(sql3, Conds);
                     if (dt3.Rows.Count == 0) continue;
                     var userid_createdBy = GeneralReponsitory.GetCommonInfoCnn(cnn, 0, createdBy).UserID;
                     Hashtable val2 = new Hashtable();
@@ -1021,7 +1021,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
 
                     SqlConditions conds = new SqlConditions();
                     conds.Add("UserID", UserID);
-                    val2.Add("AppID", id);
+                    conds.Add("AppID", id);
 
                     int z = cnn.Update(val2, conds, "Account_App");
                     if (z <= 0)
