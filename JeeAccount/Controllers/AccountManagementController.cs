@@ -71,6 +71,48 @@ namespace JeeAccount.Controllers
                 {
                     return Unauthorized(MessageReturnHelper.DangNhap());
                 }
+
+                #region tạm thời để cập nhật JeeHR
+                var isAdminHeThong = GeneralReponsitory.IsAdminHeThong(_connectionString, customData.JeeAccount.UserID);
+                var lstAppId = GeneralReponsitory.GetListAppByUserID(_connectionString, customData.JeeAccount.UserID, customData.JeeAccount.CustomerID, true).Select(item => item.AppID);
+                if (lstAppId.Contains(14) && isAdminHeThong)
+                {
+                    var jeehrController = new JeeHRController(HOST_JEEHR_API);
+
+                    var lstDSJeeHR = jeehrController.GetDSNhanVienNotAysnc(token);
+                    foreach (var item in lstDSJeeHR)
+                    {
+                        var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, 0, item.username, Int32.Parse(item.IDNV.Replace(".0", "")));
+                        if (commonInfo is null) continue;
+
+                        var account = new AccountManagementModel();
+                        account.Username = commonInfo.Username;
+                        account.Userid = commonInfo.UserID;
+                        account.StaffID = Int32.Parse(item.IDNV.Replace(".0", ""));
+                        account.Birthday = item.NgaySinh;
+                        account.chucvuid = 33;
+                        account.cocauid = 1;
+                        account.JobtitleID = Int32.Parse(item.jobtitleid.ToString().Replace(".0", ""));
+                        account.Jobtitle = item.TenChucVu;
+                        account.Departmemt = item.Structure;
+                        account.DepartmemtID = Int32.Parse(item.structureid.ToString().Replace(".0", ""));
+                        account.Email = item.Email;
+                        account.Fullname = item.HoTen;
+                        account.ImageAvatar = item.avatar;
+                        account.Phonemumber = item.PhoneNumber;
+                        account.Password = item.cmnd;
+                        var commonManagement = GeneralReponsitory.GetCommonInfo(_connectionString, 0, "", Int32.Parse(item.managerid.Replace(".0", "")));
+                        if (commonManagement is null) { continue; } else
+                        {
+                            account.DirectManager = commonManagement.Username;
+                        }
+
+                        await _service.UpdateAccount(true, token, customData.JeeAccount.CustomerID, item.username, account);
+                    }
+
+
+                }
+                #endregion tạm thời để cập nhật JeeHR
                 PageModel pageModel = new PageModel();
                 var lst = await _service.GetListAccountManagement(query, customData.JeeAccount.CustomerID).ConfigureAwait(false);
                 int total = lst.Count();

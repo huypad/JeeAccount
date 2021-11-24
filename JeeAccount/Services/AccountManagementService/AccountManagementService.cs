@@ -420,7 +420,6 @@ namespace JeeAccount.Services.AccountManagementService
             TextInfo textInfo = cultureInfo.TextInfo;
             account.Fullname = textInfo.ToTitleCase(account.Fullname.Trim());
             var isAdminHeThong = GeneralReponsitory.IsAdminHeThong(_connectionString, account.Userid);
-            var listAppCode = account.AppCode.ToList();
             var lstAppCurrentCustomer = await GetListAppByCustomerIDAsync(customerID);
             lstAppCurrentCustomer = lstAppCurrentCustomer.ToList();
             var lstAppIDCurrentCustomer = lstAppCurrentCustomer.Select(item => item.AppID).ToList();
@@ -445,35 +444,47 @@ namespace JeeAccount.Services.AccountManagementService
 
                     var appCodeNotActive = lstAppCurrentUserid.Where(x => !x.IsActive).Select(item => item.AppID).ToList();
 
-                    for (var index = 0; index < account.AppID.Count; index++)
+                    if (account.AppID != null)
                     {
-                        //remove jeehr
-
-                        if (isJeeHR)
+                        for (var index = 0; index < account.AppID.Count; index++)
                         {
-                            if (account.AppCode[index].Equals(APPCODE_JEEHR))
+                            //remove jeehr
+
+                            if (isJeeHR)
                             {
-                                continue;
+                                if (account.AppCode[index].Equals(APPCODE_JEEHR))
+                                {
+                                    continue;
+                                }
                             }
+
+
+                            if (!lstAppIDCurrentUserid.Contains(account.AppID[index]))
+                            {
+                                listInsertAppid.Add(account.AppID[index]);
+                                listInsertAppCode.Add(account.AppCode[index]);
+                            }
+
+                            if (appCodeNotActive.Contains(account.AppID[index]))
+                            {
+                                listInsertAppid.Add(account.AppID[index]);
+                                listInsertAppCode.Add(account.AppCode[index]);
+                            }
+
                         }
 
 
-                        if (!lstAppIDCurrentUserid.Contains(account.AppID[index])) {
-                            listInsertAppid.Add(account.AppID[index]);
-                            listInsertAppCode.Add(account.AppCode[index]);
-                        }
+                        _reponsitory.InsertAppCodeAccount(cnn, account.Userid, listInsertAppid, usernameCreatedBy, false);
+                        var listRemove = checkNotExisAppID(account.AppID, lstAppIDCurrentCustomer);
+                        _reponsitory.RemoveAppCodeAccount(cnn, account.Userid, listRemove, usernameCreatedBy);
 
-                        if (appCodeNotActive.Contains(account.AppID[index]))
-                        {
-                            listInsertAppid.Add(account.AppID[index]);
-                            listInsertAppCode.Add(account.AppCode[index]);
-                        }
-
+                    } else
+                    {
+                        account.AppID = lstAppIDCurrentUserid;
+                        account.AppCode = lstAppCodeCurrentUserid;
                     }
 
-                    _reponsitory.InsertAppCodeAccount(cnn, account.Userid, listInsertAppid, usernameCreatedBy, false);
-                    var listRemove = checkNotExisAppID(account.AppID, lstAppIDCurrentCustomer);
-                    _reponsitory.RemoveAppCodeAccount(cnn, account.Userid, listRemove, usernameCreatedBy);
+
 
                     var objCustomDataJeeAccount = identityServerController.JeeAccountCustomData(account.AppCode, commonInfo.UserID, customerID, commonInfo.StaffID);
 

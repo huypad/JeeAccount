@@ -25,5 +25,6 @@ namespace JeeAccount.Models.AccountManagement
         public int chucvuid { get; set; } = 0;
         public long StaffID { get; set; } = 0;
         public long Userid { get; set; }
+        public string DirectManager { get; set; } = "";
     }
 }

@@ -157,13 +157,14 @@ namespace JeeAccount.Reponsitories
                     where += $" or StaffID = {StaffID}";
                 }
             }
-            if (string.IsNullOrEmpty(where)) throw new ArgumentNullException("UserID or Username or Staffid");
-            string sql = $"select UserID, Username, StaffID, CustomerID, IsAdmin from AccountList where {where} and AccountList.Disable = 0";
+            if (string.IsNullOrEmpty(where)) return null;
+            string sql = $"select UserID, Username, StaffID, CustomerID, IsAdmin, Disable from AccountList where {where} and AccountList.Disable = 0";
             DataTable dt = new DataTable();
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
                 dt = cnn.CreateDataTable(sql);
-                if (dt.Rows.Count == 0) throw new ArgumentNullException("UserID or Username or Staffid");
+                if (dt.Rows.Count == 0) return null;
+                if (Convert.ToBoolean(dt.Rows[0]["Disable"])) return null;
                 return dt.AsEnumerable().Select(row => new CommonInfo
                 {
                     CustomerID = Convert.ToInt32(row["CustomerID"]),

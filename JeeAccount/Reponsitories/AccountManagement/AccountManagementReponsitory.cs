@@ -885,6 +885,8 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                     val.Add("Birthday", date);
                 }
 
+                if (!string.IsNullOrEmpty(account.DirectManager)) val.Add("DirectManager", account.DirectManager);
+
                 #endregion val data
 
                 int x = cnn.Update(val, conds, "AccountList");

@@ -158,10 +158,10 @@ namespace JeeCustomer.ConsumerKafka
                                     account.Birthday = item.NgaySinh;
                                     account.chucvuid = 33;
                                     account.cocauid = 1;
-                                    account.JobtitleID = Int32.Parse(item.jobtitleid.ToString());
+                                    account.JobtitleID = Int32.Parse(item.jobtitleid.ToString().Replace(".0", ""));
                                     account.Jobtitle = item.TenChucVu;
                                     account.Departmemt = item.Structure;
-                                    account.DepartmemtID = Int32.Parse(item.structureid.ToString());
+                                    account.DepartmemtID = Int32.Parse(item.structureid.ToString().Replace(".0", "").ToString());
                                     account.Email = item.Email;
                                     account.Fullname = item.HoTen;
                                     account.ImageAvatar = item.avatar;
