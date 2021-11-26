@@ -75,7 +75,7 @@ namespace JeeAccount.Controllers
                 #region tạm thời để cập nhật JeeHR
                 var isAdminHeThong = GeneralReponsitory.IsAdminHeThong(_connectionString, customData.JeeAccount.UserID);
                 var lstAppId = GeneralReponsitory.GetListAppByUserID(_connectionString, customData.JeeAccount.UserID, customData.JeeAccount.CustomerID, true).Select(item => item.AppID);
-                if (lstAppId.Contains(14) && isAdminHeThong)
+                if (lstAppId.Contains(14) && isAdminHeThong && lstAppId.Contains(1))
                 {
                     var jeehrController = new JeeHRController(HOST_JEEHR_API);
 
