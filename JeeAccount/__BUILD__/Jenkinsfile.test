@@ -15,7 +15,7 @@ pipeline {
         HOST_CDN = "cdn.jee.com.vn"
         HOST_JEECOMMENT_API = "http://jeecomment_api"
         HOST_JEEHR_API = "http://jeehr_api"
-        APP_CONNECTION = "Data Source=192.168.2.92,1433;Initial Catalog=JeeAccount;User ID=jee_account;Password=JeeLo0c@l_AccountDb"
+        APP_CONNECTION = "Data Source=192.168.2.92,1433;Initial Catalog=Jee_Account;User ID=jee_account;Password=JeeLo0c@l_AccountDb"
         APP_KEY_JEECUSTOMER = "YygaNR3BjUteGUfrbzCaS9E5PaWmmYEmC9pwULwq5gHYQ4NR2bHUMujUZAcWsk9R"
         APPCODE_JEEHR = "JeeHR"
 
