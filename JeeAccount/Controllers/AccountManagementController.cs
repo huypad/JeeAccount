@@ -1435,15 +1435,26 @@ namespace JeeAccount.Controllers
                 string sql = @$"select * from AccountList";
                 using (DpsConnection cnn = new DpsConnection(_connectionString))
                 {
-                    var dt = await cnn.CreateDataTableAsync(sql).ConfigureAwait(false);
-                    if (dt.Rows.Count == 0) return BadRequest(new { cnn.LastError, connectionString = _connectionString });
-                    object o = new { dt = dt, connectionString = _connectionString };
-                    return Ok(o);
+                    try
+                    {
+                        if (cnn.LastError != null)
+                        {
+                            return BadRequest(cnn.LastError);
+                        }
+                        var dt = await cnn.CreateDataTableAsync(sql).ConfigureAwait(false);
+                        if (dt.Rows.Count == 0) return BadRequest(new { cnn.LastError, connectionString = _connectionString });
+                        object o = new { dt = dt, connectionString = _connectionString };
+                        return Ok(o);
+                    }
+                    catch (Exception ex)
+                    {
+                        return BadRequest(ex);
+                    }
                 }
             }
             catch (Exception ex)
             {
-                return BadRequest(MessageReturnHelper.Exception(ex));
+                return BadRequest(ex);
             }
         }
     }
