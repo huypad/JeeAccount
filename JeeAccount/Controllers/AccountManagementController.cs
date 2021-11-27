@@ -1427,5 +1427,23 @@ namespace JeeAccount.Controllers
                 return BadRequest(MessageReturnHelper.Exception(ex));
             }
         }
+
+        [HttpGet("test")]
+        public async Task<IActionResult> test()
+        {
+            try {
+                string sql = @$"select * from AccountList";
+                using (DpsConnection cnn = new DpsConnection(_connectionString))
+                {
+                    var dt = await cnn.CreateDataTableAsync(sql).ConfigureAwait(false);
+                    object o = new { dt = dt, connectionString = _connectionString };
+                    return Ok(o);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
     }
 }
