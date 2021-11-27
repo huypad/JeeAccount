@@ -1436,6 +1436,7 @@ namespace JeeAccount.Controllers
                 using (DpsConnection cnn = new DpsConnection(_connectionString))
                 {
                     var dt = await cnn.CreateDataTableAsync(sql).ConfigureAwait(false);
+                    if (dt.Rows.Count == 0) return BadRequest(new { cnn.LastError, connectionString = _connectionString });
                     object o = new { dt = dt, connectionString = _connectionString };
                     return Ok(o);
                 }
