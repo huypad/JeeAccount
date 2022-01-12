@@ -11,6 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using DPSinfra.Logger;
 
 namespace JeeAccount.Controllers
 {
@@ -23,13 +26,15 @@ namespace JeeAccount.Controllers
         private readonly IDepartmentManagementService _service;
         private readonly string _connectionString;
         private readonly string HOST_JEEHR_API;
+        private readonly ILogger<DepartmentManagementController> _logger;
 
-        public DepartmentManagementController(IConfiguration configuration, IDepartmentManagementService service)
+        public DepartmentManagementController(IConfiguration configuration, IDepartmentManagementService service, ILogger<DepartmentManagementController> logger)
         {
             _config = configuration;
             _service = service;
             _connectionString = configuration.GetValue<string>("AppConfig:Connection");
             HOST_JEEHR_API = configuration.GetValue<string>("Host:JeeHR_API");
+            _logger = logger;
         }
 
         [HttpGet("GetListDepartment")]
@@ -83,8 +88,22 @@ namespace JeeAccount.Controllers
                 {
                     return BadRequest(MessageReturnHelper.DangNhap());
                 }
-                var obj = await _service.GetDSPhongBan(query, customData.JeeAccount.CustomerID, token).ConfigureAwait(false);
+                var traceLog = new GeneralLog()
+                {
+                    name = "department",
+                    data = "",
+                    message = "GetListDepartmentManagement Open"
+                };
+                _logger.LogTrace(JsonConvert.SerializeObject(traceLog));
 
+                var obj = await _service.GetDSPhongBan(query, customData.JeeAccount.CustomerID, token).ConfigureAwait(false);
+                var traceLog2 = new GeneralLog()
+                {
+                    name = "department",
+                    data = JsonConvert.SerializeObject(obj),
+                    message = "GetListDepartmentManagement GetDSPhongBan"
+                };
+                _logger.LogTrace(JsonConvert.SerializeObject(traceLog2));
                 return Ok(obj);
             }
             catch (KhongCoDuLieuException ex)

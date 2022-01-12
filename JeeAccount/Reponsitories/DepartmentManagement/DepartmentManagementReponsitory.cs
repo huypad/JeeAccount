@@ -1,9 +1,12 @@
-﻿using DpsLibs.Data;
+﻿using DPSinfra.Logger;
+using DpsLibs.Data;
 using JeeAccount.Classes;
 using JeeAccount.Models.Common;
 using JeeAccount.Models.DepartmentManagement;
 using JeeAccount.Models.JeeHR;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,6 +19,7 @@ namespace JeeAccount.Reponsitories
     public class DepartmentManagementReponsitory : IDepartmentManagementReponsitory
     {
         private readonly string _connectionString;
+        private readonly ILogger<DepartmentManagementReponsitory> _logger;
 
         private const string SQL_DSDEPARMENT_DEFAULT = @"select DepartmentList.*, UserID as DepartmentManagerUserID,
                                                     Username as DepartmentManagerUsername, AccountList.LastName +' '+ AccountList.FirstName
@@ -24,9 +28,10 @@ namespace JeeAccount.Reponsitories
 
         private const string SQL_DSDEPARTMENT_JEEHR = @"select DISTINCT DepartmentID, Department from AccountList";
 
-        public DepartmentManagementReponsitory(IConfiguration configuration)
+        public DepartmentManagementReponsitory(IConfiguration configuration, ILogger<DepartmentManagementReponsitory> logger)
         {
             _connectionString = configuration.GetValue<string>("AppConfig:Connection");
+            _logger = logger;
         }
 
         public async Task<IEnumerable<DepartmentDTO>> GetListDepartmentDefaultAsync(long custormerID, string where = "", string orderBy = "")
@@ -70,6 +75,14 @@ namespace JeeAccount.Reponsitories
 
         public async Task<IEnumerable<JeeHRCoCauToChucModelFromDB>> GetListDepartmentIsJeeHRAsync(long custormerID, string where = "", string orderBy = "")
         {
+            var traceLog = new GeneralLog()
+            {
+                name = "department",
+                data = "",
+                message = "GetListDepartmentIsJeeHRAsync"
+            };
+            _logger.LogTrace(JsonConvert.SerializeObject(traceLog));
+
             DataTable dt = new DataTable();
             SqlConditions Conds = new SqlConditions();
             Conds.Add("CustomerID", custormerID);
@@ -92,12 +105,28 @@ namespace JeeAccount.Reponsitories
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
+                var traceLog2 = new GeneralLog()
+                {
+                    name = "department",
+                    data = _connectionString,
+                    message = "GetListDepartmentIsJeeHRAsync Open DpsConnection"
+                };
+                _logger.LogTrace(JsonConvert.SerializeObject(traceLog2));
+
                 dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+
                 var result = dt.AsEnumerable().Select(row => new JeeHRCoCauToChucModelFromDB
                 {
                     RowID = int.Parse(row["DepartmentID"].ToString()),
                     Title = row["Department"].ToString()
                 });
+                var traceLog3 = new GeneralLog()
+                {
+                    name = "department",
+                    data = JsonConvert.SerializeObject(result.ToList()),
+                    message = "GetListDepartmentIsJeeHRAsync Open DpsConnection Data"
+                };
+                _logger.LogTrace(JsonConvert.SerializeObject(traceLog2));
                 return result;
             }
         }

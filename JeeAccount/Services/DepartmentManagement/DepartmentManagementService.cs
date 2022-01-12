@@ -1,10 +1,12 @@
-﻿using JeeAccount.Classes;
+﻿using DPSinfra.Logger;
+using JeeAccount.Classes;
 using JeeAccount.Controllers;
 using JeeAccount.Models.Common;
 using JeeAccount.Models.DepartmentManagement;
 using JeeAccount.Models.JeeHR;
 using JeeAccount.Reponsitories;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -19,13 +21,14 @@ namespace JeeAccount.Services.DepartmentManagement
         private readonly IConfiguration _config;
         private readonly IDepartmentManagementReponsitory _reponsitory;
         private readonly string HOST_JEEHR_API;
-
-        public DepartmentManagementService(IConfiguration configuration, IDepartmentManagementReponsitory reponsitory)
+        private readonly ILogger<DepartmentManagementService> _logger;
+        public DepartmentManagementService(IConfiguration configuration, IDepartmentManagementReponsitory reponsitory, ILogger<DepartmentManagementService> logger)
         {
             _config = configuration;
             _connectionString = configuration.GetValue<string>("AppConfig:Connection");
             _reponsitory = reponsitory;
             HOST_JEEHR_API = configuration.GetValue<string>("Host:JeeHR_API");
+            _logger = logger;
         }
 
         public void ChangeTinhTrang(long customerID, long RowID, string Note, long UserIdLogin)
@@ -77,6 +80,14 @@ namespace JeeAccount.Services.DepartmentManagement
 
         public async Task<object> GetDSPhongBan(QueryParams query, long customerid, string token)
         {
+            var traceLog = new GeneralLog()
+            {
+                name = "department",
+                data = "",
+                message = "GetDSPhongBan Open"
+            };
+            _logger.LogTrace(JsonConvert.SerializeObject(traceLog));
+
             query = query == null ? new QueryParams() : query;
             PageModel pageModel = new PageModel();
 
@@ -122,8 +133,23 @@ namespace JeeAccount.Services.DepartmentManagement
 
             if (checkusedjeehr)
             {
+                var traceLog2 = new GeneralLog()
+                {
+                    name = "department",
+                    data = checkusedjeehr.ToString(),
+                    message = "GetDSPhongBan checkusedjeehr"
+                };
+                _logger.LogTrace(JsonConvert.SerializeObject(traceLog2));
+
                 var jeehrController = new JeeHRController(HOST_JEEHR_API);
                 var list = await jeehrController.GetDSCoCauToChuc(token);
+                var traceLog3 = new GeneralLog()
+                {
+                    name = "department",
+                    data = JsonConvert.SerializeObject(list),
+                    message = "GetDSPhongBan checkusedjeehr GetDSCoCauToChuc"
+                };
+                _logger.LogTrace(JsonConvert.SerializeObject(traceLog3));
                 if (list.status == 1)
                 {
                     var flat = TranferDataHelper.FlatListJeeHRCoCauToChuc(list.data);
@@ -168,7 +194,24 @@ namespace JeeAccount.Services.DepartmentManagement
 
         private async Task<object> ReturnObjectDepartmentDefaultAsync(QueryParams query, PageModel pageModel, long customerid, string whereStrDefault, string orderByStrDefault, bool checkusedjeehr)
         {
+            var traceLog3 = new GeneralLog()
+            {
+                name = "department",
+                data = "",
+                message = "ReturnObjectDepartmentDefaultAsync open"
+            };
+            _logger.LogTrace(JsonConvert.SerializeObject(traceLog3));
+
             var depart = await _reponsitory.GetListDepartmentDefaultAsync(customerid, whereStrDefault, orderByStrDefault);
+            var traceLog1 = new GeneralLog()
+            {
+                name = "department",
+                data = JsonConvert.SerializeObject(depart),
+                message = "ReturnObjectDepartmentDefaultAsync open GetListDepartmentDefaultAsync"
+            };
+            _logger.LogTrace(JsonConvert.SerializeObject(traceLog1));
+
+
             pageModel.TotalCount = depart.Count();
             if (depart.Count() == 0) throw new KhongCoDuLieuException();
             pageModel.AllPage = (int)Math.Ceiling(depart.Count() / (decimal)query.record);
@@ -195,7 +238,25 @@ namespace JeeAccount.Services.DepartmentManagement
 
         private async Task<object> ReturnObjectGetListDepartmentIsJeeHRAsync(QueryParams query, PageModel pageModel, long customerid, string whereStrJeeHR, string orderByStrJeeHR, bool checkusedjeehr)
         {
+
+            var traceLog = new GeneralLog()
+            {
+                name = "department",
+                data = "",
+                message = "ReturnObjectGetListDepartmentIsJeeHRAsync Open"
+            };
+            _logger.LogTrace(JsonConvert.SerializeObject(traceLog));
+
             var depart = await _reponsitory.GetListDepartmentIsJeeHRAsync(customerid, whereStrJeeHR, orderByStrJeeHR).ConfigureAwait(false);
+
+            var traceLog2 = new GeneralLog()
+            {
+                name = "department",
+                data = "",
+                message = "ReturnObjectGetListDepartmentIsJeeHRAsync After getdata"
+            };
+            _logger.LogTrace(JsonConvert.SerializeObject(traceLog2));
+
             pageModel.TotalCount = depart.Count();
             if (depart.Count() == 0) throw new KhongCoDuLieuException();
             pageModel.AllPage = (int)Math.Ceiling(depart.Count() / (decimal)query.record);
