@@ -111,6 +111,42 @@ namespace JeeAccount.Controllers
             }
         }
 
+        [HttpGet("GetListDepartmentManagement2")]
+        public async Task<IActionResult> GetListDepartmentManagement2()
+        {
+            try
+            {
+
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return BadRequest(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return BadRequest(MessageReturnHelper.DangNhap());
+                }
+
+                var jeehrController = new JeeHRController(HOST_JEEHR_API);
+                var list = jeehrController.GetDSCoCauToChuc(token);
+
+                return Ok(list);
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieuException(ex));
+            }
+            catch (JeeHRException error)
+            {
+                return BadRequest(MessageReturnHelper.ExceptionJeeHR(error));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
 
         [HttpPost("CreateDepartment")]
         public object CreateDepartment(DepartmentModel depart)
