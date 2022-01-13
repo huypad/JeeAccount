@@ -18,6 +18,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net;
 using System.IO;
+using RestSharp;
 
 namespace JeeAccount.Controllers
 {
@@ -112,7 +113,7 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("GetListDepartmentManagement2")]
-        public async Task<IActionResult> GetListDepartmentManagement2()
+        public IActionResult GetListDepartmentManagement2()
         {
             try
             {
@@ -128,10 +129,18 @@ namespace JeeAccount.Controllers
                     return BadRequest(MessageReturnHelper.DangNhap());
                 }
 
-                var jeehrController = new JeeHRController(HOST_JEEHR_API);
-                var list = jeehrController.GetDSCoCauToChuc(token);
+                string host_api_jeehr = _config.GetValue<string>("Host:JeeHR_API");
+                string url = $"{host_api_jeehr}/api/interaction/getCoCauToChuc";
 
-                return Ok(list);
+                var client = new RestClient(url);
+                var request = new RestRequest(Method.GET);
+
+                request.AddHeader("Authorization", token);
+                IRestResponse response = client.Execute(request);
+                var res = JsonConvert.DeserializeObject<ReturnJeeHR<JeeHRCoCauToChuc>>(response.Content);
+                return Ok(res);
+
+                
             }
             catch (KhongCoDuLieuException ex)
             {
