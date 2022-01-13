@@ -1,4 +1,6 @@
-﻿using JeeAccount.Models.JeeHR;
+﻿using DPSinfra.Logger;
+using JeeAccount.Models.JeeHR;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RestSharp;
 using System;
@@ -12,9 +14,10 @@ namespace JeeAccount.Controllers
 {
     public class JeeHRController
     {
-        public JeeHRController(string HOST_API_JEEHR)
+        public JeeHRController(string HOST_API_JEEHR, ILogger<JeeHRController> logger)
         {
             _HOST_API_JEEHR = HOST_API_JEEHR;
+            _logger = logger;
         }
 
         private readonly string _HOST_API_JEEHR;
@@ -22,10 +25,12 @@ namespace JeeAccount.Controllers
         private const string GET_DSNHANVIEN_THEOQUANLYTRUCTIEP = "api/interaction/getDSNhanVienTheoQLTT";
         private const string GET_COCAUTOCHUC = "api/interaction/getCoCauToChuc";
         private const string GET_CHUCVUCHUCDANH = "api/interaction/getDSChucVuTheoChucDanh";
+        private readonly ILogger<JeeHRController> _logger;
 
         public async Task<ReturnJeeHR<NhanVienJeeHR>> GetDSNhanVien(string access_token)
         {
             string url = $"{_HOST_API_JEEHR}/{GET_DSNHANVIEN}";
+
 
             using (var client = new HttpClient())
             {
@@ -67,6 +72,14 @@ namespace JeeAccount.Controllers
 
         public async Task<ReturnJeeHR<JeeHRCoCauToChuc>> GetDSCoCauToChuc(string access_token)
         {
+            var traceLog2 = new GeneralLog()
+            {
+                name = "department",
+                data = "",
+                message = "GetDSPhongBan checkusedjeehr GetDSCoCauToChuc"
+            };
+            _logger.LogTrace(JsonConvert.SerializeObject(traceLog2));
+
             string url = $"{_HOST_API_JEEHR}/{GET_COCAUTOCHUC}";
 
             using (var client = new HttpClient())
@@ -74,6 +87,13 @@ namespace JeeAccount.Controllers
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(access_token);
                 var reponse = await client.GetAsync(url);
                 string returnValue = await reponse.Content.ReadAsStringAsync();
+                var traceLog3 = new GeneralLog()
+                {
+                    name = "department",
+                    data = JsonConvert.SerializeObject(returnValue),
+                    message = "GetDSPhongBan checkusedjeehr GetDSCoCauToChuc returnValue"
+                };
+                _logger.LogTrace(JsonConvert.SerializeObject(traceLog3));
                 var res = JsonConvert.DeserializeObject<ReturnJeeHR<JeeHRCoCauToChuc>>(returnValue);
                 return res;
             }
