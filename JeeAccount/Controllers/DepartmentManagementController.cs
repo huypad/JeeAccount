@@ -117,7 +117,53 @@ namespace JeeAccount.Controllers
         {
             try
             {
-                return Ok(new { content = "what why why"});
+
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return BadRequest(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return BadRequest(MessageReturnHelper.DangNhap());
+                }
+
+                string host_api_jeehr = _config.GetValue<string>("Host:JeeHR_API");
+                string url = $"{host_api_jeehr}/api/interaction/getCoCauToChuc";
+
+                var client = new RestClient(url);
+                var request = new RestRequest(Method.GET);
+
+                request.AddHeader("Authorization", token);
+                var traceLog = new GeneralLog()
+                {
+                    name = "department",
+                    data = "",
+                    message = "send response"
+                };
+                _logger.LogTrace(JsonConvert.SerializeObject(traceLog));
+                IRestResponse response = client.Execute(request);
+                var traceLog2 = new GeneralLog()
+                {
+                    name = "department",
+                    data = "",
+                    message = "send ok"
+                };
+                _logger.LogTrace(JsonConvert.SerializeObject(traceLog2));
+
+
+                var res = JsonConvert.DeserializeObject<ReturnJeeHR<JeeHRCoCauToChuc>>(response.Content);
+
+                var traceLog3 = new GeneralLog()
+                {
+                    name = "department",
+                    data = res,
+                    message = "send ok get data"
+                };
+                _logger.LogTrace(JsonConvert.SerializeObject(traceLog3));
+
+                return Ok(res);
 
                 
             }
