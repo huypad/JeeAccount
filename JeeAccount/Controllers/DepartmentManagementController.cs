@@ -14,6 +14,8 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using DPSinfra.Logger;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace JeeAccount.Controllers
 {
@@ -92,6 +94,42 @@ namespace JeeAccount.Controllers
                 var obj = await _service.GetDSPhongBan(query, customData.JeeAccount.CustomerID, token);
 
                 return Ok(obj);
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieuException(ex));
+            }
+            catch (JeeHRException error)
+            {
+                return BadRequest(MessageReturnHelper.ExceptionJeeHR(error));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpGet("GetListDepartmentManagement2")]
+        public async Task<IActionResult> GetListDepartmentManagement2([FromQuery] QueryParams query)
+        {
+            try
+            {
+                string url = $"{HOST_JEEHR_API}/api/interaction/getCoCauToChuc";
+
+                query = query == null ? new QueryParams() : query;
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(token);
+                    var reponse = await client.GetAsync(url);
+                    string returnValue = await reponse.Content.ReadAsStringAsync();
+                    var res = JsonConvert.DeserializeObject<ReturnJeeHR<JeeHRCoCauToChuc>>(returnValue);
+                    var list = res;
+                    return Ok(list);
+
+                }
+
             }
             catch (KhongCoDuLieuException ex)
             {
