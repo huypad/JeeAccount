@@ -158,7 +158,7 @@ namespace JeeAccount.Controllers
                 var traceLog3 = new GeneralLog()
                 {
                     name = "department",
-                    data = res,
+                    data = res.ToString(),
                     message = "send ok get data"
                 };
                 _logger.LogTrace(JsonConvert.SerializeObject(traceLog3));
