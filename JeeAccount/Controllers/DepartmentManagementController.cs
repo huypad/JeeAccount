@@ -117,44 +117,7 @@ namespace JeeAccount.Controllers
         {
             try
             {
-
-                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
-                if (customData is null)
-                {
-                    return BadRequest(MessageReturnHelper.CustomDataKhongTonTai());
-                }
-                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
-                if (token is null)
-                {
-                    return BadRequest(MessageReturnHelper.DangNhap());
-                }
-
-                string host_api_jeehr = _config.GetValue<string>("Host:JeeHR_API");
-                string url = $"{host_api_jeehr}/api/interaction/getCoCauToChuc";
-
-                var client = new RestClient(url);
-                var request = new RestRequest(Method.GET);
-
-                request.AddHeader("Authorization", token);
-                var traceLog1 = new GeneralLog()
-                {
-                    name = "GetListDepartmentManagement2",
-                    data = "",
-                    message ="send data"
-                };
-                _logger.LogTrace(JsonConvert.SerializeObject(traceLog1));
-                IRestResponse response = client.Execute(request);
-
-                var traceLog2 = new GeneralLog()
-                {
-                    name = "GetListDepartmentManagement2",
-                    data = JsonConvert.SerializeObject(response),
-                    message = "GetListDepartmentManagement2 data"
-                };
-                _logger.LogTrace(JsonConvert.SerializeObject(traceLog2));
-
-                var res = JsonConvert.DeserializeObject<ReturnJeeHR<JeeHRCoCauToChuc>>(response.Content);
-                return Ok(res);
+                return Ok(new { content = "what why why"});
 
                 
             }
