@@ -11,6 +11,8 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace JeeAccount.Services.DepartmentManagement
@@ -126,57 +128,55 @@ namespace JeeAccount.Services.DepartmentManagement
 
             if (checkusedjeehr)
             {
-                var traceLog2 = new GeneralLog()
-                {
-                    name = "department",
-                    data = checkusedjeehr.ToString(),
-                    message = "GetDSPhongBan checkusedjeehr"
-                };
-                _logger.LogTrace(JsonConvert.SerializeObject(traceLog2));
 
-                var jeehrController = new JeeHRController(HOST_JEEHR_API);
-                var list = await jeehrController.GetDSCoCauToChuc(token);
-                var traceLog3 = new GeneralLog()
+                //var jeehrController = new JeeHRController(HOST_JEEHR_API);
+                //var list = await jeehrController.GetDSCoCauToChuc(token);
+
+                string url = $"{HOST_JEEHR_API}/api/interaction/getCoCauToChuc";
+                using (var client = new HttpClient())
                 {
-                    name = "department",
-                    data = JsonConvert.SerializeObject(list),
-                    message = "GetDSPhongBan checkusedjeehr GetDSCoCauToChuc"
-                };
-                _logger.LogTrace(JsonConvert.SerializeObject(traceLog3));
-                if (list.status == 1)
-                {
-                    var flat = TranferDataHelper.FlatListJeeHRCoCauToChuc(list.data);
-                    flat = FilterLstFlatJeeHRCoCauToChuc(flat, query, sortableFieldsJeeHR);
-                    pageModel.TotalCount = flat.Count;
-                    if (flat.Count() == 0)
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(token);
+                    var reponse = await client.GetAsync(url);
+                    string returnValue = await reponse.Content.ReadAsStringAsync();
+                    var res = JsonConvert.DeserializeObject<ReturnJeeHR<JeeHRCoCauToChuc>>(returnValue);
+                    var list = res;
+
+                    if (list.status == 1)
+                    {
+                        var flat = TranferDataHelper.FlatListJeeHRCoCauToChuc(list.data);
+                        flat = FilterLstFlatJeeHRCoCauToChuc(flat, query, sortableFieldsJeeHR);
+                        pageModel.TotalCount = flat.Count;
+                        if (flat.Count() == 0)
+                        {
+                            return await ReturnObjectGetListDepartmentIsJeeHRAsync(query, pageModel, customerid, whereStrJeeHR, orderByStrJeeHR, checkusedjeehr);
+                        }
+                        pageModel.AllPage = (int)Math.Ceiling(flat.Count / (decimal)query.record);
+                        pageModel.Size = query.record;
+                        pageModel.Page = query.page;
+                        if (query.more)
+                        {
+                            query.page = 1;
+                            pageModel.AllPage = 1;
+                            pageModel.Size = 1;
+                            query.record = pageModel.TotalCount;
+                        }
+                        flat = flat.Skip((query.page - 1) * query.record).Take(query.record).ToList();
+
+                        var obj = new
+                        {
+                            tree = list.data,
+                            flat = flat,
+                            isTree = true,
+                            isJeeHR = checkusedjeehr,
+                        };
+
+                        return new { data = obj, panigator = pageModel };
+                    }
+
+                    else
                     {
                         return await ReturnObjectGetListDepartmentIsJeeHRAsync(query, pageModel, customerid, whereStrJeeHR, orderByStrJeeHR, checkusedjeehr);
                     }
-                    pageModel.AllPage = (int)Math.Ceiling(flat.Count / (decimal)query.record);
-                    pageModel.Size = query.record;
-                    pageModel.Page = query.page;
-                    if (query.more)
-                    {
-                        query.page = 1;
-                        pageModel.AllPage = 1;
-                        pageModel.Size = 1;
-                        query.record = pageModel.TotalCount;
-                    }
-                    flat = flat.Skip((query.page - 1) * query.record).Take(query.record).ToList();
-
-                    var obj = new
-                    {
-                        tree = list.data,
-                        flat = flat,
-                        isTree = true,
-                        isJeeHR = checkusedjeehr,
-                    };
-
-                    return new { data = obj, panigator = pageModel };
-                }
-                else
-                {
-                    return await ReturnObjectGetListDepartmentIsJeeHRAsync(query, pageModel, customerid, whereStrJeeHR, orderByStrJeeHR, checkusedjeehr);
                 }
             }
             else
