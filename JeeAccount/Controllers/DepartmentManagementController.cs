@@ -153,7 +153,7 @@ namespace JeeAccount.Controllers
                 _logger.LogTrace(JsonConvert.SerializeObject(traceLog2));
 
 
-                var res = JsonConvert.DeserializeObject<ReturnJeeHR<JeeHRCoCauToChuc>>(response.Content);
+                var res = response.Content;
 
                 var traceLog3 = new GeneralLog()
                 {
