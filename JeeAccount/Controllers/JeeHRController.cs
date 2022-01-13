@@ -65,18 +65,18 @@ namespace JeeAccount.Controllers
             }
         }
 
-        public async Task<ReturnJeeHR<JeeHRCoCauToChuc>> GetDSCoCauToChuc(string access_token)
+        public  ReturnJeeHR<JeeHRCoCauToChuc> GetDSCoCauToChuc(string access_token)
         {
             string url = $"{_HOST_API_JEEHR}/{GET_COCAUTOCHUC}";
 
-            using (var client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(access_token);
-                var reponse = await client.GetAsync(url);
-                string returnValue = await reponse.Content.ReadAsStringAsync();
-                var res = JsonConvert.DeserializeObject<ReturnJeeHR<JeeHRCoCauToChuc>>(returnValue);
-                return res;
-            }
+            var client = new RestClient(url);
+            var request = new RestRequest(Method.GET);
+
+            request.AddHeader("Authorization", access_token);
+            IRestResponse response = client.Execute(request);
+            var res = JsonConvert.DeserializeObject<ReturnJeeHR<JeeHRCoCauToChuc>>(response.Content);
+            return res;
+
         }
 
         public async Task<ReturnJeeHR<JeeHRChucVu>> GetDSChucVu(string access_token, string cocauid, string chucdanh)

@@ -129,55 +129,46 @@ namespace JeeAccount.Services.DepartmentManagement
             if (checkusedjeehr)
             {
 
-                //var jeehrController = new JeeHRController(HOST_JEEHR_API);
-                //var list = await jeehrController.GetDSCoCauToChuc(token);
+                var jeehrController = new JeeHRController(HOST_JEEHR_API);
+                var list =  jeehrController.GetDSCoCauToChuc(token);
 
-                string url = $"{HOST_JEEHR_API}/api/interaction/getCoCauToChuc";
-                using (var client = new HttpClient())
+                if (list.status == 1)
                 {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(token);
-                    var reponse = await client.GetAsync(url);
-                    string returnValue = await reponse.Content.ReadAsStringAsync();
-                    var res = JsonConvert.DeserializeObject<ReturnJeeHR<JeeHRCoCauToChuc>>(returnValue);
-                    var list = res;
-
-                    if (list.status == 1)
-                    {
-                        var flat = TranferDataHelper.FlatListJeeHRCoCauToChuc(list.data);
-                        flat = FilterLstFlatJeeHRCoCauToChuc(flat, query, sortableFieldsJeeHR);
-                        pageModel.TotalCount = flat.Count;
-                        if (flat.Count() == 0)
-                        {
-                            return await ReturnObjectGetListDepartmentIsJeeHRAsync(query, pageModel, customerid, whereStrJeeHR, orderByStrJeeHR, checkusedjeehr);
-                        }
-                        pageModel.AllPage = (int)Math.Ceiling(flat.Count / (decimal)query.record);
-                        pageModel.Size = query.record;
-                        pageModel.Page = query.page;
-                        if (query.more)
-                        {
-                            query.page = 1;
-                            pageModel.AllPage = 1;
-                            pageModel.Size = 1;
-                            query.record = pageModel.TotalCount;
-                        }
-                        flat = flat.Skip((query.page - 1) * query.record).Take(query.record).ToList();
-
-                        var obj = new
-                        {
-                            tree = list.data,
-                            flat = flat,
-                            isTree = true,
-                            isJeeHR = checkusedjeehr,
-                        };
-
-                        return new { data = obj, panigator = pageModel };
-                    }
-
-                    else
+                    var flat = TranferDataHelper.FlatListJeeHRCoCauToChuc(list.data);
+                    flat = FilterLstFlatJeeHRCoCauToChuc(flat, query, sortableFieldsJeeHR);
+                    pageModel.TotalCount = flat.Count;
+                    if (flat.Count() == 0)
                     {
                         return await ReturnObjectGetListDepartmentIsJeeHRAsync(query, pageModel, customerid, whereStrJeeHR, orderByStrJeeHR, checkusedjeehr);
                     }
+                    pageModel.AllPage = (int)Math.Ceiling(flat.Count / (decimal)query.record);
+                    pageModel.Size = query.record;
+                    pageModel.Page = query.page;
+                    if (query.more)
+                    {
+                        query.page = 1;
+                        pageModel.AllPage = 1;
+                        pageModel.Size = 1;
+                        query.record = pageModel.TotalCount;
+                    }
+                    flat = flat.Skip((query.page - 1) * query.record).Take(query.record).ToList();
+
+                    var obj = new
+                    {
+                        tree = list.data,
+                        flat = flat,
+                        isTree = true,
+                        isJeeHR = checkusedjeehr,
+                    };
+
+                    return new { data = obj, panigator = pageModel };
                 }
+
+                else
+                {
+                    return await ReturnObjectGetListDepartmentIsJeeHRAsync(query, pageModel, customerid, whereStrJeeHR, orderByStrJeeHR, checkusedjeehr);
+                }
+               
             }
             else
             {

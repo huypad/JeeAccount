@@ -65,7 +65,7 @@ namespace JeeAccount.Controllers
                 else
                 {
                     var jeehrController = new JeeHRController(HOST_JEEHR_API);
-                    var list = await jeehrController.GetDSCoCauToChuc(token);
+                    var list = jeehrController.GetDSCoCauToChuc(token);
                     return list;
                 }
             }
@@ -111,75 +111,6 @@ namespace JeeAccount.Controllers
             }
         }
 
-        [HttpGet("GetListDepartmentManagement2")]
-        public async Task<IActionResult> GetListDepartmentManagement2()
-        {
-            try
-            {
-                string url = $"{HOST_JEEHR_API}/api/interaction/getCoCauToChuc";
-
-                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
-
-                using (var client = new HttpClient())
-                {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(token);
-                    var reponse = await client.GetAsync(url);
-                    string returnValue = await reponse.Content.ReadAsStringAsync();
-                    var res = JsonConvert.DeserializeObject<ReturnJeeHR<JeeHRCoCauToChuc>>(returnValue);
-                    var list = res;
-                    return Ok(list);
-
-                }
-
-            }
-            catch (KhongCoDuLieuException ex)
-            {
-                return BadRequest(MessageReturnHelper.KhongCoDuLieuException(ex));
-            }
-            catch (JeeHRException error)
-            {
-                return BadRequest(MessageReturnHelper.ExceptionJeeHR(error));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(MessageReturnHelper.Exception(ex));
-            }
-        }
-
-        [HttpGet("GetListDepartmentManagement3")]
-        public async Task<IActionResult> GetListDepartmentManagement3()
-        {
-            try
-            {
-                string url = $"{HOST_JEEHR_API}/api/interaction/getCoCauToChuc";
-
-                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
-
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-                request.Headers[HttpRequestHeader.Authorization] = "Bearer " + token;
-
-                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-                using (Stream stream = response.GetResponseStream())
-                using (StreamReader reader = new StreamReader(stream))
-                {
-                    return Ok(reader.ReadToEnd());
-                }
-
-
-            }
-            catch (KhongCoDuLieuException ex)
-            {
-                return BadRequest(MessageReturnHelper.KhongCoDuLieuException(ex));
-            }
-            catch (JeeHRException error)
-            {
-                return BadRequest(MessageReturnHelper.ExceptionJeeHR(error));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(MessageReturnHelper.Exception(ex));
-            }
-        }
 
         [HttpPost("CreateDepartment")]
         public object CreateDepartment(DepartmentModel depart)
