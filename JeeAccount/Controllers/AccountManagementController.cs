@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using RestSharp;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -1414,6 +1415,44 @@ namespace JeeAccount.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex);
+            }
+        }
+
+        [HttpGet("GetListDepartmentManagement2")]
+        public IActionResult GetListDepartmentManagement2()
+        {
+            try
+            {
+
+                var customData = Ulities.GetCustomDataByHeader(HttpContext.Request.Headers);
+                if (customData is null)
+                {
+                    return BadRequest(MessageReturnHelper.CustomDataKhongTonTai());
+                }
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+                if (token is null)
+                {
+                    return BadRequest(MessageReturnHelper.DangNhap());
+                }
+
+                string host_api_jeehr = _config.GetValue<string>("Host:JeeHR_API");
+                string url = $"{host_api_jeehr}/api/interaction/getCoCauToChuc";
+
+                var client = new RestClient(url);
+                var request = new RestRequest(Method.GET);
+
+                IRestResponse response = client.Execute(request);
+         
+
+                var res = response.Content;
+
+                return Ok(res);
+
+            }
+
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
             }
         }
     }
