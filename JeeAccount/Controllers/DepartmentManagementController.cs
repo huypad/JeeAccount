@@ -150,31 +150,14 @@ namespace JeeAccount.Controllers
                     data = "",
                     message = "send ok"
                 };
-                _logger.LogTrace(JsonConvert.SerializeObject(traceLog2));
 
 
                 var res = response.Content;
 
-                var traceLog3 = new GeneralLog()
-                {
-                    name = "department",
-                    data = res.ToString(),
-                    message = "send ok get data"
-                };
-                _logger.LogTrace(JsonConvert.SerializeObject(traceLog3));
-
                 return Ok(res);
-
                 
             }
-            catch (KhongCoDuLieuException ex)
-            {
-                return BadRequest(MessageReturnHelper.KhongCoDuLieuException(ex));
-            }
-            catch (JeeHRException error)
-            {
-                return BadRequest(MessageReturnHelper.ExceptionJeeHR(error));
-            }
+
             catch (Exception ex)
             {
                 return BadRequest(MessageReturnHelper.Exception(ex));
