@@ -110,13 +110,12 @@ namespace JeeAccount.Controllers
         }
 
         [HttpGet("GetListDepartmentManagement2")]
-        public async Task<IActionResult> GetListDepartmentManagement2([FromQuery] QueryParams query)
+        public async Task<IActionResult> GetListDepartmentManagement2()
         {
             try
             {
                 string url = $"{HOST_JEEHR_API}/api/interaction/getCoCauToChuc";
 
-                query = query == null ? new QueryParams() : query;
                 var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
 
                 using (var client = new HttpClient())
