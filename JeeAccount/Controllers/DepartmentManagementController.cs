@@ -88,22 +88,9 @@ namespace JeeAccount.Controllers
                 {
                     return BadRequest(MessageReturnHelper.DangNhap());
                 }
-                var traceLog = new GeneralLog()
-                {
-                    name = "department",
-                    data = "",
-                    message = "GetListDepartmentManagement Open"
-                };
-                _logger.LogTrace(JsonConvert.SerializeObject(traceLog));
 
-                var obj = await _service.GetDSPhongBan(query, customData.JeeAccount.CustomerID, token).ConfigureAwait(false);
-                var traceLog2 = new GeneralLog()
-                {
-                    name = "department",
-                    data = JsonConvert.SerializeObject(obj),
-                    message = "GetListDepartmentManagement GetDSPhongBan"
-                };
-                _logger.LogTrace(JsonConvert.SerializeObject(traceLog2));
+                var obj = await _service.GetDSPhongBan(query, customData.JeeAccount.CustomerID, token);
+
                 return Ok(obj);
             }
             catch (KhongCoDuLieuException ex)

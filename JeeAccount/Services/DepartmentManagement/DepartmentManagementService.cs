@@ -80,13 +80,6 @@ namespace JeeAccount.Services.DepartmentManagement
 
         public async Task<object> GetDSPhongBan(QueryParams query, long customerid, string token)
         {
-            var traceLog = new GeneralLog()
-            {
-                name = "department",
-                data = "",
-                message = "GetDSPhongBan Open"
-            };
-            _logger.LogTrace(JsonConvert.SerializeObject(traceLog));
 
             query = query == null ? new QueryParams() : query;
             PageModel pageModel = new PageModel();
