@@ -149,7 +149,7 @@ namespace JeeAccount.Services.CommentService
             kafkaModel.IsAddNew = true;
             kafkaModel.PostComment = postComment;
 
-            await _producer.PublishAsync(TOPIC_JeeplatformPostcomment, JsonConvert.SerializeObject(kafkaModel)).ConfigureAwait(false);
+            await _producer.PublishAsync(TOPIC_JeeplatformPostcomment, JsonConvert.SerializeObject(kafkaModel));
         }
 
         public async Task PostReactionCommentKafka(ReactionCommentModel reactionCommentModel)
@@ -159,7 +159,7 @@ namespace JeeAccount.Services.CommentService
             kafkaModel.IsReaction = true;
             kafkaModel.ReactionComment = reactionCommentModel;
 
-            await _producer.PublishAsync(TOPIC_JeeplatformPostcomment, JsonConvert.SerializeObject(kafkaModel)).ConfigureAwait(false);
+            await _producer.PublishAsync(TOPIC_JeeplatformPostcomment, JsonConvert.SerializeObject(kafkaModel));
         }
     }
 }

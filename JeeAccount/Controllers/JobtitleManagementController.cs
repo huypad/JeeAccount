@@ -49,7 +49,7 @@ namespace JeeAccount.Controllers
                     return Unauthorized(MessageReturnHelper.DangNhap());
                 }
 
-                var obj = await _service.GetDSChucvu(query, customData.JeeAccount.CustomerID, token).ConfigureAwait(false);
+                var obj = await _service.GetDSChucvu(query, customData.JeeAccount.CustomerID, token);
 
                 return Ok(obj);
             }

@@ -651,7 +651,7 @@ join AppList on AppList.AppID = Account_App.AppID";
 
             using (DpsConnection cnn = new DpsConnection(connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
 
                 var result = dt.AsEnumerable().Select(row => new AppListDTO
                 {
@@ -700,7 +700,7 @@ join AppList on AppList.AppID = Account_App.AppID";
 
             string sql = @$"select {selection} from AccountList {join} {where} and Account_App.Disable = 0 order by Position";
 
-            dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+            dt = await cnn.CreateDataTableAsync(sql, Conds);
 
             var result = dt.AsEnumerable().Select(row => new AppListDTO
             {

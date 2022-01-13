@@ -57,7 +57,7 @@ namespace JeeAccount.Reponsitories.JobtitleManagement
                     Title = row["JobtitleName"] != DBNull.Value ? row["JobtitleName"].ToString() : "",
                     Note = row["Note"] != DBNull.Value ? row["Note"].ToString() : "",
                 });
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return await Task.FromResult(result);
             }
         }
 
@@ -85,7 +85,7 @@ namespace JeeAccount.Reponsitories.JobtitleManagement
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 var result = dt.AsEnumerable().Select(row => new JeeHRChucVuFromDB
                 {
                     RowID = int.Parse(row["JobtitleID"].ToString()),

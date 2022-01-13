@@ -62,7 +62,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
 
                 var result = dt.AsEnumerable().Select(row => new AccountManagementDTO
                 {
@@ -120,7 +120,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
 
                 var result = dt.AsEnumerable().Select(row => new AccountManagementDTO
                 {
@@ -169,7 +169,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
 
                 return dt.AsEnumerable().Select(row => new AccUsernameModel
                 {
@@ -202,7 +202,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
 
                 return dt.AsEnumerable().Select(row => new AccUsernameModel
                 {
@@ -235,7 +235,7 @@ left join JobtitleList on JobtitleList.RowID = AccountList.JobtitleID";
                 dt = cnn.CreateDataTable(sql, Conds);
                 var result = dt.AsEnumerable().Select(row => long.Parse(row["RowID"].ToString()));
 
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return await Task.FromResult(result);
             }
         }
 
@@ -252,7 +252,7 @@ where AppList.AppCode = '{AppCode}'";
                 dt = cnn.CreateDataTable(sql, Conds);
                 var result = dt.AsEnumerable().Select(row => long.Parse(row["RowID"].ToString()));
 
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return await Task.FromResult(result);
             }
         }
 
@@ -267,7 +267,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 if (dt.Rows.Count == 0)
                     return 0;
                 var result = dt.AsEnumerable().Select(row => long.Parse(row["CustomerID"].ToString())).SingleOrDefault();
@@ -286,7 +286,7 @@ where Username = @Username and (Disable != 1 or Disable is null)";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 if (dt.Rows.Count == 0)
                     return 0;
                 var result = dt.AsEnumerable().Select(row => long.Parse(row["CustomerID"].ToString())).SingleOrDefault();
@@ -308,7 +308,7 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null) and IsAdmin
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 var result = dt.AsEnumerable().Select(row => new AdminModel
                 {
                     UserId = Int32.Parse(row["UserID"].ToString()),
@@ -330,7 +330,7 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null) and IsAdmin
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
 
                 var result = dt.AsEnumerable().Select(row => new InfoAdminDTO
                 {
@@ -358,7 +358,7 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null) and IsAdmin
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
 
                 var result = dt.AsEnumerable().Select(row => new InfoAdminDTO
                 {
@@ -387,7 +387,7 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null) and IsAdmin
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 if (dt.Rows.Count == 0)
                     return new InfoCustomerDTO();
                 var result = new InfoCustomerDTO
@@ -414,7 +414,7 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null) and IsAdmin
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 if (dt.Rows.Count == 0)
                     return new InfoUserDTO();
                 var result = new InfoUserDTO
@@ -447,7 +447,7 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null) and IsAdmin
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 if (dt.Rows.Count == 0)
                     return new InfoUserDTO();
                 var result = new InfoUserDTO
@@ -482,7 +482,7 @@ where CustomerID = @CustomerID and (Disable != 1 or Disable is null) and IsAdmin
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 var result = dt.AsEnumerable().Select(row => new AppListDTO
                 {
                     AppID = Int32.Parse(row["AppID"].ToString()),
@@ -576,7 +576,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                     return null;
                 var result = dt.AsEnumerable().Select(row => row["DirectManager"].ToString()).SingleOrDefault();
 
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return await Task.FromResult(result);
             }
         }
 
@@ -590,12 +590,12 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 if (dt.Rows.Count == 0)
                     return null;
                 var result = dt.AsEnumerable().Select(row => row["DirectManager"].ToString()).SingleOrDefault();
 
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return await Task.FromResult(result);
             }
         }
 
@@ -616,7 +616,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                     StaffID = row["StaffID"] != DBNull.Value ? Convert.ToInt64(row["StaffID"]) : 0,
                 });
 
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return await Task.FromResult(result);
             }
         }
 
@@ -632,7 +632,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                 dt = cnn.CreateDataTable(sql, Conds);
                 var result = dt.AsEnumerable().Select(row => row["Username"].ToString());
 
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return await Task.FromResult(result);
             }
         }
 
@@ -648,7 +648,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
                 dt = cnn.CreateDataTable(sql, Conds);
                 var result = dt.AsEnumerable().Select(row => long.Parse(row["UserID"].ToString()));
 
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return await Task.FromResult(result);
             }
         }
 
@@ -662,7 +662,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
             {
                 dt = cnn.CreateDataTable(sql, Conds);
                 var result = dt.AsEnumerable().Select(row => row["DirectManager"].ToString());
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return await Task.FromResult(result);
             }
         }
 
@@ -677,7 +677,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 var result = dt.AsEnumerable().Select(row => new AccUsernameModel
                 {
                     UserId = Int32.Parse(row["UserID"].ToString()),
@@ -712,7 +712,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 var result = dt.AsEnumerable().Select(row => new AccUsernameModel
                 {
                     UserId = Int32.Parse(row["UserID"].ToString()),
@@ -1101,7 +1101,7 @@ where AppList.AppCode = '{appcode}' and AccountList.CustomerID = {custormerID} a
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 var result = dt.AsEnumerable().Select(row => new CustomerAppDTO
                 {
                     AppID = Int32.Parse(row["AppID"].ToString()),

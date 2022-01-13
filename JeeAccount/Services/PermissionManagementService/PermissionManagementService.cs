@@ -161,7 +161,7 @@ namespace JeeAccount.Services.PermissionManagementService
                 foreach (var appCode in AppCodes)
                 {
                     string objectSUpdateAdmin = JsonConvert.SerializeObject(ObjectUpdateAdminKafka(appCode, customerid, userid, username));
-                    await _producer.PublishAsync(TOPIC_UPDATEADMIN, objectSUpdateAdmin).ConfigureAwait(false);
+                    await _producer.PublishAsync(TOPIC_UPDATEADMIN, objectSUpdateAdmin);
                 }
                 var identityServerController = new IdentityServerController();
                 var common = GeneralReponsitory.GetCommonInfo(_connectionString, userid);
@@ -252,7 +252,7 @@ namespace JeeAccount.Services.PermissionManagementService
                 foreach (var appCode in AppCodes)
                 {
                     string objectSUpdateAdmin = JsonConvert.SerializeObject(ObjectRemoveAdminKafka(appCode, customerid, userid, username));
-                    await _producer.PublishAsync(TOPIC_UPDATEADMIN, objectSUpdateAdmin).ConfigureAwait(false);
+                    await _producer.PublishAsync(TOPIC_UPDATEADMIN, objectSUpdateAdmin);
                 }
             }
             catch (Exception)

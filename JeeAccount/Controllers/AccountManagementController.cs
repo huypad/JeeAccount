@@ -73,7 +73,7 @@ namespace JeeAccount.Controllers
                 }
 
                 PageModel pageModel = new PageModel();
-                var lst = await _service.GetListAccountManagement(query, customData.JeeAccount.CustomerID).ConfigureAwait(false);
+                var lst = await _service.GetListAccountManagement(query, customData.JeeAccount.CustomerID);
                 int total = lst.Count();
                 if (total == 0) return BadRequest(MessageReturnHelper.KhongCoDuLieu("danh sách tài khoản"));
                 pageModel.TotalCount = lst.Count();
@@ -116,7 +116,7 @@ namespace JeeAccount.Controllers
                     return Unauthorized(MessageReturnHelper.DangNhap());
                 }
                 PageModel pageModel = new PageModel();
-                var lst = await _service.GetListAccountManagement(query, customerid).ConfigureAwait(false);
+                var lst = await _service.GetListAccountManagement(query, customerid);
                 int total = lst.Count();
                 if (total == 0) return BadRequest(MessageReturnHelper.KhongCoDuLieu("danh sách tài khoản"));
                 pageModel.TotalCount = lst.Count();
@@ -158,7 +158,7 @@ namespace JeeAccount.Controllers
                 }
                 var commonInfo = GeneralReponsitory.GetCommonInfo(_connectionString, 0, img.Username);
                 var userid = commonInfo.UserID;
-                var obj = await _service.UpdateAvatarWithChangeUrlAvatar(Convert.ToInt64(userid), img.Username, customData.JeeAccount.CustomerID, img.imgFile).ConfigureAwait(false);
+                var obj = await _service.UpdateAvatarWithChangeUrlAvatar(Convert.ToInt64(userid), img.Username, customData.JeeAccount.CustomerID, img.imgFile);
                 return Ok(obj);
             }
             catch (KhongCoDuLieuException ex)
@@ -1400,7 +1400,7 @@ namespace JeeAccount.Controllers
                         {
                             return BadRequest(cnn.LastError);
                         }
-                        var dt = await cnn.CreateDataTableAsync(sql).ConfigureAwait(false);
+                        var dt = await cnn.CreateDataTableAsync(sql);
                         if (dt.Rows.Count == 0) return BadRequest(new { cnn.LastError, connectionString = _connectionString });
                         object o = new { dt = dt, connectionString = _connectionString };
                         return Ok(o);

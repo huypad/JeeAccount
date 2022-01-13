@@ -84,7 +84,7 @@ namespace JeeAccount.Services.JobtitleManagementService
                     chucdanhid = query.filter["chucdanhid"];
                 }
                 var jeehrController = new JeeHRController(HOST_JEEHR_API);
-                var list = await jeehrController.GetDSChucVu(token, cocauid, chucdanhid).ConfigureAwait(false);
+                var list = await jeehrController.GetDSChucVu(token, cocauid, chucdanhid);
                 if (list.status == 1)
                 {
                     var ds_jeehr = FilterLstJeeHRChucVu(list.data, query, sortableFieldsJeeHR);
@@ -250,12 +250,12 @@ namespace JeeAccount.Services.JobtitleManagementService
 
         public async Task<IEnumerable<JobtitleDTO>> GetListJobtitleDefaultAsync(long custormerID)
         {
-            return await _reponsitory.GetListJobtitleDefaultAsync(custormerID).ConfigureAwait(false);
+            return await _reponsitory.GetListJobtitleDefaultAsync(custormerID);
         }
 
         public async Task<IEnumerable<JeeHRChucVuFromDB>> GetListJobtitleIsJeeHRtAsync(long custormerID)
         {
-            return await _reponsitory.GetListJobtitleIsJeeHRAsync(custormerID).ConfigureAwait(false);
+            return await _reponsitory.GetListJobtitleIsJeeHRAsync(custormerID);
         }
 
         public ReturnSqlModel ChangeTinhTrang(long customerID, long RowID, string Note, long UserIdLogin)

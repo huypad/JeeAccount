@@ -182,11 +182,11 @@ namespace JeeAccount.Services.AccountManagementService
             var checkusedjeehr = GeneralReponsitory.IsUsedJeeHRCustomerid(_connectionString, customerid);
             if (checkusedjeehr)
             {
-                lst = await _reponsitory.GetListAccUsernameModelIsJeeHRAsync(customerid).ConfigureAwait(false);
+                lst = await _reponsitory.GetListAccUsernameModelIsJeeHRAsync(customerid);
             }
             else
             {
-                lst = await _reponsitory.GetListAccUsernameModelDefaultAsync(customerid).ConfigureAwait(false);
+                lst = await _reponsitory.GetListAccUsernameModelDefaultAsync(customerid);
             }
 
             return lst;
@@ -194,12 +194,12 @@ namespace JeeAccount.Services.AccountManagementService
 
         public async Task<IEnumerable<long>> GetListJustCustormerID()
         {
-            return await _reponsitory.GetListJustCustormerID().ConfigureAwait(false);
+            return await _reponsitory.GetListJustCustormerID();
         }
 
         public async Task<IEnumerable<long>> GetListJustCustormerIDAppCode(string appCode)
         {
-            return await _reponsitory.GetListJustCustormerIDAppCode(appCode).ConfigureAwait(false);
+            return await _reponsitory.GetListJustCustormerIDAppCode(appCode);
         }
 
         public async Task<long> GetCustormerID(InputApiModel model)
@@ -222,12 +222,12 @@ namespace JeeAccount.Services.AccountManagementService
 
         public async Task<long> GetCustormerIDByUsernameAsync(string username)
         {
-            return await _reponsitory.GetCustormerIDByUsernameAsync(username).ConfigureAwait(false);
+            return await _reponsitory.GetCustormerIDByUsernameAsync(username);
         }
 
         public async Task<long> GetCustormerIDByUserIDAsync(long UserId)
         {
-            return await _reponsitory.GetCustormerIDByUserIDAsync(UserId).ConfigureAwait(false);
+            return await _reponsitory.GetCustormerIDByUserIDAsync(UserId);
         }
 
         public async Task<IEnumerable<InfoAdminDTO>> GetInfoAdminAccountByCustomerIDAsync(long customerID)
@@ -247,7 +247,7 @@ namespace JeeAccount.Services.AccountManagementService
 
         public async Task<InfoCustomerDTO> GetInfoByCustomerIDAsync(long customerID)
         {
-            return await _reponsitory.GetInfoByCustomerIDAsync(customerID).ConfigureAwait(false);
+            return await _reponsitory.GetInfoByCustomerIDAsync(customerID);
         }
 
         public async Task<InfoUserDTO> GetInfoByUsernameAsync(string username, long customerid)
@@ -267,52 +267,52 @@ namespace JeeAccount.Services.AccountManagementService
 
         public async Task<IEnumerable<AdminModel>> GetListAdminsByCustomerIDAsync(long customerID)
         {
-            return await _reponsitory.GetListAdminsByCustomerIDAsync(customerID).ConfigureAwait(false);
+            return await _reponsitory.GetListAdminsByCustomerIDAsync(customerID);
         }
 
         public async Task<IEnumerable<AppListDTO>> GetListAppByCustomerIDAsync(long customerID)
         {
-            return await _reponsitory.GetListAppByCustomerIDAsync(customerID).ConfigureAwait(false);
+            return await _reponsitory.GetListAppByCustomerIDAsync(customerID);
         }
 
         public async Task<IEnumerable<UserNameDTO>> GetListUsernameByAppcodeAsync(long custormerID, string appcode)
         {
-            return await _reponsitory.GetListUsernameByAppcodeAsync(custormerID, appcode).ConfigureAwait(false);
+            return await _reponsitory.GetListUsernameByAppcodeAsync(custormerID, appcode);
         }
 
         public async Task<string> GetDirectManagerByUserID(string userid)
         {
-            return await _reponsitory.GetDirectManagerByUserID(userid).ConfigureAwait(false);
+            return await _reponsitory.GetDirectManagerByUserID(userid);
         }
 
         public async Task<string> GetDirectManagerByUsername(string username)
         {
-            return await _reponsitory.GetDirectManagerByUsername(username).ConfigureAwait(false);
+            return await _reponsitory.GetDirectManagerByUsername(username);
         }
 
         public async Task<IEnumerable<UserNameDTO>> GetListJustUsernameAndUserIDByCustormerID(long custormerID)
         {
-            return await _reponsitory.GetListJustUsernameAndUserIDByCustormerID(custormerID).ConfigureAwait(false);
+            return await _reponsitory.GetListJustUsernameAndUserIDByCustormerID(custormerID);
         }
 
         public async Task<IEnumerable<string>> GetListJustUsernameByCustormerID(long custormerID)
         {
-            return await _reponsitory.GetListJustUsernameByCustormerID(custormerID).ConfigureAwait(false);
+            return await _reponsitory.GetListJustUsernameByCustormerID(custormerID);
         }
 
         public async Task<IEnumerable<long>> GetListJustUserIDByCustormerID(long custormerID)
         {
-            return await _reponsitory.GetListJustUserIDByCustormerID(custormerID).ConfigureAwait(false);
+            return await _reponsitory.GetListJustUserIDByCustormerID(custormerID);
         }
 
         public async Task<IEnumerable<string>> GetListDirectManager(long custormerID)
         {
-            return await _reponsitory.GetListDirectManager(custormerID).ConfigureAwait(false);
+            return await _reponsitory.GetListDirectManager(custormerID);
         }
 
         public async Task<IEnumerable<CustomerAppDTO>> GetListCustomerAppByCustomerIDFromAccountAsync(long customerID)
         {
-            return await _reponsitory.GetListCustomerAppByCustomerIDFromAccountAsync(customerID).ConfigureAwait(false);
+            return await _reponsitory.GetListCustomerAppByCustomerIDFromAccountAsync(customerID);
         }
 
         #endregion api giao diện
@@ -680,7 +680,7 @@ namespace JeeAccount.Services.AccountManagementService
                 var userID = cnn.ExecuteScalar(sql).ToString();
                 var commoninfo = GeneralReponsitory.GetCommonInfoCnn(cnn, long.Parse(userID));
                 var username = commoninfo.Username;
-                return await identityServerController.ResetPasswordRootCustomer(getSecretToken(), username, model).ConfigureAwait(false);
+                return await identityServerController.ResetPasswordRootCustomer(getSecretToken(), username, model);
             }
         }
 

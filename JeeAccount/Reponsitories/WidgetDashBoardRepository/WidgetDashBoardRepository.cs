@@ -39,7 +39,7 @@ namespace JeeAccount.Reponsitories
                     x = Convert.ToInt32(row["x"]),
                     y = Convert.ToInt32(row["y"])
                 });
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return await Task.FromResult(result);
             }
         }
 
@@ -62,7 +62,7 @@ namespace JeeAccount.Reponsitories
                     x = Convert.ToInt32(row["x"]),
                     y = Convert.ToInt32(row["y"])
                 }).SingleOrDefault();
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return await Task.FromResult(result);
             }
         }
 

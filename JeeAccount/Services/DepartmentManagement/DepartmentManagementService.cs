@@ -70,12 +70,12 @@ namespace JeeAccount.Services.DepartmentManagement
 
         public async Task<IEnumerable<DepartmentDTO>> GetListDepartmentDefaultAsync(long custormerID)
         {
-            return await _reponsitory.GetListDepartmentDefaultAsync(custormerID).ConfigureAwait(false);
+            return await _reponsitory.GetListDepartmentDefaultAsync(custormerID);
         }
 
         public async Task<IEnumerable<JeeHRCoCauToChucModelFromDB>> GetListDepartmentIsJeeHRAsync(long custormerID)
         {
-            return await _reponsitory.GetListDepartmentIsJeeHRAsync(custormerID).ConfigureAwait(false);
+            return await _reponsitory.GetListDepartmentIsJeeHRAsync(custormerID);
         }
 
         #region GetDS Phong Ban
@@ -223,23 +223,7 @@ namespace JeeAccount.Services.DepartmentManagement
         private async Task<object> ReturnObjectGetListDepartmentIsJeeHRAsync(QueryParams query, PageModel pageModel, long customerid, string whereStrJeeHR, string orderByStrJeeHR, bool checkusedjeehr)
         {
 
-            var traceLog = new GeneralLog()
-            {
-                name = "department",
-                data = "",
-                message = "ReturnObjectGetListDepartmentIsJeeHRAsync Open"
-            };
-            _logger.LogTrace(JsonConvert.SerializeObject(traceLog));
-
-            var depart = await _reponsitory.GetListDepartmentIsJeeHRAsync(customerid, whereStrJeeHR, orderByStrJeeHR).ConfigureAwait(false);
-
-            var traceLog2 = new GeneralLog()
-            {
-                name = "department",
-                data = "",
-                message = "ReturnObjectGetListDepartmentIsJeeHRAsync After getdata"
-            };
-            _logger.LogTrace(JsonConvert.SerializeObject(traceLog2));
+            var depart = await _reponsitory.GetListDepartmentIsJeeHRAsync(customerid, whereStrJeeHR, orderByStrJeeHR);
 
             pageModel.TotalCount = depart.Count();
             if (depart.Count() == 0) throw new KhongCoDuLieuException();

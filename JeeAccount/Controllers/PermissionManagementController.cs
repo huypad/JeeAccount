@@ -64,7 +64,7 @@ namespace JeeAccount.Controllers
                     return Unauthorized(MessageReturnHelper.DangNhap());
                 }
                 PageModel pageModel = new PageModel();
-                var lst = await _service.GetListAccountAdminAppNotAdminHeThong(query, customData.JeeAccount.CustomerID, appid).ConfigureAwait(false);
+                var lst = await _service.GetListAccountAdminAppNotAdminHeThong(query, customData.JeeAccount.CustomerID, appid);
 
                 int total = lst.Count();
                 if (total == 0) return Ok(MessageReturnHelper.Ok(lst, pageModel));
@@ -114,7 +114,7 @@ namespace JeeAccount.Controllers
                     return Unauthorized(MessageReturnHelper.DangNhap());
                 }
                 PageModel pageModel = new PageModel();
-                var lst = await _accountService.GetListAccountManagement(query, customData.JeeAccount.CustomerID, true).ConfigureAwait(false);
+                var lst = await _accountService.GetListAccountManagement(query, customData.JeeAccount.CustomerID, true);
                 int total = lst.Count();
                 if (total == 0) return Ok(MessageReturnHelper.Ok(lst, pageModel));
                 pageModel.TotalCount = lst.Count();

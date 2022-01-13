@@ -63,7 +63,7 @@ join Account_App on Account_App.UserID = AccountList.UserID";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
 
                 var result = dt.AsEnumerable().Select(row => new AccountManagementDTO
                 {
@@ -121,7 +121,7 @@ join Account_App on Account_App.UserID = AccountList.UserID";
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
 
                 var result = dt.AsEnumerable().Select(row => new AccountManagementDTO
                 {

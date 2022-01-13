@@ -116,7 +116,7 @@ namespace JeeAccount.Reponsitories
                     CreatedDate = String.Format("{0:dd\\/MM\\/yyyy HH:mm}", row["CreatedDate"]),
                     ParentName = row["ParentName"].ToString()
                 });
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return await Task.FromResult(result);
             }
         }
 
@@ -172,7 +172,7 @@ namespace JeeAccount.Reponsitories
                     CreatedDate = String.Format("{0:dd\\/MM\\/yyyy HH:mm}", row["CreatedDate"]),
                     ParentName = row["ParentName"].ToString()
                 });
-                return await Task.FromResult(result).ConfigureAwait(false);
+                return await Task.FromResult(result);
             }
         }
     }

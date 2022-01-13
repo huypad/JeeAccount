@@ -57,7 +57,7 @@ namespace JeeAccount.Reponsitories
 
             using (DpsConnection cnn = new DpsConnection(_connectionString))
             {
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
                 var result = dt.AsEnumerable().Select(row => new DepartmentDTO
                 {
                     RowID = long.Parse(row["RowID"].ToString()),
@@ -113,7 +113,7 @@ namespace JeeAccount.Reponsitories
                 };
                 _logger.LogTrace(JsonConvert.SerializeObject(traceLog2));
 
-                dt = await cnn.CreateDataTableAsync(sql, Conds).ConfigureAwait(false);
+                dt = await cnn.CreateDataTableAsync(sql, Conds);
 
                 var result = dt.AsEnumerable().Select(row => new JeeHRCoCauToChucModelFromDB
                 {
