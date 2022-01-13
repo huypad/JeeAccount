@@ -16,6 +16,8 @@ using Newtonsoft.Json;
 using DPSinfra.Logger;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net;
+using System.IO;
 
 namespace JeeAccount.Controllers
 {
@@ -128,6 +130,41 @@ namespace JeeAccount.Controllers
                     return Ok(list);
 
                 }
+
+            }
+            catch (KhongCoDuLieuException ex)
+            {
+                return BadRequest(MessageReturnHelper.KhongCoDuLieuException(ex));
+            }
+            catch (JeeHRException error)
+            {
+                return BadRequest(MessageReturnHelper.ExceptionJeeHR(error));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(MessageReturnHelper.Exception(ex));
+            }
+        }
+
+        [HttpGet("GetListDepartmentManagement3")]
+        public async Task<IActionResult> GetListDepartmentManagement3()
+        {
+            try
+            {
+                string url = $"{HOST_JEEHR_API}/api/interaction/getCoCauToChuc";
+
+                var token = Ulities.GetAccessTokenByHeader(HttpContext.Request.Headers);
+
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+                request.Headers[HttpRequestHeader.Authorization] = "Bearer " + token;
+
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    return Ok(reader.ReadToEnd());
+                }
+
 
             }
             catch (KhongCoDuLieuException ex)
