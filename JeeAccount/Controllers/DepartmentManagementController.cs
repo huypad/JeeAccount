@@ -23,8 +23,8 @@ using RestSharp;
 namespace JeeAccount.Controllers
 {
     [EnableCors("AllowOrigin")]
-    [Route("api/accountdepartmentmanagement")]
     [ApiController]
+    [Route("api/accountdepartmentmanagement")]
     public class DepartmentManagementController : ControllerBase
     {
         private readonly IConfiguration _config;
