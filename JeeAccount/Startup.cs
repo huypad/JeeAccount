@@ -145,29 +145,29 @@ namespace JeeAccount
 
             #region add Repository
 
-            services.AddSingleton<IAccountManagementReponsitory, AccountManagementReponsitory>();
-            services.AddSingleton<ICustomerManagementReponsitory, CustomerManagementReponsitory>();
-            services.AddSingleton<IDepartmentManagementReponsitory, DepartmentManagementReponsitory>();
-            services.AddSingleton<IDatabaseManagementRepositoty, DatabaseManagementRepositoty>();
-            services.AddSingleton<IMailReponsitory, MailReponsitory>();
-            services.AddSingleton<IStructureManagementReponsitory, StructureManagementReponsitory>();
-            services.AddSingleton<IWidgetDashBoardRepository, WidgetDashBoardRepository>();
-            services.AddSingleton<IJobtitleManagementReponsitory, JobtitleManagementReponsitory>();
-            services.AddSingleton<IPermissionManagementRepository, PermissionManagementRepository>();
+            services.AddTransient<IAccountManagementReponsitory, AccountManagementReponsitory>();
+            services.AddTransient<ICustomerManagementReponsitory, CustomerManagementReponsitory>();
+            services.AddTransient<IDepartmentManagementReponsitory, DepartmentManagementReponsitory>();
+            services.AddTransient<IDatabaseManagementRepositoty, DatabaseManagementRepositoty>();
+            services.AddTransient<IMailReponsitory, MailReponsitory>();
+            services.AddTransient<IStructureManagementReponsitory, StructureManagementReponsitory>();
+            services.AddTransient<IWidgetDashBoardRepository, WidgetDashBoardRepository>();
+            services.AddTransient<IJobtitleManagementReponsitory, JobtitleManagementReponsitory>();
+            services.AddTransient<IPermissionManagementRepository, PermissionManagementRepository>();
 
             #endregion add Repository
 
             #region add Services
 
-            services.AddSingleton<IAccountManagementService, AccountManagementService>();
-            services.AddSingleton<IDepartmentManagementService, DepartmentManagementService>();
-            services.AddSingleton<ICustomerManagementService, CustomerManagementService>();
-            services.AddSingleton<IDatabaseManagementService, DatabaseManagementService>();
-            services.AddSingleton<IMailService, MailService>();
-            services.AddSingleton<IStructureManagementService, StructureManagementService>();
-            services.AddSingleton<ICommentService, CommentService>();
-            services.AddSingleton<IJobtitleManagementService, JobtitleManagementService>();
-            services.AddSingleton<IPermissionManagementService, PermissionManagementService>();
+            services.AddTransient<IAccountManagementService, AccountManagementService>();
+            services.AddTransient<IDepartmentManagementService, DepartmentManagementService>();
+            services.AddTransient<ICustomerManagementService, CustomerManagementService>();
+            services.AddTransient<IDatabaseManagementService, DatabaseManagementService>();
+            services.AddTransient<IMailService, MailService>();
+            services.AddTransient<IStructureManagementService, StructureManagementService>();
+            services.AddTransient<ICommentService, CommentService>();
+            services.AddTransient<IJobtitleManagementService, JobtitleManagementService>();
+            services.AddTransient<IPermissionManagementService, PermissionManagementService>();
 
             #endregion add Services
         }
